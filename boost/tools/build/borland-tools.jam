@@ -38,8 +38,6 @@ flags borland CFLAGS <threading>multi : -tWM ;
 flags borland CFLAGS <runtime-link>dynamic : -tWR ;
 flags borland CFLAGS <wide-character-support>on : -WU ;
 
-flags borland CFLAGS <cflags> ;
-flags borland C++FLAGS <cxxflags> ;
 flags borland DEFINES <define> ;
 flags borland UNDEFS <undef> ;
 flags borland HDRS <include> ;
@@ -84,7 +82,7 @@ rule Cc-action
 
 actions borland-Cc-action
 {
-    $(BCC_TOOL_PATH)bcc32 -q -c -w -U$(UNDEFS) -D$(DEFINES) $(CFLAGS) -I"$(HDRS)" -I"$(BCCROOT)$(SLASH)include" -o"$(<)" "$(>)"
+    $(BCC_TOOL_PATH)bcc32 -q -c -w- -U$(UNDEFS) -D$(DEFINES) $(CFLAGS) -I"$(HDRS)" -I"$(BCCROOT)$(SLASH)include" -o"$(<)" "$(>)"
 }
 
 #### C++ ####
@@ -95,7 +93,7 @@ rule C++-action
 
 actions borland-C++-action
 {
-    $(BCC_TOOL_PATH)bcc32 -q -c -P -w -U$(UNDEFS) -D$(DEFINES) $(CFLAGS) $(C++FLAGS) -I"$(HDRS)" -I"$(BCCROOT)$(SLASH)include" -o"$(<)" "$(>)"
+    $(BCC_TOOL_PATH)bcc32 -q -c -P -w- -U$(UNDEFS) -D$(DEFINES) $(CFLAGS) $(C++FLAGS) -I"$(HDRS)" -I"$(BCCROOT)$(SLASH)include" -o"$(<)" "$(>)"
 }
 
 #### Archive ####
@@ -106,5 +104,5 @@ rule Archive-action
 
 actions updated together piecemeal borland-Archive-action
 {
-    $(BCC_TOOL_PATH)tlib /P32 /u /a /C "$(<)" +-"$(>)"
+    $(BCC_TOOL_PATH)tlib /P32 /u /a /C "$(<)" +"$(>)"
 }
