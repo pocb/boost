@@ -290,7 +290,7 @@
           <default><classname>std::less</classname>&lt;Group&gt;</default>
         </template-type-parameter>
         <template-type-parameter name="SlotFunction">
-          <default><classname>functionN</classname>&lt;Signature&gt;</default>
+          <default><classname>function</classname>&lt;Signature&gt;</default>
         </template-type-parameter>
       </template>
 
