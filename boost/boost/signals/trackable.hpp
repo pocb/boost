@@ -72,7 +72,7 @@ namespace BOOST_SIGNALS_NAMESPACE {
       }
 
       template<typename T>
-      void operator()(const T& t) const
+      void operator()(T& t) const
       {
         decode(t, 0);
       }
@@ -86,7 +86,7 @@ namespace BOOST_SIGNALS_NAMESPACE {
       }
 
       template<typename T>
-      void decode(const T& t, long) const
+      void decode(T& t, long) const
       {
         typedef truth<(is_pointer<T>::value)> is_a_pointer;
         maybe_get_pointer(t, is_a_pointer());
@@ -94,14 +94,14 @@ namespace BOOST_SIGNALS_NAMESPACE {
 
       // maybe_get_pointer() decides between a pointer and a non-pointer
       template<typename T>
-      void maybe_get_pointer(const T& t, truth<true>) const
+      void maybe_get_pointer(T& t, truth<true>) const
       {
         //        add_if_trackable(t);
         maybe_get_pointer(*t, truth<false>());
       }
 
       template<typename T>
-      void maybe_get_pointer(const T& t, truth<false>) const
+      void maybe_get_pointer(T& t, truth<false>) const
       {
         // Take the address of this object, because the object itself may be
         // trackable
@@ -118,7 +118,7 @@ namespace BOOST_SIGNALS_NAMESPACE {
       }
 
       template<typename T>
-      inline void add_if_trackable(const T*, truth<false>) const
+      inline void add_if_trackable(T*, truth<false>) const
       {
       }
 
