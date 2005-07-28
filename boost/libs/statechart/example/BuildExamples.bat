@@ -1,1 +1,0 @@
-bjam "-sTOOLS=mingw vc-7_1" "-sMINGW_ROOT_DIRECTORY=C:\ProgramFiles\MinGW3.2.0" %1 %2 %3 %4
