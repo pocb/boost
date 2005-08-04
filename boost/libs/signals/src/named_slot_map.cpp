@@ -148,7 +148,7 @@ void named_slot_map::erase(iterator pos)
 {
   // Erase the slot
   pos.slot_->first.disconnect();
-  //  pos.impl_->group->second.erase(pos.impl_->slot_); ?
+  pos.group->second.erase(pos.slot_);
 }
 
 void named_slot_map::remove_disconnected_slots()
