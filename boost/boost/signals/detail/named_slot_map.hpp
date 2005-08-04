@@ -89,9 +89,10 @@ public:
   void increment();
   bool equal(const named_slot_map_iterator& other) const;
 
-  // Visual C++ and compilers that emulate it need these
+#if BOOST_WORKAROUND(_MSC_VER, <= 0x1701)
   void decrement();
   void advance(difference_type);
+#endif
 
 private:
   named_slot_map_iterator(group_iterator group, group_iterator last) :

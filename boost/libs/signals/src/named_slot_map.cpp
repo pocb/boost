@@ -64,8 +64,10 @@ named_slot_map_iterator::equal(const named_slot_map_iterator& other) const
               || slot_ == other.slot_));
 }
 
+#if BOOST_WORKAROUND(_MSC_VER, <= 0x1701)
 void named_slot_map_iterator::decrement() { assert(false); }
 void named_slot_map_iterator::advance(difference_type) { assert(false); }
+#endif
 
 named_slot_map::named_slot_map(const compare_type& compare) : groups(compare)
 {
