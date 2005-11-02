@@ -100,7 +100,7 @@ public:
   void increment();
   bool equal(const named_slot_map_iterator& other) const;
 
-#if BOOST_WORKAROUND(_MSC_VER, <= 1310)
+#if BOOST_WORKAROUND(_MSC_VER, <= 1400)
   void decrement();
   void advance(difference_type);
 #endif
