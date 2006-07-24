@@ -13,13 +13,7 @@
 
 //  See http://www.boost.org/tools/inspect for more information.
 
-#include <boost/shared_ptr.hpp>
-#include <boost/filesystem/exception.hpp>
-#include <boost/filesystem/operations.hpp>
-#include <boost/filesystem/fstream.hpp>
-#include <boost/format.hpp>
 
-#include <iostream>
 #include <cassert>
 #include <vector>
 #include <list>
@@ -27,9 +21,15 @@
 #include <algorithm>
 #include <cstring>
 
-#include "inspector.hpp" // includes <string>, <boost/filesystem/path.hpp>,
-                         // <iostream>, <set>
-                         // and gives using for string and path.
+#include <boost/shared_ptr.hpp>
+#include <boost/filesystem/exception.hpp>
+#include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/fstream.hpp>
+#include <boost/format.hpp>
+
+
+#include "inspector.hpp"
+
 #include "copyright_check.hpp"
 #include "crlf_check.hpp"
 #include "license_check.hpp"
@@ -37,6 +37,8 @@
 #include "long_name_check.hpp"
 #include "tab_check.hpp"
 #include "minmax_check.hpp"
+#include "unnamed_namespace_check.hpp"
+
 #include "cvs_iterator.hpp"
 
 namespace fs = boost::filesystem;
@@ -94,7 +96,7 @@ namespace
       && leaf != "bin"
       && leaf != "bin.v2"
       // this really out of our hands
-      && leaf != "jam_src" 
+      && leaf != "jam_src"
       && local.find("tools/jam/src") != 0
       // too many issues with generated HTML files
       && leaf != "status"
@@ -209,6 +211,11 @@ namespace
     display_html, display_text
   }
   display_format = display_html;
+  enum display_mode_type
+  {
+    display_full, display_brief
+  }
+  display_mode = display_full;
 
 //  display_summary_helper  --------------------------------------------------//
 
@@ -221,14 +228,14 @@ namespace
     else
     {
       std::cout
-        << "  <tr><td><a href=\"#" 
+        << "  <tr><td><a href=\"#"
         << current_library
         << "\">" << current_library
         << "</a></td><td align=\"center\">"
         << err_count << "</td></tr>\n";
     }
   }
-  
+
 //  display_summary  ---------------------------------------------------------//
 
   void display_summary()
@@ -249,8 +256,8 @@ namespace
         "  </tr>\n"
         ;
     }
-    
-    string current_library( msgs.begin()->library ); 
+
+    string current_library( msgs.begin()->library );
     int err_count = 0;
     for ( error_msg_vector::iterator itr ( msgs.begin() );
       itr != msgs.end(); ++itr )
@@ -290,12 +297,27 @@ namespace
       {
         if ( current.library != itr->library )
         {
-          std::cout << boost::format("\n|%1%|\n") % itr->library;
+          std::cout << boost::format(
+            display_full == display_mode ? "\n|%1%|\n" : "\n\n|%1%|"
+            ) % itr->library;
         }
         if ( current.library != itr->library
           || current.rel_path != itr->rel_path )
         {
-          std::cout << boost::format("  %1%:\n") % itr->rel_path;
+          if (display_full == display_mode)
+          {
+            std::cout << boost::format("  %1%:\n") % itr->rel_path;
+          }
+          else
+          {
+            path current_rel_path(current.rel_path);
+            path this_rel_path(itr->rel_path);
+            if (current_rel_path.branch_path() != this_rel_path.branch_path())
+            {
+              std::cout << boost::format("\n  %1%/") % this_rel_path.branch_path().string();
+            }
+            std::cout << boost::format("\n    %1%:") % this_rel_path.leaf();
+          }
         }
         if ( current.library != itr->library
           || current.rel_path != itr->rel_path
@@ -307,7 +329,9 @@ namespace
           {
             m.replace(i,4,">");
           }
-          std::cout << boost::format("    %1%\n") % m;
+          std::cout << boost::format(
+            display_full == display_mode ? "    %1%\n" : " %1%"
+            ) % m;
         }
         current.library = itr->library;
         current.rel_path = itr->rel_path;
@@ -363,6 +387,7 @@ namespace
          "  -long_name\n"
          "  -tab\n"
          "  -minmax\n"
+         "  -unnamed\n"
          "default is all checks on; otherwise options specify desired checks\n";
   }
 
@@ -398,7 +423,7 @@ namespace boost
 //        << msg << '\n';
 
     }
-    
+
     source_inspector::source_inspector()
     {
       // C/C++ source code...
@@ -411,12 +436,12 @@ namespace boost
       register_signature( ".hxx" );
       register_signature( ".inc" );
       register_signature( ".ipp" );
-      
+
       // Boost.Build BJam source code...
       register_signature( "Jamfile" );
       register_signature( ".jam" );
       register_signature( ".v2" );
-      
+
       // Other scripts; Python, shell, autoconfig, etc.
       register_signature( "configure.in" );
       register_signature( "GNUmakefile" );
@@ -426,7 +451,7 @@ namespace boost
       register_signature( ".pl" );
       register_signature( ".py" );
       register_signature( ".sh" );
-      
+
       // Hypertext, Boost.Book, and other text...
       register_signature( "news" );
       register_signature( "readme" );
@@ -445,7 +470,7 @@ namespace boost
       register_signature( ".xsd" );
       register_signature( ".xsl" );
     }
-    
+
     hypertext_inspector::hypertext_inspector()
     {
       register_signature( ".htm" );
@@ -461,7 +486,7 @@ namespace boost
         fs::no_check );
       if ( relative.empty() ) return "boost-root";
       string first( *relative.begin() );
-      string second =  // borland 5.61 requires op=  
+      string second =  // borland 5.61 requires op=
         ++relative.begin() == relative.end()
           ? string() : *++relative.begin();
 
@@ -486,7 +511,7 @@ int cpp_main( int argc, char * argv[] )
   if ( argc > 1 && (std::strcmp( argv[1], "-help" ) == 0
     || std::strcmp( argv[1], "--help" ) == 0 ) )
   {
-    std::clog << "Usage: inspect [-cvs] [-text] [options...]\n"
+    std::clog << "Usage: inspect [-cvs] [-text] [-brief] [options...]\n"
       "options:\n"
       << options();
     return 1;
@@ -499,6 +524,7 @@ int cpp_main( int argc, char * argv[] )
   bool long_name_ck = true;
   bool tab_ck = true;
   bool minmax_ck = true;
+  bool unnamed_ck = true;
   bool cvs = false;
 
   if ( argc > 1 && std::strcmp( argv[1], "-cvs" ) == 0 )
@@ -513,6 +539,12 @@ int cpp_main( int argc, char * argv[] )
     --argc; ++argv;
   }
 
+  if ( argc > 1 && std::strcmp( argv[1], "-brief" ) == 0 )
+  {
+    display_mode = display_brief;
+    --argc; ++argv;
+  }
+
   if ( argc > 1 && *argv[1] == '-' )
   {
     license_ck = false;
@@ -522,6 +554,7 @@ int cpp_main( int argc, char * argv[] )
     long_name_ck = false;
     tab_ck = false;
     minmax_ck = false;
+    unnamed_ck = false;
   }
 
   for(; argc > 1; --argc, ++argv )
@@ -540,6 +573,8 @@ int cpp_main( int argc, char * argv[] )
       tab_ck = true;
     else if ( std::strcmp( argv[1], "-minmax" ) == 0 )
         minmax_ck = true;
+    else if ( std::strcmp( argv[1], "-unnamed" ) == 0 )
+        unnamed_ck = true;
     else
     {
       std::cerr << "unknown option: " << argv[1]
@@ -565,6 +600,8 @@ int cpp_main( int argc, char * argv[] )
       inspectors.push_back( inspector_element( new boost::inspect::tab_check ) );
   if ( minmax_ck )
       inspectors.push_back( inspector_element( new boost::inspect::minmax_check ) );
+  if ( unnamed_ck )
+      inspectors.push_back( inspector_element( new boost::inspect::unnamed_namespace_check ) );
 
   // perform the actual inspection, using the requested type of iteration
   if ( cvs )
@@ -629,9 +666,9 @@ int cpp_main( int argc, char * argv[] )
       "<b>Run Date:</b> " << run_date  << "\n"
       "</td>\n"
       "</table>\n"
-      "<p>An <a href=\"http://www.boost.org/tools/inspect/index.html\">inspection\n" 
-      "program</a> checks each file in the current Boost CVS for various problems,\n" 
-      "generating this web page as output. Problems detected include tabs in files,\n" 
+      "<p>An <a href=\"http://www.boost.org/tools/inspect/index.html\">inspection\n"
+      "program</a> checks each file in the current Boost CVS for various problems,\n"
+      "generating this web page as output. Problems detected include tabs in files,\n"
       "missing copyrights, broken URL's, and similar misdemeanors.</p>\n"
       ;
 
@@ -675,7 +712,7 @@ int cpp_main( int argc, char * argv[] )
   if ( !msgs.empty() )
   {
     display_summary();
-    
+
     if (display_text == display_format)
     {
       std::cout << "Details:\n" << inspector_keys;
