@@ -32,7 +32,7 @@ namespace boost
      register_signature( ".hh" ); // just in case
      register_signature( ".hpp" );
      register_signature( ".hxx" ); // just in case
-	 register_signature( ".inc" );
+     register_signature( ".inc" );
      register_signature( ".ipp" );
      register_signature( ".inl" );
    }
