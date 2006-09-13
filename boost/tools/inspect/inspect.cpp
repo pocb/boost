@@ -2,6 +2,8 @@
 
 //  Copyright Beman Dawes 2002.
 //  Copyright Rene Rivera 2004-2006.
+//  Copyright Gennaro Prota 2006.
+
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
@@ -11,25 +13,23 @@
 //  and the code that identifies library names assumes the Boost directory
 //  structure.
 
-//  See http://www.boost.org/tools/inspect for more information.
+//  See http://www.boost.org/tools/inspect/ for more information.
 
 
-#include <cassert>
 #include <vector>
 #include <list>
-#include <utility>
 #include <algorithm>
 #include <cstring>
 
-#include <boost/shared_ptr.hpp>
-#include <boost/filesystem/exception.hpp>
-#include <boost/filesystem/operations.hpp>
-#include <boost/filesystem/fstream.hpp>
-#include <boost/format.hpp>
+#include "boost/shared_ptr.hpp"
+#include "boost/filesystem/operations.hpp"
+#include "boost/filesystem/fstream.hpp"
 
+#include "time_string.hpp"
 
 #include "inspector.hpp"
 
+// the inspectors
 #include "copyright_check.hpp"
 #include "crlf_check.hpp"
 #include "license_check.hpp"
@@ -41,24 +41,27 @@
 
 #include "cvs_iterator.hpp"
 
+#include "boost/test/included/prg_exec_monitor.hpp"
+
 namespace fs = boost::filesystem;
 
 namespace
 {
-  typedef boost::shared_ptr< boost::inspect::inspector > inspector_ptr;
-
-  struct inspector_element
+  class inspector_element
   {
-    inspector_ptr  inspector;
+    typedef boost::shared_ptr< boost::inspect::inspector > inspector_ptr;
 
+  public:
+    inspector_ptr  inspector;
+    explicit
     inspector_element( boost::inspect::inspector * p ) : inspector(p) {}
   };
 
   typedef std::list< inspector_element > inspector_list;
 
-  long file_count;
-  long directory_count;
-  long error_count;
+  long file_count = 0;
+  long directory_count = 0;
+  long error_count = 0;
 
   boost::inspect::string_set content_signatures;
 
@@ -111,17 +114,25 @@ namespace
 
   string library_from_content( const string & content )
   {
-    string::size_type pos( content.find( "www.boost.org/libs/" ) );
+    const string unknown_library ( "unknown" );
+    const string lib_root ( "www.boost.org/libs/" );
+    string::size_type pos( content.find( lib_root ) );
 
-    if ( pos == string::npos ) return "unknown";
+    string lib = unknown_library;
 
-    string lib;
-    pos += 19;
-    while ( content[pos] != ' '
-      && content[pos] != '/'
-      && content[pos] != '\n'
-      && content[pos] != '\r'
-      && content[pos] != '\t' ) lib += content[pos++];
+    if ( pos != string::npos ) {
+
+        pos += lib_root.length();
+
+        const char delims[] = " " // space and...
+                              "/\n\r\t";
+
+        string::size_type n = content.find_first_of( string(delims), pos );
+        if (n != string::npos)
+            lib = string(content, pos, n - pos);
+        
+    }
+
     return lib;
   }
 
@@ -198,8 +209,9 @@ namespace
         ++file_count;
         string content;
         load_content( *itr, content );
-        check( lib == "unknown"
-          ? library_from_content( content ) : lib, *itr, content, insps );
+        check( lib.empty()
+                ? library_from_content( content ) : lib
+               , *itr, content, insps );
       }
     }
   }
@@ -211,6 +223,7 @@ namespace
     display_html, display_text
   }
   display_format = display_html;
+
   enum display_mode_type
   {
     display_full, display_brief
@@ -223,13 +236,13 @@ namespace
   {
     if (display_text == display_format)
     {
-      std::cout << boost::format("  %1% (%2%)\n") % current_library % err_count;
+        std::cout << "  " << current_library << " (" << err_count << ")\n";
     }
     else
     {
       std::cout
         << "  <tr><td><a href=\"#"
-        << current_library
+        << current_library          // what about malformed for URI refs? [gps]
         << "\">" << current_library
         << "</a></td><td align=\"center\">"
         << err_count << "</td></tr>\n";
@@ -287,6 +300,8 @@ namespace
 
   void display_details()
   {
+    // gps - review this
+
     if (display_text == display_format)
     {
       // display error messages with group indication
@@ -297,16 +312,18 @@ namespace
       {
         if ( current.library != itr->library )
         {
-          std::cout << boost::format(
-            display_full == display_mode ? "\n|%1%|\n" : "\n\n|%1%|"
-            ) % itr->library;
+          if ( display_full == display_mode )
+              std::cout << "\n|" << itr->library << "|\n";
+          else
+              std::cout << "\n\n|" << itr->library << '|';
         }
+
         if ( current.library != itr->library
           || current.rel_path != itr->rel_path )
         {
-          if (display_full == display_mode)
+          if ( display_full == display_mode )
           {
-            std::cout << boost::format("  %1%:\n") % itr->rel_path;
+            std::cout << "  " << itr->rel_path << ":\n";
           }
           else
           {
@@ -314,24 +331,21 @@ namespace
             path this_rel_path(itr->rel_path);
             if (current_rel_path.branch_path() != this_rel_path.branch_path())
             {
-              std::cout << boost::format("\n  %1%/") % this_rel_path.branch_path().string();
+              std::cout << "\n  " << this_rel_path.branch_path().string() << '/';
             }
-            std::cout << boost::format("\n    %1%:") % this_rel_path.leaf();
+            std::cout << "\n    " << this_rel_path.leaf() << ':';
           }
         }
         if ( current.library != itr->library
           || current.rel_path != itr->rel_path
           || current.msg != itr->msg )
         {
-          string m = itr->msg;
-          for (string::size_type i = m.find("&gt;"); i != string::npos;
-            i = m.find("&gt;",i) )
-          {
-            m.replace(i,4,">");
-          }
-          std::cout << boost::format(
-            display_full == display_mode ? "    %1%\n" : " %1%"
-            ) % m;
+          const string m = itr->msg;
+
+          if ( display_full == display_mode )
+              std::cout << "    " << m << '\n';
+          else
+              std::cout << ' ' << m;
         }
         current.library = itr->library;
         current.rel_path = itr->rel_path;
@@ -388,7 +402,26 @@ namespace
          "  -tab\n"
          "  -minmax\n"
          "  -unnamed\n"
-         "default is all checks on; otherwise options specify desired checks\n";
+         " default is all checks on; otherwise options specify desired checks"
+         "\n";
+  }
+
+  const char * doctype_declaration()
+  {
+    return
+         "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\n"
+         "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">"
+         ;
+  }
+
+  std::string validator_link(const std::string & text)
+  {
+    return
+        // with link to validation service
+        "<a href=\"http://validator.w3.org/check?uri=referer\">"
+        + text
+        + "</a>"
+        ;
   }
 
 } // unnamed namespace
@@ -480,6 +513,7 @@ namespace boost
 
 //  impute_library  ----------------------------------------------------------//
 
+    // may return an empty string [gps]
     string impute_library( const path & full_dir_path )
     {
       path relative( relative_to( full_dir_path, fs::initial_path() ),
@@ -491,7 +525,7 @@ namespace boost
           ? string() : *++relative.begin();
 
       if ( first == "boost" )
-        return second.empty() ? string( "unknown" ) : second;
+        return second;
 
       return (( first == "libs" || first == "tools" ) && !second.empty())
         ? second : first;
@@ -502,19 +536,21 @@ namespace boost
 
 //  cpp_main()  --------------------------------------------------------------//
 
-#include <boost/test/included/prg_exec_monitor.hpp>
-
-int cpp_main( int argc, char * argv[] )
+int cpp_main( int argc_param, char * argv_param[] )
 {
-  fs::initial_path();
+  // <hack> for the moment, let's be on the safe side
+  // and ensure we don't modify anything being pointed to;
+  // then we'll do some cleanup here
+  int argc = argc_param;
+  const char* const * argv = &argv_param[0];
 
   if ( argc > 1 && (std::strcmp( argv[1], "-help" ) == 0
     || std::strcmp( argv[1], "--help" ) == 0 ) )
   {
-    std::clog << "Usage: inspect [-cvs] [-text] [-brief] [options...]\n"
-      "options:\n"
-      << options();
-    return 1;
+    std::clog << "Usage: inspect [-cvs] [-text] [-brief] [options...]\n\n"
+      " Options:\n"
+      << options() << '\n';
+    return 0;
   }
 
   bool license_ck = true;
@@ -557,6 +593,7 @@ int cpp_main( int argc, char * argv[] )
     unnamed_ck = false;
   }
 
+  bool invalid_options = false;
   for(; argc > 1; --argc, ++argv )
   {
     if ( std::strcmp( argv[1], "-license" ) == 0 )
@@ -577,13 +614,24 @@ int cpp_main( int argc, char * argv[] )
         unnamed_ck = true;
     else
     {
-      std::cerr << "unknown option: " << argv[1]
-      << "\nvalid options are:\n"
-      << options();
-      return 1;
+      std::cerr << "unknown option: " << argv[1] << '\n';
+      invalid_options = true;
     }
   }
+  if ( invalid_options ) {
+      std::cerr << "\nvalid options are:\n"
+                << options();
+      return 1;
+  }
 
+  string inspector_keys;
+  fs::initial_path();
+
+  {
+
+  // note how this is in its own block; reporting will happen
+  // automatically, from each registered inspector, when
+  // leaving, due to destruction of the inspector_list object
   inspector_list inspectors;
 
   if ( license_ck )
@@ -595,7 +643,7 @@ int cpp_main( int argc, char * argv[] )
   if ( link_ck )
     inspectors.push_back( inspector_element( new boost::inspect::link_check ) );
   if ( long_name_ck )
-    inspectors.push_back( inspector_element( new boost::inspect::long_name_check ) );
+    inspectors.push_back( inspector_element( new boost::inspect::file_name_check ) );
   if ( tab_ck )
       inspectors.push_back( inspector_element( new boost::inspect::tab_check ) );
   if ( minmax_ck )
@@ -618,11 +666,8 @@ int cpp_main( int argc, char * argv[] )
     itr->inspector->close();
   }
 
-  char run_date[128];
-  std::time_t tod;
-  std::time( &tod );
-  std::strftime( run_date, sizeof(run_date),
-    "%X UTC, %A %d %B %Y", std::gmtime( &tod ) );
+  string run_date ( "n/a" );
+  boost::time_string( run_date );
 
   if (display_text == display_format)
   {
@@ -640,32 +685,37 @@ int cpp_main( int argc, char * argv[] )
 
     std::cout
       << "Totals:\n"
-      << boost::format("  %1% files scanned\n") % file_count
-      << boost::format("  %1% directories scanned\n") % directory_count
-      << boost::format("  %1% problems reported\n") % error_count
-      << "\n"
+      << "  " << file_count << " files scanned\n"
+      << "  " << directory_count << " directories scanned (including root)\n"
+      << "  " << error_count << " problems reported\n"
+      << '\n'
       ;
-
-    std::cout
-      << "Problem counts:\n";
   }
   else
   {
+    //
+    std::cout << doctype_declaration() << '\n';
+
     std::cout
       << "<html>\n"
       "<head>\n"
       "<title>Boost Inspection Report</title>\n"
       "</head>\n"
-      "<body bgcolor=\"#ffffff\" text=\"#000000\">\n"
-      "<table border=\"0\">\n"
+
+      "<body>\n"
+      // we should not use a table, of course [gps]
+      "<table>\n"
       "<tr>\n"
-      "<td><img border=\"0\" src=\"../boost.png\" width=\"277\" "
-      "height=\"86\"></td>\n"
-      "<td align=\"center\">\n"
+      "<td><img src=\"../boost.png\" alt=\"Boost logo\" />"
+      "</td>\n"
+      "<td>\n"
       "<h1>Boost Inspection Report</h1>\n"
       "<b>Run Date:</b> " << run_date  << "\n"
+      "&nbsp;&nbsp;/ " << validator_link( "validate me" ) << " /\n"
       "</td>\n"
+      "</tr>\n"
       "</table>\n"
+
       "<p>An <a href=\"http://www.boost.org/tools/inspect/index.html\">inspection\n"
       "program</a> checks each file in the current Boost CVS for various problems,\n"
       "generating this web page as output. Problems detected include tabs in files,\n"
@@ -675,32 +725,28 @@ int cpp_main( int argc, char * argv[] )
     std::cout
       << "<h2>Totals</h2>\n<pre>"
       << file_count << " files scanned\n"
-      << directory_count << " directories scanned\n"
+      << directory_count << " directories scanned (including root)\n"
       << error_count << " problems reported\n";
-
-    std::cout << "\nproblem counts:\n";
   }
 
-  string inspector_keys;
   for ( inspector_list::iterator itr = inspectors.begin();
         itr != inspectors.end(); ++itr )
   {
-    if (display_text == display_format)
-    {
-      inspector_keys += (
-        boost::format("  %1% %2%\n")
-          % itr->inspector->name() % itr->inspector->desc()
-        ).str();
-    }
-    else
-    {
-      inspector_keys += (
-        boost::format("  %1% %2%</br>\n")
-          % itr->inspector->name() % itr->inspector->desc()
-        ).str();
-    }
-    itr->inspector.reset();
+    const string line_break (
+        display_text == display_format? "\n" : "<br />\n"); // gps
+
+    inspector_keys += static_cast<string>("  ")
+        + itr->inspector->name()
+        + ' ' + itr->inspector->desc()
+        + line_break
+        ;
   }
+
+  
+  std::cout
+      << "\nProblem counts:\n";
+
+  } // end of block: starts reporting
 
   if (display_text == display_format)
   {
@@ -734,5 +780,6 @@ int cpp_main( int argc, char * argv[] )
       << "</body>\n"
       "</html>\n";
   }
+
   return 0;
 }

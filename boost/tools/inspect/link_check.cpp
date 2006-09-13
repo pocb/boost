@@ -1,14 +1,14 @@
 //  link_check implementation  -----------------------------------------------//
 
 //  Copyright Beman Dawes 2002.
+//
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
 #include "link_check.hpp"
-#include <boost/regex.hpp>
-#include <boost/filesystem/operations.hpp>
-#include <boost/filesystem/exception.hpp>
+#include "boost/regex.hpp"
+#include "boost/filesystem/operations.hpp"
 
 namespace fs = boost::filesystem;
 
@@ -37,7 +37,7 @@ namespace boost
 //  inspect (all)  -----------------------------------------------------------//
 
    void link_check::inspect(
-      const string & library_name,
+      const string & /*library_name*/,
       const path & full_path )
     {
       // keep track of paths already encountered to reduce disk activity
@@ -52,7 +52,7 @@ namespace boost
       const path & full_path,   // example: c:/foo/boost/filesystem/path.hpp
       const string & contents )     // contents of file to be inspected
     {
-      if (contents.find( "boostinspect:nolink" ) != string::npos) return;
+      if (contents.find( "boostinspect:" "nolink" ) != string::npos) return;
 
       string::const_iterator start( contents.begin() );
       string::const_iterator end( contents.end() );

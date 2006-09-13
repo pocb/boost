@@ -1,6 +1,7 @@
 //  cvs_iterator  ------------------------------------------------------------//
 
 //  Copyright Beman Dawes 2003.
+//
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
@@ -8,11 +9,13 @@
 //  WARNING: This is just a quick hack. It doesn't conform to C++ Standard
 //  Library iterator requirements.
 
+#ifndef BOOST_CVS_ITERATOR_HPP
+#define BOOST_CVS_ITERATOR_HPP
+
 #include <string>
-#include <cassert>
+#include <assert.h>
 
 #include "boost/filesystem/path.hpp"
-#include "boost/filesystem/exception.hpp"
 #include "boost/filesystem/operations.hpp"
 #include "boost/filesystem/fstream.hpp"
 #include "boost/noncopyable.hpp"
@@ -74,3 +77,5 @@ namespace hack
 
   };
 }
+
+#endif // include guard
