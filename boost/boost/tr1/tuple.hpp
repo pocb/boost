@@ -1,6 +1,3 @@
-//  (C) Copyright John Maddock 2005.
-//  Use, modification and distribution are subject to the
-//  Boost Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #ifndef BOOST_TR1_TUPLE_HPP_INCLUDED
@@ -41,7 +38,7 @@ struct tuple_element
    typedef typename boost::tuples::element<I,T>::type type;
 };
 
-#if !BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x570))
+#if !BOOST_WORKAROUND(__BORLANDC__, < 0x0582)
 // [6.1.3.4] Element access
 using ::boost::get;
 #endif
@@ -50,18 +47,8 @@ using ::boost::get;
 
 #else
 
-#include <boost/spirit/fusion/sequence/tuple.hpp>
-#include <boost/spirit/fusion/sequence/tuple_element.hpp>
-#include <boost/spirit/fusion/sequence/tuple_size.hpp>
-#include <boost/spirit/fusion/sequence/make_tuple.hpp>
-#include <boost/spirit/fusion/sequence/tie.hpp>
-#include <boost/spirit/fusion/sequence/get.hpp>
-#include <boost/spirit/fusion/sequence/equal_to.hpp>
-#include <boost/spirit/fusion/sequence/not_equal_to.hpp>
-#include <boost/spirit/fusion/sequence/less.hpp>
-#include <boost/spirit/fusion/sequence/less_equal.hpp>
-#include <boost/spirit/fusion/sequence/greater.hpp>
-#include <boost/spirit/fusion/sequence/greater_equal.hpp>
+#include <boost/fusion/tuple.hpp>
+#include <boost/fusion/sequence/adapted/std_pair.hpp>
 
 namespace std{ namespace tr1{
 
