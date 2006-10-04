@@ -15,7 +15,7 @@
 #include <boost/detail/workaround.hpp>
 #include <cmath>
 
-namespace std{
+namespace std{ 
 
 #ifdef BOOST_NO_STDC_NAMESPACE
    using :: atan2;
@@ -120,8 +120,8 @@ inline complex<double> polar(const unsigned __int64& rho, const unsigned __int64
 { return ::std::polar(static_cast<double>(rho), static_cast<double>(theta)); }
 #endif
 
-template<class T, class U>
-inline complex<typename boost::tr1_detail::promote_to_real<T, U>::type>
+template<class T, class U> 
+inline complex<typename boost::tr1_detail::promote_to_real<T, U>::type> 
    polar(const T& rho, const U& theta)
 {
    typedef typename boost::tr1_detail::promote_to_real<T, U>::type real_type;
@@ -182,7 +182,7 @@ inline complex<typename boost::tr1_detail::largest_real<T, U>::type>
    cast2_type y1(y);
    return std::pow(x1, y1);
 }
-template<class T, class U>
+template<class T, class U> 
 inline complex<typename boost::tr1_detail::promote_to_real<T, U>::type>
    pow (const complex<T>& x, const U& y)
 {
@@ -195,7 +195,7 @@ inline complex<typename boost::tr1_detail::promote_to_real<T, U>::type>
    return std::pow(x1, y1);
 }
 
-template<class T, class U>
+template<class T, class U> 
 inline complex<typename boost::tr1_detail::promote_to_real<T, U>::type>
    pow (const T& x, const complex<U>& y)
 {
