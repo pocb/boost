@@ -72,8 +72,9 @@ using boost::mem_fn;
 
 namespace std{ namespace tr1{
 
-   using ::boost::is_bind_expression;
-   using ::boost::is_placeholder;
+   // These aren't supported in this release but are in mainline cvs:
+   // using ::boost::is_bind_expression;
+   // using ::boost::is_placeholder;
    using ::boost::bind;
    namespace placeholders {
 #ifndef BOOST_BIND_NO_PLACEHOLDERS
