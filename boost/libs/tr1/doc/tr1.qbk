@@ -404,7 +404,7 @@ arguments and returning a floating-point value) through which some
 arbitrary code may be called. However a polymorphic function wrapper can call
 any callable object with a compatible call signature, this could be a function 
 pointer, or it could be a function object produced by std::tr1::bind, or some
-other mechanism.  For more information see the [@../../doc/html/function.html"
+other mechanism.  For more information see the [@../../doc/html/function.html
 Boost.Function documentation].
 
    
@@ -1690,6 +1690,7 @@ as the Boost-specific ones. This will allow these tests to be used against the s
 library's own TR1 implementation as well as the Boost one.
 
 [endsect]
+
 
 
 
