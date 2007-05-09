@@ -12,6 +12,11 @@
 ]
 
 [section:intro Introduction]
+
+This documentation is 
+[@http://boost-consulting.com/vault/index.php?action=downloadfile&filename=boost_tr1-1.34.pdf&directory=PDF%20Documentation& 
+also available in printer-friendly PDF format].
+
 The TR1 library provides an implementation of the C++ Technical Report on Standard Library Extensions.
 This library does not itself implement the TR1 components, rather it's a thin wrapper that will 
 include your standard library's TR1 implementation (if it has one), otherwise it will include the Boost
@@ -1690,6 +1695,7 @@ as the Boost-specific ones. This will allow these tests to be used against the s
 library's own TR1 implementation as well as the Boost one.
 
 [endsect]
+
 
 
 
