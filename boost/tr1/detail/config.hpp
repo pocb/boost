@@ -34,8 +34,10 @@
 #     define BOOST_TR1_STD_HEADER(name) <../include/name>
 #  endif
 
-#if defined(__GNUC__) && !defined(BOOST_HAS_INCLUDE_NEXT)
-#  define BOOST_HAS_INCLUDE_NEXT
+#if defined(__GNUC__) || (!defined(_AIX) && defined(__IBMCPP__)  && __IBMCPP__ >= 800)
+#  ifndef BOOST_HAS_INCLUDE_NEXT
+#     define BOOST_HAS_INCLUDE_NEXT
+#  endif
 #endif
 
 // Can't use BOOST_WORKAROUND here, it leads to recursive includes:
