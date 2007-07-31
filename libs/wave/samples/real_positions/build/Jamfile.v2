@@ -1,0 +1,22 @@
+# Boost.Wave: A Standard compliant C++ preprocessor library
+#
+# Boost Wave Library Sample Build Jamfile (real_positions)
+#
+# http://www.boost.org/
+#
+# Copyright (c) 2001-2007 Hartmut Kaiser. Distributed under the Boost 
+# Software License, Version 1.0. (See accompanying file 
+# LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+exe real_positions
+    :   ../real_positions.cpp 
+        ../instantiate_cpp_exprgrammar 
+        ../instantiate_cpp_grammar 
+        ../instantiate_cpp_literalgrs
+        ../instantiate_defined_grammar
+        ../instantiate_re2c_lexer 
+        /boost/wave//boost_wave
+        /boost/filesystem//boost_filesystem
+        /boost/system//boost_system
+    ;  
+
