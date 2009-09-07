@@ -69,7 +69,6 @@ include(BoostUtils)
 include(BoostConfig)
 include(BoostCore)
 include(BoostDocs)
-include(CTest)
 include(BoostTesting)
 message(STATUS "Build name: ${BUILDNAME}")
 ##########################################################################
