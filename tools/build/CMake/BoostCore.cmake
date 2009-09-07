@@ -197,16 +197,25 @@ macro(boost_library_project LIBNAME)
       # OPTIONAL, which only works on cmake >= 2.7
       # 
       if (${CMAKE_MAJOR_VERSION} GREATER 1 AND ${CMAKE_MINOR_VERSION} GREATER 6)
-	set(_INSTALL_OPTIONAL "OPTIONAL")
+	# Install this module's headers
+	install(DIRECTORY include/boost 
+          DESTINATION ${BOOST_HEADER_DIR}
+	  ${_INSTALL_OPTIONAL}
+          COMPONENT ${libname}_headers
+          PATTERN "CVS" EXCLUDE
+          PATTERN ".svn" EXCLUDE)
+      else()
+	if (EXISTS include/boost)
+	  # Install this module's headers
+	  install(DIRECTORY include/boost 
+            DESTINATION ${BOOST_HEADER_DIR}
+	    ${_INSTALL_OPTIONAL}
+            COMPONENT ${libname}_headers
+            PATTERN "CVS" EXCLUDE
+            PATTERN ".svn" EXCLUDE)
+	endif()
       endif()
 
-      # Install this module's headers
-      install(DIRECTORY include/boost 
-        DESTINATION ${BOOST_HEADER_DIR}
-	${_INSTALL_OPTIONAL}
-        COMPONENT ${libname}_headers
-        PATTERN "CVS" EXCLUDE
-        PATTERN ".svn" EXCLUDE)
         
       if (COMMAND cpack_add_component)        
         # Determine the header dependencies
