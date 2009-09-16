@@ -7,6 +7,7 @@
 boost_tool_project(Inspect
   DESCRIPTION "Boost inspector tool")
 
+boost_tool_dependencies(BOOST_DEPENDS filesystem regex test)
 
 boost_add_executable(inspect 
 
