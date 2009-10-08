@@ -38,6 +38,7 @@ boost_add_library(
   point_to_point.cpp
   request.cpp
   text_skeleton_oarchive.cpp
+  timer.cpp
   DEPENDS boost_serialization
   COMPILE_FLAGS "${MPI_COMPILE_FLAGS}"
   LINK_FLAGS "${MPI_LINK_FLAGS}"
