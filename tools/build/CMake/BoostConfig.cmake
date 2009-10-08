@@ -86,7 +86,9 @@ if (NOT BOOST_TOOLSET)
     
     # Set the GCC versioning toolset
     set(BOOST_TOOLSET "gcc${BOOST_VERSIONING_GCC_VERSION}")
-  elseif(CMAKE_CXX_COMPILER MATCHES "/icpc$" OR CMAKE_CXX_COMPILER MATCHES "/icpc.exe$")
+  elseif(CMAKE_CXX_COMPILER MATCHES "/icpc$" 
+      OR CMAKE_CXX_COMPILER MATCHES "/icpc.exe$" 
+      OR CMAKE_CXX_COMPILER_MATCHES "/icl.exe$")
     set(BOOST_TOOLSET "intel")
     set(BOOST_COMPILER "intel")
     set(CMAKE_COMPILER_IS_INTEL ON)
