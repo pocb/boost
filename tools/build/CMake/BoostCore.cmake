@@ -185,8 +185,8 @@ macro(boost_library_project LIBNAME)
         cpack_add_component_group(${CPACK_COMPONENT_GROUP_NAME}
           DISPLAY_NAME "${LIBNAME}"
           DESCRIPTION ${THIS_PROJECT_DESCRIPTION})
-      endif ()
-    endif ()
+      endif () # COMMAND cpake_add_component_group
+    endif () # THIS_PROJECT_MODULARIZED OR THIS_PROJECT_SRCDIRS
         
     if (THIS_PROJECT_MODULARIZED)
       # Add this module's include directory
@@ -196,25 +196,32 @@ macro(boost_library_project LIBNAME)
       # Horrible hackery.  Make install of headers from modularized directories
       # OPTIONAL, which only works on cmake >= 2.7
       # 
-      if (${CMAKE_MAJOR_VERSION} GREATER 1 AND ${CMAKE_MINOR_VERSION} GREATER 6)
-	# Install this module's headers
-	install(DIRECTORY include/boost 
-          DESTINATION ${BOOST_HEADER_DIR}
-	  ${_INSTALL_OPTIONAL}
-          COMPONENT ${libname}_headers
-          PATTERN "CVS" EXCLUDE
-          PATTERN ".svn" EXCLUDE)
-      else()
-	if (EXISTS include/boost)
-	  # Install this module's headers
-	  install(DIRECTORY include/boost 
-            DESTINATION ${BOOST_HEADER_DIR}
-	    ${_INSTALL_OPTIONAL}
-            COMPONENT ${libname}_headers
-            PATTERN "CVS" EXCLUDE
-            PATTERN ".svn" EXCLUDE)
-	endif()
-      endif()
+      #
+      # TDS 20091009: disable this modularized stuff, as forcing
+      # people to make modularize (which wastes your source directory)
+      # is a huge hassle and anyway it looks like the 'modularization'
+      # of boost is dead for a while.
+      #
+
+      # if (${CMAKE_MAJOR_VERSION} GREATER 1 AND ${CMAKE_MINOR_VERSION} GREATER 6)
+      # 	# Install this module's headers
+      # 	install(DIRECTORY include/boost 
+      #     DESTINATION ${BOOST_HEADER_DIR}
+      # 	  ${_INSTALL_OPTIONAL}
+      #     COMPONENT ${libname}_headers
+      #     PATTERN "CVS" EXCLUDE
+      #     PATTERN ".svn" EXCLUDE)
+      # else()
+      # 	if (EXISTS include/boost)
+      # 	  # Install this module's headers
+      # 	  install(DIRECTORY include/boost 
+      #       DESTINATION ${BOOST_HEADER_DIR}
+      # 	    ${_INSTALL_OPTIONAL}
+      #       COMPONENT ${libname}_headers
+      #       PATTERN "CVS" EXCLUDE
+      #       PATTERN ".svn" EXCLUDE)
+      # 	endif()
+      # endif()
 
         
       if (COMMAND cpack_add_component)        
@@ -237,7 +244,7 @@ macro(boost_library_project LIBNAME)
           GROUP      ${CPACK_COMPONENT_GROUP_NAME}
           DEPENDS    ${THIS_PROJECT_HEADER_DEPENDS})
       endif ()
-    endif ()
+    endif () # THIS_PROJECT_MODULARIZED
 
 #-- This is here to debug the modularize code
     set(modularize_debug FALSE)

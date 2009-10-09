@@ -7,7 +7,7 @@
 boost_tool_project(Inspect
   DESCRIPTION "Boost inspector tool")
 
-boost_tool_dependencies(BOOST_DEPENDS filesystem regex test)
+boost_tool_dependencies(BOOST_DEPENDS filesystem system regex test)
 
 boost_add_executable(inspect 
 
@@ -16,5 +16,5 @@ boost_add_executable(inspect
   end_check.cpp unnamed_namespace_check.cpp ascii_check.cpp
   copyright_check.cpp minmax_check.cpp 
 
-  DEPENDS boost_filesystem boost_regex
+  DEPENDS boost_filesystem boost_system boost_regex
   )
