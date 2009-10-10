@@ -114,3 +114,36 @@ Known Issues
   ``boost_unit_test_framework`` libraries with an additional trailing
   ``-s``.  You will probably need to modify your build if you use
   these libraries.
+
+
+1.40.0
+------
+
+This version is **broken** in the svn distribution.  There are
+separate distributions in git.
+
+1.40.0.cmake0
+-------------
+
+This version works on windows with MSVC and linux with gcc.
+
+
+1.40.0.cmake1
+-------------
+
+From the boost-cmake list::
+
+  > As of now, your Boost 1.40.0 branch builds and installs without error 
+  > for me on Windows (Intel 11.1, Visual Studio 2009, Visual Studio 2010 
+  > Beta 1), Linux (GCC 4.2, GCC 4.4, Intel 11.1), and Mac OS X 10.6 (GCC 
+  > 4.2, Intel 11.1).
+
+This version also includes fixes for cmake version 2.8 (as of this
+writing, in beta).
+
+Special thanks in alphabetical order:
+
+* Claudio Bley
+* Justin Holewinski
+* Philip Lowman
+
