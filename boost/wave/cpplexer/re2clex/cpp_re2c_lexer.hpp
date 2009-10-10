@@ -115,7 +115,8 @@ inline
 lexer<IteratorT, PositionT>::lexer(IteratorT const &first, 
         IteratorT const &last, PositionT const &pos, 
         boost::wave::language_support language_) 
-:   filename(pos.get_file()), at_eof(false), language(language_)
+    :   filename(pos.get_file()), at_eof(false), language(language_),
+	cache(token_cache<typename lexer<IteratorT, PositionT>::string_type>())
 {
     using namespace std;        // some systems have memset in std
     memset(&scanner, '\0', sizeof(Scanner));
