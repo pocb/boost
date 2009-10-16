@@ -437,7 +437,11 @@ macro(boost_tool_project TOOLNAME)
     # add the include path for that library.
     foreach(DEP ${BOOST_${UTOOLNAME}_DEPENDS})
       string(TOUPPER ${DEP} UDEP)
-      include_directories("${Boost_SOURCE_DIR}/libs/${DEP}/include")
+      #
+      # Modularization disabled
+      #
+      # include_directories("${Boost_SOURCE_DIR}/libs/${DEP}/include")
+      #
     endforeach(DEP)
   endif()
 endmacro(boost_tool_project)

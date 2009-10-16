@@ -147,3 +147,10 @@ Special thanks in alphabetical order:
 * Justin Holewinski
 * Philip Lowman
 
+1.40.0.cmake2
+-------------
+
+* Modularization disabled... this can waste your source directory
+  and was causing confusion.
+* Docs tagged with specific boost-cmake release version.
+

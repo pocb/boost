@@ -125,7 +125,11 @@ macro(boost_additional_test_dependencies libname)
   endforeach()
   
   foreach (include ${THIS_TEST_DEPENDS_ALL})
-    include_directories("${Boost_SOURCE_DIR}/libs/${include}/include")
+    #
+    # Modularization temporarily disabled
+    #
+    # include_directories("${Boost_SOURCE_DIR}/libs/${include}/include")
+    #
   endforeach (include ${includes})
   
 endmacro(boost_additional_test_dependencies libname)

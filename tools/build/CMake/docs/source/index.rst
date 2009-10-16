@@ -7,12 +7,21 @@
 Boost-CMake |version|
 =====================
 
-Boost.\ `CMake <http://www.cmake.org>`_ is an alternate (not official)
+Boost.\ `CMake <http://www.cmake.org>`_ is an alternate
 build system for boost, under development since boost version 1.35.
 As of Boost version 1.38, boost.cmake can reliably build and
 package boost.  
 
-This is the documentation for Boost.CMake version 1.40.0
+.. index:: Mailing List, IRC
+
+**boost-cmake mailing list**    
+  http://lists.boost.org/mailman/listinfo.cgi/boost-cmake      
+**IRC**             
+  ``#boost-cmake`` on the `freenode network <http://freenode.net>`_
+**CMake/CTest regression testing of boost**
+  http://www.cdash.org/CDashPublic/index.php?project=Boost
+**CMake home page** 
+  http://www.cmake.org
 
 Users's guide
 =============
@@ -42,22 +51,6 @@ Reference
    reference/boost_add_library
    reference/boost_add_executable
    reference/boost_additional_test_dependencies
-
-
-Contact Info / Links
-====================
-
-.. index:: Mailing List, IRC
-
-**CMake home page** 
-  http://www.cmake.org
-**boost-cmake mailing list**    
-  http://lists.boost.org/mailman/listinfo.cgi/boost-cmake      
-**IRC**             
-  ``#boost-cmake`` on the `freenode network <http://freenode.net>`_
-**CMake/CTest regression testing of boost**
-  http://www.cdash.org/CDashPublic/index.php?project=Boost
-
 
 About this documentation
 ========================

@@ -5,13 +5,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Introduction &mdash; Boost.CMake</title>
+    <title>Boost-CMake 1.40.0.cmake2 &mdash; Boost.CMake 1.40.0.cmake2</title>
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '0.0',
+        VERSION:     '1.40.0.cmake2',
         COLLAPSE_MODINDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -19,7 +19,7 @@
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Boost.CMake" href="" />
+    <link rel="top" title="Boost.CMake 1.40.0.cmake2" href="" />
     <link rel="next" title="Quickstart" href="quickstart.html" /> 
   </head>
   <body>
@@ -34,7 +34,7 @@
              accesskey="N">next</a> |</li>
     <li><a href="http://www.boost.org/">Boost</a> &raquo;</li>
     
-        <li><a href="">Boost.CMake</a> &raquo;</li>
+        <li><a href="">Boost.CMake 1.40.0.cmake2</a> &raquo;</li>
  
       </ul>
     </div>
@@ -45,14 +45,13 @@
             </a></p>
             <h3><a href="">Table Of Contents</a></h3>
             <ul>
-<li><a class="reference external" href="">Introduction</a></li>
+<li><a class="reference external" href="">Boost-CMake 1.40.0.cmake2</a></li>
 <li><a class="reference external" href="#users-s-guide">Users&#8217;s guide</a><ul>
 </ul>
 </li>
 <li><a class="reference external" href="#reference">Reference</a><ul>
 </ul>
 </li>
-<li><a class="reference external" href="#contact-info-links">Contact Info / Links</a></li>
 <li><a class="reference external" href="#about-this-documentation">About this documentation</a></li>
 <li><a class="reference external" href="#index">Index</a></li>
 </ul>
@@ -73,13 +72,22 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="introduction">
-<h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
-<p>Boost.<a class="reference external" href="http://www.cmake.org">CMake</a> is an alternate (not official)
+  <div class="section" id="boost-cmake-version">
+<h1>Boost-CMake 1.40.0.cmake2<a class="headerlink" href="#boost-cmake-version" title="Permalink to this headline">¶</a></h1>
+<p>Boost.<a class="reference external" href="http://www.cmake.org">CMake</a> is an alternate
 build system for boost, under development since boost version 1.35.
 As of Boost version 1.38, boost.cmake can reliably build and
 package boost.</p>
-<p>This is the documentation for Boost.CMake version 1.40.0</p>
+<dl class="docutils" id="index-31">
+<dt><strong>boost-cmake mailing list</strong></dt>
+<dd><a class="reference external" href="http://lists.boost.org/mailman/listinfo.cgi/boost-cmake">http://lists.boost.org/mailman/listinfo.cgi/boost-cmake</a></dd>
+<dt><strong>IRC</strong></dt>
+<dd><tt class="docutils literal"><span class="pre">#boost-cmake</span></tt> on the <a class="reference external" href="http://freenode.net">freenode network</a></dd>
+<dt><strong>CMake/CTest regression testing of boost</strong></dt>
+<dd><a class="reference external" href="http://www.cdash.org/CDashPublic/index.php?project=Boost">http://www.cdash.org/CDashPublic/index.php?project=Boost</a></dd>
+<dt><strong>CMake home page</strong></dt>
+<dd><a class="reference external" href="http://www.cmake.org">http://www.cmake.org</a></dd>
+</dl>
 </div>
 <div class="section" id="users-s-guide">
 <h1>Users&#8217;s guide<a class="headerlink" href="#users-s-guide" title="Permalink to this headline">¶</a></h1>
@@ -87,15 +95,17 @@ package boost.</p>
 <li class="toctree-l1"><a class="reference external" href="quickstart.html">Quickstart</a><ul>
 <li class="toctree-l2"><a class="reference external" href="quickstart.html#download-cmake">Download CMake</a></li>
 <li class="toctree-l2"><a class="reference external" href="quickstart.html#check-out-the-code">Check out the code</a></li>
-<li class="toctree-l2"><a class="reference external" href="quickstart.html#configure-the-boost-source-tree">Configure the Boost source tree</a><ul>
-<li class="toctree-l3"><a class="reference external" href="quickstart.html#on-windows">On Windows</a></li>
-<li class="toctree-l3"><a class="reference external" href="quickstart.html#on-unix">On Unix</a></li>
+<li class="toctree-l2"><a class="reference external" href="quickstart.html#on-unix">On Unix</a><ul>
+<li class="toctree-l3"><a class="reference external" href="quickstart.html#configure">Configure</a></li>
+<li class="toctree-l3"><a class="reference external" href="quickstart.html#build-and-install">Build and Install</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference external" href="quickstart.html#build-boost">Build Boost</a></li>
-<li class="toctree-l2"><a class="reference external" href="quickstart.html#microsoft-visual-studio">Microsoft Visual Studio</a></li>
-<li class="toctree-l2"><a class="reference external" href="quickstart.html#on-unix-and-when-using-makefile-variants-on-microsoft-windows">On Unix (and when using makefile variants on Microsoft Windows)</a></li>
-<li class="toctree-l2"><a class="reference external" href="quickstart.html#installing-boost">Installing Boost</a></li>
+<li class="toctree-l2"><a class="reference external" href="quickstart.html#on-windows">On Windows</a><ul>
+<li class="toctree-l3"><a class="reference external" href="quickstart.html#id2">Configure</a></li>
+<li class="toctree-l3"><a class="reference external" href="quickstart.html#build">Build</a></li>
+<li class="toctree-l3"><a class="reference external" href="quickstart.html#install">Install</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="build_configuration.html">Configuring the buildspace</a><ul>
@@ -157,6 +167,7 @@ package boost.</p>
 <li class="toctree-l2"><a class="reference external" href="notes_by_version.html#id2">1.40.0</a></li>
 <li class="toctree-l2"><a class="reference external" href="notes_by_version.html#cmake0">1.40.0.cmake0</a></li>
 <li class="toctree-l2"><a class="reference external" href="notes_by_version.html#cmake1">1.40.0.cmake1</a></li>
+<li class="toctree-l2"><a class="reference external" href="notes_by_version.html#cmake2">1.40.0.cmake2</a></li>
 </ul>
 </li>
 </ul>
@@ -169,19 +180,6 @@ package boost.</p>
 <li class="toctree-l1"><a class="reference external" href="reference/boost_add_executable.html">boost_add_executable</a></li>
 <li class="toctree-l1"><a class="reference external" href="reference/boost_additional_test_dependencies.html">boost_additional_test_dependencies</a></li>
 </ul>
-</div>
-<div class="section" id="contact-info-links">
-<h1>Contact Info / Links<a class="headerlink" href="#contact-info-links" title="Permalink to this headline">¶</a></h1>
-<dl class="docutils" id="index-9">
-<dt><strong>CMake home page</strong></dt>
-<dd><a class="reference external" href="http://www.cmake.org">http://www.cmake.org</a></dd>
-<dt><strong>boost-cmake mailing list</strong></dt>
-<dd><a class="reference external" href="http://lists.boost.org/mailman/listinfo.cgi/boost-cmake">http://lists.boost.org/mailman/listinfo.cgi/boost-cmake</a></dd>
-<dt><strong>IRC</strong></dt>
-<dd><tt class="docutils literal"><span class="pre">#boost-cmake</span></tt> on the <a class="reference external" href="http://freenode.net">freenode network</a></dd>
-<dt><strong>CMake/CTest regression testing of boost</strong></dt>
-<dd><a class="reference external" href="http://www.cdash.org/CDashPublic/index.php?project=Boost">http://www.cdash.org/CDashPublic/index.php?project=Boost</a></dd>
-</dl>
 </div>
 <div class="section" id="about-this-documentation">
 <h1>About this documentation<a class="headerlink" href="#about-this-documentation" title="Permalink to this headline">¶</a></h1>
@@ -217,12 +215,12 @@ them (or use <tt class="docutils literal"><span class="pre">git</span> <span cla
              >next</a> |</li>
     <li><a href="http://www.boost.org/">Boost</a> &raquo;</li>
     
-        <li><a href="">Boost.CMake</a> &raquo;</li>
+        <li><a href="">Boost.CMake 1.40.0.cmake2</a> &raquo;</li>
  
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version d6c475b413dfafe696118374dbe3a129197bedb6, Sat, 10 Oct 2009.
+      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version a1bf4d525d2cfde1f3a901f6c4c1c3d03adffe11, Sat, 10 Oct 2009.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

@@ -75,8 +75,11 @@ macro(boost_tool_dependencies)
         
     endforeach(libname ${BOOST_TEST_BOOST_DEPENDS})
    foreach (include ${THIS_TEST_DEPENDS_ALL})
-      #message(STATUS "include: ${include}")
-      include_directories("${Boost_SOURCE_DIR}/libs/${include}/include")
+      #
+      # Modularization temporarily disabled
+      #
+      # include_directories("${Boost_SOURCE_DIR}/libs/${include}/include")
+      #
     endforeach (include ${includes})
 
 endmacro(boost_tool_dependencies)
