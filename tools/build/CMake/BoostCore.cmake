@@ -19,7 +19,13 @@
 #   boost_add_executable: Builds executables.                            #
 ##########################################################################
 
-add_custom_target(modularize)
+add_custom_target(modularize
+  COMMENT 
+  "***
+*** Modularization is DISABLED and unnecessary for a standard 
+*** Build-and-install of boost.  
+***")
+
 
 # Defines a Boost library project (e.g., for Boost.Python). Use as:
 #
@@ -189,8 +195,11 @@ macro(boost_library_project LIBNAME)
     endif () # THIS_PROJECT_MODULARIZED OR THIS_PROJECT_SRCDIRS
         
     if (THIS_PROJECT_MODULARIZED)
-      # Add this module's include directory
-      include_directories("${Boost_SOURCE_DIR}/libs/${libname}/include")
+      #
+      # Don't add this module's include directory
+      # until modularization makes sense
+      #
+      # include_directories("${Boost_SOURCE_DIR}/libs/${libname}/include")
      
       #
       # Horrible hackery.  Make install of headers from modularized directories
@@ -311,7 +320,11 @@ macro(boost_library_project LIBNAME)
       )
 
         if(THIS_PROJECT_MODULARIZED)
-          add_dependencies(modularize ${LIBNAME}-modularize)
+          #
+	  # Temporarily disable modularization 
+	  #
+	  # add_dependencies(modularize ${LIBNAME}-modularize)
+	  #
         endif(THIS_PROJECT_MODULARIZED)
       endif()
     endif(THIS_PROJECT_HEADERS)
@@ -320,7 +333,10 @@ macro(boost_library_project LIBNAME)
     # add the include path for that library.
     set(THIS_PROJECT_HAS_HEADER_DEPENDS FALSE)
     foreach(DEP ${THIS_PROJECT_DEPENDS_ALL})
-      include_directories("${modularize_output}/${modularize_libs_dir}/${DEP}/include")
+      #
+      # Temporarily disable modularization stuff.
+      # 
+      # include_directories("${modularize_output}/${modularize_libs_dir}/${DEP}/include")
     endforeach(DEP)
 
     # TODO: is this still necessary?

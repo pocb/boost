@@ -4,8 +4,8 @@
    contain the root `toctree` directive.
 
 
-Introduction
-============
+Boost-CMake |version|
+=====================
 
 Boost.\ `CMake <http://www.cmake.org>`_ is an alternate (not official)
 build system for boost, under development since boost version 1.35.
