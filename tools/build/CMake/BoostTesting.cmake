@@ -37,23 +37,11 @@
 # want or need to perform regression testing on Boost. The Boost build
 # is significantly faster when we aren't also building regression
 # tests.
-option(BUILD_TESTING "Enable regression testing." OFF)
 
-if (BUILD_TESTING)
-  enable_testing()
+set(BUILD_TESTS "NONE" CACHE STRING "Semicolon-separated list of lowercase librarary names to test, or \"ALL\"")
+enable_testing()
 
-  option(TEST_INSTALLED_TREE "Enable testing of an already-installed tree" OFF)
-
-  set(BOOST_TEST_LIBRARIES "ALL"
-    CACHE STRING "Semicolon-separated list of Boost libraries to test, or ALL to test all")
-  
-  if (TEST_INSTALLED_TREE)
-    include("${CMAKE_INSTALL_PREFIX}/lib/Boost${BOOST_VERSION}/boost-targets.cmake")
-  endif (TEST_INSTALLED_TREE)
-
-  set(DART_TESTING_TIMEOUT=15 CACHE INTEGER "Timeout after this much madness")
-
-endif (BUILD_TESTING)
+set(DART_TESTING_TIMEOUT=15 CACHE INTEGER "Timeout after this much madness")
 
 #-------------------------------------------------------------------------------
 # This macro adds additional include directories based on the dependencies of 
@@ -211,9 +199,6 @@ macro(boost_test_parse_args testname)
   set(BOOST_TEST_TESTNAME "${PROJECT_NAME}-${testname}")
   #message("testname: ${BOOST_TEST_TESTNAME}")
   # If testing is turned off, this test is not okay
-  if (NOT BUILD_TESTING)
-    set(BOOST_TEST_OKAY FALSE)
-  endif(NOT BUILD_TESTING)
 endmacro(boost_test_parse_args)
 
 # This macro attaches a the "known-failure" label to the given test
@@ -302,10 +287,6 @@ macro(boost_test_run testname)
         LABELS "${PROJECT_NAME}"
         )
       boost_test_known_failures(${testname} ${BOOST_TEST_KNOWN_FAILURES})
-
-      # Make sure that the -test target that corresponds to this
-      # library or tool depends on this test executable.
-      add_dependencies(${PROJECT_NAME}-test ${THIS_EXE_NAME})
 
       if (BOOST_TEST_FAIL)
         set_tests_properties(${BOOST_TEST_TESTNAME} PROPERTIES WILL_FAIL ON)

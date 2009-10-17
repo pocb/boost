@@ -8,8 +8,9 @@ set (lib_headers
 # Add a library target to the build system
 boost_library_project(
   accumulators
-  SRCDIRS  example doc 
-  TESTDIRS  test 
+  SRCDIRS doc 
+  TESTDIRS test 
+  EXAMPLEDIRS example
   HEADERS ${lib_headers}
   #  DOCDIRS 
   DESCRIPTION  "A framework for incremental calculation, and a collection of statistical accumulators."
