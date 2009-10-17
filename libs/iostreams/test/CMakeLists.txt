@@ -52,21 +52,17 @@ iostreams_test(symmetric_filter_test)
 iostreams_test(tee_test)
 iostreams_test(wide_stream_test)
 
-# Find zlib. If it's available, test it
-set(ZLIB_FIND_QUIETLY TRUE)
-include(FindZLIB)
+# Test zlib stuff if available
 if (ZLIB_FOUND)
   boost_test_run(gzip_test
-    DEPENDS boost_unit_test_framework boost_iostreams
+    DEPENDS boost_unit_test_framework boost_iostreams 
     COMPILE_FLAGS "-DBOOST_IOSTREAMS_NO_LIB")
   boost_test_run(zlib_test
     DEPENDS boost_unit_test_framework boost_iostreams
     COMPILE_FLAGS "-DBOOST_IOSTREAMS_NO_LIB")
 endif(ZLIB_FOUND)
 
-# Find BZip2. If it's available, test it
-set(BZip2_FIND_QUIETLY TRUE)
-include(FindBZip2)
+# Test bzip2 stuff if available
 if (BZIP2_FOUND)
   boost_test_run(bzip2_test
     DEPENDS boost_unit_test_framework boost_iostreams
