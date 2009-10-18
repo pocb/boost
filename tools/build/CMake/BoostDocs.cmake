@@ -183,7 +183,7 @@ macro(doxygen_to_boostbook OUTPUT)
   # Generate Doxygen XML
   add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/xml/index.xml
     COMMAND ${DOXYGEN} ${DOXYFILE}
-    COMMENT "Generating Doxygen XML output for Boost.${PROJECT_NAME}..."
+    COMMENT "Generating Doxygen XML output for Boost.${BOOST_PROJECT_NAME}..."
     DEPENDS ${THIS_DOXY_HEADERS})
 
   # Collect Doxygen XML into a single XML file
@@ -194,13 +194,13 @@ macro(doxygen_to_boostbook OUTPUT)
     ${CMAKE_CURRENT_BINARY_DIR}/xml/all.xml
     ${CMAKE_CURRENT_BINARY_DIR}/xml/index.xml
     STYLESHEET ${CMAKE_CURRENT_BINARY_DIR}/xml/combine.xslt
-    COMMENT "Collecting Doxygen XML output for Boost.${PROJECT_NAME}...")
+    COMMENT "Collecting Doxygen XML output for Boost.${BOOST_PROJECT_NAME}...")
 
   # Transform single Doxygen XML file into BoostBook XML
   xsl_transform(${OUTPUT}
     ${CMAKE_CURRENT_BINARY_DIR}/xml/all.xml
     STYLESHEET ${BOOSTBOOK_XSL_DIR}/doxygen/doxygen2boostbook.xsl
-    COMMENT "Transforming Doxygen XML into BoostBook XML for Boost.${PROJECT_NAME}...")
+    COMMENT "Transforming Doxygen XML into BoostBook XML for Boost.${BOOST_PROJECT_NAME}...")
 endmacro(doxygen_to_boostbook)
 
 # Adds documentation for the current library or tool project
@@ -289,7 +289,7 @@ macro(boost_add_documentation SOURCE)
         COMMAND quickbook "--output-file=${BOOSTBOOK_FILE}"
         ${THIS_DOC_SOURCE_PATH} 
         DEPENDS ${THIS_DOC_SOURCE_PATH} ${THIS_DOC_DEFAULT_ARGS}
-        COMMENT "Generating BoostBook documentation for Boost.${PROJECT_NAME}...")
+        COMMENT "Generating BoostBook documentation for Boost.${BOOST_PROJECT_NAME}...")
 
       # Transform BoostBook into other formats
       boost_add_documentation(${CMAKE_CURRENT_BINARY_DIR}/${BOOSTBOOK_FILE})
@@ -305,8 +305,8 @@ macro(boost_add_documentation SOURCE)
       ${THIS_DOC_DEFAULT_ARGS}
       STYLESHEET ${BOOSTBOOK_XSL_DIR}/docbook.xsl
       CATALOG ${CMAKE_BINARY_DIR}/catalog.xml
-      COMMENT "Generating DocBook documentation for Boost.${PROJECT_NAME}..."
-      MAKE_TARGET ${PROJECT_NAME}-docbook)
+      COMMENT "Generating DocBook documentation for Boost.${BOOST_PROJECT_NAME}..."
+      MAKE_TARGET ${BOOST_PROJECT_NAME}-docbook)
 
     # Transform DocBook into other formats
     boost_add_documentation(${CMAKE_CURRENT_BINARY_DIR}/${DOCBOOK_FILE})
@@ -322,10 +322,10 @@ macro(boost_add_documentation SOURCE)
         PARAMETERS admon.graphics.path=images
                    navig.graphics.path=images
                    boost.image.src=boost.png
-        COMMENT "Generating HTML documentaiton for Boost.${PROJECT_NAME}..."
-        MAKE_TARGET ${PROJECT_NAME}-html)
+        COMMENT "Generating HTML documentaiton for Boost.${BOOST_PROJECT_NAME}..."
+        MAKE_TARGET ${BOOST_PROJECT_NAME}-html)
 
-      add_custom_command(TARGET ${PROJECT_NAME}-html
+      add_custom_command(TARGET ${BOOST_PROJECT_NAME}-html
 	POST_BUILD
 	COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/doc/src/boostbook.css ${CMAKE_CURRENT_BINARY_DIR}/html
 	COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/boost.png ${CMAKE_CURRENT_BINARY_DIR}/html
@@ -345,8 +345,8 @@ macro(boost_add_documentation SOURCE)
         STYLESHEET ${BOOSTBOOK_XSL_DIR}/manpages.xsl
         CATALOG ${CMAKE_BINARY_DIR}/catalog.xml
         DIRECTORY man.manifest
-        COMMENT "Generating man pages for Boost.${PROJECT_NAME}..."
-        MAKE_TARGET ${PROJECT_NAME}-man)
+        COMMENT "Generating man pages for Boost.${BOOST_PROJECT_NAME}..."
+        MAKE_TARGET ${BOOST_PROJECT_NAME}-man)
 
       # Install man pages
       install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/man

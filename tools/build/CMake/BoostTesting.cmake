@@ -196,7 +196,7 @@ macro(boost_test_parse_args testname)
     set(BOOST_TEST_SOURCES "${testname}.cpp")
   endif (BOOST_TEST_DEFAULT_ARGS)
 
-  set(BOOST_TEST_TESTNAME "${PROJECT_NAME}-${testname}")
+  set(BOOST_TEST_TESTNAME "${BOOST_PROJECT_NAME}-${testname}")
   #message("testname: ${BOOST_TEST_TESTNAME}")
   # If testing is turned off, this test is not okay
 endmacro(boost_test_parse_args)
@@ -207,8 +207,8 @@ endmacro(boost_test_parse_args)
 macro(boost_test_known_failures TEST)
   foreach(PATTERN ${ARGN})
     if (${BUILDNAME} MATCHES ${PATTERN})
-      set_tests_properties("${PROJECT_NAME}-${TEST}"
-        PROPERTIES LABELS "${PROJECT_NAME};known-failure")
+      set_tests_properties("${BOOST_PROJECT_NAME}-${TEST}"
+        PROPERTIES LABELS "${BOOST_PROJECT_NAME};known-failure")
     endif()
   endforeach()
 endmacro(boost_test_known_failures)
@@ -267,7 +267,7 @@ macro(boost_test_run testname)
   boost_test_parse_args(${testname} ${ARGN} RUN)
   if (BOOST_TEST_OKAY)  
     boost_add_executable(${testname} ${BOOST_TEST_SOURCES}
-      OUTPUT_NAME tests/${PROJECT_NAME}/${testname}
+      OUTPUT_NAME tests/${BOOST_PROJECT_NAME}/${testname}
       DEPENDS "${BOOST_TEST_DEPENDS}"
       LINK_LIBS ${BOOST_TEST_LINK_LIBS}
       LINK_FLAGS ${BOOST_TEST_LINK_FLAGS}
@@ -279,12 +279,12 @@ macro(boost_test_run testname)
       get_target_property(THIS_TEST_OUTPUT_DIRECTORY ${testname} 
         RUNTIME_OUTPUT_DIRECTORY)
       add_test (${BOOST_TEST_TESTNAME} 
-        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_CFG_INTDIR}/tests/${PROJECT_NAME}/${testname}
+        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_CFG_INTDIR}/tests/${BOOST_PROJECT_NAME}/${testname}
         ${BOOST_TEST_ARGS})
 
       set_tests_properties(${BOOST_TEST_TESTNAME}
         PROPERTIES
-        LABELS "${PROJECT_NAME}"
+        LABELS "${BOOST_PROJECT_NAME}"
         )
       boost_test_known_failures(${testname} ${BOOST_TEST_KNOWN_FAILURES})
 
@@ -355,7 +355,7 @@ macro(boost_test_compile testname)
 
     set_tests_properties(${BOOST_TEST_TESTNAME}
       PROPERTIES
-      LABELS "${PROJECT_NAME}"
+      LABELS "${BOOST_PROJECT_NAME}"
       )
 
     boost_test_known_failures(${testname} ${BOOST_TEST_KNOWN_FAILURES})
@@ -424,7 +424,7 @@ macro(boost_test_link testname)
 
     set_tests_properties(${BOOST_TEST_TESTNAME}
       PROPERTIES
-      LABELS "${PROJECT_NAME}"
+      LABELS "${BOOST_PROJECT_NAME}"
       )
 
     boost_test_known_failures(${testname} ${BOOST_TEST_KNOWN_FAILURES})

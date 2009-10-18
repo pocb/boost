@@ -83,6 +83,7 @@ macro(boost_library_project LIBNAME)
   endwhile()
 
   string(TOLOWER "${LIBNAME}" libname)
+  string(TOLOWER "${LIBNAME}" BOOST_PROJECT_NAME)
   string(TOUPPER "${LIBNAME}" ULIBNAME)
   project(${LIBNAME})
   
@@ -292,9 +293,9 @@ macro(boost_library_project LIBNAME)
   if(NOT EXISTS ${CMAKE_BINARY_DIR}/bin/tests)
     file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/bin/tests)
   endif(NOT EXISTS ${CMAKE_BINARY_DIR}/bin/tests)
-  if(NOT EXISTS ${CMAKE_BINARY_DIR}/bin/tests/${PROJECT_NAME})
-    file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/bin/tests/${PROJECT_NAME})
-  endif(NOT EXISTS ${CMAKE_BINARY_DIR}/bin/tests/${PROJECT_NAME})
+  if(NOT EXISTS ${CMAKE_BINARY_DIR}/bin/tests/${BOOST_PROJECT_NAME})
+    file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/bin/tests/${BOOST_PROJECT_NAME})
+  endif(NOT EXISTS ${CMAKE_BINARY_DIR}/bin/tests/${BOOST_PROJECT_NAME})
 
   # Include each of the source directories
   if(THIS_PROJECT_SRCDIRS)
@@ -666,7 +667,7 @@ macro(boost_library_variant LIBNAME)
         CLEAN_DIRECT_OUTPUT 1
         COMPILE_FLAGS "${THIS_VARIANT_COMPILE_FLAGS}"
         LINK_FLAGS "${THIS_VARIANT_LINK_FLAGS}"
-        LABELS "${PROJECT_NAME}"
+        LABELS "${BOOST_PROJECT_NAME}"
         )
     elseif (THIS_LIB_MODULE)
       # Add a module
@@ -679,7 +680,7 @@ macro(boost_library_variant LIBNAME)
         CLEAN_DIRECT_OUTPUT 1
         COMPILE_FLAGS "${THIS_VARIANT_COMPILE_FLAGS}"
         LINK_FLAGS "${THIS_VARIANT_LINK_FLAGS}"
-        LABELS "${PROJECT_NAME}"
+        LABELS "${BOOST_PROJECT_NAME}"
         PREFIX ""
        # SOVERSION "${BOOST_VERSION}"
         )
@@ -694,7 +695,7 @@ macro(boost_library_variant LIBNAME)
         CLEAN_DIRECT_OUTPUT 1
         COMPILE_FLAGS "${THIS_VARIANT_COMPILE_FLAGS}"
         LINK_FLAGS "${THIS_VARIANT_LINK_FLAGS}"
-        LABELS "${PROJECT_NAME}"
+        LABELS "${BOOST_PROJECT_NAME}"
         # SOVERSION "${BOOST_VERSION}"
         )
     endif (THIS_LIB_IS_STATIC)
@@ -712,11 +713,11 @@ macro(boost_library_variant LIBNAME)
 
     if(NOT THIS_LIB_NO_INSTALL)
       # Setup installation properties
-      string(TOLOWER "${PROJECT_NAME}${VARIANT_TARGET_NAME}" LIB_COMPONENT)
+      string(TOLOWER "${BOOST_PROJECT_NAME}${VARIANT_TARGET_NAME}" LIB_COMPONENT)
       string(REPLACE "-" "_" LIB_COMPONENT ${LIB_COMPONENT})
       
       # Installation of this library variant
-      string(TOLOWER ${PROJECT_NAME} libname)
+      string(TOLOWER ${BOOST_PROJECT_NAME} libname)
       install(TARGETS ${VARIANT_LIBNAME} DESTINATION lib COMPONENT ${LIB_COMPONENT})
       set_property( 
             TARGET ${VARIANT_LIBNAME}
@@ -1351,7 +1352,7 @@ macro(boost_add_executable EXENAME)
     if (THIS_PROJECT_IS_TOOL)
       set(THIS_EXE_NAME ${EXENAME})
     else()
-      set(THIS_EXE_NAME ${PROJECT_NAME}-${EXENAME})
+      set(THIS_EXE_NAME ${BOOST_PROJECT_NAME}-${EXENAME})
     endif()
     add_executable(${THIS_EXE_NAME} ${THIS_EXE_SOURCES})
     
@@ -1360,7 +1361,7 @@ macro(boost_add_executable EXENAME)
       PROPERTIES
       COMPILE_FLAGS "${THIS_EXE_COMPILE_FLAGS}"
       LINK_FLAGS "${THIS_EXE_LINK_FLAGS}"
-      LABELS "${PROJECT_NAME}"
+      LABELS "${BOOST_PROJECT_NAME}"
       )
 
     # For IDE generators where we can build both debug and release
