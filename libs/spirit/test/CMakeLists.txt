@@ -10,6 +10,8 @@ boost_additional_test_dependencies(spirit
   lambda assign iostreams math random dynamic_bitset fusion
   )
 
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+
 set(test_compile_flags "")
 
 if(CMAKE_COMPILER_IS_GNUCC)
@@ -108,7 +110,8 @@ foreach(karma_run_test
     stream
     tricky_alignment
     )
-  boost_test_run(karma_${karma_run_test} karma/${karma_run_test}.cpp COMPILE_FLAGS ${test_compile_flags})
+  boost_test_run(karma_${karma_run_test} karma/${karma_run_test}.cpp COMPILE_FLAGS ${test_compile_flags}
+    )
 endforeach()
 
 foreach(karma_compile_fail_test
