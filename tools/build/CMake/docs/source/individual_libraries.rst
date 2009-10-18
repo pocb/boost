@@ -86,8 +86,65 @@ just pass ``VERBOSE=1`` on the command line::
   -I/home/troy/Projects/boost/branches/CMake/Boost_1_35_0     -O3 -DNDEBUG -DBOOST_SIGNALS_DYN_LINK=1   
   -pthread -D_REENTRANT -E /home/troy/Projects/boost/branches/CMake/Boost_1_35_0/libs/signals/src/slot.cpp > CMakeFiles/boost_signals-mt-shared.dir/slot.cpp.i
 
+Tests and examples
+------------------
+
+Tests and examples are typically grouped into subdirectories, e.g.::
+
+  libs/
+    iostreams/
+      test/
+      examples/
+
+CMake builds a parallel directory hierarchy in the build directory. If
+you are working on, say, the examples for iostreams, you can just
+``cd`` into the directory $BUILDDIR/libs/iostreams/examples and type
+``make``::
+
+  % cd libs/iostreams/example
+  % make
+  [  0%] Built target boost_iostreams-mt-static
+  Scanning dependencies of target iostreams-examples-boost_back_inserter_example
+  [  0%] Building CXX object libs/iostreams/example/CMakeFiles/iostreams-examples-boost_back_inserter_example.dir/boost_back_inserter_example.cpp.o
+  Linking CXX executable ../../../bin/iostreams-examples-boost_back_inserter_example
+  [  0%] Built target iostreams-examples-boost_back_inserter_example
+  Scanning dependencies of target iostreams-examples-container_device_example
+  [  0%] Building CXX object libs/iostreams/example/CMakeFiles/iostreams-examples-container_device_example.dir/container_device_example.cpp.o
+  Linking CXX executable ../../../bin/iostreams-examples-container_device_example
+  [  0%] Built target iostreams-examples-container_device_example
+  Scanning dependencies of target iostreams-examples-container_sink_example
+  [  0%] Building CXX object libs/iostreams/example/CMakeFiles/iostreams-examples-container_sink_example.dir/container_sink_example.cpp.o
+
+Building individual targets, ignoring prerequisites
+---------------------------------------------------
+
+If you find yourself working on a compiler error in a file that takes
+a long time to compile, waiting for make to check all of the
+prerequisites might become tedious.  You can have make skip the
+prerequisite testing (you do this at your own risk), by appending
+``/fast`` to the target name.  For instance, bcp depends on the
+``system``, ``filesystem`` ``regex`` and ``prg_exec_monitor``
+libraries::
+
+  % cd tools/bcp
+  % make bcp
+  [  0%] Built target boost_system-mt-static
+  [  0%] Built target boost_filesystem-mt-static
+  [ 50%] Built target boost_regex-mt-static
+  [ 75%] Built target boost_prg_exec_monitor-mt-static
+  [ 75%] Building CXX object tools/bcp/CMakeFiles/bcp.dir/add_path.cpp.o
+  
+if I make ``bcp/fast``, the dependencies are assumed to be built
+already::
+
+  % make bcp/fast
+  [ 75%] Building CXX object tools/bcp/CMakeFiles/bcp.dir/add_path.cpp.o
+  [ 75%] Building CXX object tools/bcp/CMakeFiles/bcp.dir/bcp_imp.cpp.o
+  (etc)
 
 
+
+  
 
 
 

@@ -37,7 +37,7 @@ Users's guide
    add_boost_library
    add_compiled_library
    adding_regression_tests
-   modularize_library
+   .. modularize_library
    build_installer
    notes_by_version
 

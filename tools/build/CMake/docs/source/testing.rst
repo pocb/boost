@@ -130,51 +130,38 @@ There is also a ``-E`` (exclude) option which does the inverse of ``-R``.
 Targets
 -------
 
-The testing subsystem adds a toplevel target to the build.  In the
-case of e.g. ``mpi``, (again when ``BUILD_TESTING`` is on,
-and ``BOOST_TEST_LIBRARIES`` is either empty or contains ``mpi``), the
-target **mpi-test** will first build the test drivers, then run
-``ctest -R mpi-``.  Example:  for intrusive, ::
+The testing subsystem adds toplevel targets to the build.  On unix you
+can see them in the output of ``make help``.  For example some of the
+accumulators test targets look like this::
 
-  % make intrusive-test
-  [  0%] Built target intrusive-multiset_test
-  [  0%] Built target intrusive-splay_multiset_test
-  ...
-  [100%] Built target intrusive-avl_set_test
-  [100%] Built target intrusive-sg_multiset_test
-  Start processing tests
-  Test project /home/troy/Projects/boost/patches/build/libs/intrusive
-   1/ 21 Testing intrusive-splay_multiset_test    Passed
-   2/ 21 Testing intrusive-slist_test .........   Passed
-   3/ 21 Testing intrusive-stateful_value_trait   Passed
-   4/ 21 Testing intrusive-sg_set_test ........   Passed
-   5/ 21 Testing intrusive-treap_multiset_test ***Failed 
-  ...
-  20/ 21 Testing intrusive-sg_multiset_test ...   Passed
-  21/ 21 Testing intrusive-multiset_test ......   Passed
+  % make help | grep accum
+  ... accumulators-tests-count
+  ... accumulators-tests-covariance
+  ... accumulators-tests-droppable
+  ... accumulators-tests-error_of
+  ... accumulators-tests-extended_p_square
+  ... accumulators-tests-extended_p_square_quantile
   
-  95% tests passed, 1 tests failed out of 21
-  
-  The following tests FAILED:
-            5 - intrusive-treap_multiset_test (Failed)
-  Errors while running CTest
-  
+Note that they are prefixed with the name of the project, a dash, and
+'tests'.  Under visual studio you will see these targets in the
+'solution explorer'.
 
+Submitting Results
+------------------
 
-Submit Results
---------------
+.. warning:: This needs updating for git
 
 The ``ctest`` command can be used by individual developers to test
 local changes to their libraries. The same program can also be used to
 build all of Boost, run its regression tests, and submit the results
 to a central server where others can view them. Currently, regression
 test results based on the CMake build system are displayed on the Dart
-server at http://www.cdash.org/CDashPublic/index.php?project=Boost
+server at http://www.cdash.org/CDashPublic/index.php?project=Boost.
 
 To submit "experimental" results to the Dart server, configure a Boost
 binary tree by following the configuration instructions in the section
 :ref:`quickstart`, and then enable regression testing via the
-`BOOST_TESTING` option, as described above. At this point, don't build
+`BOOST_TESTS=ALL` option, as described above. At this point, don't build
 anything! We'll let CTest do that work. You may want to customize some
 of the advanced CMake options, such as `SITE` (to give your site
 name), and `MAKECOMMAND` (which, for makefile targets, governs the
@@ -334,7 +321,8 @@ this into ``$DIR/CTestNightly.cmake`` ::
   SITE:STRING=zinc
   MAKECOMMAND:STRING=make -i -j2
   DART_TESTING_TIMEOUT:STRING=30
-  BUILD_TESTING:STRING=ON
+  BUILD_TESTS:STRING=ALL
+  BUILD_EXAMPLES:STRING=ALL
   CVSCOMMAND:FILEPATH=${CTEST_CVS_COMMAND}
   ")
   
@@ -405,4 +393,5 @@ if you want extra verbosity add a ``-VV`` flag.  You'll see something like the f
      Build name: gcc-4.0.1-macos
   (etc, etc)
 
-You'll see it configure again, run... and sooner or later you'll see your results on :ref:`the_dashboard`.  a dashboard posted.
+You'll see it configure again, run... and sooner or later you'll see
+your results on :ref:`the_dashboard`.

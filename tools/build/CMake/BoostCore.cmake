@@ -306,6 +306,7 @@ macro(boost_library_project LIBNAME)
   list(FIND BUILD_TESTS ${libname} BUILD_TESTS_INDEX)
   if ((BUILD_TESTS_INDEX GREATER -1) OR (BUILD_TESTS STREQUAL "ALL"))
     # Include the test directories.
+    project(${libname}-tests)
     foreach(SUBDIR ${THIS_PROJECT_TESTDIRS})
       add_subdirectory(${SUBDIR})
     endforeach()
@@ -313,6 +314,7 @@ macro(boost_library_project LIBNAME)
 
   list(FIND BUILD_EXAMPLES ${libname} BUILD_EXAMPLES_INDEX)
   if ((BUILD_EXAMPLES_INDEX GREATER -1) OR (BUILD_EXAMPLES STREQUAL "ALL"))
+    project(${libname}-examples)
     # Include the example directories.
     foreach(SUBDIR ${THIS_PROJECT_EXAMPLEDIRS})
       add_subdirectory(${SUBDIR})

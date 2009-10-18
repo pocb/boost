@@ -19,17 +19,23 @@ build a binary installer for Boost, follow these steps:
    do not need to install any extra tools.
 
 3. Using the same development tools for building Boost, build the
-    "package" target to create the binary installers.  
-    * With Microsoft Visual Studio, build the target named ``PACKAGE``
-    * With makefiles, run ` make package``.
+   "package" target to create the binary installers.  
+
+   * With Microsoft Visual Studio, build the target named ``PACKAGE``
+   * With makefiles, run ` make package``.
 
 The output of the packaging process will be one or more binary
 packages of the form Boost-*version*\ -*platform*\ \.*extension*\ . The
 type of package will differ from one platform to another:
 
-  * On Windows: The primary output is an executable (``.exe``) that provides a graphical installer.
-  * On Mac OS X: The primary output is a disk image (``.dmg``) that contains a graphical installer package.
-  * On Unix: Packaging produces compressed tarballs (``.tar.gz``) and a self-installing shell script (``.sh``)
+* On Windows: The primary output is an executable (``.exe``) that
+  provides a graphical installer.
+
+* On Mac OS X: The primary output is a disk image (``.dmg``) that
+  contains a graphical installer package.
+
+* On Unix: Packaging produces compressed tarballs (``.tar.gz``) and
+  a self-installing shell script (``.sh``)
 
 
 Windows installer:
