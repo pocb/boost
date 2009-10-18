@@ -70,6 +70,14 @@ message(STATUS "TR1 tests need some love")
 boost_glob_test_compile(cyclic_depend *.cpp "")
 
 # Known failures
-boost_test_known_failures(test_cmath_tricky_std "gcc-4.0.[0-9]-.*")
-boost_test_known_failures(test_mem_fn_tricky_std "gcc-4.0.[0-9]-.*")
-boost_test_known_failures(test_ref_wrapper_tricky_std "gcc-4.0.[0-9]-.*")
+foreach(known_failure
+
+    test_cmath_tricky
+    test_cmath_tricky_std
+    test_mem_fn_tricky
+    test_mem_fn_tricky_std
+    test_ref_wrapper_tricky
+    test_ref_wrapper_tricky_std)
+
+  boost_test_known_failures(${known_failure} "gcc-4.[0-4].[0-9]-.*")
+endforeach()
