@@ -14,11 +14,11 @@ set (lib_headers
 # find zlib up here... used lower down in various places
 include(FindZLIB)
 if (ZLIB_FOUND)
-  message("Zlib found, enabling extra components.")
+  message(STATUS "Zlib found, enabling extra components.")
 endif()
 include(FindBZip2)
 if(BZIP2_FOUND)
-  message("BZip2 found, enabling extra components.")
+  message(STATUS "BZip2 found, enabling extra components.")
 endif()
 
 #
