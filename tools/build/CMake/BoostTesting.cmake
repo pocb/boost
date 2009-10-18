@@ -206,9 +206,14 @@ endmacro(boost_test_parse_args)
 # failures.
 macro(boost_test_known_failures TEST)
   foreach(PATTERN ${ARGN})
+    message(STATUS "${BUILDNAME} matches ${PATTERN} ?")
     if (${BUILDNAME} MATCHES ${PATTERN})
+      message(STATUS "YES")
       set_tests_properties("${BOOST_PROJECT_NAME}-${TEST}"
-        PROPERTIES LABELS "${BOOST_PROJECT_NAME};known-failure")
+        PROPERTIES 
+	LABELS "${BOOST_PROJECT_NAME};known-failure"
+	WILL_FAIL TRUE
+	)
     endif()
   endforeach()
 endmacro(boost_test_known_failures)
