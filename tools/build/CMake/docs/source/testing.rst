@@ -13,19 +13,17 @@ collects and reports regression-testing results from different
 sites. This document assumes that the reader has already learned how
 to build and configure Boost using CMake.
 
-.. _BUILD_TESTING:
-.. index:: BUILD_TESTING
-.. _BOOST_TEST_LIBRARIES:
-.. index:: BOOST_TEST_LIBRARIES
+.. _BUILD_TESTS:
+.. index:: BUILD_TESTS
 
-.. index:: testing ; speeding up 
+.. index:: testing
 
 Re-run the CMake configuration for Boost, after setting
-``BUILD_TESTING`` to ``ON``. You may notice that
+``BUILD_TESTS`` to ``ALL``. You may notice that
 configuration takes significantly longer when we are building all of
 the regression tests.  You may enable regression testing for only a
 subset of Boost libraries (this speeds configuration and build time)
-by setting the variable ``BOOST_TEST_LIBRARIES`` to a semicolon
+by setting the variable ``BUILD_TESTS`` to a semicolon
 separated list of library names, e.g. (from the CMakeCache.txt) ::
 
   spirit;serialization;variant
@@ -34,12 +32,12 @@ Be sure to re-configure CMake once you are done tweaking these
 options, and generate makefiles or project files, by clicking *OK* (on
 Microsoft Windows) or pressing :kbd:`g` (on Unix).
 
-To test **all**, libraries, set ``BOOST_TEST_LIBRARIES`` to ``ALL``
+To test **all**, libraries, set ``BUILD_TESTS`` to ``ALL``
 
 If you know what you're going to be testing, you can simplify the
 whole process with e.g. ::
 
-   cmake ../src -DBUILD_TESTING=ON -DBOOST_TEST_LIBRARIES=mpi;graph_parallel
+   cmake ../src -DBUILD_TESTS=mpi;graph_parallel
 
 .. _the_dashboard:
 
@@ -111,9 +109,7 @@ output like the following::
 
 
 Here, we have only enabled testing of the Boost.Any and Boost.Function
-libraries, by setting `TEST_BOOST_ANY` and `TEST_BOOST_FUNCTION` to
-`ON` while all of the other `TEST_BOOST_`''LIBNAME'' options are set
-to `OFF`.
+libraries, by setting `BUILD_TESTS` to `any;function`.
 
 .. warning:: Again, This ``ctest`` step runs the tests without first
    	     running a build.  If you change a source file and run the
@@ -124,7 +120,6 @@ expression to ``ctest`` (see the output of ``ctest --help-full``). For
 example, to run all of the Python tests, use::
 
   ctest -R python
-
 
 There is also a ``-E`` (exclude) option which does the inverse of ``-R``.
 ``ctest --help`` shows the full list of options.

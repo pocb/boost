@@ -77,21 +77,21 @@ message(STATUS "Build name: ${BUILDNAME}")
 # Build Features and Variants                                            #
 ##########################################################################
 
-# Determine default settings for the variable BUILD_feature options
+# Determine default settings for the variable ENABLE_feature options
 if (MSVC)
-  set(BUILD_SINGLE_THREADED_DEFAULT OFF)
+  set(ENABLE_SINGLE_THREADED_DEFAULT OFF)
 else ()
-  set(BUILD_SINGLE_THREADED_DEFAULT OFF)
+  set(ENABLE_SINGLE_THREADED_DEFAULT OFF)
 endif ()
 
 # User-level options deciding which variants we will build. 
-option(BUILD_STATIC "Whether to build static libraries" ON)
-option(BUILD_SHARED "Whether to build shared libraries" ON)
-option(BUILD_DEBUG "Whether to build debugging libraries" ON)
-option(BUILD_RELEASE "Whether to build release libraries" ON)
-option(BUILD_SINGLE_THREADED "Whether to build single-threaded libraries" 
-       ${BUILD_SINGLE_THREADED_DEFAULT})
-option(BUILD_MULTI_THREADED "Whether to build multi-threaded libraries" ON)
+option(ENABLE_STATIC "Whether to build static libraries" ON)
+option(ENABLE_SHARED "Whether to build shared libraries" ON)
+option(ENABLE_DEBUG "Whether to build debugging libraries" ON)
+option(ENABLE_RELEASE "Whether to build release libraries" ON)
+option(ENABLE_SINGLE_THREADED "Whether to build single-threaded libraries" 
+       ${ENABLE_SINGLE_THREADED_DEFAULT})
+option(ENABLE_MULTI_THREADED "Whether to build multi-threaded libraries" ON)
 
 if(UNIX)
   option(BUILD_VERSIONED "Add versioning information to names of built files" OFF)
@@ -103,11 +103,11 @@ endif(UNIX)
 # Visual C++. Provide both options for Visual C++ users, but just fix
 # the values of the variables for all other platforms.
 if(MSVC)
-  option(BUILD_STATIC_RUNTIME "Whether to build libraries linking against the static runtime" ON)
-  option(BUILD_DYNAMIC_RUNTIME "Whether to build libraries linking against the dynamic runtime" ON)
+  option(ENABLE_STATIC_RUNTIME "Whether to build libraries linking against the static runtime" ON)
+  option(ENABLE_DYNAMIC_RUNTIME "Whether to build libraries linking against the dynamic runtime" ON)
 else(MSVC)
-  set(BUILD_STATIC_RUNTIME OFF)
-  set(BUILD_DYNAMIC_RUNTIME ON)
+  set(ENABLE_STATIC_RUNTIME OFF)
+  set(ENABLE_DYNAMIC_RUNTIME ON)
 endif(MSVC)
 
 # The default set of library variants that we will be building
@@ -117,7 +117,7 @@ boost_add_default_variant(SINGLE_THREADED MULTI_THREADED)
 boost_add_default_variant(DYNAMIC_RUNTIME STATIC_RUNTIME)
 
 # Extra features used by some libraries
-set(BUILD_PYTHON_NODEBUG ON)
+set(ENABLE_PYTHON_NODEBUG ON)
 boost_add_extra_variant(PYTHON_NODEBUG PYTHON_DEBUG)
 ##########################################################################
 
@@ -143,7 +143,7 @@ install(DIRECTORY boost
 # TDS 20080526:  Getting a segfault here even with the ifs.   At r45780, with these lines 
 # uncommented:
 # 1. cmake the workspace
-# 2. run ccmake and turn OFF BUILD_MULTI_THREADED and BUILD_SHARED
+# 2. run ccmake and turn OFF ENABLE_MULTI_THREADED and ENABLE_SHARED
 # 3. 'c' to configure
 # 4. 'g' to generate.... segfault.
 # 5. run rebuild_cache at the command line:  no segfault this time.

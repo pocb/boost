@@ -48,11 +48,6 @@
 # angle brackets, with -at- instead of the at sign, e.g.,
 #   Douglas Gregor <doug.gregor -at- gmail.com>
 #
-# For libraries that build actual library binaries, this macro adds a
-# option BUILD_BOOST_LIBNAME (which defaults to ON). When the option
-# is ON, this macro will include the source subdirectories, and
-# therefore, will build and install the library binary.
-#
 # Example: 
 #   boost_library_project(
 #     Thread
@@ -514,9 +509,9 @@ macro(boost_library_variant_target_name)
   list_contains(VARIANT_IS_DEBUG DEBUG ${ARGN})
   if (VARIANT_IS_DEBUG)
     # Only add the actual "-debug" if we're also building release libraries
-    if (BUILD_RELEASE)
+    if (ENABLE_RELEASE)
       set(VARIANT_TARGET_NAME "${VARIANT_TARGET_NAME}-debug")
-    endif (BUILD_RELEASE)
+    endif (ENABLE_RELEASE)
     set(VARIANT_ABI_TAG "${VARIANT_ABI_TAG}d")
 
     set(VARIANT_DISPLAY_NAME "${VARIANT_DISPLAY_NAME}, debug")
@@ -627,11 +622,11 @@ macro(boost_library_variant LIBNAME)
     endif (THIS_LIB_NO_${ARG})
 
     # If the user specified that we should not build any variants of
-    # this kind, don't. For example, if the BUILD_SHARED option is
+    # this kind, don't. For example, if the ENABLE_SHARED option is
     # off, don't build shared libraries.
-    if(NOT BUILD_${ARG})
+    if(NOT ENABLE_${ARG})
       set(THIS_VARIANT_OKAY FALSE)
-    endif(NOT BUILD_${ARG})
+    endif(NOT ENABLE_${ARG})
 
     # Accumulate compile and link flags
     set(THIS_VARIANT_COMPILE_FLAGS "${THIS_VARIANT_COMPILE_FLAGS} ${THIS_LIB_${ARG}_COMPILE_FLAGS} ${${ARG}_COMPILE_FLAGS}")
@@ -926,10 +921,10 @@ macro(boost_select_variant NAME PREFIX)
         # that request (because the user has turned off the build
         # variants with that feature), then we won't build this
         # executable or module.
-        if (NOT BUILD_${FEATURE})
+        if (NOT ENABLE_${FEATURE})
           set(SELECT_VARIANT_OKAY FALSE)
-          message(STATUS "* ${NAME} is NOT being built because BUILD_${FEATURE} is FALSE")
-        endif (NOT BUILD_${FEATURE})
+          message(STATUS "* ${NAME} is NOT being built because ENABLE_${FEATURE} is FALSE")
+        endif (NOT ENABLE_${FEATURE})
       endif (${PREFIX}_${FEATURE})
     endforeach (FEATURE ${FEATURESET})
 
@@ -945,7 +940,7 @@ macro(boost_select_variant NAME PREFIX)
       if (FEATURESET_STR STREQUAL "RELEASE:DEBUG")
         if (CMAKE_CONFIGURATION_TYPES)
           # IDE target: can we build both debug and release?
-          if (BUILD_DEBUG AND BUILD_RELEASE)
+          if (ENABLE_DEBUG AND ENABLE_RELEASE)
             if (${PREFIX} STREQUAL "THIS_EXE")
               # Remember that we're capable of building both configurations
               set(${PREFIX}_DEBUG_AND_RELEASE TRUE)
@@ -973,11 +968,11 @@ macro(boost_select_variant NAME PREFIX)
         # We only care about the first feature value we find...
         if (NOT ${PREFIX}_FOUND_FEATURE)
           # Are we allowed to build this feature?
-          if (BUILD_${FEATURE})
+          if (ENABLE_${FEATURE})
             # Found it: we're done
             list(APPEND ${PREFIX}_VARIANT ${FEATURE})
             set(${PREFIX}_FOUND_FEATURE TRUE)
-          endif (BUILD_${FEATURE})
+          endif (ENABLE_${FEATURE})
         endif (NOT ${PREFIX}_FOUND_FEATURE)
       endforeach (FEATURE ${FEATURESET})
 
@@ -1158,8 +1153,8 @@ macro(boost_add_library LIBNAME)
   if (THIS_LIB_FORCE_VARIANTS)
     #  string(TOUPPER "${LIBNAME}_FORCE_VARIANTS" force_variants)
     #  set(${force_variants} ${THIS_LIB_FORCE_VARIANTS} CACHE INTERNAL "")
-    set(BUILD_${THIS_LIB_FORCE_VARIANTS}_PREV ${BUILD_${THIS_LIB_FORCE_VARIANTS}} )
-    set(BUILD_${THIS_LIB_FORCE_VARIANTS} TRUE)
+    set(ENABLE_${THIS_LIB_FORCE_VARIANTS}_PREV ${ENABLE_${THIS_LIB_FORCE_VARIANTS}} )
+    set(ENABLE_${THIS_LIB_FORCE_VARIANTS} TRUE)
   endif (THIS_LIB_FORCE_VARIANTS)
   
   
@@ -1171,8 +1166,8 @@ macro(boost_add_library LIBNAME)
   endforeach(VARIANT_STR ${THIS_LIB_VARIANTS})
   
   if (THIS_LIB_FORCE_VARIANTS)
-    set(BUILD_${THIS_LIB_FORCE_VARIANTS} ${BUILD_${THIS_LIB_FORCE_VARIANTS}_PREV} )
-   # message(STATUS "* ^^ BUILD_${THIS_LIB_FORCE_VARIANTS}  ${BUILD_${THIS_LIB_FORCE_VARIANTS}}")
+    set(ENABLE_${THIS_LIB_FORCE_VARIANTS} ${ENABLE_${THIS_LIB_FORCE_VARIANTS}_PREV} )
+   # message(STATUS "* ^^ ENABLE_${THIS_LIB_FORCE_VARIANTS}  ${ENABLE_${THIS_LIB_FORCE_VARIANTS}}")
   endif (THIS_LIB_FORCE_VARIANTS)  
 endmacro(boost_add_library)
 

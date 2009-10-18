@@ -41,7 +41,6 @@ macro(bpl_test TESTNAME)
 
       endif (BPL_SRC_EXT STREQUAL ".cpp")
 
-      add_dependencies(${PROJECT_NAME}-test ${BPL_EXTENSION_MODULE})
     endforeach(SRC ${BPL_TEST_DEFAULT_ARGS})
 
   else (BPL_TEST_DEFAULT_ARGS)
@@ -53,8 +52,6 @@ macro(bpl_test TESTNAME)
     add_dependencies(${PROJECT_NAME}-test ${TESTNAME}_ext)
 
   endif(BPL_TEST_DEFAULT_ARGS)
-
-  add_dependencies(${PROJECT_NAME}-test ${BPL_TEST_PYSOURCE})
 
   # We'll need the full patch to run the Python test
   set(BPL_TEST_PYSOURCE ${CMAKE_CURRENT_SOURCE_DIR}/${BPL_TEST_PYSOURCE})

@@ -177,15 +177,15 @@ macro(boost_test_parse_args testname)
     get_target_property(DEPEND_LOCATION ${ARG} LOCATION)
     # If building static libraries is turned off, don't try to build
     # the test
-    if (NOT BUILD_STATIC AND ${DEPEND_TYPE} STREQUAL "STATIC_LIBRARY")
+    if (NOT ENABLE_STATIC AND ${DEPEND_TYPE} STREQUAL "STATIC_LIBRARY")
       set(BOOST_TEST_OKAY FALSE)
-    endif (NOT BUILD_STATIC AND ${DEPEND_TYPE} STREQUAL "STATIC_LIBRARY")
+    endif (NOT ENABLE_STATIC AND ${DEPEND_TYPE} STREQUAL "STATIC_LIBRARY")
 
     # If building shared libraries is turned off, don't try to build
     # the test
-    if (NOT BUILD_SHARED AND ${DEPEND_TYPE} STREQUAL "SHARED_LIBRARY")
+    if (NOT ENABLE_SHARED AND ${DEPEND_TYPE} STREQUAL "SHARED_LIBRARY")
       set(BOOST_TEST_OKAY FALSE)
-    endif (NOT BUILD_SHARED AND ${DEPEND_TYPE} STREQUAL "SHARED_LIBRARY")
+    endif (NOT ENABLE_SHARED AND ${DEPEND_TYPE} STREQUAL "SHARED_LIBRARY")
   endforeach(ARG ${BOOST_TEST_DEPENDS})
 
   # Setup the SOURCES variables. If no sources are specified, use the
