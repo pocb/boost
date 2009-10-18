@@ -28,9 +28,12 @@ set(SOURCES
     text_iarchive.cpp
     text_oarchive.cpp
     void_cast.cpp
+    archive_exception.cpp
     xml_grammar.cpp
     xml_iarchive.cpp
     xml_oarchive.cpp
+    xml_archive_exception.cpp
+    shared_ptr_helper.cpp
     )
     
 set(WSOURCES
