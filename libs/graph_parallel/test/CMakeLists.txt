@@ -34,7 +34,7 @@ if (MPI_FOUND)
       set(MPI_TEST_SOURCES "${testname}.cpp")
     endif (MPI_TEST_DEFAULT_ARGS)
 
-    set(THIS_TEST_LOCATION tests/${PROJECT_NAME}/${testname})
+    set(THIS_TEST_LOCATION tests/${BOOST_PROJECT_NAME}/${testname})
 
     # Build the test executable
     boost_add_executable(${testname} 
@@ -52,7 +52,7 @@ if (MPI_FOUND)
     endif (NOT MPI_TEST_NUMPROCS)
 
     foreach(PROCS ${MPI_TEST_NUMPROCS})
-      add_test("${PROJECT_NAME}-${testname}-${PROCS}"
+      add_test("${BOOST_PROJECT_NAME}-${testname}-${PROCS}"
         ${MPIEXEC}
         -n ${PROCS}
 	${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${THIS_TEST_LOCATION}
@@ -91,7 +91,7 @@ if (MPI_FOUND)
 
   boost_add_executable(ssca 
     ssca.cpp
-    OUTPUT_NAME tests/${PROJECT_NAME}/ssca
+    OUTPUT_NAME tests/${BOOST_PROJECT_NAME}/ssca
     NO_INSTALL
     DEPENDS boost_graph_parallel boost_system
     COMPILE_FLAGS "${MPI_COMPILE_FLAGS}"
@@ -101,7 +101,7 @@ if (MPI_FOUND)
 
   boost_add_executable(algorithm_performance 
     algorithm_performance.cpp
-    OUTPUT_NAME tests/${PROJECT_NAME}/algorithm_performance
+    OUTPUT_NAME tests/${BOOST_PROJECT_NAME}/algorithm_performance
     NO_INSTALL
     DEPENDS boost_graph_parallel boost_system
     COMPILE_FLAGS "${MPI_COMPILE_FLAGS}"
