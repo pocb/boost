@@ -50,7 +50,10 @@ like this::
    XSLTPROC_FLAGS                   --xinclude 
 
 On windows, the configurables will be right in the middle of the gui;
-can't miss 'em.
+can't miss 'em.  Note the ``[t]`` key to toggle 'advanced mode' which
+will show more options (on windows this is a selection box that says
+``Simple View`` by default, pull it down to see Advanced and Grouped
+views).
 
 Use the arrow keys to select particular options.  Press :kbd:`c` (for
 (c)onfigure) to perform the preliminary configuration of the CMake

@@ -131,7 +131,10 @@ XSLTPROC                         /usr/bin/xsltproc
 XSLTPROC_FLAGS                   --xinclude</pre>
 </div>
 <p>On windows, the configurables will be right in the middle of the gui;
-can&#8217;t miss &#8216;em.</p>
+can&#8217;t miss &#8216;em.  Note the <tt class="docutils literal"><span class="pre">[t]</span></tt> key to toggle &#8216;advanced mode&#8217; which
+will show more options (on windows this is a selection box that says
+<tt class="docutils literal"><span class="pre">Simple</span> <span class="pre">View</span></tt> by default, pull it down to see Advanced and Grouped
+views).</p>
 <p>Use the arrow keys to select particular options.  Press <tt class="docutils literal"><span class="pre">c</span></tt> (for
 (c)onfigure) to perform the preliminary configuration of the CMake
 build system when you are done.  When the options you have selected
@@ -189,7 +192,7 @@ manually you may execute</p>
 <p><tt class="docutils literal"><span class="pre">ccmake</span></tt> provides the keystroke option <tt class="docutils literal"><span class="pre">t</span></tt> which toggles advanced
 mode.  Some of the useful options here are:</p>
 <span class="target" id="verbosity"></span><div class="section" id="cmake-verbose-makefile">
-<span id="index-2"></span><h3>CMAKE_VERBOSE_MAKEFILE`<a class="headerlink" href="#cmake-verbose-makefile" title="Permalink to this headline">¶</a></h3>
+<span id="index-44"></span><h3>CMAKE_VERBOSE_MAKEFILE`<a class="headerlink" href="#cmake-verbose-makefile" title="Permalink to this headline">¶</a></h3>
 <blockquote>
 Displays full build commands during build.  Good for debugging.
 This option will generate permanently verbose makefiles; it is
@@ -197,7 +200,7 @@ generally easier to invoke make with the option <tt class="docutils literal"><sp
 instead (this has the same effect, but for one build only).</blockquote>
 </div>
 <div class="section" id="cmake-cxx-compiler">
-<span id="id2"></span><span id="index-3"></span><h3>CMAKE_CXX_COMPILER<a class="headerlink" href="#cmake-cxx-compiler" title="Permalink to this headline">¶</a></h3>
+<span id="id2"></span><span id="index-45"></span><h3>CMAKE_CXX_COMPILER<a class="headerlink" href="#cmake-cxx-compiler" title="Permalink to this headline">¶</a></h3>
 <blockquote>
 <p>Sets the compiler.  If you have a nonstandard compiler and no
 default compiler, you may have to pass the value of this option on
@@ -235,7 +238,7 @@ the commandline, for example:</p>
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version 885af6cde8b010cb3710c5fb7f6ee23a86b086d1, Sun, 18 Oct 2009.
+      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version bcaa9d6fba6f9a7a2e3633e631316c3da1bde477, Mon, 19 Oct 2009.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>
