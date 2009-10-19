@@ -8,7 +8,7 @@ CMake-based build system. If your library is a "header-only" library,
 and does not require separate compilation of object files into a
 library binary, you can safely skip this step. Before adding compiled
 libraries to CMake, make sure you have already followed the directions
-for :ref:`add_boost_library_project`, so that the CMake system recognizes your
+for :ref:`boost_library_project_macro`, so that the CMake system recognizes your
 Boost library.
 
 We will assume that your library resides in the subdirectory
@@ -16,8 +16,8 @@ We will assume that your library resides in the subdirectory
 ``boost_libname``. We will also assume that the sources for this
 library reside in the subdirectory ``libs/libname/src``. The source
 directory should be listed via ``SRCDIRS`` in the use of the
-:ref:`boost_library_project` macro, as described in the previous
-section, :ref:`add_boost_library_project`. Follow these steps to add this new
+:ref:`boost_library_project_macro` macro, as described in the previous
+section. Follow these steps to add this new
 library into Boost's build system. If your library has multiple source
 directories listed after ``SRCDIRS``, follow these steps for each one.
 

@@ -53,6 +53,8 @@ CMake build::
   mkdir $BOOST/build 
   cd $BOOST/build
 
+.. _unix_configure:
+
 Configure
 ^^^^^^^^^
 
@@ -126,11 +128,13 @@ you are building all of the Boost libraries), the Boost libraries will
 be in a predictable layout under the directory passed to
 ``CMAKE_INSTALL_PREFIX`` (default ``/usr/local``)
 
-On Windows
-----------
+Windows
+-------
 
-Configure
-^^^^^^^^^
+.. index:: Visual Studio
+
+Configure -- Visual Studio
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Run CMake by selecting it from the Start menu. 
 
@@ -143,7 +147,7 @@ Run CMake by selecting it from the Start menu.
 * CMake will ask you what kind of project files or make files to
   build. If you're using Microsoft Visual Studio, select the
   appropriate version to generate project files. Otherwise, you can
-  use Borland's make files, generate NMake files, etc.
+  use Borland's make files.  If you're using NMake, see the next section.
 * You will then be given the opportunity to tune build options in
   the CMake GUI (see also :ref:`configure_and_build`. These options
   will affect what libraries are built and how.  They will initially
@@ -152,14 +156,35 @@ Run CMake by selecting it from the Start menu.
   time. 
 * Finally, click *OK* to generate project files.
 
+.. index:: NMake
+
+Configure -- NMake
+^^^^^^^^^^^^^^^^^^
+
+* Start a `Visual Studio Command Prompt` from the start menu.  This
+  will spawn a command prompt window with certain env variables set.
+  CMake will detect these and automatically choose to generate NMake
+  files.
+
+* cd to $BOOST/build and execute::
+
+    cmake ..\src
+
+  You will see output very similar to that on unix, see
+  :ref:`unix_configure`.
+
 Build
 ^^^^^
 
-If you have generated project files for Microsoft Visual Studio, you
-will need to start up Visual Studio to build Boost. Once Visual Studio
-has loaded, load the solution or project ``Boost`` from the Boost build
-directory you set in the CMake configuration earlier. Then, just click
-*Build* to build all of Boost.
+**Visual Studio** 
+
+  Start up Visual Studio, load the solution or project ``Boost`` from
+  the Boost build directory you set in the CMake configuration
+  earlier. Then, just click *Build* to build all of Boost.
+
+**NMake**
+
+  Execute ``nmake`` from the command prompt in the build directory.
 
 Install
 ^^^^^^^
@@ -167,5 +192,5 @@ Install
 The installation of Boost's headers and compiled libraries uses the
 same tools as building the library. With Microsoft Visual Studio, just
 load the Boost solution or project and build the 'INSTALL' target to
-perform the installation. 
+perform the installation.  With NMake, ``nmake install``.
 

@@ -1,6 +1,9 @@
 boost_additional_test_dependencies
 ----------------------------------
 
+.. note:: This is only needed in the presence of 'modularization'
+   	  which is currently disabled.
+
 Add additional include directories based on the dependencies of the
 library being tested 'libname' and all of its dependencies.
 

@@ -1,3 +1,4 @@
+.. index:: regression tests; adding
 .. _adding_regression_tests:
 
 Adding Regression Tests
@@ -6,9 +7,10 @@ Adding Regression Tests
 This page describes how to add regression tests for a Boost library in
 the CMake-based build system. Before adding regression tests, make
 sure you have already followed the directions for
-:ref:`add_library_project` , so that the CMake system recognizes your
-Boost library project, and (if necessary) :ref:`add_compiled_library`
-. We also assume that you have already configured your build
+:ref:`boost_library_project_macro` , so that the CMake system recognizes
+your Boost library project, and (if necessary)
+:ref:`add_compiled_library`. We also assume that you have already
+configured your build
 
 .. index:: BUILD_TESTS
 
@@ -21,11 +23,11 @@ project's name to the ``BUILD_TESTS`` option described in the section
 In this page, we will assume that your library resides in the
 subdirectory ``libs/libname``, and that tests for this library are
 stored in ``libs/libname/test``. The test directory should be listed
-via ``TESTDIRS`` in the call of :ref:`boost_library_project`, as
-described in an earlier section, :ref:`add_library_project`. Follow
-these steps to add this new library into Boost's build system. If your
-library has multiple testing directories listed after ``TESTDIRS``,
-follow these steps for each one.
+via ``TESTDIRS`` in the call of
+:ref:`boost_library_project_macro`. Follow these steps to add this new
+library into Boost's build system. If your library has multiple
+testing directories listed after ``TESTDIRS``, follow these steps for
+each one.
 
 #.  Create a new file ``libs/libname/test/CMakeLists.txt`` file with
     your favorite text editor. This file will contain instructions for

@@ -1,4 +1,5 @@
 .. index:: boost_library_project
+.. _boost_library_project_macro:
 
 boost_library_project
 ---------------------

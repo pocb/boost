@@ -117,16 +117,16 @@ the default variants that are built for each platform.</p>
 <p>The CMake-based build system for Boost supports the following
 features.</p>
 <div class="section" id="static">
-<span id="index-257"></span><h2>STATIC<a class="headerlink" href="#static" title="Permalink to this headline">¶</a></h2>
+<span id="index-4"></span><h2>STATIC<a class="headerlink" href="#static" title="Permalink to this headline">¶</a></h2>
 <blockquote>
 <p>The <cite>STATIC</cite> feature identifies static builds of libraries, i.e., a
 <cite>.lib</cite> (library) file on Microsoft Windows or a <cite>.a</cite> (archive) file
 on Unix systems.</p>
-<p id="enable-static"><span id="index-258"></span>This is globally toggled with the cmake option <tt class="docutils literal"><span class="pre">ENABLE_STATIC</span></tt>.</p>
+<p id="enable-static"><span id="index-5"></span>This is globally toggled with the cmake option <tt class="docutils literal"><span class="pre">ENABLE_STATIC</span></tt>.</p>
 </blockquote>
 </div>
 <div class="section" id="shared">
-<span id="index-259"></span><h2>SHARED<a class="headerlink" href="#shared" title="Permalink to this headline">¶</a></h2>
+<span id="index-6"></span><h2>SHARED<a class="headerlink" href="#shared" title="Permalink to this headline">¶</a></h2>
 <blockquote>
 <p>The <cite>SHARED</cite> feature identifies shared builds of libraries, i.e.,
 a <cite>.dll</cite> (dynamically linked library) file on Microsoft Windows or
@@ -134,21 +134,21 @@ a <cite>.so`(shared object) or `.dylib</cite> (dynamic library) file on Unix
 systems. In some cases, <cite>SHARED</cite> variants actually refer to
 &#8220;modules&#8221;, which are a special kind of shared library on some
 systems (e.g., Mac OS X).</p>
-<p id="enable-shared"><span id="index-260"></span>This is globally toggled with the cmake option <tt class="docutils literal"><span class="pre">ENABLE_SHARED</span></tt>.</p>
+<p id="enable-shared"><span id="index-7"></span>This is globally toggled with the cmake option <tt class="docutils literal"><span class="pre">ENABLE_SHARED</span></tt>.</p>
 </blockquote>
 </div>
 <div class="section" id="debug">
-<span id="index-261"></span><h2>DEBUG<a class="headerlink" href="#debug" title="Permalink to this headline">¶</a></h2>
+<span id="index-8"></span><h2>DEBUG<a class="headerlink" href="#debug" title="Permalink to this headline">¶</a></h2>
 <blockquote>
 <blockquote>
 The <cite>DEBUG</cite> feature identifies builds of libraries that retain
 complete debugging information and prohibit optimization, making
 these builds far easier to use for debugging programs.</blockquote>
-<p id="enable-debug"><span id="index-262"></span>This is globally toggled with the cmake option <tt class="docutils literal"><span class="pre">ENABLE_DEBUG</span></tt>.</p>
+<p id="enable-debug"><span id="index-9"></span>This is globally toggled with the cmake option <tt class="docutils literal"><span class="pre">ENABLE_DEBUG</span></tt>.</p>
 </blockquote>
 </div>
 <div class="section" id="release">
-<span id="index-263"></span><h2>RELEASE<a class="headerlink" href="#release" title="Permalink to this headline">¶</a></h2>
+<span id="index-10"></span><h2>RELEASE<a class="headerlink" href="#release" title="Permalink to this headline">¶</a></h2>
 <blockquote>
 <blockquote>
 The <cite>RELEASE</cite> feature identifies builds of libraries that use full
@@ -156,22 +156,22 @@ optimization and eliminate extraneous information such as debug
 symbols, resulting in builds of libraries that are typically much
 smaller than (and execute faster than) their debug library
 counterparts.</blockquote>
-<p id="enable-release"><span id="index-264"></span>This is globally dis/enabled with the cmake option <tt class="docutils literal"><span class="pre">ENABLE_RELEASE</span></tt>.</p>
+<p id="enable-release"><span id="index-11"></span>This is globally dis/enabled with the cmake option <tt class="docutils literal"><span class="pre">ENABLE_RELEASE</span></tt>.</p>
 </blockquote>
 </div>
 <div class="section" id="single-threaded">
-<span id="index-265"></span><h2>SINGLE_THREADED<a class="headerlink" href="#single-threaded" title="Permalink to this headline">¶</a></h2>
+<span id="index-12"></span><h2>SINGLE_THREADED<a class="headerlink" href="#single-threaded" title="Permalink to this headline">¶</a></h2>
 <blockquote>
 <blockquote>
 The <cite>SINGLE_THREADED</cite> feature identifies builds of libraries that
 assume that the program using them is single-threaded. These
 libraries typically avoid costly atomic operations or locks, and
 make use of no multi-threaded features.</blockquote>
-<p id="enable-single-threaded"><span id="index-266"></span>This is globally dis/enabled with the cmake option <tt class="docutils literal"><span class="pre">ENABLE_SINGLE_THREADED</span></tt>.</p>
+<p id="enable-single-threaded"><span id="index-13"></span>This is globally dis/enabled with the cmake option <tt class="docutils literal"><span class="pre">ENABLE_SINGLE_THREADED</span></tt>.</p>
 </blockquote>
 </div>
 <div class="section" id="multi-threaded">
-<span id="index-267"></span><h2>MULTI_THREADED<a class="headerlink" href="#multi-threaded" title="Permalink to this headline">¶</a></h2>
+<span id="index-14"></span><h2>MULTI_THREADED<a class="headerlink" href="#multi-threaded" title="Permalink to this headline">¶</a></h2>
 <blockquote>
 <blockquote>
 The <cite>MULTI_THREADED</cite> feature identifies builds of libraries that
@@ -180,27 +180,27 @@ libraries may introduce additional code (relative to their
 single-threaded variants) that improves the behavior of the
 library in a multi-threade context, often at the cost of
 single-thread performance.</blockquote>
-<p id="enable-multi-threaded"><span id="index-268"></span>This is globally dis/enabled with the cmake option <tt class="docutils literal"><span class="pre">ENABLE_MULTI_THREADED</span></tt>.</p>
+<p id="enable-multi-threaded"><span id="index-15"></span>This is globally dis/enabled with the cmake option <tt class="docutils literal"><span class="pre">ENABLE_MULTI_THREADED</span></tt>.</p>
 </blockquote>
 </div>
 <div class="section" id="static-runtime">
-<span id="index-269"></span><h2>STATIC_RUNTIME<a class="headerlink" href="#static-runtime" title="Permalink to this headline">¶</a></h2>
+<span id="index-16"></span><h2>STATIC_RUNTIME<a class="headerlink" href="#static-runtime" title="Permalink to this headline">¶</a></h2>
 <blockquote>
 <blockquote>
 The <cite>STATIC_RUNTIME</cite> feature identifies builds that link against
 the C and C++ run-time libraries statically, which directly
 includes the code from those run-time libraries into the Boost
 library or executable.</blockquote>
-<p id="enable-static-runtime"><span id="index-270"></span>This is globally dis/enabled with the cmake option <tt class="docutils literal"><span class="pre">ENABLE_STATIC_RUNTIME</span></tt>.</p>
+<p id="enable-static-runtime"><span id="index-17"></span>This is globally dis/enabled with the cmake option <tt class="docutils literal"><span class="pre">ENABLE_STATIC_RUNTIME</span></tt>.</p>
 </blockquote>
 </div>
 <div class="section" id="dynamic-runtime">
-<span id="index-271"></span><h2>DYNAMIC_RUNTIME<a class="headerlink" href="#dynamic-runtime" title="Permalink to this headline">¶</a></h2>
+<span id="index-18"></span><h2>DYNAMIC_RUNTIME<a class="headerlink" href="#dynamic-runtime" title="Permalink to this headline">¶</a></h2>
 <blockquote>
 <blockquote>
 The <cite>DYNAMIC_RUNTIME</cite> feature identifies builds that link against
 the dynamic C and C++ run-time libraries.</blockquote>
-<p id="enable-dynamic-runtime"><span id="index-272"></span>This is globally dis/enabled with the cmake option <tt class="docutils literal"><span class="pre">ENABLE_DYNAMIC_RUNTIME</span></tt>.</p>
+<p id="enable-dynamic-runtime"><span id="index-19"></span>This is globally dis/enabled with the cmake option <tt class="docutils literal"><span class="pre">ENABLE_DYNAMIC_RUNTIME</span></tt>.</p>
 </blockquote>
 </div>
 <div class="section" id="compilation-and-linker-options">
@@ -292,7 +292,7 @@ the debug variants, drastically improving overall build times.</p>
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version 7e71276b51b40710c4b1c2b7ef30440a3a9d8fb9, Sat, 17 Oct 2009.
+      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version 885af6cde8b010cb3710c5fb7f6ee23a86b086d1, Sun, 18 Oct 2009.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>
