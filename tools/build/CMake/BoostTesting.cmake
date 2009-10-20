@@ -283,8 +283,18 @@ macro(boost_test_run testname)
     if (THIS_EXE_OKAY)
       get_target_property(THIS_TEST_OUTPUT_DIRECTORY ${testname} 
         RUNTIME_OUTPUT_DIRECTORY)
+      #
+      # Fixup path for visual studio per instructions from Brad King:  
+      #
+      get_target_property(THIS_TEST_LOCATION ${BOOST_TEST_TESTNAME}
+        LOCATION)
+      message("LOCATION=${THIS_TEST_LOCATION}")
+      string(REGEX REPLACE "\\$\\(.*\\)" "\${CTEST_CONFIGURATION_TYPE}"
+        THIS_TEST_LOCATION "${THIS_TEST_LOCATION}")
+      message("LOCATION2=${THIS_TEST_LOCATION}")
+
       add_test (${BOOST_TEST_TESTNAME} 
-        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_CFG_INTDIR}/tests/${BOOST_PROJECT_NAME}/${testname}
+        ${THIS_TEST_LOCATION}
         ${BOOST_TEST_ARGS})
 
       set_tests_properties(${BOOST_TEST_TESTNAME}
