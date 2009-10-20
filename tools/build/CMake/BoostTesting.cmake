@@ -41,6 +41,14 @@
 set(BUILD_TESTS "NONE" CACHE STRING "Semicolon-separated list of lowercase librarary names to test, or \"ALL\"")
 enable_testing()
 
+if (BUILD_TESTS STREQUAL "NONE")
+  #
+  # Add a little "message" if tests are run while BUILD_TESTS is NONE
+  #
+  add_test(BUILD_TESTS_is_NONE_nothing_to_test
+    /bin/false)
+endif()
+ 
 set(DART_TESTING_TIMEOUT=15 CACHE INTEGER "Timeout after this much madness")
 
 #-------------------------------------------------------------------------------
@@ -288,10 +296,8 @@ macro(boost_test_run testname)
       #
       get_target_property(THIS_TEST_LOCATION ${BOOST_TEST_TESTNAME}
         LOCATION)
-      message("LOCATION=${THIS_TEST_LOCATION}")
       string(REGEX REPLACE "\\$\\(.*\\)" "\${CTEST_CONFIGURATION_TYPE}"
         THIS_TEST_LOCATION "${THIS_TEST_LOCATION}")
-      message("LOCATION2=${THIS_TEST_LOCATION}")
 
       add_test (${BOOST_TEST_TESTNAME} 
         ${THIS_TEST_LOCATION}
