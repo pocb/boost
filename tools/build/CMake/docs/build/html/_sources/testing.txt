@@ -13,72 +13,79 @@ collects and reports regression-testing results from different
 sites. This document assumes that the reader has already learned how
 to build and configure Boost using CMake.
 
-.. _BUILD_TESTS:
 .. index:: BUILD_TESTS
+.. _BUILD_TESTS:
 
-.. index:: testing
+BUILD_TESTS
+-----------
 
-Re-run the CMake configuration for Boost, after setting
-``BUILD_TESTS`` to ``ALL``. You may notice that
-configuration takes significantly longer when we are building all of
-the regression tests.  You may enable regression testing for only a
-subset of Boost libraries (this speeds configuration and build time)
-by setting the variable ``BUILD_TESTS`` to a semicolon
-separated list of library names, e.g. (from the CMakeCache.txt) ::
+The variable BUILD_TESTS is a comma-separated list of projects for
+which testing will be enabled, e.g.::
 
-  spirit;serialization;variant
+  accumulators;iostreams;variant
+
+or the string ``"ALL"`` for all projects, or the string
+``"NONE"`` to disable testing.
+
+If you re-run the CMake configuration for Boost with ``BUILD_TESTS``
+set to ``ALL``, you will notice that configuration takes significantly
+longer when we are building all of the regression tests.  This is due
+to the very large number of toplevel targets (thousands) that are
+created.  Until boost's testing scheme is reorganized to reduce this
+number, we anticipate that only testing nodes will want to test ALL,
+whereas developers will want to test the library under development and
+those that are dependent on it.  
 
 Be sure to re-configure CMake once you are done tweaking these
-options, and generate makefiles or project files, by clicking *OK* (on
-Microsoft Windows) or pressing :kbd:`g` (on Unix).
+options, and generate makefiles or project files, as mentioned in
+:ref:`quickstart`.  
 
-To test **all**, libraries, set ``BUILD_TESTS`` to ``ALL``
-
-If you know what you're going to be testing, you can simplify the
-whole process with e.g. ::
+If you're using a command-line configuration (nmake files, unix
+makefiles) you can simplify this process by passing the value of
+``BUILD_TESTS`` on the command line, e.g. ::
 
    cmake ../src -DBUILD_TESTS=mpi;graph_parallel
 
-.. _the_dashboard:
-
-The Dashboard
--------------
-
-Donated by kitware, it is here:
-
-http://www.cdash.org/CDashPublic/index.php?project=Boost
+.. note:: In Visual Studio, you should be prompted by the gui to
+   reload the project.  If you're unlucky, you will be prompted a
+   thousand times to reload each individual solution.  For this
+   reason, our current best recommendataion is to close and reopen the
+   project if you rebuild ``Boost.sln``.
 
 
 Build
 -----
 
-      
-Following the same building process described in :ref:`quickstart`.
-For Unix users, don't forget the `-i` option to `make`, and also
-possibly `-j 2` (or more) to run the build process in
+Follow the same building process described in :ref:`quickstart`.  For
+Unix users, don't forget the `-i` option to `make` (ignore errors),
+and also possibly `-j 2` (or more) to run the build process in
 parallel. Building all of the regression tests for the Boost libraries
 can take a long time. ::
 
-  make -i -j 2
+  make -j2 -i
  
 .. note:: If you change Boost source files in a way that affects your
-   	  tests, you will need to re-run the build process to update
-   	  the libraries and tests before moving on to the next step.
+   	  tests, you will need to rebuild to update the libraries and
+   	  test executables before moving on to the next step.
 
 Test
 ----
 
-Once regression tests have finished building, go into the command line
-or command prompt and enter the Boost binary directory. Then, run the
-command::
+Once regression tests have finished building,
+
+Unix and nmake
+^^^^^^^^^^^^^^
+
+at a command prompt, ``cd`` to the Boost binary directory. Then, run
+the command::
 
   ctest
 
-to execute all of the regression tests. The `ctest` executable will be
-stored in the binary directory for CMake. On Unix platforms, this is
-the same place where `ccmake` resides. On Windows platforms, it will
-be in ``C:\Program Files\CMake\bin``. The ctest program should produce
-output like the following::
+to execute all of the regression tests. The `ctest` executable comes
+with cmake.  On Unix platforms, this is the same place where `ccmake`
+resides. On Windows platforms, it will be in ``C:\Program
+Files\CMake X.Y\bin``. The ctest program should produce output like the
+following::
 
   Start processing tests
   Test project /Users/dgregor/Projects/boost-darwin
@@ -107,7 +114,6 @@ output like the following::
   
   100% tests passed, 0 tests failed out of 22
 
-
 Here, we have only enabled testing of the Boost.Any and Boost.Function
 libraries, by setting `BUILD_TESTS` to `any;function`.
 
@@ -127,6 +133,13 @@ There is also a ``-E`` (exclude) option which does the inverse of ``-R``.
 .. index:: targets ; testing
 .. index:: testing ; targets
 
+Visual Studio
+^^^^^^^^^^^^^
+
+You will see a solution named ``RUN_TESTS``.  Build this to run the
+tests.
+
+
 Targets
 -------
 
@@ -145,6 +158,15 @@ accumulators test targets look like this::
 Note that they are prefixed with the name of the project, a dash, and
 'tests'.  Under visual studio you will see these targets in the
 'solution explorer'.
+
+.. _the_dashboard:
+
+The Dashboard
+-------------
+
+Donated by kitware, it is here:
+
+http://www.cdash.org/CDashPublic/index.php?project=Boost
 
 Submitting Results
 ------------------
@@ -176,11 +198,6 @@ results to the Dart dashboard at
 http://www.cdash.org/CDashPublic/index.php?project=Boost.  Results
 submitted to the dashboard are usually browsable momentarily within a
 minute or two.
-
-.. note:: Although we are running regression tests on several flavors
-   	  of Unix on a nightly basis, we have done very little work to
-   	  ensure that regression testing runs smoothly on other
-   	  platforms. We will remedy this problem in the near future.
 
 Automatic testing
 -----------------

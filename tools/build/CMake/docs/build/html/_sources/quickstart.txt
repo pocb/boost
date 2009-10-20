@@ -136,6 +136,8 @@ quite specific, and nmake, which is much like the Unix version, above.
 
 .. index:: Visual Studio
 
+.. _vs_configure:
+
 Configuration for Visual Studio
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -185,9 +187,9 @@ Run CMake by selecting it from the Start menu.
   initially appear red.  Click *Configure* again when you are done
   editing them.  The one thing that you may wish to configure as part
   of this 'quickstart' is ``CMAKE_INSTALL_PREFIX``.
-* Finally, click *Generate* to generate project files.  Boost.sln will
-  appear in the *where to build the binaries* directory from the cmake
-  gui.
+* Finally, click *Generate* to generate project files.  ``Boost.sln``,
+  the VS solution file, will appear in the *where to build the
+  binaries* directory from the cmake gui.
 
 .. index:: NMake
 

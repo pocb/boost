@@ -50,10 +50,15 @@
             <h3><a href="index.html">Table Of Contents</a></h3>
             <ul>
 <li><a class="reference external" href="">Testing</a><ul>
-<li><a class="reference external" href="#the-dashboard">The Dashboard</a></li>
+<li><a class="reference external" href="#build-tests">BUILD_TESTS</a></li>
 <li><a class="reference external" href="#build">Build</a></li>
-<li><a class="reference external" href="#test">Test</a></li>
+<li><a class="reference external" href="#test">Test</a><ul>
+<li><a class="reference external" href="#unix-and-nmake">Unix and nmake</a></li>
+<li><a class="reference external" href="#visual-studio">Visual Studio</a></li>
+</ul>
+</li>
 <li><a class="reference external" href="#targets">Targets</a></li>
+<li><a class="reference external" href="#the-dashboard">The Dashboard</a></li>
 <li><a class="reference external" href="#submitting-results">Submitting Results</a></li>
 <li><a class="reference external" href="#automatic-testing">Automatic testing</a><ul>
 <li><a class="reference external" href="#continuous">Continuous</a></li>
@@ -93,58 +98,72 @@ and users to submit regression tests to a <a class="reference external" href="ht
 collects and reports regression-testing results from different
 sites. This document assumes that the reader has already learned how
 to build and configure Boost using CMake.</p>
-<span class="target" id="build-tests"></span><span class="target" id="index-79"></span><p id="index-80">Re-run the CMake configuration for Boost, after setting
-<tt class="docutils literal"><span class="pre">BUILD_TESTS</span></tt> to <tt class="docutils literal"><span class="pre">ALL</span></tt>. You may notice that
-configuration takes significantly longer when we are building all of
-the regression tests.  You may enable regression testing for only a
-subset of Boost libraries (this speeds configuration and build time)
-by setting the variable <tt class="docutils literal"><span class="pre">BUILD_TESTS</span></tt> to a semicolon
-separated list of library names, e.g. (from the CMakeCache.txt)</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">spirit</span><span class="p">;</span><span class="n">serialization</span><span class="p">;</span><span class="n">variant</span>
+<div class="section" id="build-tests">
+<span id="index-96"></span><span id="id2"></span><h2>BUILD_TESTS<a class="headerlink" href="#build-tests" title="Permalink to this headline">¶</a></h2>
+<p>The variable BUILD_TESTS is a comma-separated list of projects for
+which testing will be enabled, e.g.:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">accumulators</span><span class="p">;</span><span class="n">iostreams</span><span class="p">;</span><span class="n">variant</span>
 </pre></div>
 </div>
+<p>or the string <tt class="docutils literal"><span class="pre">&quot;ALL&quot;</span></tt> for all projects, or the string
+<tt class="docutils literal"><span class="pre">&quot;NONE&quot;</span></tt> to disable testing.</p>
+<p>If you re-run the CMake configuration for Boost with <tt class="docutils literal"><span class="pre">BUILD_TESTS</span></tt>
+set to <tt class="docutils literal"><span class="pre">ALL</span></tt>, you will notice that configuration takes significantly
+longer when we are building all of the regression tests.  This is due
+to the very large number of toplevel targets (thousands) that are
+created.  Until boost&#8217;s testing scheme is reorganized to reduce this
+number, we anticipate that only testing nodes will want to test ALL,
+whereas developers will want to test the library under development and
+those that are dependent on it.</p>
 <p>Be sure to re-configure CMake once you are done tweaking these
-options, and generate makefiles or project files, by clicking <em>OK</em> (on
-Microsoft Windows) or pressing <tt class="docutils literal"><span class="pre">g</span></tt> (on Unix).</p>
-<p>To test <strong>all</strong>, libraries, set <tt class="docutils literal"><span class="pre">BUILD_TESTS</span></tt> to <tt class="docutils literal"><span class="pre">ALL</span></tt></p>
-<p>If you know what you&#8217;re going to be testing, you can simplify the
-whole process with e.g.</p>
+options, and generate makefiles or project files, as mentioned in
+<a class="reference external" href="quickstart.html#quickstart"><em>Quickstart</em></a>.</p>
+<p>If you&#8217;re using a command-line configuration (nmake files, unix
+makefiles) you can simplify this process by passing the value of
+<tt class="docutils literal"><span class="pre">BUILD_TESTS</span></tt> on the command line, e.g.</p>
 <div class="highlight-python"><pre>cmake ../src -DBUILD_TESTS=mpi;graph_parallel</pre>
 </div>
-<div class="section" id="the-dashboard">
-<span id="id2"></span><h2>The Dashboard<a class="headerlink" href="#the-dashboard" title="Permalink to this headline">¶</a></h2>
-<p>Donated by kitware, it is here:</p>
-<p><a class="reference external" href="http://www.cdash.org/CDashPublic/index.php?project=Boost">http://www.cdash.org/CDashPublic/index.php?project=Boost</a></p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">In Visual Studio, you should be prompted by the gui to
+reload the project.  If you&#8217;re unlucky, you will be prompted a
+thousand times to reload each individual solution.  For this
+reason, our current best recommendataion is to close and reopen the
+project if you rebuild <tt class="docutils literal"><span class="pre">Boost.sln</span></tt>.</p>
+</div>
 </div>
 <div class="section" id="build">
 <h2>Build<a class="headerlink" href="#build" title="Permalink to this headline">¶</a></h2>
-<p>Following the same building process described in <a class="reference external" href="quickstart.html#quickstart"><em>Quickstart</em></a>.
-For Unix users, don&#8217;t forget the <cite>-i</cite> option to <cite>make</cite>, and also
-possibly <cite>-j 2</cite> (or more) to run the build process in
+<p>Follow the same building process described in <a class="reference external" href="quickstart.html#quickstart"><em>Quickstart</em></a>.  For
+Unix users, don&#8217;t forget the <cite>-i</cite> option to <cite>make</cite> (ignore errors),
+and also possibly <cite>-j 2</cite> (or more) to run the build process in
 parallel. Building all of the regression tests for the Boost libraries
 can take a long time.</p>
-<div class="highlight-python"><pre>make -i -j 2</pre>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">make</span> <span class="o">-</span><span class="n">j2</span> <span class="o">-</span><span class="n">i</span>
+</pre></div>
 </div>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">If you change Boost source files in a way that affects your
-tests, you will need to re-run the build process to update
-the libraries and tests before moving on to the next step.</p>
+tests, you will need to rebuild to update the libraries and
+test executables before moving on to the next step.</p>
 </div>
 </div>
 <div class="section" id="test">
 <h2>Test<a class="headerlink" href="#test" title="Permalink to this headline">¶</a></h2>
-<p>Once regression tests have finished building, go into the command line
-or command prompt and enter the Boost binary directory. Then, run the
-command:</p>
+<p>Once regression tests have finished building,</p>
+<div class="section" id="unix-and-nmake">
+<h3>Unix and nmake<a class="headerlink" href="#unix-and-nmake" title="Permalink to this headline">¶</a></h3>
+<p>at a command prompt, <tt class="docutils literal"><span class="pre">cd</span></tt> to the Boost binary directory. Then, run
+the command:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">ctest</span>
 </pre></div>
 </div>
-<p>to execute all of the regression tests. The <cite>ctest</cite> executable will be
-stored in the binary directory for CMake. On Unix platforms, this is
-the same place where <cite>ccmake</cite> resides. On Windows platforms, it will
-be in <tt class="docutils literal"><span class="pre">C:\Program</span> <span class="pre">Files\CMake\bin</span></tt>. The ctest program should produce
-output like the following:</p>
+<p>to execute all of the regression tests. The <cite>ctest</cite> executable comes
+with cmake.  On Unix platforms, this is the same place where <cite>ccmake</cite>
+resides. On Windows platforms, it will be in <tt class="docutils literal"><span class="pre">C:\Program</span>
+<span class="pre">Files\CMake</span> <span class="pre">X.Y\bin</span></tt>. The ctest program should produce output like the
+following:</p>
 <div class="highlight-python"><pre>Start processing tests
 Test project /Users/dgregor/Projects/boost-darwin
   1/ 22 Testing any-any_test                    Passed
@@ -187,9 +206,15 @@ example, to run all of the Python tests, use:</p>
 </div>
 <p>There is also a <tt class="docutils literal"><span class="pre">-E</span></tt> (exclude) option which does the inverse of <tt class="docutils literal"><span class="pre">-R</span></tt>.
 <tt class="docutils literal"><span class="pre">ctest</span> <span class="pre">--help</span></tt> shows the full list of options.</p>
-<span class="target" id="index-81"></span></div>
+<span class="target" id="index-97"></span></div>
+<div class="section" id="visual-studio">
+<span id="index-98"></span><h3>Visual Studio<a class="headerlink" href="#visual-studio" title="Permalink to this headline">¶</a></h3>
+<p>You will see a solution named <tt class="docutils literal"><span class="pre">RUN_TESTS</span></tt>.  Build this to run the
+tests.</p>
+</div>
+</div>
 <div class="section" id="targets">
-<span id="index-82"></span><h2>Targets<a class="headerlink" href="#targets" title="Permalink to this headline">¶</a></h2>
+<h2>Targets<a class="headerlink" href="#targets" title="Permalink to this headline">¶</a></h2>
 <p>The testing subsystem adds toplevel targets to the build.  On unix you
 can see them in the output of <tt class="docutils literal"><span class="pre">make</span> <span class="pre">help</span></tt>.  For example some of the
 accumulators test targets look like this:</p>
@@ -204,6 +229,11 @@ accumulators test targets look like this:</p>
 <p>Note that they are prefixed with the name of the project, a dash, and
 &#8216;tests&#8217;.  Under visual studio you will see these targets in the
 &#8216;solution explorer&#8217;.</p>
+</div>
+<div class="section" id="the-dashboard">
+<span id="id3"></span><h2>The Dashboard<a class="headerlink" href="#the-dashboard" title="Permalink to this headline">¶</a></h2>
+<p>Donated by kitware, it is here:</p>
+<p><a class="reference external" href="http://www.cdash.org/CDashPublic/index.php?project=Boost">http://www.cdash.org/CDashPublic/index.php?project=Boost</a></p>
 </div>
 <div class="section" id="submitting-results">
 <h2>Submitting Results<a class="headerlink" href="#submitting-results" title="Permalink to this headline">¶</a></h2>
@@ -234,13 +264,6 @@ results to the Dart dashboard at
 <a class="reference external" href="http://www.cdash.org/CDashPublic/index.php?project=Boost">http://www.cdash.org/CDashPublic/index.php?project=Boost</a>.  Results
 submitted to the dashboard are usually browsable momentarily within a
 minute or two.</p>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">Although we are running regression tests on several flavors
-of Unix on a nightly basis, we have done very little work to
-ensure that regression testing runs smoothly on other
-platforms. We will remedy this problem in the near future.</p>
-</div>
 </div>
 <div class="section" id="automatic-testing">
 <h2>Automatic testing<a class="headerlink" href="#automatic-testing" title="Permalink to this headline">¶</a></h2>
@@ -306,7 +329,7 @@ Updating the repository
 </div>
 <p>If you add <tt class="docutils literal"><span class="pre">-V</span> <span class="pre">or</span> <span class="pre">-VV</span></tt> you&#8217;ll get a little more feedback about what
 is going on.  On unix it is handy to do this via the utility <em>screen</em>.</p>
-<div class="admonition-todo admonition " id="todo-83">
+<div class="admonition-todo admonition " id="todo-99">
 <p class="first admonition-title">Todo</p>
 <p class="last">Figure out how to do this on windows, encapsulate some of
 this scripting.  Just use the ctest builtin scripting
@@ -472,7 +495,7 @@ your results on <a class="reference internal" href="#the-dashboard"><em>The Dash
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version bcaa9d6fba6f9a7a2e3633e631316c3da1bde477, Mon, 19 Oct 2009.
+      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version c2fd46765454df35ee0bc40f0847ffeb1377ec2d, Tue, 20 Oct 2009.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

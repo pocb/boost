@@ -88,5 +88,10 @@ doctest:
 	      "results in build/doctest/output.txt."
 
 deploy:
-	rsync -va build/html/ flourine:/var/www/www.resophonic.com/boost_cmake/
+	make html
+	rsync --delete -va build/html/ sodium:/var/www/htdocs/boost-cmake/1.41.0.cmakebeta0/doc/
+
+	make latex
+	make -C build/latex all-pdf
+	scp build/latex/boost-cmake.pdf sodium:/var/www/htdocs/boost-cmake/1.41.0.cmakebeta0/
 
