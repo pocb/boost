@@ -99,7 +99,7 @@ directories listed after <tt class="docutils literal"><span class="pre">SRCDIRS<
 <li><p class="first">Create a new file <tt class="docutils literal"><span class="pre">libs/libname/src/CMakeLists.txt</span></tt> with your
 favorite text editor. This file will contain build rules for your
 compiled library. In this file, we will create one or more
-invocations of the <a class="reference external" href="reference/boost_add_library.html#boost-add-library"><em>boost_add_library</em></a> macro, which adds a
+invocations of the <a class="reference external" href="reference/boost_add_library.html#boost-add-library-macro"><em>boost_add_library</em></a> macro, which adds a
 compiled Boost library to the CMake system. This macro provides the
 name of the library, the source files from which the library will
 be built, and any specific compiler and linker options needed to
@@ -261,7 +261,7 @@ check out the build rules for the Boost.IOStreams library at
 </div>
 <div class="section" id="build-variants">
 <h2>Build Variants<a class="headerlink" href="#build-variants" title="Permalink to this headline">¶</a></h2>
-<p>The Boost build system defines many different <a class="reference external" href="build_variants.html#variants"><em>Build Variants</em></a>, which
+<p>The Boost build system defines many different <a class="reference external" href="build_variants.html#variants"><em>Build Variants and Features</em></a>, which
 describe specific properties of certain builds. For example, the
 <tt class="docutils literal"><span class="pre">SHARED</span></tt> feature indicates that we are building a shared library,
 while the <tt class="docutils literal"><span class="pre">MULTI_THREADED</span></tt> feature indicates that we are building a
@@ -271,7 +271,7 @@ multi-threaded library. A specific set of features is called a
 different variants of each Boost library.</p>
 <p>Since some features conflict with certain libraries (a threading
 library cannot be <tt class="docutils literal"><span class="pre">SINGLE_THREADED</span></tt>!), one can pass additional flags
-to <a class="reference external" href="reference/boost_add_library.html#boost-add-library"><em>boost_add_library</em></a> stating which features should the library
+to <a class="reference external" href="reference/boost_add_library.html#boost-add-library-macro"><em>boost_add_library</em></a> stating which features should the library
 cannot be built with.  For example, say that our library cannot be
 built as a multi-threaded library, because it uses thread-unsafe
 routines from the underlying C library. To disable multi-threaded
@@ -312,7 +312,7 @@ variants of the library, pass the option <tt class="docutils literal"><span clas
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version 3002856d57131650020d71d4f1fd7911c0f9cd6d, Sat, 24 Oct 2009.
+      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version 9240f26b2961a3d7c7ce2efb4b42eeb317d28c88, Sun, 25 Oct 2009.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

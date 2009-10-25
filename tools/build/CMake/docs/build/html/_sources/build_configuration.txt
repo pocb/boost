@@ -3,11 +3,6 @@
 Configuring the buildspace
 ===========================
 
-Setting the compiler
---------------------
-
-See :ref:`setting_the_compiler` below.
-
 Configuration tools
 -------------------
 
@@ -138,6 +133,11 @@ But with it on, (on a gcc 4.3 linux box)::
 Historically this mangling has been more interesting to windows users
 than unix users.
 
+.. note:: The on-disk names of library :ref:`variants <variants>` are
+   	  always mangled with the active :ref:`features <features>`.
+   	  ``BUILD_VERSIONED`` affects mangling of compiler and boost
+   	  version only.
+
 In addition, with ``BUILD_VERSIONED`` on, the install destination for
 header files will contain a subdirectory containing ``boost-VERSION``.
 For example, on boost 1.40.0 with ``BUILD_VERSIONED`` ON, and a
@@ -151,6 +151,19 @@ segment is omitted::
 
   /usr/local/include/boost/...
 
+.. index:: BUILD_EXAMPLES
+.. _BUILD_EXAMPLES:
+
+BUILD_EXAMPLES
+^^^^^^^^^^^^^^
+
+This is a semicolon-separated list of projects whose examples should
+be built, e.g.::
+
+  BUILD_EXAMPLES=iostreams;accumulators
+
+Per-library examples are specified with the :ref:`EXAMPLEDIRS`
+argument to the :ref:`boost_library_project_macro` macro.
 
 Advanced options
 ----------------
@@ -160,7 +173,7 @@ mode.  Some of the useful options here are:
 
 .. _verbosity:
 
-.. index:: verbosity
+.. index:: verbosity; CMAKE_VERBOSE_MAKEFILE
 
 CMAKE_VERBOSE_MAKEFILE
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -170,9 +183,9 @@ CMAKE_VERBOSE_MAKEFILE
   generally easier to invoke make with the option ``VERBOSE=1``
   instead (this has the same effect, but for one build only).
 
-.. index:: CMAKE_CXX_COMPILER; compiler, setting
+.. index:: CMAKE_CXX_COMPILER
 
-.. _setting_the_compiler:
+.. _cmake_cxx_compiler:
 
 CMAKE_CXX_COMPILER
 ^^^^^^^^^^^^^^^^^^
@@ -188,11 +201,18 @@ CMAKE_CXX_COMPILER
 Options for customizing installation
 ------------------------------------
 
+.. index:: CMAKE_INSTALL_PREFIX
+   single:  installation
+
+.. _cmake_install_prefix:
+
 CMAKE_INSTALL_PREFIX
 ^^^^^^^^^^^^^^^^^^^^
 
 This is a standard cmake option that sets the path to which boost will
 be installed.
+
+.. _boost_install_lib_subdir_name:
 
 BOOST_INSTALL_LIB_SUBDIR_NAME
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

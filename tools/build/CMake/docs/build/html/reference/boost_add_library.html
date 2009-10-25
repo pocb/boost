@@ -47,6 +47,24 @@
             <p class="logo"><a href="../index.html">
               <img class="logo" src="../_static/boost-small.png" alt="Logo"/>
             </a></p>
+            <h3><a href="../index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">boost_add_library</a><ul>
+<li><a class="reference external" href="#compile-flags">COMPILE_FLAGS</a></li>
+<li><a class="reference external" href="#feature-compile-flags">feature_COMPILE_FLAGS</a></li>
+<li><a class="reference external" href="#link-flags">LINK_FLAGS</a></li>
+<li><a class="reference external" href="#feature-link-flags">feature_LINK_FLAGS</a></li>
+<li><a class="reference external" href="#link-libs">LINK_LIBS</a></li>
+<li><a class="reference external" href="#feature-link-libs">feature_LINK_LIBS</a></li>
+<li><a class="reference external" href="#depends">DEPENDS</a></li>
+<li><a class="reference external" href="#static-tag">STATIC_TAG</a></li>
+<li><a class="reference external" href="#module">MODULE</a></li>
+<li><a class="reference external" href="#no-feature">NO_feature</a></li>
+<li><a class="reference external" href="#extra-variants">EXTRA_VARIANTS</a></li>
+</ul>
+</li>
+</ul>
+
             <h4>Previous topic</h4>
             <p class="topless"><a href="boost_library_project.html"
                                   title="previous chapter">boost_library_project</a></p>
@@ -67,15 +85,15 @@
           <div class="body">
             
   <div class="section" id="boost-add-library">
-<span id="id1"></span><h1>boost_add_library<a class="headerlink" href="#boost-add-library" title="Permalink to this headline">¶</a></h1>
+<span id="boost-add-library-macro"></span><span id="index-42"></span><h1>boost_add_library<a class="headerlink" href="#boost-add-library" title="Permalink to this headline">¶</a></h1>
 <p>This macro creates a new Boost library target that generates a compiled library
 (.a, .lib, .dll, .so, etc) from source files. This routine will
 actually build several different variants of the same library, with
 different compilation options, as determined by the set of &#8220;default&#8221;
 library variants.</p>
 <dl class="cmake">
-<dt>
-<tt class="descname">boost_add_library(libname source1 source2 ...</tt></dt>
+<dt id="boost_add_library">
+<tt class="descname">boost_add_library</tt><big>(</big><em>libname source1 source2 ...</em><big>)</big><a class="headerlink" href="#boost_add_library" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -108,17 +126,19 @@ several cases, we use the placeholder &#8220;feature&#8221; in the option name
 to indicate that there are actually several different kinds of
 options, each referring to a different build feature, e.g., shared
 libraries, multi-threaded, debug build, etc. For a complete listing
-of these features, please refer to the page on [wiki:CMakeBuildFeatures CMake Build Features].</p>
+of these features, see <a class="reference external" href="../build_variants.html#features"><em>Build Variants and Features</em></a>.</p>
 <p>The options that affect this macro&#8217;s behavior are:</p>
-<blockquote>
-<p><cite>COMPILE_FLAGS</cite></p>
+<div class="section" id="compile-flags">
+<span id="index-43"></span><h2>COMPILE_FLAGS<a class="headerlink" href="#compile-flags" title="Permalink to this headline">¶</a></h2>
 <blockquote>
 Provides additional compilation flags that will be
 used when building all variants of the library. For example, one
-might want to add &#8220;-DBOOST_SIGNALS_NO_LIB=1&#8221; through this option
+might want to add <tt class="docutils literal"><span class="pre">&quot;-DBOOST_SIGNALS_NO_LIB=1&quot;</span></tt> through this option
 (which turns off auto-linking for the Signals library while
 building it).</blockquote>
-<p><cite>feature_COMPILE_FLAGS</cite></p>
+</div>
+<div class="section" id="feature-compile-flags">
+<h2>feature_COMPILE_FLAGS<a class="headerlink" href="#feature-compile-flags" title="Permalink to this headline">¶</a></h2>
 <blockquote>
 Provides additional compilation flags that
 will be used only when building variants of the library that
@@ -127,33 +147,43 @@ include the given feature. For example,
 used when building a multi-threaded variant, while
 <cite>SHARED_COMPILE_FLAGS</cite> will be used when building a shared library
 (as opposed to a static library).</blockquote>
-<p><cite>LINK_FLAGS</cite></p>
+</div>
+<div class="section" id="link-flags">
+<h2>LINK_FLAGS<a class="headerlink" href="#link-flags" title="Permalink to this headline">¶</a></h2>
 <blockquote>
 Provides additional flags that will be passed to the
 linker when linking each variant of the library. This option
 should not be used to link in additional libraries; see <cite>LINK_LIBS</cite>
 and <cite>DEPENDS</cite>.</blockquote>
-<p><cite>feature_LINK_FLAGS</cite></p>
+</div>
+<div class="section" id="feature-link-flags">
+<h2>feature_LINK_FLAGS<a class="headerlink" href="#feature-link-flags" title="Permalink to this headline">¶</a></h2>
 <blockquote>
 Provides additional flags that will be passed
 to the linker when building variants of the library that contain a
 specific feature, e.g., <cite>MULTI_THREADED_LINK_FLAGS</cite>. This option
 should not be used to link in additional libraries; see
 feature_LINK_LIBS.</blockquote>
-<p><cite>LINK_LIBS</cite></p>
+</div>
+<div class="section" id="link-libs">
+<h2>LINK_LIBS<a class="headerlink" href="#link-libs" title="Permalink to this headline">¶</a></h2>
 <blockquote>
 Provides additional libraries against which each of the
 library variants will be linked. For example, one might provide
 &#8220;expat&#8221; as options to LINK_LIBS, to state that each of the library
 variants will link against the expat library binary. Use LINK_LIBS
 for libraries external to Boost; for Boost libraries, use DEPENDS.</blockquote>
-<p><cite>feature_LINK_LIBS</cite></p>
+</div>
+<div class="section" id="feature-link-libs">
+<h2>feature_LINK_LIBS<a class="headerlink" href="#feature-link-libs" title="Permalink to this headline">¶</a></h2>
 <blockquote>
 Provides additional libraries for specific
 variants of the library to link against. For example,
 <cite>MULTI_THREADED_LINK_LIBS</cite> provides extra libraries to link into
 multi-threaded variants of the library.</blockquote>
-<p><cite>DEPENDS</cite></p>
+</div>
+<div class="section" id="depends">
+<h2>DEPENDS<a class="headerlink" href="#depends" title="Permalink to this headline">¶</a></h2>
 <blockquote>
 States that this Boost libraries depends on and links
 against another Boost library. The arguments to <cite>DEPENDS</cite> should be
@@ -166,7 +196,9 @@ Boost library against the same variant of the other Boost
 library. For example, if the boost_mpi_python library <cite>DEPENDS</cite> on
 boost_python, multi-threaded variants of boost_mpi_python will
 link against multi-threaded variants of boost_python.</blockquote>
-<p><cite>STATIC_TAG</cite></p>
+</div>
+<div class="section" id="static-tag">
+<h2>STATIC_TAG<a class="headerlink" href="#static-tag" title="Permalink to this headline">¶</a></h2>
 <blockquote>
 States that the name of static library variants on
 Unix need to be named differently from shared library
@@ -175,24 +207,27 @@ where the static and shared library variants are incompatible,
 such that linking against the shared library rather than the
 static library will cause features. When this option is provided,
 static libraries on Unix variants will have &#8220;-s&#8221; appended to their
-names. Note: we hope that this is a temporary solution. At
-present, it is only used by the Test library.</blockquote>
-<p><cite>MODULE</cite></p>
+names. <em>We hope that this is a temporary solution. At
+present, it is only used by the Test library.</em></blockquote>
+</div>
+<div class="section" id="module">
+<h2>MODULE<a class="headerlink" href="#module" title="Permalink to this headline">¶</a></h2>
 <blockquote>
 This option states that, when building a shared library,
 the shared library should be built as a module rather than a
 normal shared library. Modules have special meaning an behavior on
 some platforms, such as Mac OS X.</blockquote>
-<p><cite>NOT_feature</cite></p>
+</div>
+<div class="section" id="no-feature">
+<h2>NO_feature<a class="headerlink" href="#no-feature" title="Permalink to this headline">¶</a></h2>
 <blockquote>
-<dl class="docutils">
-<dt>States that library variants containing a particular</dt>
-<dd>feature should not be built. For example, passing
-<cite>NOT_SINGLE_THREADED</cite> suppresses generation of single-threaded
-variants of this library.</dd>
-</dl>
-</blockquote>
-<p><cite>EXTRA_VARIANTS</cite></p>
+States that library variants containing a particular
+feature should not be built. For example, passing
+<cite>NO_SINGLE_THREADED</cite> suppresses generation of single-threaded
+variants of this library.</blockquote>
+</div>
+<div class="section" id="extra-variants">
+<h2>EXTRA_VARIANTS<a class="headerlink" href="#extra-variants" title="Permalink to this headline">¶</a></h2>
 <blockquote>
 Specifies that extra variants of this library
 should be built, based on the features listed. Each &#8220;variant&#8221; is a
@@ -201,7 +236,6 @@ EXTRA_VARIANTS &#8220;PYTHON_NODEBUG:PYTHON_DEBUG&#8221;
 will result in the creation of an extra set of library variants,
 some with the <cite>PYTHON_NODEBUG</cite> feature and some with the
 <cite>PYTHON_DEBUG</cite> feature.</blockquote>
-</blockquote>
 <p class="rubric">Example</p>
 <p>The Boost.Thread library binary is built using the following
 invocation of the <cite>boost_add_library</cite> macro. The options passed to the
@@ -222,10 +256,11 @@ added.</p>
   NO_SINGLE_THREADED
 )</pre>
 </div>
-<p>This example is from libs/thread/src/CMakeLists.txt.</p>
+<p>This example is from <tt class="docutils literal"><span class="pre">libs/thread/src/CMakeLists.txt</span></tt>.</p>
 <p class="rubric">Where Defined</p>
 <p>This macro is defined in the Boost Core module in
-tools/build/CMake/BoostCore.cmake</p>
+<tt class="docutils literal"><span class="pre">tools/build/CMake/BoostCore.cmake</span></tt>.</p>
+</div>
 </div>
 
 
@@ -253,7 +288,7 @@ tools/build/CMake/BoostCore.cmake</p>
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version 3002856d57131650020d71d4f1fd7911c0f9cd6d, Sat, 24 Oct 2009.
+      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version 9240f26b2961a3d7c7ce2efb4b42eeb317d28c88, Sun, 25 Oct 2009.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

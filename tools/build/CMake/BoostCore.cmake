@@ -1106,9 +1106,9 @@ endmacro(boost_select_variant)
 #   normal shared library. Modules have special meaning an behavior on
 #   some platforms, such as Mac OS X.
 #
-#   NOT_feature: States that library variants containing a particular
+#   NO_feature: States that library variants containing a particular
 #   feature should not be built. For example, passing
-#   NOT_SINGLE_THREADED suppresses generation of single-threaded
+#   NO_SINGLE_THREADED suppresses generation of single-threaded
 #   variants of this library.
 #
 #   EXTRA_VARIANTS: Specifies that extra variants of this library
@@ -1130,7 +1130,7 @@ endmacro(boost_select_variant)
 #     tss.cpp xtime.cpp
 #     SHARED_COMPILE_FLAGS "-DBOOST_THREAD_BUILD_DLL=1"
 #     STATIC_COMPILE_FLAGS "-DBOOST_THREAD_BUILD_LIB=1"
-#     NOT_SINGLE_THREADED
+#     NO_SINGLE_THREADED
 #   )
 macro(boost_add_library LIBNAME)
   parse_arguments(THIS_LIB

@@ -42,11 +42,36 @@ angle brackets, with -at- instead of the at sign, e.g., ::
 
   Douglas Gregor <doug.gregor -at- gmail.com>
 
+.. index:: TESTDIRS
+.. _TESTDIRS:
+
+TESTDIRS
+^^^^^^^^
+
 For libraries that have regression tests, and when testing is enabled
 either by `BUILD_TESTS` containing the (lowercase) name of this
 library or the string ``ALL``, the generated makefiles/project files
 will contain regression tests for this library.
    
+.. index:: EXAMPLEDIRS
+.. _EXAMPLEDIRS:
+
+EXAMPLEDIRS
+^^^^^^^^^^^
+
+This option specifies directories containing examples.  Examples are
+just libraries/executables created with :ref:`boost_add_library_macro`
+and :ref:`boost_add_executable_macro`, except they are only built if
+the name of the current project is specified in :ref:`BUILD_EXAMPLES`.
+
+.. index:: MODULAR
+.. _MODULAR:
+
+MODULAR
+^^^^^^^
+
+Currently unused.
+
 .. rubric:: Example
 
 The Boost.Thread library uses the following invocation of the

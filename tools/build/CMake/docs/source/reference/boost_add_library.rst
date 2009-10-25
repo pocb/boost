@@ -1,4 +1,5 @@
-.. _boost_add_library:
+.. index:: boost_add_library 
+.. _boost_add_library_macro:
 
 boost_add_library
 -----------------
@@ -9,7 +10,7 @@ actually build several different variants of the same library, with
 different compilation options, as determined by the set of "default"
 library variants.
 
-.. cmake:: boost_add_library(libname source1 source2 ...
+.. cmake:: boost_add_library(libname source1 source2 ...)
 
    :param source1 source2 ...:  relative paths to source files
    :type COMPILE_FLAGS: optional
@@ -43,19 +44,23 @@ several cases, we use the placeholder "feature" in the option name
 to indicate that there are actually several different kinds of
 options, each referring to a different build feature, e.g., shared
 libraries, multi-threaded, debug build, etc. For a complete listing
-of these features, please refer to the page on [wiki:CMakeBuildFeatures CMake Build Features].
+of these features, see :ref:`features`.
 
 The options that affect this macro's behavior are:
 
-  `COMPILE_FLAGS`
+.. index:: COMPILE_FLAGS
+
+COMPILE_FLAGS
+^^^^^^^^^^^^^
 
     Provides additional compilation flags that will be
     used when building all variants of the library. For example, one
-    might want to add "-DBOOST_SIGNALS_NO_LIB=1" through this option
+    might want to add ``"-DBOOST_SIGNALS_NO_LIB=1"`` through this option
     (which turns off auto-linking for the Signals library while
     building it).
 
-  `feature_COMPILE_FLAGS`
+feature_COMPILE_FLAGS
+^^^^^^^^^^^^^^^^^^^^^
 
     Provides additional compilation flags that
     will be used only when building variants of the library that
@@ -65,14 +70,16 @@ The options that affect this macro's behavior are:
     `SHARED_COMPILE_FLAGS` will be used when building a shared library
     (as opposed to a static library).
 
-  `LINK_FLAGS`
+LINK_FLAGS
+^^^^^^^^^^
 
     Provides additional flags that will be passed to the
     linker when linking each variant of the library. This option
     should not be used to link in additional libraries; see `LINK_LIBS`
     and `DEPENDS`.
 
-  `feature_LINK_FLAGS`
+feature_LINK_FLAGS
+^^^^^^^^^^^^^^^^^^
 
     Provides additional flags that will be passed
     to the linker when building variants of the library that contain a
@@ -80,7 +87,8 @@ The options that affect this macro's behavior are:
     should not be used to link in additional libraries; see
     feature_LINK_LIBS.
 
-  `LINK_LIBS`
+LINK_LIBS
+^^^^^^^^^
 
     Provides additional libraries against which each of the
     library variants will be linked. For example, one might provide
@@ -88,14 +96,16 @@ The options that affect this macro's behavior are:
     variants will link against the expat library binary. Use LINK_LIBS
     for libraries external to Boost; for Boost libraries, use DEPENDS.
 
-  `feature_LINK_LIBS`
+feature_LINK_LIBS
+^^^^^^^^^^^^^^^^^
 
     Provides additional libraries for specific
     variants of the library to link against. For example,
     `MULTI_THREADED_LINK_LIBS` provides extra libraries to link into
     multi-threaded variants of the library.
 
-  `DEPENDS`
+DEPENDS
+^^^^^^^
 
     States that this Boost libraries depends on and links
     against another Boost library. The arguments to `DEPENDS` should be
@@ -109,7 +119,8 @@ The options that affect this macro's behavior are:
     boost_python, multi-threaded variants of boost_mpi_python will
     link against multi-threaded variants of boost_python.
 
-  `STATIC_TAG`
+STATIC_TAG
+^^^^^^^^^^
 
     States that the name of static library variants on
     Unix need to be named differently from shared library
@@ -118,24 +129,27 @@ The options that affect this macro's behavior are:
     such that linking against the shared library rather than the
     static library will cause features. When this option is provided,
     static libraries on Unix variants will have "-s" appended to their
-    names. Note: we hope that this is a temporary solution. At
-    present, it is only used by the Test library.
+    names. *We hope that this is a temporary solution. At
+    present, it is only used by the Test library.*
 
-  `MODULE`
+MODULE
+^^^^^^
 
     This option states that, when building a shared library,
     the shared library should be built as a module rather than a
     normal shared library. Modules have special meaning an behavior on
     some platforms, such as Mac OS X.
 
-  `NOT_feature`
+NO_feature
+^^^^^^^^^^
 
-   States that library variants containing a particular
+    States that library variants containing a particular
     feature should not be built. For example, passing
-    `NOT_SINGLE_THREADED` suppresses generation of single-threaded
+    `NO_SINGLE_THREADED` suppresses generation of single-threaded
     variants of this library.
 
-  `EXTRA_VARIANTS`
+EXTRA_VARIANTS
+^^^^^^^^^^^^^^
 
     Specifies that extra variants of this library
     should be built, based on the features listed. Each "variant" is a 
@@ -157,7 +171,6 @@ obviously would not make sense for a threading library!). The flags
 needed to compile the multi-threaded variants are automatically
 added. ::
 
-
   boost_add_library(
     boost_thread
     barrier.cpp condition.cpp exceptions.cpp mutex.cpp once.cpp 
@@ -169,11 +182,11 @@ added. ::
   )
   
 
-This example is from libs/thread/src/CMakeLists.txt.
+This example is from ``libs/thread/src/CMakeLists.txt``.
 
 .. rubric:: Where Defined
 
 This macro is defined in the Boost Core module in
-tools/build/CMake/BoostCore.cmake
+``tools/build/CMake/BoostCore.cmake``.
 
 

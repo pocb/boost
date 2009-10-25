@@ -78,7 +78,7 @@
 build system for boost, under development since boost version 1.35.
 As of Boost version 1.38, boost.cmake can reliably build and
 package boost.</p>
-<dl class="docutils" id="index-249">
+<dl class="docutils" id="index-44">
 <dt><strong>boost-cmake mailing list</strong></dt>
 <dd><a class="reference external" href="http://lists.boost.org/mailman/listinfo.cgi/boost-cmake">http://lists.boost.org/mailman/listinfo.cgi/boost-cmake</a></dd>
 <dt><strong>IRC</strong></dt>
@@ -111,7 +111,6 @@ package boost.</p>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="build_configuration.html">Configuring the buildspace</a><ul>
-<li class="toctree-l2"><a class="reference external" href="build_configuration.html#setting-the-compiler">Setting the compiler</a></li>
 <li class="toctree-l2"><a class="reference external" href="build_configuration.html#configuration-tools">Configuration tools</a></li>
 </ul>
 </li>
@@ -119,6 +118,7 @@ package boost.</p>
 <li class="toctree-l2"><a class="reference external" href="build_configuration.html#a-few-useful-options">A few useful options</a><ul>
 <li class="toctree-l3"><a class="reference external" href="build_configuration.html#cmake-osx-architectures">CMAKE_OSX_ARCHITECTURES</a></li>
 <li class="toctree-l3"><a class="reference external" href="build_configuration.html#build-versioned">BUILD_VERSIONED</a></li>
+<li class="toctree-l3"><a class="reference external" href="build_configuration.html#build-examples">BUILD_EXAMPLES</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference external" href="build_configuration.html#advanced-options">Advanced options</a><ul>
@@ -133,16 +133,16 @@ package boost.</p>
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference external" href="build_variants.html">Build Variants</a><ul>
-<li class="toctree-l2"><a class="reference external" href="build_variants.html#static">STATIC</a></li>
-<li class="toctree-l2"><a class="reference external" href="build_variants.html#shared">SHARED</a></li>
-<li class="toctree-l2"><a class="reference external" href="build_variants.html#debug">DEBUG</a></li>
-<li class="toctree-l2"><a class="reference external" href="build_variants.html#release">RELEASE</a></li>
-<li class="toctree-l2"><a class="reference external" href="build_variants.html#single-threaded">SINGLE_THREADED</a></li>
-<li class="toctree-l2"><a class="reference external" href="build_variants.html#multi-threaded">MULTI_THREADED</a></li>
-<li class="toctree-l2"><a class="reference external" href="build_variants.html#static-runtime">STATIC_RUNTIME</a></li>
-<li class="toctree-l2"><a class="reference external" href="build_variants.html#dynamic-runtime">DYNAMIC_RUNTIME</a></li>
-<li class="toctree-l2"><a class="reference external" href="build_variants.html#compilation-and-linker-options">Compilation and Linker Options</a><ul>
+<li class="toctree-l1"><a class="reference external" href="build_variants.html">Build Variants and Features</a><ul>
+<li class="toctree-l2"><a class="reference external" href="build_variants.html#enable-static">ENABLE_STATIC</a></li>
+<li class="toctree-l2"><a class="reference external" href="build_variants.html#enable-shared">ENABLE_SHARED</a></li>
+<li class="toctree-l2"><a class="reference external" href="build_variants.html#enable-debug">ENABLE_DEBUG</a></li>
+<li class="toctree-l2"><a class="reference external" href="build_variants.html#enable-release">ENABLE_RELEASE</a></li>
+<li class="toctree-l2"><a class="reference external" href="build_variants.html#enable-single-threaded">ENABLE_SINGLE_THREADED</a></li>
+<li class="toctree-l2"><a class="reference external" href="build_variants.html#enable-multi-threaded">ENABLE_MULTI_THREADED</a></li>
+<li class="toctree-l2"><a class="reference external" href="build_variants.html#enable-static-runtime">ENABLE_STATIC_RUNTIME</a></li>
+<li class="toctree-l2"><a class="reference external" href="build_variants.html#enable-dynamic-runtime">ENABLE_DYNAMIC_RUNTIME</a></li>
+<li class="toctree-l2"><a class="reference external" href="build_variants.html#per-feature-compilation-and-linker-options">Per-feature Compilation and Linker Options</a><ul>
 <li class="toctree-l3"><a class="reference external" href="build_variants.html#feature-compile-flags">feature_COMPILE_FLAGS</a></li>
 <li class="toctree-l3"><a class="reference external" href="build_variants.html#feature-link-flags">feature_LINK_FLAGS</a></li>
 <li class="toctree-l3"><a class="reference external" href="build_variants.html#feature-link-libs">feature_LINK_LIBS</a></li>
@@ -251,7 +251,7 @@ them (or use <tt class="docutils literal"><span class="pre">git</span> <span cla
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version 3002856d57131650020d71d4f1fd7911c0f9cd6d, Sat, 24 Oct 2009.
+      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version 9240f26b2961a3d7c7ce2efb4b42eeb317d28c88, Sun, 25 Oct 2009.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

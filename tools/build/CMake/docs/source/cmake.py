@@ -27,7 +27,7 @@ class CMake(PythonDesc):
         return self.desctype == 'cmake'
 
     def get_index_text(self, modname, name_cls):
-        return _('%s (cmake macro)') % name_cls[0]
+        return _('%s') % name_cls[0]
 
 def setup(app):
 

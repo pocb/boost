@@ -47,6 +47,16 @@
             <p class="logo"><a href="../index.html">
               <img class="logo" src="../_static/boost-small.png" alt="Logo"/>
             </a></p>
+            <h3><a href="../index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">boost_library_project</a><ul>
+<li><a class="reference external" href="#testdirs">TESTDIRS</a></li>
+<li><a class="reference external" href="#exampledirs">EXAMPLEDIRS</a></li>
+<li><a class="reference external" href="#modular">MODULAR</a></li>
+</ul>
+</li>
+</ul>
+
             <h4>Previous topic</h4>
             <p class="topless"><a href="../notes_by_version.html"
                                   title="previous chapter">Notes by Boost Version</a></p>
@@ -67,7 +77,7 @@
           <div class="body">
             
   <div class="section" id="boost-library-project">
-<span id="boost-library-project-macro"></span><span id="index-263"></span><h1>boost_library_project<a class="headerlink" href="#boost-library-project" title="Permalink to this headline">¶</a></h1>
+<span id="boost-library-project-macro"></span><span id="index-67"></span><h1>boost_library_project<a class="headerlink" href="#boost-library-project" title="Permalink to this headline">¶</a></h1>
 <p>Define a boost library project.</p>
 <dl class="cmake">
 <dt id="boost_library_project">
@@ -106,10 +116,23 @@ should have their name followed by their current e-mail address in
 angle brackets, with -at- instead of the at sign, e.g.,</p>
 <div class="highlight-python"><pre>Douglas Gregor &lt;doug.gregor -at- gmail.com&gt;</pre>
 </div>
+<div class="section" id="testdirs">
+<span id="index-68"></span><span id="id1"></span><h2>TESTDIRS<a class="headerlink" href="#testdirs" title="Permalink to this headline">¶</a></h2>
 <p>For libraries that have regression tests, and when testing is enabled
 either by <cite>BUILD_TESTS</cite> containing the (lowercase) name of this
 library or the string <tt class="docutils literal"><span class="pre">ALL</span></tt>, the generated makefiles/project files
 will contain regression tests for this library.</p>
+</div>
+<div class="section" id="exampledirs">
+<span id="index-69"></span><span id="id2"></span><h2>EXAMPLEDIRS<a class="headerlink" href="#exampledirs" title="Permalink to this headline">¶</a></h2>
+<p>This option specifies directories containing examples.  Examples are
+just libraries/executables created with <a class="reference external" href="boost_add_library.html#boost-add-library-macro"><em>boost_add_library</em></a>
+and <a class="reference external" href="boost_add_executable.html#boost-add-executable-macro"><em>boost_add_executable</em></a>, except they are only built if
+the name of the current project is specified in <a class="reference external" href="../build_configuration.html#build-examples"><em>BUILD_EXAMPLES</em></a>.</p>
+</div>
+<div class="section" id="modular">
+<span id="index-70"></span><span id="id3"></span><h2>MODULAR<a class="headerlink" href="#modular" title="Permalink to this headline">¶</a></h2>
+<p>Currently unused.</p>
 <p class="rubric">Example</p>
 <p>The Boost.Thread library uses the following invocation of the
 <cite>boost_library_project</cite> macro, since it has both a compiled library
@@ -126,6 +149,7 @@ will contain regression tests for this library.</p>
 <p class="rubric">Where Defined</p>
 <p>This macro is defined in the Boost Core module in
 <tt class="docutils literal"><span class="pre">tools/build/CMake/BoostCore.cmake</span></tt></p>
+</div>
 </div>
 
 
@@ -153,7 +177,7 @@ will contain regression tests for this library.</p>
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version 3002856d57131650020d71d4f1fd7911c0f9cd6d, Sat, 24 Oct 2009.
+      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version 9240f26b2961a3d7c7ce2efb4b42eeb317d28c88, Sun, 25 Oct 2009.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

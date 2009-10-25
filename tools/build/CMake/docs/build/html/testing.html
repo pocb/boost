@@ -21,7 +21,7 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Boost.CMake 1.40.0.cmake3" href="index.html" />
     <link rel="next" title="Building individual libraries with cmake" href="individual_libraries.html" />
-    <link rel="prev" title="Build Variants" href="build_variants.html" /> 
+    <link rel="prev" title="Build Variants and Features" href="build_variants.html" /> 
   </head>
   <body>
     <div class="related">
@@ -34,7 +34,7 @@
           <a href="individual_libraries.html" title="Building individual libraries with cmake"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="build_variants.html" title="Build Variants"
+          <a href="build_variants.html" title="Build Variants and Features"
              accesskey="P">previous</a> |</li>
     <li><a href="http://www.boost.org/">Boost</a> &raquo;</li>
     
@@ -71,7 +71,7 @@
 
             <h4>Previous topic</h4>
             <p class="topless"><a href="build_variants.html"
-                                  title="previous chapter">Build Variants</a></p>
+                                  title="previous chapter">Build Variants and Features</a></p>
             <h4>Next topic</h4>
             <p class="topless"><a href="individual_libraries.html"
                                   title="next chapter">Building individual libraries with cmake</a></p>
@@ -99,7 +99,7 @@ collects and reports regression-testing results from different
 sites. This document assumes that the reader has already learned how
 to build and configure Boost using CMake.</p>
 <div class="section" id="build-tests">
-<span id="index-266"></span><span id="id2"></span><h2>BUILD_TESTS<a class="headerlink" href="#build-tests" title="Permalink to this headline">¶</a></h2>
+<span id="index-34"></span><span id="id2"></span><h2>BUILD_TESTS<a class="headerlink" href="#build-tests" title="Permalink to this headline">¶</a></h2>
 <p>The variable BUILD_TESTS is a comma-separated list of projects for
 which testing will be enabled, e.g.:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">accumulators</span><span class="p">;</span><span class="n">iostreams</span><span class="p">;</span><span class="n">variant</span>
@@ -206,9 +206,9 @@ example, to run all of the Python tests, use:</p>
 </div>
 <p>There is also a <tt class="docutils literal"><span class="pre">-E</span></tt> (exclude) option which does the inverse of <tt class="docutils literal"><span class="pre">-R</span></tt>.
 <tt class="docutils literal"><span class="pre">ctest</span> <span class="pre">--help</span></tt> shows the full list of options.</p>
-<span class="target" id="index-267"></span></div>
+<span class="target" id="index-35"></span></div>
 <div class="section" id="visual-studio">
-<span id="index-268"></span><h3>Visual Studio<a class="headerlink" href="#visual-studio" title="Permalink to this headline">¶</a></h3>
+<span id="index-36"></span><h3>Visual Studio<a class="headerlink" href="#visual-studio" title="Permalink to this headline">¶</a></h3>
 <p>You will see a solution named <tt class="docutils literal"><span class="pre">RUN_TESTS</span></tt>.  Build this to run the
 tests.</p>
 </div>
@@ -329,7 +329,7 @@ Updating the repository
 </div>
 <p>If you add <tt class="docutils literal"><span class="pre">-V</span> <span class="pre">or</span> <span class="pre">-VV</span></tt> you&#8217;ll get a little more feedback about what
 is going on.  On unix it is handy to do this via the utility <em>screen</em>.</p>
-<div class="admonition-todo admonition " id="todo-269">
+<div class="admonition-todo admonition " id="todo-37">
 <p class="first admonition-title">Todo</p>
 <p class="last">Figure out how to do this on windows, encapsulate some of
 this scripting.  Just use the ctest builtin scripting
@@ -486,7 +486,7 @@ your results on <a class="reference internal" href="#the-dashboard"><em>The Dash
           <a href="individual_libraries.html" title="Building individual libraries with cmake"
              >next</a> |</li>
         <li class="right" >
-          <a href="build_variants.html" title="Build Variants"
+          <a href="build_variants.html" title="Build Variants and Features"
              >previous</a> |</li>
     <li><a href="http://www.boost.org/">Boost</a> &raquo;</li>
     
@@ -495,7 +495,7 @@ your results on <a class="reference internal" href="#the-dashboard"><em>The Dash
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version 3002856d57131650020d71d4f1fd7911c0f9cd6d, Sat, 24 Oct 2009.
+      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version 9240f26b2961a3d7c7ce2efb4b42eeb317d28c88, Sun, 25 Oct 2009.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>
