@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>boost_additional_test_dependencies &mdash; Boost.CMake 1.40.0.cmake3</title>
+    <title>boost_test_compile_fail &mdash; Boost.CMake 1.40.0.cmake3</title>
     <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
@@ -20,8 +20,8 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <link rel="top" title="Boost.CMake 1.40.0.cmake3" href="../index.html" />
-    <link rel="next" title="boost_test_compile" href="boost_test_compile.html" />
-    <link rel="prev" title="boost_add_executable" href="boost_add_executable.html" /> 
+    <link rel="next" title="boost_test_run" href="boost_test_run.html" />
+    <link rel="prev" title="boost_test_compile" href="boost_test_compile.html" /> 
   </head>
   <body>
     <div class="related">
@@ -31,10 +31,10 @@
           <a href="../genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="boost_test_compile.html" title="boost_test_compile"
+          <a href="boost_test_run.html" title="boost_test_run"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="boost_add_executable.html" title="boost_add_executable"
+          <a href="boost_test_compile.html" title="boost_test_compile"
              accesskey="P">previous</a> |</li>
     <li><a href="http://www.boost.org/">Boost</a> &raquo;</li>
     
@@ -48,14 +48,14 @@
               <img class="logo" src="../_static/boost-small.png" alt="Logo"/>
             </a></p>
             <h4>Previous topic</h4>
-            <p class="topless"><a href="boost_add_executable.html"
-                                  title="previous chapter">boost_add_executable</a></p>
-            <h4>Next topic</h4>
             <p class="topless"><a href="boost_test_compile.html"
-                                  title="next chapter">boost_test_compile</a></p>
+                                  title="previous chapter">boost_test_compile</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="boost_test_run.html"
+                                  title="next chapter">boost_test_run</a></p>
             <h3>This Page</h3>
             <ul class="this-page-menu">
-              <li><a href="../_sources/reference/boost_additional_test_dependencies.txt"
+              <li><a href="../_sources/reference/boost_test_compile_fail.txt"
                      rel="nofollow">Show Source</a></li>
             </ul>
         </div>
@@ -66,48 +66,9 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="boost-additional-test-dependencies">
-<h1>boost_additional_test_dependencies<a class="headerlink" href="#boost-additional-test-dependencies" title="Permalink to this headline">¶</a></h1>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">This is only needed in the presence of &#8216;modularization&#8217;
-which is currently disabled.</p>
-</div>
-<p>Add additional include directories based on the dependencies of the
-library being tested &#8216;libname&#8217; and all of its dependencies.</p>
-<dl class="cmake">
-<dt>
-<tt class="descname">boost_additional_test_dependencies(libname, ...</tt></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><em>libname</em> &#8211; name of library being tested</li>
-<li><em>BOOST_DEPENDS</em> &#8211; libdepend1 libdepend2 ...</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<p><cite>libname</cite></p>
-<blockquote>
-the name of the boost library being tested. (signals)</blockquote>
-<p><cite>BOOST_DEPENDS</cite></p>
-<blockquote>
-The list of the extra boost libraries that the test suite will
-depend on. You do NOT have to list those libraries already listed
-by the module.cmake file as these will be used.</blockquote>
-<p class="rubric">Example</p>
-<p>The following invocation of the <cite>boost_additional_test_dependencies</cite>
-macro is taken from the signals library.</p>
-<div class="highlight-python"><pre>boost_additional_test_dependencies(signals BOOST_DEPENDS test optional)</pre>
-</div>
-<p class="rubric">Where Defined</p>
-<p>This macro is defined in the Boost Testing module in
-tools/build/CMake/BoostTesting.cmake</p>
+  <div class="section" id="boost-test-compile-fail">
+<span id="id1"></span><h1>boost_test_compile_fail<a class="headerlink" href="#boost-test-compile-fail" title="Permalink to this headline">¶</a></h1>
+<p>FIXME</p>
 </div>
 
 
@@ -123,10 +84,10 @@ tools/build/CMake/BoostTesting.cmake</p>
           <a href="../genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="boost_test_compile.html" title="boost_test_compile"
+          <a href="boost_test_run.html" title="boost_test_run"
              >next</a> |</li>
         <li class="right" >
-          <a href="boost_add_executable.html" title="boost_add_executable"
+          <a href="boost_test_compile.html" title="boost_test_compile"
              >previous</a> |</li>
     <li><a href="http://www.boost.org/">Boost</a> &raquo;</li>
     

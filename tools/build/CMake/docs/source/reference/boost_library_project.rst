@@ -1,4 +1,5 @@
 .. index:: boost_library_project
+.. _boost_library_project_macro:
 
 boost_library_project
 ---------------------
@@ -12,6 +13,8 @@ Define a boost library project.
    :param SRCDIRS: srcdir1 srcdir2 ...
    :type TESTDIRS: optional
    :param TESTDIRS: testdir1 testdir2 ..
+   :type EXAMPLEDIRS: optional
+   :param EXAMPLEDIRS: testdir1 testdir2 ..
    :param DESCRIPTION: description
    :param AUTHORS: author1 author2
    :param MAINTAINERS: maint maint2
@@ -24,10 +27,10 @@ library sources (for Boost libraries that build actual library
 binaries), and `testdir1`, `testdir2`, etc, are subdirectories
 containing regression tests.
 
-A library marked MODULAR has all of its header files in its own
-subdirectory include/boost rather than the "global" boost
-subdirectory. These libraries can be added or removed from the tree
-freely; they do not need to be a part of the main repository.
+.. A library marked MODULAR has all of its header files in its own
+.. subdirectory include/boost rather than the "global" boost
+.. subdirectory. These libraries can be added or removed from the tree
+.. freely; they do not need to be a part of the main repository.
  
 `DESCRIPTION` provides a brief description of the library, which can
 be used to summarize the behavior of the library for a user. `AUTHORS`
@@ -39,16 +42,10 @@ angle brackets, with -at- instead of the at sign, e.g., ::
 
   Douglas Gregor <doug.gregor -at- gmail.com>
 
-For libraries that build actual library binaries, this macro adds a
-option `BUILD_BOOST_LIBNAME` (which defaults to ON). When the option
-is ON, this macro will include the source subdirectories, and
-therefore, will build and install the library binary.
-
-For libraries that have regression tests, and when testing is
-enabled globally by the `BUILD_REGRESSION_TESTS` option, this macro also
-defines the `TEST_BOOST_LIBNAME` option (defaults to ON). When ON, the
-generated makefiles/project files will contain regression tests for
-this library.
+For libraries that have regression tests, and when testing is enabled
+either by `BUILD_TESTS` containing the (lowercase) name of this
+library or the string ``ALL``, the generated makefiles/project files
+will contain regression tests for this library.
    
 .. rubric:: Example
 

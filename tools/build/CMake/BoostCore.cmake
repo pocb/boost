@@ -19,14 +19,6 @@
 #   boost_add_executable: Builds executables.                            #
 ##########################################################################
 
-add_custom_target(modularize
-  COMMENT 
-  "***
-*** Modularization is DISABLED and unnecessary for a standard 
-*** Build-and-install of boost.  
-***")
-
-
 # Defines a Boost library project (e.g., for Boost.Python). Use as:
 #
 #   boost_library_project(libname
@@ -56,26 +48,21 @@ add_custom_target(modularize
 # angle brackets, with -at- instead of the at sign, e.g.,
 #   Douglas Gregor <doug.gregor -at- gmail.com>
 #
-# For libraries that build actual library binaries, this macro adds a
-# option BUILD_BOOST_LIBNAME (which defaults to ON). When the option
-# is ON, this macro will include the source subdirectories, and
-# therefore, will build and install the library binary.
-#
-# For libraries that have regression tests, and when testing is
-# enabled globally by the BUILD_TESTING option, this macro also
-# defines the TEST_BOOST_LIBNAME option (defaults to ON). When ON, the
-# generated makefiles/project files will contain regression tests for
-# this library.
-#
 # Example: 
 #   boost_library_project(
 #     Thread
 #     SRCDIRS src 
 #     TESTDIRS test
 #     )
+set(BUILD_EXAMPLES "NONE" CACHE STRING "Semicolon-separated list of lowercase project names that should have their examples built, or \"ALL\"")
+
+set(BOOST_INSTALL_LIB_SUBDIR_NAME "lib" 
+  CACHE STRING 
+  "Name of directory under CMAKE_INSTALL_PREFIX to which libraries will be installed")
+
 macro(boost_library_project LIBNAME)
   parse_arguments(THIS_PROJECT
-    "SRCDIRS;TESTDIRS;HEADERS;DOCDIRS;DESCRIPTION;AUTHORS;MAINTAINERS"
+    "SRCDIRS;TESTDIRS;EXAMPLEDIRS;HEADERS;DOCDIRS;DESCRIPTION;AUTHORS;MAINTAINERS"
     "MODULARIZED"
     ${ARGN}
     )
@@ -99,301 +86,251 @@ macro(boost_library_project LIBNAME)
     endforeach()
   endwhile()
 
-  set(THIS_PROJECT_OKAY ON)
-
-  if(FALSE)
-    # This really isn't the check we want to do, especially when we
-    # hit circular dependencies. For now, just enable all libraries to
-    # be built all the time, until we can implement proper subsetting
-    # behavior at the CMake level.
-    set(THIS_PROJECT_FAILED_DEPS "")
-    foreach(DEP ${THIS_PROJECT_DEPENDS_ALL})
-      string(TOUPPER "BUILD_BOOST_${DEP}" BOOST_LIB_DEP)
-      if (NOT ${BOOST_LIB_DEP})
-        set(THIS_PROJECT_OKAY OFF)
-        set(THIS_PROJECT_FAILED_DEPS "${THIS_PROJECT_FAILED_DEPS}  ${DEP}\n")
-      endif (NOT ${BOOST_LIB_DEP})
-    endforeach(DEP)
-  endif(FALSE)
-
-  if (THIS_PROJECT_SRCDIRS)
-    # This Boost library has source directories, so provide an option
-    # BUILD_BOOST_LIBNAME that allows one to turn on/off building of
-    # the library.
-    if (NOT THIS_PROJECT_OKAY)
-      if (${BOOST_BUILD_LIB_OPTION})
-        # The user explicitly turned on this library in a prior
-        # iteration, but it can no longer be built because one of the
-        # dependencies was turned off. Force this option off and
-        # complain about it.
-        set(${BOOST_BUILD_LIB_OPTION} OFF
-          CACHE BOOL "Build Boost.${LIBNAME} (prefer make targets, not this, to build individual libs)" FORCE)
-        message(SEND_ERROR 
-      "Cannot build Boost.${LIBNAME} due to missing library dependencies:\n${THIS_PROJECT_FAILED_DEPS}")
-      endif (${BOOST_BUILD_LIB_OPTION})
-    endif (NOT THIS_PROJECT_OKAY)
-  endif (THIS_PROJECT_SRCDIRS)
-
-  if(THIS_PROJECT_OKAY)
-    string(TOLOWER "${LIBNAME}" libname)
-    string(TOUPPER "${LIBNAME}" ULIBNAME)
-    project(${LIBNAME})
-    
-    if (THIS_PROJECT_MODULARIZED OR THIS_PROJECT_SRCDIRS)
-      # We only build a component group for modularized libraries or libraries
-      # that have compiled parts.
-      if (COMMAND cpack_add_component_group)
-        # Compute a reasonable description for this library.
-        if (THIS_PROJECT_DESCRIPTION)
-          set(THIS_PROJECT_DESCRIPTION "Boost.${LIBNAME}\n\n${THIS_PROJECT_DESCRIPTION}")
-         
-          if (THIS_PROJECT_AUTHORS)
-            list(LENGTH THIS_PROJECT_AUTHORS THIS_PROJECT_NUM_AUTHORS)
-            if (THIS_PROJECT_NUM_AUTHORS EQUAL 1)
-              set(THIS_PROJECT_DESCRIPTION "${THIS_PROJECT_DESCRIPTION}\n\nAuthor: ")
-            else()
-              set(THIS_PROJECT_DESCRIPTION "${THIS_PROJECT_DESCRIPTION}\n\nAuthors: ")
-            endif()
-            set(THIS_PROJECT_FIRST_AUTHOR TRUE)
-            foreach(AUTHOR ${THIS_PROJECT_AUTHORS})
-              string(REGEX REPLACE " *-at- *" "@" AUTHOR ${AUTHOR})
-              if (THIS_PROJECT_FIRST_AUTHOR)
-                set(THIS_PROJECT_FIRST_AUTHOR FALSE)
-              else()
-                set(THIS_PROJECT_DESCRIPTION "${THIS_PROJECT_DESCRIPTION}\n         ")
-              endif()
-              set(THIS_PROJECT_DESCRIPTION "${THIS_PROJECT_DESCRIPTION}${AUTHOR}")
-            endforeach(AUTHOR)
-          endif (THIS_PROJECT_AUTHORS)
-
-          if (THIS_PROJECT_MAINTAINERS)
-            list(LENGTH THIS_PROJECT_MAINTAINERS THIS_PROJECT_NUM_MAINTAINERS)
-            if (THIS_PROJECT_NUM_MAINTAINERS EQUAL 1)
-              set(THIS_PROJECT_DESCRIPTION "${THIS_PROJECT_DESCRIPTION}\nMaintainer: ")
-            else()
-              set(THIS_PROJECT_DESCRIPTION "${THIS_PROJECT_DESCRIPTION}\nMaintainers: ")
-            endif()
-            set(THIS_PROJECT_FIRST_MAINTAINER TRUE)
-            foreach(MAINTAINER ${THIS_PROJECT_MAINTAINERS})
-              string(REGEX REPLACE " *-at- *" "@" MAINTAINER ${MAINTAINER})
-              if (THIS_PROJECT_FIRST_MAINTAINER)
-                set(THIS_PROJECT_FIRST_MAINTAINER FALSE)
-              else()
-                set(THIS_PROJECT_DESCRIPTION "${THIS_PROJECT_DESCRIPTION}\n             ")
-              endif()
-              set(THIS_PROJECT_DESCRIPTION "${THIS_PROJECT_DESCRIPTION}${MAINTAINER}")
-            endforeach(MAINTAINER)
-          endif (THIS_PROJECT_MAINTAINERS)
-        endif (THIS_PROJECT_DESCRIPTION)
-      
-        # Create a component group for this library
-        fix_cpack_component_name(CPACK_COMPONENT_GROUP_NAME ${libname})
-        cpack_add_component_group(${CPACK_COMPONENT_GROUP_NAME}
-          DISPLAY_NAME "${LIBNAME}"
-          DESCRIPTION ${THIS_PROJECT_DESCRIPTION})
-      endif () # COMMAND cpake_add_component_group
-    endif () # THIS_PROJECT_MODULARIZED OR THIS_PROJECT_SRCDIRS
+  string(TOLOWER "${LIBNAME}" libname)
+  string(TOLOWER "${LIBNAME}" BOOST_PROJECT_NAME)
+  string(TOUPPER "${LIBNAME}" ULIBNAME)
+  project(${LIBNAME})
+  
+  if (THIS_PROJECT_MODULARIZED OR THIS_PROJECT_SRCDIRS)
+    # We only build a component group for modularized libraries or libraries
+    # that have compiled parts.
+    if (COMMAND cpack_add_component_group)
+      # Compute a reasonable description for this library.
+      if (THIS_PROJECT_DESCRIPTION)
+        set(THIS_PROJECT_DESCRIPTION "Boost.${LIBNAME}\n\n${THIS_PROJECT_DESCRIPTION}")
         
-    if (THIS_PROJECT_MODULARIZED)
-      #
-      # Don't add this module's include directory
-      # until modularization makes sense
-      #
-      # include_directories("${Boost_SOURCE_DIR}/libs/${libname}/include")
-     
-      #
-      # Horrible hackery.  Make install of headers from modularized directories
-      # OPTIONAL, which only works on cmake >= 2.7
-      # 
-      #
-      # TDS 20091009: disable this modularized stuff, as forcing
-      # people to make modularize (which wastes your source directory)
-      # is a huge hassle and anyway it looks like the 'modularization'
-      # of boost is dead for a while.
-      #
-
-      # if (${CMAKE_MAJOR_VERSION} GREATER 1 AND ${CMAKE_MINOR_VERSION} GREATER 6)
-      # 	# Install this module's headers
-      # 	install(DIRECTORY include/boost 
-      #     DESTINATION ${BOOST_HEADER_DIR}
-      # 	  ${_INSTALL_OPTIONAL}
-      #     COMPONENT ${libname}_headers
-      #     PATTERN "CVS" EXCLUDE
-      #     PATTERN ".svn" EXCLUDE)
-      # else()
-      # 	if (EXISTS include/boost)
-      # 	  # Install this module's headers
-      # 	  install(DIRECTORY include/boost 
-      #       DESTINATION ${BOOST_HEADER_DIR}
-      # 	    ${_INSTALL_OPTIONAL}
-      #       COMPONENT ${libname}_headers
-      #       PATTERN "CVS" EXCLUDE
-      #       PATTERN ".svn" EXCLUDE)
-      # 	endif()
-      # endif()
-
-        
-      if (COMMAND cpack_add_component)        
-        # Determine the header dependencies
-        set(THIS_PROJECT_HEADER_DEPENDS)
-        foreach(DEP ${${THIS_PROJECT_DEPENDS}})
-          string(TOLOWER ${DEP} dep)
-          if (${dep} STREQUAL "serialization")
-            # TODO: Ugly, ugly hack until the serialization library is modularized
-          elseif (${dep} STREQUAL "thread")
+        if (THIS_PROJECT_AUTHORS)
+          list(LENGTH THIS_PROJECT_AUTHORS THIS_PROJECT_NUM_AUTHORS)
+          if (THIS_PROJECT_NUM_AUTHORS EQUAL 1)
+            set(THIS_PROJECT_DESCRIPTION "${THIS_PROJECT_DESCRIPTION}\n\nAuthor: ")
           else()
-            list(APPEND THIS_PROJECT_HEADER_DEPENDS ${dep}_headers)
+            set(THIS_PROJECT_DESCRIPTION "${THIS_PROJECT_DESCRIPTION}\n\nAuthors: ")
           endif()
-        endforeach(DEP)
+          set(THIS_PROJECT_FIRST_AUTHOR TRUE)
+          foreach(AUTHOR ${THIS_PROJECT_AUTHORS})
+            string(REGEX REPLACE " *-at- *" "@" AUTHOR ${AUTHOR})
+            if (THIS_PROJECT_FIRST_AUTHOR)
+              set(THIS_PROJECT_FIRST_AUTHOR FALSE)
+            else()
+              set(THIS_PROJECT_DESCRIPTION "${THIS_PROJECT_DESCRIPTION}\n         ")
+            endif()
+            set(THIS_PROJECT_DESCRIPTION "${THIS_PROJECT_DESCRIPTION}${AUTHOR}")
+          endforeach(AUTHOR)
+        endif (THIS_PROJECT_AUTHORS)
 
-        # Tell CPack about the headers component
-        fix_cpack_component_name(CPACK_COMPONENT_GROUP_NAME ${libname})
-        cpack_add_component(${libname}_headers
-          DISPLAY_NAME "Header files"
-          GROUP      ${CPACK_COMPONENT_GROUP_NAME}
-          DEPENDS    ${THIS_PROJECT_HEADER_DEPENDS})
-      endif ()
-    endif () # THIS_PROJECT_MODULARIZED
+        if (THIS_PROJECT_MAINTAINERS)
+          list(LENGTH THIS_PROJECT_MAINTAINERS THIS_PROJECT_NUM_MAINTAINERS)
+          if (THIS_PROJECT_NUM_MAINTAINERS EQUAL 1)
+            set(THIS_PROJECT_DESCRIPTION "${THIS_PROJECT_DESCRIPTION}\nMaintainer: ")
+          else()
+            set(THIS_PROJECT_DESCRIPTION "${THIS_PROJECT_DESCRIPTION}\nMaintainers: ")
+          endif()
+          set(THIS_PROJECT_FIRST_MAINTAINER TRUE)
+          foreach(MAINTAINER ${THIS_PROJECT_MAINTAINERS})
+            string(REGEX REPLACE " *-at- *" "@" MAINTAINER ${MAINTAINER})
+            if (THIS_PROJECT_FIRST_MAINTAINER)
+              set(THIS_PROJECT_FIRST_MAINTAINER FALSE)
+            else()
+              set(THIS_PROJECT_DESCRIPTION "${THIS_PROJECT_DESCRIPTION}\n             ")
+            endif()
+            set(THIS_PROJECT_DESCRIPTION "${THIS_PROJECT_DESCRIPTION}${MAINTAINER}")
+          endforeach(MAINTAINER)
+        endif (THIS_PROJECT_MAINTAINERS)
+      endif (THIS_PROJECT_DESCRIPTION)
+      
+      # Create a component group for this library
+      fix_cpack_component_name(CPACK_COMPONENT_GROUP_NAME ${libname})
+      cpack_add_component_group(${CPACK_COMPONENT_GROUP_NAME}
+        DISPLAY_NAME "${LIBNAME}"
+        DESCRIPTION ${THIS_PROJECT_DESCRIPTION})
+    endif () # COMMAND cpake_add_component_group
+  endif () # THIS_PROJECT_MODULARIZED OR THIS_PROJECT_SRCDIRS
+  
+  if (THIS_PROJECT_MODULARIZED)
+    #
+    # Don't add this module's include directory
+    # until modularization makes sense
+    #
+    # include_directories("${Boost_SOURCE_DIR}/libs/${libname}/include")
+    
+    #
+    # Horrible hackery.  Make install of headers from modularized directories
+    # OPTIONAL, which only works on cmake >= 2.7
+    # 
+    #
+    # TDS 20091009: disable this modularized stuff, as forcing
+    # people to make modularize (which wastes your source directory)
+    # is a huge hassle and anyway it looks like the 'modularization'
+    # of boost is dead for a while.
+    #
 
-#-- This is here to debug the modularize code
-    set(modularize_debug FALSE)
-    if (modularize_debug)
-      set(modularize_output ${Boost_BINARY_DIR})
-      set(modularize_libs_dir "modularize")
-    else (modularize_debug)
-      set(modularize_output ${Boost_SOURCE_DIR})
-      set(modularize_libs_dir "libs")
-    endif(modularize_debug)
-      # Modularization code
-    if(THIS_PROJECT_HEADERS)
-      set(${LIBNAME}-modularize-commands)
-      foreach(item ${THIS_PROJECT_HEADERS})
-        if(EXISTS "${Boost_SOURCE_DIR}/boost/${item}")
-          if(IS_DIRECTORY "${Boost_SOURCE_DIR}/boost/${item}")
-            list(APPEND ${LIBNAME}-modularize-commands
-              COMMAND "${CMAKE_COMMAND}" -E copy_directory
-              "${Boost_SOURCE_DIR}/boost/${item}"
-              "${modularize_output}/${modularize_libs_dir}/${libname}/include/boost/${item}"
-              )
-            if (NOT modularize_debug)
-                list(APPEND ${LIBNAME}-modularize-commands
-                     COMMAND "${CMAKE_COMMAND}" -E remove_directory "${Boost_SOURCE_DIR}/boost/${item}" 
-                    )
-            endif (NOT modularize_debug)
-          else(IS_DIRECTORY "${Boost_SOURCE_DIR}/boost/${item}")
-            list(APPEND ${LIBNAME}-modularize-commands
-              COMMAND "${CMAKE_COMMAND}" -E copy
-              "${Boost_SOURCE_DIR}/boost/${item}"
-              "${modularize_output}/${modularize_libs_dir}/${libname}/include/boost/${item}"
-              )
-            if (NOT modularize_debug)
-                list(APPEND ${LIBNAME}-modularize-commands
-                     COMMAND "${CMAKE_COMMAND}" -E remove "${Boost_SOURCE_DIR}/boost/${item}" 
-                    )
-            endif (NOT modularize_debug)
-            
-          endif(IS_DIRECTORY "${Boost_SOURCE_DIR}/boost/${item}")
-        elseif(EXISTS "${Boost_SOURCE_DIR}/${modularize_libs_dir}/${libname}/include/boost/${item}")
-          # Okay; already modularized
+    # if (${CMAKE_MAJOR_VERSION} GREATER 1 AND ${CMAKE_MINOR_VERSION} GREATER 6)
+    # 	# Install this module's headers
+    # 	install(DIRECTORY include/boost 
+    #     DESTINATION ${BOOST_HEADER_DIR}
+    # 	  ${_INSTALL_OPTIONAL}
+    #     COMPONENT ${libname}_headers
+    #     PATTERN "CVS" EXCLUDE
+    #     PATTERN ".svn" EXCLUDE)
+    # else()
+    # 	if (EXISTS include/boost)
+    # 	  # Install this module's headers
+    # 	  install(DIRECTORY include/boost 
+    #       DESTINATION ${BOOST_HEADER_DIR}
+    # 	    ${_INSTALL_OPTIONAL}
+    #       COMPONENT ${libname}_headers
+    #       PATTERN "CVS" EXCLUDE
+    #       PATTERN ".svn" EXCLUDE)
+    # 	endif()
+    # endif()
+
+    
+    if (COMMAND cpack_add_component)        
+      # Determine the header dependencies
+      set(THIS_PROJECT_HEADER_DEPENDS)
+      foreach(DEP ${${THIS_PROJECT_DEPENDS}})
+        string(TOLOWER ${DEP} dep)
+        if (${dep} STREQUAL "serialization")
+          # TODO: Ugly, ugly hack until the serialization library is modularized
+        elseif (${dep} STREQUAL "thread")
         else()
-          message(SEND_ERROR 
-            "Header or directory boost/${item} does not exist. The HEADERS argument in ${Boost_SOURCE_DIR}/${modularize_libs_dir}/${libname}/CMakeLists.txt should be updated.")
+          list(APPEND THIS_PROJECT_HEADER_DEPENDS ${dep}_headers)
         endif()
-      endforeach(item)
+      endforeach(DEP)
 
-      if (${LIBNAME}-modularize-commands)
+      # Tell CPack about the headers component
+      fix_cpack_component_name(CPACK_COMPONENT_GROUP_NAME ${libname})
+      cpack_add_component(${libname}_headers
+        DISPLAY_NAME "Header files"
+        GROUP      ${CPACK_COMPONENT_GROUP_NAME}
+        DEPENDS    ${THIS_PROJECT_HEADER_DEPENDS})
+    endif ()
+  endif () # THIS_PROJECT_MODULARIZED
+
+  #-- This is here to debug the modularize code
+  set(modularize_debug FALSE)
+  if (modularize_debug)
+    set(modularize_output ${Boost_BINARY_DIR})
+    set(modularize_libs_dir "modularize")
+  else (modularize_debug)
+    set(modularize_output ${Boost_SOURCE_DIR})
+    set(modularize_libs_dir "libs")
+  endif(modularize_debug)
+
+  #
+  # Modularization code
+  #
+  if(THIS_PROJECT_HEADERS)
+    set(${LIBNAME}-modularize-commands)
+    foreach(item ${THIS_PROJECT_HEADERS})
+      if(EXISTS "${Boost_SOURCE_DIR}/boost/${item}")
+        if(IS_DIRECTORY "${Boost_SOURCE_DIR}/boost/${item}")
+          list(APPEND ${LIBNAME}-modularize-commands
+            COMMAND "${CMAKE_COMMAND}" -E copy_directory
+            "${Boost_SOURCE_DIR}/boost/${item}"
+            "${modularize_output}/${modularize_libs_dir}/${libname}/include/boost/${item}"
+            )
+          if (NOT modularize_debug)
+            list(APPEND ${LIBNAME}-modularize-commands
+              COMMAND "${CMAKE_COMMAND}" -E remove_directory "${Boost_SOURCE_DIR}/boost/${item}" 
+              )
+          endif (NOT modularize_debug)
+        else(IS_DIRECTORY "${Boost_SOURCE_DIR}/boost/${item}")
+          list(APPEND ${LIBNAME}-modularize-commands
+            COMMAND "${CMAKE_COMMAND}" -E copy
+            "${Boost_SOURCE_DIR}/boost/${item}"
+            "${modularize_output}/${modularize_libs_dir}/${libname}/include/boost/${item}"
+            )
+          if (NOT modularize_debug)
+            list(APPEND ${LIBNAME}-modularize-commands
+              COMMAND "${CMAKE_COMMAND}" -E remove "${Boost_SOURCE_DIR}/boost/${item}" 
+              )
+          endif (NOT modularize_debug)
+          
+        endif(IS_DIRECTORY "${Boost_SOURCE_DIR}/boost/${item}")
+      elseif(EXISTS "${Boost_SOURCE_DIR}/${modularize_libs_dir}/${libname}/include/boost/${item}")
+        # Okay; already modularized
+      else()
+        message(SEND_ERROR 
+          "Header or directory boost/${item} does not exist. The HEADERS argument in ${Boost_SOURCE_DIR}/${modularize_libs_dir}/${libname}/CMakeLists.txt should be updated.")
+      endif()
+    endforeach(item)
+
+    if (${LIBNAME}-modularize-commands)
+      set(${LIBNAME}-modularize-commands
+        # COMMAND "${CMAKE_COMMAND}" -E remove_directory "${modularize_output}/libs/${libname}/include"
+        COMMAND "${CMAKE_COMMAND}" -E make_directory
+        "${modularize_output}/${modularize_libs_dir}/${libname}/include/boost"
+        ${${LIBNAME}-modularize-commands}
+        )
+      if (NOT modularize_debug)
         set(${LIBNAME}-modularize-commands
-         # COMMAND "${CMAKE_COMMAND}" -E remove_directory "${modularize_output}/libs/${libname}/include"
-          COMMAND "${CMAKE_COMMAND}" -E make_directory
-          "${modularize_output}/${modularize_libs_dir}/${libname}/include/boost"
+          COMMAND "${CMAKE_COMMAND}" -E remove_directory "${modularize_output}/${modularize_libs_dir}/${libname}/include"
           ${${LIBNAME}-modularize-commands}
           )
-        if (NOT modularize_debug)
-          set(${LIBNAME}-modularize-commands
-            COMMAND "${CMAKE_COMMAND}" -E remove_directory "${modularize_output}/${modularize_libs_dir}/${libname}/include"
-            ${${LIBNAME}-modularize-commands}
-          )
-        endif (NOT modularize_debug)
+      endif (NOT modularize_debug)
+      # disable modularization
+      # add_custom_target(${LIBNAME}-modularize
+      # ${${LIBNAME}-modularize-commands}
+      # COMMENT "Modularizing ${LIBNAME} headers to project-local dir from monolithic boost dir"
+      # )
+
+      if(THIS_PROJECT_MODULARIZED)
+        #
+	# Temporarily disable modularization 
 	#
-	#  Modularization temporarily disabled
+	# add_dependencies(modularize ${LIBNAME}-modularize)
 	#
-        #add_custom_target(${LIBNAME}-modularize
-        # ${${LIBNAME}-modularize-commands}
-        #  COMMENT "Modularizing ${LIBNAME} headers to project-local dir from monolithic boost dir"
-	#)
-
-        if(THIS_PROJECT_MODULARIZED)
-          #
-	  # Temporarily disable modularization 
-	  #
-	  # add_dependencies(modularize ${LIBNAME}-modularize)
-	  #
-        endif(THIS_PROJECT_MODULARIZED)
-      endif()
-    endif(THIS_PROJECT_HEADERS)
-    
-    # For each of the modular libraries on which this project depends,
-    # add the include path for that library.
-    set(THIS_PROJECT_HAS_HEADER_DEPENDS FALSE)
-    foreach(DEP ${THIS_PROJECT_DEPENDS_ALL})
-      #
-      # Temporarily disable modularization stuff.
-      # 
-      # include_directories("${modularize_output}/${modularize_libs_dir}/${DEP}/include")
-    endforeach(DEP)
-
-    # TODO: is this still necessary?
-    if(NOT EXISTS ${CMAKE_BINARY_DIR}/bin/tests)
-      file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/bin/tests)
-    endif(NOT EXISTS ${CMAKE_BINARY_DIR}/bin/tests)
-    if(NOT EXISTS ${CMAKE_BINARY_DIR}/bin/tests/${PROJECT_NAME})
-      file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/bin/tests/${PROJECT_NAME})
-    endif(NOT EXISTS ${CMAKE_BINARY_DIR}/bin/tests/${PROJECT_NAME})
-
-    # Include each of the source directories
-    if(THIS_PROJECT_SRCDIRS)
-      foreach(SUBDIR ${THIS_PROJECT_SRCDIRS})
-        add_subdirectory(${SUBDIR})
-      endforeach(SUBDIR ${THIS_PROJECT_SRCDIRS})
+      endif(THIS_PROJECT_MODULARIZED)
     endif()
+  endif(THIS_PROJECT_HEADERS)
+  
+  # For each of the modular libraries on which this project depends,
+  # add the include path for that library.
+  set(THIS_PROJECT_HAS_HEADER_DEPENDS FALSE)
+  # Temporarily disable modularization stuff.
+  # foreach(DEP ${THIS_PROJECT_DEPENDS_ALL})
+  #   include_directories("${modularize_output}/${modularize_libs_dir}/${DEP}/include")
+  # endforeach(DEP)
 
-    if(BUILD_TESTING AND THIS_PROJECT_TESTDIRS)
-      # Testing is enabled globally and this project has some
-      # tests. Check whether we should include these tests.
-      if (BOOST_TEST_LIBRARIES)
-        set(SAVED_TESTDIRS ${THIS_PROJECT_TESTDIRS})
-        set(THIS_PROJECT_TESTDIRS)
-        foreach (TESTLIB ${BOOST_TEST_LIBRARIES})
-          if (${TESTLIB} STREQUAL ${libname}
-	      OR ${TESTLIB} STREQUAL "ALL"
-	      )
-            # We are allowed to test this library; restore the set of
-            # test directories for this library.
-            set(THIS_PROJECT_TESTDIRS ${SAVED_TESTDIRS})
-          endif()
-        endforeach ()
-      endif()
+  # TODO: is this still necessary?
+  if(NOT EXISTS ${CMAKE_BINARY_DIR}/bin/tests)
+    file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/bin/tests)
+  endif(NOT EXISTS ${CMAKE_BINARY_DIR}/bin/tests)
+  if(NOT EXISTS ${CMAKE_BINARY_DIR}/bin/tests/${BOOST_PROJECT_NAME})
+    file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/bin/tests/${BOOST_PROJECT_NAME})
+  endif(NOT EXISTS ${CMAKE_BINARY_DIR}/bin/tests/${BOOST_PROJECT_NAME})
 
-      # Create a target <library name>-test, which will run all of
-      # this library's tests.
-      if (THIS_PROJECT_TESTDIRS)
-        add_custom_target(${PROJECT_NAME}-test
-          COMMAND ${CMAKE_CTEST_COMMAND} -R "^${PROJECT_NAME}-*"
-          MESSAGE "Running tests for Boost.${PROJECT_NAME}...")
-      endif ()
-
-      # Include the test directories.
-      foreach(SUBDIR ${THIS_PROJECT_TESTDIRS})
-        add_subdirectory(${SUBDIR})
-      endforeach()
-    endif()
-
-    if (BUILD_DOCUMENTATION AND THIS_PROJECT_DOCDIRS)
-      foreach(SUBDIR ${THIS_PROJECT_DOCDIRS})
-        add_subdirectory(${SUBDIR})
-      endforeach(SUBDIR)
-    endif ()
+  # Include each of the source directories
+  if(THIS_PROJECT_SRCDIRS)
+    foreach(SUBDIR ${THIS_PROJECT_SRCDIRS})
+      add_subdirectory(${SUBDIR})
+    endforeach(SUBDIR ${THIS_PROJECT_SRCDIRS})
   endif()
+
+  list(FIND BUILD_TESTS ${libname} BUILD_TESTS_INDEX)
+  if ((BUILD_TESTS_INDEX GREATER -1) OR (BUILD_TESTS STREQUAL "ALL"))
+    # Include the test directories.
+    project(${libname}-tests)
+    foreach(SUBDIR ${THIS_PROJECT_TESTDIRS})
+      add_subdirectory(${SUBDIR})
+    endforeach()
+  endif()
+
+  list(FIND BUILD_EXAMPLES ${libname} BUILD_EXAMPLES_INDEX)
+  if ((BUILD_EXAMPLES_INDEX GREATER -1) OR (BUILD_EXAMPLES STREQUAL "ALL"))
+    project(${libname}-examples)
+    # Include the example directories.
+    foreach(SUBDIR ${THIS_PROJECT_EXAMPLEDIRS})
+      add_subdirectory(${SUBDIR})
+    endforeach()
+  endif()
+
+  if (BUILD_DOCUMENTATION AND THIS_PROJECT_DOCDIRS)
+    foreach(SUBDIR ${THIS_PROJECT_DOCDIRS})
+      add_subdirectory(${SUBDIR})
+    endforeach(SUBDIR)
+  endif ()
 endmacro(boost_library_project)
 
 macro(boost_tool_project TOOLNAME)
@@ -579,9 +516,9 @@ macro(boost_library_variant_target_name)
   list_contains(VARIANT_IS_DEBUG DEBUG ${ARGN})
   if (VARIANT_IS_DEBUG)
     # Only add the actual "-debug" if we're also building release libraries
-    if (BUILD_RELEASE)
+    if (ENABLE_RELEASE)
       set(VARIANT_TARGET_NAME "${VARIANT_TARGET_NAME}-debug")
-    endif (BUILD_RELEASE)
+    endif (ENABLE_RELEASE)
     set(VARIANT_ABI_TAG "${VARIANT_ABI_TAG}d")
 
     set(VARIANT_DISPLAY_NAME "${VARIANT_DISPLAY_NAME}, debug")
@@ -692,11 +629,11 @@ macro(boost_library_variant LIBNAME)
     endif (THIS_LIB_NO_${ARG})
 
     # If the user specified that we should not build any variants of
-    # this kind, don't. For example, if the BUILD_SHARED option is
+    # this kind, don't. For example, if the ENABLE_SHARED option is
     # off, don't build shared libraries.
-    if(NOT BUILD_${ARG})
+    if(NOT ENABLE_${ARG})
       set(THIS_VARIANT_OKAY FALSE)
-    endif(NOT BUILD_${ARG})
+    endif(NOT ENABLE_${ARG})
 
     # Accumulate compile and link flags
     set(THIS_VARIANT_COMPILE_FLAGS "${THIS_VARIANT_COMPILE_FLAGS} ${THIS_LIB_${ARG}_COMPILE_FLAGS} ${${ARG}_COMPILE_FLAGS}")
@@ -734,7 +671,7 @@ macro(boost_library_variant LIBNAME)
         CLEAN_DIRECT_OUTPUT 1
         COMPILE_FLAGS "${THIS_VARIANT_COMPILE_FLAGS}"
         LINK_FLAGS "${THIS_VARIANT_LINK_FLAGS}"
-        LABELS "${PROJECT_NAME}"
+        LABELS "${BOOST_PROJECT_NAME}"
         )
     elseif (THIS_LIB_MODULE)
       # Add a module
@@ -747,7 +684,7 @@ macro(boost_library_variant LIBNAME)
         CLEAN_DIRECT_OUTPUT 1
         COMPILE_FLAGS "${THIS_VARIANT_COMPILE_FLAGS}"
         LINK_FLAGS "${THIS_VARIANT_LINK_FLAGS}"
-        LABELS "${PROJECT_NAME}"
+        LABELS "${BOOST_PROJECT_NAME}"
         PREFIX ""
        # SOVERSION "${BOOST_VERSION}"
         )
@@ -762,7 +699,7 @@ macro(boost_library_variant LIBNAME)
         CLEAN_DIRECT_OUTPUT 1
         COMPILE_FLAGS "${THIS_VARIANT_COMPILE_FLAGS}"
         LINK_FLAGS "${THIS_VARIANT_LINK_FLAGS}"
-        LABELS "${PROJECT_NAME}"
+        LABELS "${BOOST_PROJECT_NAME}"
         # SOVERSION "${BOOST_VERSION}"
         )
     endif (THIS_LIB_IS_STATIC)
@@ -780,20 +717,20 @@ macro(boost_library_variant LIBNAME)
 
     if(NOT THIS_LIB_NO_INSTALL)
       # Setup installation properties
-      string(TOLOWER "${PROJECT_NAME}${VARIANT_TARGET_NAME}" LIB_COMPONENT)
+      string(TOLOWER "${BOOST_PROJECT_NAME}${VARIANT_TARGET_NAME}" LIB_COMPONENT)
       string(REPLACE "-" "_" LIB_COMPONENT ${LIB_COMPONENT})
       
       # Installation of this library variant
-      string(TOLOWER ${PROJECT_NAME} libname)
+      string(TOLOWER ${BOOST_PROJECT_NAME} libname)
 
       install(TARGETS ${VARIANT_LIBNAME} 
-	DESTINATION lib${LIB_SUFFIX}
+	DESTINATION ${BOOST_INSTALL_LIB_SUBDIR_NAME}
 	COMPONENT ${LIB_COMPONENT})
 
       set_property( 
-            TARGET ${VARIANT_LIBNAME}
-            PROPERTY BOOST_CPACK_COMPONENT
-            ${LIB_COMPONENT})
+        TARGET ${VARIANT_LIBNAME}
+        PROPERTY BOOST_CPACK_COMPONENT
+        ${LIB_COMPONENT})
       
       # Make the library installation component dependent on the library
       # installation components of dependent libraries.
@@ -995,10 +932,10 @@ macro(boost_select_variant NAME PREFIX)
         # that request (because the user has turned off the build
         # variants with that feature), then we won't build this
         # executable or module.
-        if (NOT BUILD_${FEATURE})
+        if (NOT ENABLE_${FEATURE})
           set(SELECT_VARIANT_OKAY FALSE)
-          message(STATUS "* ${NAME} is NOT being built because BUILD_${FEATURE} is FALSE")
-        endif (NOT BUILD_${FEATURE})
+          message(STATUS "* ${NAME} is NOT being built because ENABLE_${FEATURE} is FALSE")
+        endif (NOT ENABLE_${FEATURE})
       endif (${PREFIX}_${FEATURE})
     endforeach (FEATURE ${FEATURESET})
 
@@ -1014,7 +951,7 @@ macro(boost_select_variant NAME PREFIX)
       if (FEATURESET_STR STREQUAL "RELEASE:DEBUG")
         if (CMAKE_CONFIGURATION_TYPES)
           # IDE target: can we build both debug and release?
-          if (BUILD_DEBUG AND BUILD_RELEASE)
+          if (ENABLE_DEBUG AND ENABLE_RELEASE)
             if (${PREFIX} STREQUAL "THIS_EXE")
               # Remember that we're capable of building both configurations
               set(${PREFIX}_DEBUG_AND_RELEASE TRUE)
@@ -1042,11 +979,11 @@ macro(boost_select_variant NAME PREFIX)
         # We only care about the first feature value we find...
         if (NOT ${PREFIX}_FOUND_FEATURE)
           # Are we allowed to build this feature?
-          if (BUILD_${FEATURE})
+          if (ENABLE_${FEATURE})
             # Found it: we're done
             list(APPEND ${PREFIX}_VARIANT ${FEATURE})
             set(${PREFIX}_FOUND_FEATURE TRUE)
-          endif (BUILD_${FEATURE})
+          endif (ENABLE_${FEATURE})
         endif (NOT ${PREFIX}_FOUND_FEATURE)
       endforeach (FEATURE ${FEATURESET})
 
@@ -1203,46 +1140,45 @@ macro(boost_add_library LIBNAME)
     )
   set(THIS_LIB_SOURCES ${THIS_LIB_DEFAULT_ARGS})
 
-  if (NOT TEST_INSTALLED_TREE)
-    # A top-level target that refers to all of the variants of the
-    # library, collectively.
-    add_custom_target(${LIBNAME})
+  
+  # A top-level target that refers to all of the variants of the
+  # library, collectively.
+  add_custom_target(${LIBNAME})
 
-    if (THIS_LIB_EXTRA_VARIANTS)
-      # Build the set of variants that we will generate for this library
-      set(THIS_LIB_VARIANTS)
-      foreach(VARIANT ${BOOST_DEFAULT_VARIANTS})
-        foreach(EXTRA_VARIANT ${THIS_LIB_EXTRA_VARIANTS})
-          string(REPLACE ":" ";" FEATURES "${EXTRA_VARIANT}")
-          separate_arguments(FEATURES)
-          foreach(FEATURE ${FEATURES})
-            list(APPEND THIS_LIB_VARIANTS "${VARIANT}:${FEATURE}")
-          endforeach(FEATURE ${FEATURES})
-        endforeach(EXTRA_VARIANT ${THIS_LIB_EXTRA_VARIANTS})
-      endforeach(VARIANT ${BOOST_DEFAULT_VARIANTS})
-    else (THIS_LIB_EXTRA_VARIANTS)
-      set(THIS_LIB_VARIANTS ${BOOST_DEFAULT_VARIANTS})
-    endif (THIS_LIB_EXTRA_VARIANTS)
-    
-    if (THIS_LIB_FORCE_VARIANTS)
-    #  string(TOUPPER "${LIBNAME}_FORCE_VARIANTS" force_variants)
-    #  set(${force_variants} ${THIS_LIB_FORCE_VARIANTS} CACHE INTERNAL "")
-      set(BUILD_${THIS_LIB_FORCE_VARIANTS}_PREV ${BUILD_${THIS_LIB_FORCE_VARIANTS}} )
-      set(BUILD_${THIS_LIB_FORCE_VARIANTS} TRUE)
-    endif (THIS_LIB_FORCE_VARIANTS)
-    
-    
-    # Build each of the library variants
-    foreach(VARIANT_STR ${THIS_LIB_VARIANTS})
-      string(REPLACE ":" ";" VARIANT ${VARIANT_STR})
-      separate_arguments(VARIANT)
-      boost_library_variant(${LIBNAME} ${VARIANT})
-    endforeach(VARIANT_STR ${THIS_LIB_VARIANTS})
-  endif (NOT TEST_INSTALLED_TREE)
+  if (THIS_LIB_EXTRA_VARIANTS)
+    # Build the set of variants that we will generate for this library
+    set(THIS_LIB_VARIANTS)
+    foreach(VARIANT ${BOOST_DEFAULT_VARIANTS})
+      foreach(EXTRA_VARIANT ${THIS_LIB_EXTRA_VARIANTS})
+        string(REPLACE ":" ";" FEATURES "${EXTRA_VARIANT}")
+        separate_arguments(FEATURES)
+        foreach(FEATURE ${FEATURES})
+          list(APPEND THIS_LIB_VARIANTS "${VARIANT}:${FEATURE}")
+        endforeach(FEATURE ${FEATURES})
+      endforeach(EXTRA_VARIANT ${THIS_LIB_EXTRA_VARIANTS})
+    endforeach(VARIANT ${BOOST_DEFAULT_VARIANTS})
+  else (THIS_LIB_EXTRA_VARIANTS)
+    set(THIS_LIB_VARIANTS ${BOOST_DEFAULT_VARIANTS})
+  endif (THIS_LIB_EXTRA_VARIANTS)
   
   if (THIS_LIB_FORCE_VARIANTS)
-    set(BUILD_${THIS_LIB_FORCE_VARIANTS} ${BUILD_${THIS_LIB_FORCE_VARIANTS}_PREV} )
-   # message(STATUS "* ^^ BUILD_${THIS_LIB_FORCE_VARIANTS}  ${BUILD_${THIS_LIB_FORCE_VARIANTS}}")
+    #  string(TOUPPER "${LIBNAME}_FORCE_VARIANTS" force_variants)
+    #  set(${force_variants} ${THIS_LIB_FORCE_VARIANTS} CACHE INTERNAL "")
+    set(ENABLE_${THIS_LIB_FORCE_VARIANTS}_PREV ${ENABLE_${THIS_LIB_FORCE_VARIANTS}} )
+    set(ENABLE_${THIS_LIB_FORCE_VARIANTS} TRUE)
+  endif (THIS_LIB_FORCE_VARIANTS)
+  
+  
+  # Build each of the library variants
+  foreach(VARIANT_STR ${THIS_LIB_VARIANTS})
+    string(REPLACE ":" ";" VARIANT ${VARIANT_STR})
+    separate_arguments(VARIANT)
+    boost_library_variant(${LIBNAME} ${VARIANT})
+  endforeach(VARIANT_STR ${THIS_LIB_VARIANTS})
+  
+  if (THIS_LIB_FORCE_VARIANTS)
+    set(ENABLE_${THIS_LIB_FORCE_VARIANTS} ${ENABLE_${THIS_LIB_FORCE_VARIANTS}_PREV} )
+   # message(STATUS "* ^^ ENABLE_${THIS_LIB_FORCE_VARIANTS}  ${ENABLE_${THIS_LIB_FORCE_VARIANTS}}")
   endif (THIS_LIB_FORCE_VARIANTS)  
 endmacro(boost_add_library)
 
@@ -1256,14 +1192,12 @@ macro(boost_add_single_library LIBNAME)
     )
   set(THIS_LIB_SOURCES ${THIS_LIB_DEFAULT_ARGS})
 
-  if (NOT TEST_INSTALLED_TREE)
-    boost_select_variant(${LIBNAME} THIS_LIB)
-    if (THIS_LIB_VARIANT)
-      add_custom_target(${LIBNAME})
-      separate_arguments(THIS_LIB_VARIANT)
-      boost_library_variant(${LIBNAME} ${THIS_LIB_VARIANT})
-    endif ()
-  endif (NOT TEST_INSTALLED_TREE)
+  boost_select_variant(${LIBNAME} THIS_LIB)
+  if (THIS_LIB_VARIANT)
+    add_custom_target(${LIBNAME})
+    separate_arguments(THIS_LIB_VARIANT)
+    boost_library_variant(${LIBNAME} ${THIS_LIB_VARIANT})
+  endif ()
 endmacro(boost_add_single_library)
 
 # Creates a new executable from source files.
@@ -1426,7 +1360,7 @@ macro(boost_add_executable EXENAME)
     if (THIS_PROJECT_IS_TOOL)
       set(THIS_EXE_NAME ${EXENAME})
     else()
-      set(THIS_EXE_NAME ${PROJECT_NAME}-${EXENAME})
+      set(THIS_EXE_NAME ${BOOST_PROJECT_NAME}-${EXENAME})
     endif()
     add_executable(${THIS_EXE_NAME} ${THIS_EXE_SOURCES})
     
@@ -1435,7 +1369,7 @@ macro(boost_add_executable EXENAME)
       PROPERTIES
       COMPILE_FLAGS "${THIS_EXE_COMPILE_FLAGS}"
       LINK_FLAGS "${THIS_EXE_LINK_FLAGS}"
-      LABELS "${PROJECT_NAME}"
+      LABELS "${BOOST_PROJECT_NAME}"
       )
 
     # For IDE generators where we can build both debug and release

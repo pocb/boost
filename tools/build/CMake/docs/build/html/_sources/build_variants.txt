@@ -1,3 +1,5 @@
+.. _VARIANTS:
+
 Build Variants
 ==============
 
@@ -22,15 +24,11 @@ a library is given a unique name based on the features in that
 variant, so that one can readily identify the library, for example,
 `libboost_signals-gcc40-mt-d.so` is the multi-threaded, debug version
 of the shared library for Boost.Signals on a typical Linux system. The
-[http://www.boost.org/more/getting_started/windows.html#library-naming
-Boost Getting Started guide] describes the library naming conventions
+`Boost Getting Started guide <http://www.boost.org/more/getting_started/windows.html#library-naming>`_ describes the library naming conventions
 used for the variants.
 
 This page describes each of the featues supported by Boost.Build, and
 the default variants that are built for each platform.
-
-Features
---------
 
 The CMake-based build system for Boost supports the following
 features.
@@ -38,16 +36,24 @@ features.
 .. index:: 
    pair: STATIC; build_variant	
 
-`STATIC`
+STATIC
+------
 
-  The `STATIC` feature identifies static builds of libraries, i.e.,
-  a `.lib` (library) file on Microsoft Windows or a `.a` (archive)
-  file on Unix systems.
+  The `STATIC` feature identifies static builds of libraries, i.e., a
+  `.lib` (library) file on Microsoft Windows or a `.a` (archive) file
+  on Unix systems.  
+
+  .. index:: ENABLE_STATIC
+  .. _ENABLE_STATIC: 
+
+  This is globally toggled with the cmake option ``ENABLE_STATIC``.
+
 
 .. index:: 
    pair: SHARED; build_variant
 
-`SHARED`
+SHARED
+------
 
   The `SHARED` feature identifies shared builds of libraries, i.e.,
   a `.dll` (dynamically linked library) file on Microsoft Windows or
@@ -56,19 +62,33 @@ features.
   "modules", which are a special kind of shared library on some
   systems (e.g., Mac OS X).
 
+  .. index:: ENABLE_SHARED
+  .. _ENABLE_SHARED:
+
+  This is globally toggled with the cmake option ``ENABLE_SHARED``.
+
+
 .. index:: 
    pair: DEBUG; build_variant
 
-`DEBUG`
+DEBUG
+-----
 
    The `DEBUG` feature identifies builds of libraries that retain
    complete debugging information and prohibit optimization, making
    these builds far easier to use for debugging programs.
 
+  .. index:: ENABLE_DEBUG
+  .. _ENABLE_DEBUG:
+
+  This is globally toggled with the cmake option ``ENABLE_DEBUG``.
+
 .. index::
    pair: RELEASE; build_variant
 
-`RELEASE`
+
+RELEASE
+-------
 
    The `RELEASE` feature identifies builds of libraries that use full
    optimization and eliminate extraneous information such as debug
@@ -76,20 +96,34 @@ features.
    smaller than (and execute faster than) their debug library
    counterparts.
 
+  .. index:: ENABLE_RELEASE
+  .. _ENABLE_RELEASE:
+
+  This is globally dis/enabled with the cmake option ``ENABLE_RELEASE``.
+
+
 .. index::
    pair: SINGLE_THREADED; build_variant
     
-`SINGLE_THREADED`
+SINGLE_THREADED
+---------------
 
    The `SINGLE_THREADED` feature identifies builds of libraries that
    assume that the program using them is single-threaded. These
    libraries typically avoid costly atomic operations or locks, and
    make use of no multi-threaded features.
 
+  .. index:: ENABLE_SINGLE_THREADED
+  .. _ENABLE_SINGLE_THREADED:
+
+  This is globally dis/enabled with the cmake option ``ENABLE_SINGLE_THREADED``.
+
+
 .. index::
    pair: MULTI_THREADED; build_variant
 
-`MULTI_THREADED`
+MULTI_THREADED
+--------------
 
    The `MULTI_THREADED` feature identifies builds of libraries that
    assume that the program using them is multi-threaded. These
@@ -98,48 +132,74 @@ features.
    library in a multi-threade context, often at the cost of
    single-thread performance.
 
+  .. index:: ENABLE_MULTI_THREADED
+  .. _ENABLE_MULTI_THREADED:
+
+  This is globally dis/enabled with the cmake option ``ENABLE_MULTI_THREADED``.
+
+
+
 .. index::
    pair: STATIC_RUNTIME; build_variant
 
-`STATIC_RUNTIME`
+STATIC_RUNTIME
+--------------
 
    The `STATIC_RUNTIME` feature identifies builds that link against
    the C and C++ run-time libraries statically, which directly
    includes the code from those run-time libraries into the Boost
    library or executable.
 
+  .. index:: ENABLE_STATIC_RUNTIME
+  .. _ENABLE_STATIC_RUNTIME:
+
+  This is globally dis/enabled with the cmake option ``ENABLE_STATIC_RUNTIME``.
+
+
 .. index::
    pair: DYNAMIC_RUNTIME; build_variant
 
-`DYNAMIC_RUNTIME`
+DYNAMIC_RUNTIME
+---------------
 
    The `DYNAMIC_RUNTIME` feature identifies builds that link against
    the dynamic C and C++ run-time libraries.
 
+
+  .. index:: ENABLE_DYNAMIC_RUNTIME
+  .. _ENABLE_DYNAMIC_RUNTIME:
+
+  This is globally dis/enabled with the cmake option ``ENABLE_DYNAMIC_RUNTIME``.
+
+
+
 Compilation and Linker Options
 ------------------------------
 
-For each feature, the Boost build system defines three macros
+For each feature above, the Boost build system defines three macros
 providing compilation flags, linking flags, and extra libraries to
 link against when using that feature. These flags are automatically
 added to the build commands for variants using that feature. The
 particular flags and libraries are described by the following global
 variables:
 
-`feature_COMPILE_FLAGS`
+feature_COMPILE_FLAGS
+^^^^^^^^^^^^^^^^^^^^^
 
    A string containing extra flags that will be added to the compile
    line, including macro definitions and compiler-specific flags
    needed to enable this particular feature.
 
-`feature_LINK_FLAGS`
+feature_LINK_FLAGS
+^^^^^^^^^^^^^^^^^^
 
    A string containing extra flags that will be added to the
    beginning of the link line. Note that these flags should '''not'''
    contain extra libraries that one needs to link against. Those
    should go into `feature_LINK_LIBS`.
 
-`feature_LINK_LIBS`
+feature_LINK_LIBS
+^^^^^^^^^^^^^^^^^
 
    A CMake list containing the names of additional libraries that
    will be linked into libraries and executables that require this
@@ -154,6 +214,7 @@ variants should link against.
 All of the flags provided for each feature are typically detected by
 the Boost CMake configuration module in
 ``tools/build/CMake/BoostConfig.cmake``.
+
 
 Default Variants
 ----------------
@@ -174,8 +235,8 @@ library.
 Users who only need a few variants of each library can change which
 variants of Boost libraries are build by default using various
 configuration options. For each feature, CMake's configuration will
-contain an option `BUILD_feature`. When the feature is ON, the build
+contain an option `ENABLE_feature`. When the feature is ON, the build
 system will produce variants with that feature. When the feature is
 OFF, the build system will suppress variants with that feature. For
-example, toggling `BUILD_DEBUG` to `OFF` will inhibit the creation of
+example, toggling `ENABLE_DEBUG` to `OFF` will inhibit the creation of
 the debug variants, drastically improving overall build times.

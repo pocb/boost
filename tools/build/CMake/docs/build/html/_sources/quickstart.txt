@@ -53,6 +53,8 @@ CMake build::
   mkdir $BOOST/build 
   cd $BOOST/build
 
+.. _unix_configure:
+
 Configure
 ^^^^^^^^^
 
@@ -126,46 +128,103 @@ you are building all of the Boost libraries), the Boost libraries will
 be in a predictable layout under the directory passed to
 ``CMAKE_INSTALL_PREFIX`` (default ``/usr/local``)
 
-On Windows
-----------
+Windows
+-------
 
-Configure
-^^^^^^^^^
+There are two different sets of directions: visual studio, which is
+quite specific, and nmake, which is much like the Unix version, above.
+
+.. index:: Visual Studio
+
+.. _vs_configure:
+
+Configuration for Visual Studio
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Run CMake by selecting it from the Start menu. 
 
-* Use the *Browse...* button to point CMake at the Boost source code
-  in ``$BOOST\src``.
-* Use the second *Browse...* button to select the directory where
-  Boost will build binaries, ``$BOOST\build``.
-* Click *Configure* a first time to configure Boost, which will
-  search for various libraries on your system and prepare the build.
-* CMake will ask you what kind of project files or make files to
-  build. If you're using Microsoft Visual Studio, select the
-  appropriate version to generate project files. Otherwise, you can
-  use Borland's make files, generate NMake files, etc.
-* You will then be given the opportunity to tune build options in
-  the CMake GUI (see also :ref:`configure_and_build`. These options
-  will affect what libraries are built and how.  They will initially
-  appear red.  Click *Configure* again when you are done editing
-  them.  You may wish to configure ``CMAKE_INSTALL_PREFIX`` at this
-  time. 
-* Finally, click *OK* to generate project files.
+* Use the *Browse...* button next to *Where is the source code* to
+  point CMake at the Boost source code in ``$BOOST\src``.
+* Use the second *Browse...* button to next to *Where to build the
+  binaries* to select the directory where Boost will build binaries,
+  ``$BOOST\build``.
+* Click *Configure* a first time to configure Boost, which will search
+  for various libraries on your system and prepare the build.  CMake
+  will ask you what kind of project files or make files to build. If
+  you're using Microsoft Visual Studio, select the appropriate version
+  to generate project files. Otherwise, you can use Borland's make
+  files.  If you're using NMake, see the next section.
+* On an XP box with VS9 one sees roughly this in the output window at
+  the bottom::
 
-Build
-^^^^^
+    Check for working C compiler: cl
+    Check for working C compiler: cl -- works
+    Detecting C compiler ABI info
+    Detecting C compiler ABI info - done
+    Check for working CXX compiler: cl
+    Check for working CXX compiler: cl -- works
+    Detecting CXX compiler ABI info
+    Detecting CXX compiler ABI info - done
+    Boost version 1.41.0
+    Found PythonInterp: C:/Python26/python.exe
+    Found PythonLibs: C:/Python26/libs/python26.lib
+    Boost compiler: msvc
+    Boost toolset:  vc90
+    Boost platform: windows
+    Could NOT find Doxygen  (missing:  DOXYGEN_EXECUTABLE)
+    Build name: msvc-9.0-windows
+     + preprocessor
+     + concept_check
+     ...
+     + units
+     + wave
+    Configuring done    
 
-If you have generated project files for Microsoft Visual Studio, you
-will need to start up Visual Studio to build Boost. Once Visual Studio
-has loaded, load the solution or project ``Boost`` from the Boost build
-directory you set in the CMake configuration earlier. Then, just click
-*Build* to build all of Boost.
+* The messages about 'missing doxygen' and whatnot are not
+  showstoppers for now, so long as configuration is successful.  You
+  will be given the opportunity to tune build options in the CMake GUI
+  (see :ref:`configure_and_build` for more detail). They will
+  initially appear red.  Click *Configure* again when you are done
+  editing them.  The one thing that you may wish to configure as part
+  of this 'quickstart' is ``CMAKE_INSTALL_PREFIX``.
+* Finally, click *Generate* to generate project files.  ``Boost.sln``,
+  the VS solution file, will appear in the *where to build the
+  binaries* directory from the cmake gui.
 
-Install
-^^^^^^^
+.. index:: NMake
+
+Configuration for NMake
+^^^^^^^^^^^^^^^^^^^^^^^
+
+* Start a `Visual Studio Command Prompt` from the start menu.  This
+  will spawn a command prompt window with certain env variables set.
+  CMake will detect these and automatically choose to generate NMake
+  files.
+
+* cd to $BOOST/build and execute::
+
+    cmake ..\src
+
+  You will see output very similar to that on unix, see
+  :ref:`unix_configure`.
+
+Build -- Visual Studio
+^^^^^^^^^^^^^^^^^^^^^^
+
+  Start up Visual Studio, load the solution or project ``Boost`` from
+  the Boost build directory you set in the CMake configuration
+  earlier. Then, just click *Build* to build all of Boost.
+
+Build -- NMake
+^^^^^^^^^^^^^^
+
+  Execute ``nmake`` from the command prompt in the build directory.
+
+Installation
+^^^^^^^^^^^^
 
 The installation of Boost's headers and compiled libraries uses the
 same tools as building the library. With Microsoft Visual Studio, just
 load the Boost solution or project and build the 'INSTALL' target to
-perform the installation. 
+perform the installation.  With NMake, ``nmake install``.
 

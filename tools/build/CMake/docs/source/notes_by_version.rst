@@ -8,11 +8,42 @@ Notes by Boost Version
    creative) when running cmake for the first time to disable the
    guard.
 
-1.35.0 - 1.37
+1.40.0.cmake2
 -------------
 
-There was a CMake branch that built these releases, but Boost.CMake
-was not included in the official distribution.
+* Modularization disabled... this can waste your source directory
+  and was causing confusion.
+* Docs tagged with specific boost-cmake release version.
+
+1.40.0.cmake1
+-------------
+
+From the boost-cmake list::
+
+  > As of now, your Boost 1.40.0 branch builds and installs without error 
+  > for me on Windows (Intel 11.1, Visual Studio 2009, Visual Studio 2010 
+  > Beta 1), Linux (GCC 4.2, GCC 4.4, Intel 11.1), and Mac OS X 10.6 (GCC 
+  > 4.2, Intel 11.1).
+
+This version also includes fixes for cmake version 2.8 (as of this
+writing, in beta).
+
+Special thanks in alphabetical order:
+
+* Claudio Bley
+* Justin Holewinski
+* Philip Lowman
+
+1.40.0.cmake0
+-------------
+
+This version works on windows with MSVC and linux with gcc.
+
+1.40.0
+------
+
+This version is **broken** in the svn distribution.  See later
+releases with the ``.cmakeN`` suffix.
 
 1.38.0 and 1.39.0
 -----------------
@@ -116,41 +147,9 @@ Known Issues
   these libraries.
 
 
-1.40.0
-------
-
-This version is **broken** in the svn distribution.  There are
-separate distributions in git.
-
-1.40.0.cmake0
+1.35.0 - 1.37
 -------------
 
-This version works on windows with MSVC and linux with gcc.
-
-
-1.40.0.cmake1
--------------
-
-From the boost-cmake list::
-
-  > As of now, your Boost 1.40.0 branch builds and installs without error 
-  > for me on Windows (Intel 11.1, Visual Studio 2009, Visual Studio 2010 
-  > Beta 1), Linux (GCC 4.2, GCC 4.4, Intel 11.1), and Mac OS X 10.6 (GCC 
-  > 4.2, Intel 11.1).
-
-This version also includes fixes for cmake version 2.8 (as of this
-writing, in beta).
-
-Special thanks in alphabetical order:
-
-* Claudio Bley
-* Justin Holewinski
-* Philip Lowman
-
-1.40.0.cmake2
--------------
-
-* Modularization disabled... this can waste your source directory
-  and was causing confusion.
-* Docs tagged with specific boost-cmake release version.
+There was a CMake branch that built these releases, but Boost.CMake
+was not included in the official distribution.
 

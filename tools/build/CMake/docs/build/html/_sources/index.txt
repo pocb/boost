@@ -37,9 +37,10 @@ Users's guide
    add_boost_library
    add_compiled_library
    adding_regression_tests
-   modularize_library
    build_installer
    notes_by_version
+
+.. modularize_library
 
 Reference
 =========
@@ -51,6 +52,10 @@ Reference
    reference/boost_add_library
    reference/boost_add_executable
    reference/boost_additional_test_dependencies
+   reference/boost_test_compile
+   reference/boost_test_compile_fail
+   reference/boost_test_run
+   reference/boost_test_run_fail
 
 About this documentation
 ========================

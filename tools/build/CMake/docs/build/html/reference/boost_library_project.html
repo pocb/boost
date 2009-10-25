@@ -5,13 +5,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>boost_library_project &mdash; Boost.CMake 1.40.0.cmake2</title>
+    <title>boost_library_project &mdash; Boost.CMake 1.40.0.cmake3</title>
     <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.40.0.cmake2',
+        VERSION:     '1.40.0.cmake3',
         COLLAPSE_MODINDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -19,7 +19,7 @@
     </script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Boost.CMake 1.40.0.cmake2" href="../index.html" />
+    <link rel="top" title="Boost.CMake 1.40.0.cmake3" href="../index.html" />
     <link rel="next" title="boost_add_library" href="boost_add_library.html" />
     <link rel="prev" title="Notes by Boost Version" href="../notes_by_version.html" /> 
   </head>
@@ -38,7 +38,7 @@
              accesskey="P">previous</a> |</li>
     <li><a href="http://www.boost.org/">Boost</a> &raquo;</li>
     
-        <li><a href="../index.html">Boost.CMake 1.40.0.cmake2</a> &raquo;</li>
+        <li><a href="../index.html">Boost.CMake 1.40.0.cmake3</a> &raquo;</li>
  
       </ul>
     </div>
@@ -67,7 +67,7 @@
           <div class="body">
             
   <div class="section" id="boost-library-project">
-<span id="index-21"></span><h1>boost_library_project<a class="headerlink" href="#boost-library-project" title="Permalink to this headline">¶</a></h1>
+<span id="boost-library-project-macro"></span><span id="index-263"></span><h1>boost_library_project<a class="headerlink" href="#boost-library-project" title="Permalink to this headline">¶</a></h1>
 <p>Define a boost library project.</p>
 <dl class="cmake">
 <dt id="boost_library_project">
@@ -80,6 +80,7 @@
 <li><em>libname</em> &#8211; name of library to add</li>
 <li><em>SRCDIRS</em> (optional) &#8211; srcdir1 srcdir2 ...</li>
 <li><em>TESTDIRS</em> (optional) &#8211; testdir1 testdir2 ..</li>
+<li><em>EXAMPLEDIRS</em> (optional) &#8211; testdir1 testdir2 ..</li>
 <li><em>DESCRIPTION</em> &#8211; description</li>
 <li><em>AUTHORS</em> &#8211; author1 author2</li>
 <li><em>MAINTAINERS</em> &#8211; maint maint2</li>
@@ -96,10 +97,6 @@ Filesystem), <cite>srcdir1</cite>, <cite>srcdir2</cite>, etc, are subdirectories
 library sources (for Boost libraries that build actual library
 binaries), and <cite>testdir1</cite>, <cite>testdir2</cite>, etc, are subdirectories
 containing regression tests.</p>
-<p>A library marked MODULAR has all of its header files in its own
-subdirectory include/boost rather than the &#8220;global&#8221; boost
-subdirectory. These libraries can be added or removed from the tree
-freely; they do not need to be a part of the main repository.</p>
 <p><cite>DESCRIPTION</cite> provides a brief description of the library, which can
 be used to summarize the behavior of the library for a user. <cite>AUTHORS</cite>
 lists the authors of the library, while <cite>MAINTAINERS</cite> lists the active
@@ -109,15 +106,10 @@ should have their name followed by their current e-mail address in
 angle brackets, with -at- instead of the at sign, e.g.,</p>
 <div class="highlight-python"><pre>Douglas Gregor &lt;doug.gregor -at- gmail.com&gt;</pre>
 </div>
-<p>For libraries that build actual library binaries, this macro adds a
-option <cite>BUILD_BOOST_LIBNAME</cite> (which defaults to ON). When the option
-is ON, this macro will include the source subdirectories, and
-therefore, will build and install the library binary.</p>
-<p>For libraries that have regression tests, and when testing is
-enabled globally by the <cite>BUILD_REGRESSION_TESTS</cite> option, this macro also
-defines the <cite>TEST_BOOST_LIBNAME</cite> option (defaults to ON). When ON, the
-generated makefiles/project files will contain regression tests for
-this library.</p>
+<p>For libraries that have regression tests, and when testing is enabled
+either by <cite>BUILD_TESTS</cite> containing the (lowercase) name of this
+library or the string <tt class="docutils literal"><span class="pre">ALL</span></tt>, the generated makefiles/project files
+will contain regression tests for this library.</p>
 <p class="rubric">Example</p>
 <p>The Boost.Thread library uses the following invocation of the
 <cite>boost_library_project</cite> macro, since it has both a compiled library
@@ -156,12 +148,12 @@ this library.</p>
              >previous</a> |</li>
     <li><a href="http://www.boost.org/">Boost</a> &raquo;</li>
     
-        <li><a href="../index.html">Boost.CMake 1.40.0.cmake2</a> &raquo;</li>
+        <li><a href="../index.html">Boost.CMake 1.40.0.cmake3</a> &raquo;</li>
  
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version a1bf4d525d2cfde1f3a901f6c4c1c3d03adffe11, Sat, 10 Oct 2009.
+      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version 3002856d57131650020d71d4f1fd7911c0f9cd6d, Sat, 24 Oct 2009.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

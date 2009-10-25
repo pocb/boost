@@ -37,23 +37,21 @@
 # want or need to perform regression testing on Boost. The Boost build
 # is significantly faster when we aren't also building regression
 # tests.
-option(BUILD_TESTING "Enable regression testing." OFF)
 
-if (BUILD_TESTING)
-  enable_testing()
+set(BUILD_TESTS "NONE" CACHE STRING "Semicolon-separated list of lowercase librarary names to test, or \"ALL\"")
+enable_testing()
 
-  option(TEST_INSTALLED_TREE "Enable testing of an already-installed tree" OFF)
-
-  set(BOOST_TEST_LIBRARIES "ALL"
-    CACHE STRING "Semicolon-separated list of Boost libraries to test, or ALL to test all")
-  
-  if (TEST_INSTALLED_TREE)
-    include("${CMAKE_INSTALL_PREFIX}/lib/Boost${BOOST_VERSION}/boost-targets.cmake")
-  endif (TEST_INSTALLED_TREE)
-
-  set(DART_TESTING_TIMEOUT=15 CACHE INTEGER "Timeout after this much madness")
-
-endif (BUILD_TESTING)
+if (BUILD_TESTS STREQUAL "NONE")
+  #
+  # Add a little "message" if tests are run while BUILD_TESTS is NONE
+  #
+  add_test(BUILD_TESTS_is_NONE_nothing_to_test
+    /bin/false)
+endif()
+ 
+set(DART_TESTING_TIMEOUT 15 
+  CACHE INTEGER 
+  "Timeout after this many seconds of madness")
 
 #-------------------------------------------------------------------------------
 # This macro adds additional include directories based on the dependencies of 
@@ -189,15 +187,15 @@ macro(boost_test_parse_args testname)
     get_target_property(DEPEND_LOCATION ${ARG} LOCATION)
     # If building static libraries is turned off, don't try to build
     # the test
-    if (NOT BUILD_STATIC AND ${DEPEND_TYPE} STREQUAL "STATIC_LIBRARY")
+    if (NOT ENABLE_STATIC AND ${DEPEND_TYPE} STREQUAL "STATIC_LIBRARY")
       set(BOOST_TEST_OKAY FALSE)
-    endif (NOT BUILD_STATIC AND ${DEPEND_TYPE} STREQUAL "STATIC_LIBRARY")
+    endif (NOT ENABLE_STATIC AND ${DEPEND_TYPE} STREQUAL "STATIC_LIBRARY")
 
     # If building shared libraries is turned off, don't try to build
     # the test
-    if (NOT BUILD_SHARED AND ${DEPEND_TYPE} STREQUAL "SHARED_LIBRARY")
+    if (NOT ENABLE_SHARED AND ${DEPEND_TYPE} STREQUAL "SHARED_LIBRARY")
       set(BOOST_TEST_OKAY FALSE)
-    endif (NOT BUILD_SHARED AND ${DEPEND_TYPE} STREQUAL "SHARED_LIBRARY")
+    endif (NOT ENABLE_SHARED AND ${DEPEND_TYPE} STREQUAL "SHARED_LIBRARY")
   endforeach(ARG ${BOOST_TEST_DEPENDS})
 
   # Setup the SOURCES variables. If no sources are specified, use the
@@ -208,12 +206,9 @@ macro(boost_test_parse_args testname)
     set(BOOST_TEST_SOURCES "${testname}.cpp")
   endif (BOOST_TEST_DEFAULT_ARGS)
 
-  set(BOOST_TEST_TESTNAME "${PROJECT_NAME}-${testname}")
+  set(BOOST_TEST_TESTNAME "${BOOST_PROJECT_NAME}-${testname}")
   #message("testname: ${BOOST_TEST_TESTNAME}")
   # If testing is turned off, this test is not okay
-  if (NOT BUILD_TESTING)
-    set(BOOST_TEST_OKAY FALSE)
-  endif(NOT BUILD_TESTING)
 endmacro(boost_test_parse_args)
 
 # This macro attaches a the "known-failure" label to the given test
@@ -221,9 +216,14 @@ endmacro(boost_test_parse_args)
 # failures.
 macro(boost_test_known_failures TEST)
   foreach(PATTERN ${ARGN})
+    message(STATUS "${BUILDNAME} matches ${PATTERN} ?")
     if (${BUILDNAME} MATCHES ${PATTERN})
-      set_tests_properties("${PROJECT_NAME}-${TEST}"
-        PROPERTIES LABELS "${PROJECT_NAME};known-failure")
+      message(STATUS "YES")
+      set_tests_properties("${BOOST_PROJECT_NAME}-${TEST}"
+        PROPERTIES 
+	LABELS "${BOOST_PROJECT_NAME};known-failure"
+	WILL_FAIL TRUE
+	)
     endif()
   endforeach()
 endmacro(boost_test_known_failures)
@@ -282,7 +282,7 @@ macro(boost_test_run testname)
   boost_test_parse_args(${testname} ${ARGN} RUN)
   if (BOOST_TEST_OKAY)  
     boost_add_executable(${testname} ${BOOST_TEST_SOURCES}
-      OUTPUT_NAME tests/${PROJECT_NAME}/${testname}
+      OUTPUT_NAME tests/${BOOST_PROJECT_NAME}/${testname}
       DEPENDS "${BOOST_TEST_DEPENDS}"
       LINK_LIBS ${BOOST_TEST_LINK_LIBS}
       LINK_FLAGS ${BOOST_TEST_LINK_FLAGS}
@@ -293,19 +293,23 @@ macro(boost_test_run testname)
     if (THIS_EXE_OKAY)
       get_target_property(THIS_TEST_OUTPUT_DIRECTORY ${testname} 
         RUNTIME_OUTPUT_DIRECTORY)
+      #
+      # Fixup path for visual studio per instructions from Brad King:  
+      #
+      get_target_property(THIS_TEST_LOCATION ${BOOST_TEST_TESTNAME}
+        LOCATION)
+      string(REGEX REPLACE "\\$\\(.*\\)" "\${CTEST_CONFIGURATION_TYPE}"
+        THIS_TEST_LOCATION "${THIS_TEST_LOCATION}")
+
       add_test (${BOOST_TEST_TESTNAME} 
-        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_CFG_INTDIR}/tests/${PROJECT_NAME}/${testname}
+        ${THIS_TEST_LOCATION}
         ${BOOST_TEST_ARGS})
 
       set_tests_properties(${BOOST_TEST_TESTNAME}
         PROPERTIES
-        LABELS "${PROJECT_NAME}"
+        LABELS "${BOOST_PROJECT_NAME}"
         )
       boost_test_known_failures(${testname} ${BOOST_TEST_KNOWN_FAILURES})
-
-      # Make sure that the -test target that corresponds to this
-      # library or tool depends on this test executable.
-      add_dependencies(${PROJECT_NAME}-test ${THIS_EXE_NAME})
 
       if (BOOST_TEST_FAIL)
         set_tests_properties(${BOOST_TEST_TESTNAME} PROPERTIES WILL_FAIL ON)
@@ -374,7 +378,7 @@ macro(boost_test_compile testname)
 
     set_tests_properties(${BOOST_TEST_TESTNAME}
       PROPERTIES
-      LABELS "${PROJECT_NAME}"
+      LABELS "${BOOST_PROJECT_NAME}"
       )
 
     boost_test_known_failures(${testname} ${BOOST_TEST_KNOWN_FAILURES})
@@ -443,7 +447,7 @@ macro(boost_test_link testname)
 
     set_tests_properties(${BOOST_TEST_TESTNAME}
       PROPERTIES
-      LABELS "${PROJECT_NAME}"
+      LABELS "${BOOST_PROJECT_NAME}"
       )
 
     boost_test_known_failures(${testname} ${BOOST_TEST_KNOWN_FAILURES})
