@@ -159,13 +159,28 @@ BUILD_PROJECTS
 ^^^^^^^^^^^^^^
 
 This is a semicolon-separated list of projects to be built, or
-``"ALL"`` (the default) for all projects.  Projects not appearing in
-this list (if list not "ALL") are ignored; no targets in this project
-will appear.  Example::
+``"ALL"`` (the default) for all projects, or ``"NONE"``.  Projects not
+appearing in this list (if list not ``"ALL"``) are ignored; no targets in
+this project will appear.  Example::
 
   BUILD_PROJECTS=thread;python
 
-See also the :ref:`boost_library_project_macro` macro.
+See also the :ref:`boost_library_project_macro` macro.  
+
+.. note::
+
+   If you specify a project with link time dependencies on other
+   projects, e.g. ``filesystem``, (which depends on ``system``) and
+   omit the dependencies, you will get an error from cmake something
+   like this::
+
+      CMake Error at tools/build/CMake/BoostCore.cmake:736 (get_property):
+        get_property could not find TARGET boost_system-mt-shared.  Perhaps it has
+        not yet been created.
+      Call Stack (most recent call first):
+        tools/build/CMake/BoostCore.cmake:1170 (boost_library_variant)
+        libs/filesystem/src/CMakeLists.txt:7 (boost_add_library)
+
 
 .. index:: BUILD_EXAMPLES
 .. _BUILD_EXAMPLES:

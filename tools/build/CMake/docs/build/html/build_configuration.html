@@ -229,18 +229,32 @@ segment is omitted:</p>
 </div>
 </div>
 <div class="section" id="build-projects">
-<span id="index-76"></span><span id="id2"></span><h3>BUILD_PROJECTS<a class="headerlink" href="#build-projects" title="Permalink to this headline">¶</a></h3>
+<span id="index-81"></span><span id="id2"></span><h3>BUILD_PROJECTS<a class="headerlink" href="#build-projects" title="Permalink to this headline">¶</a></h3>
 <p>This is a semicolon-separated list of projects to be built, or
-<tt class="docutils literal"><span class="pre">&quot;ALL&quot;</span></tt> (the default) for all projects.  Projects not appearing in
-this list (if list not &#8220;ALL&#8221;) are ignored; no targets in this project
-will appear.  Example:</p>
+<tt class="docutils literal"><span class="pre">&quot;ALL&quot;</span></tt> (the default) for all projects, or <tt class="docutils literal"><span class="pre">&quot;NONE&quot;</span></tt>.  Projects not
+appearing in this list (if list not <tt class="docutils literal"><span class="pre">&quot;ALL&quot;</span></tt>) are ignored; no targets in
+this project will appear.  Example:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">BUILD_PROJECTS</span><span class="o">=</span><span class="n">thread</span><span class="p">;</span><span class="n">python</span>
 </pre></div>
 </div>
 <p>See also the <a class="reference external" href="reference/boost_library_project.html#boost-library-project-macro"><em>boost_library_project</em></a> macro.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>If you specify a project with link time dependencies on other
+projects, e.g. <tt class="docutils literal"><span class="pre">filesystem</span></tt>, (which depends on <tt class="docutils literal"><span class="pre">system</span></tt>) and
+omit the dependencies, you will get an error from cmake something
+like this:</p>
+<div class="last highlight-python"><pre>CMake Error at tools/build/CMake/BoostCore.cmake:736 (get_property):
+  get_property could not find TARGET boost_system-mt-shared.  Perhaps it has
+  not yet been created.
+Call Stack (most recent call first):
+  tools/build/CMake/BoostCore.cmake:1170 (boost_library_variant)
+  libs/filesystem/src/CMakeLists.txt:7 (boost_add_library)</pre>
+</div>
+</div>
 </div>
 <div class="section" id="build-examples">
-<span id="index-77"></span><span id="id3"></span><h3>BUILD_EXAMPLES<a class="headerlink" href="#build-examples" title="Permalink to this headline">¶</a></h3>
+<span id="index-82"></span><span id="id3"></span><h3>BUILD_EXAMPLES<a class="headerlink" href="#build-examples" title="Permalink to this headline">¶</a></h3>
 <p>This is a semicolon-separated list of projects whose examples should
 be built, e.g.:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">BUILD_EXAMPLES</span><span class="o">=</span><span class="n">iostreams</span><span class="p">;</span><span class="n">accumulators</span>
@@ -255,7 +269,7 @@ argument to the <a class="reference external" href="reference/boost_library_proj
 <p><tt class="docutils literal"><span class="pre">ccmake</span></tt> provides the keystroke option <tt class="docutils literal"><span class="pre">t</span></tt> which toggles advanced
 mode.  Some of the useful options here are:</p>
 <span class="target" id="verbosity"></span><div class="section" id="cmake-verbose-makefile">
-<span id="index-78"></span><h3>CMAKE_VERBOSE_MAKEFILE<a class="headerlink" href="#cmake-verbose-makefile" title="Permalink to this headline">¶</a></h3>
+<span id="index-83"></span><h3>CMAKE_VERBOSE_MAKEFILE<a class="headerlink" href="#cmake-verbose-makefile" title="Permalink to this headline">¶</a></h3>
 <blockquote>
 Displays full build commands during build.  Good for debugging.
 This option will generate permanently verbose makefiles; it is
@@ -263,7 +277,7 @@ generally easier to invoke make with the option <tt class="docutils literal"><sp
 instead (this has the same effect, but for one build only).</blockquote>
 </div>
 <div class="section" id="cmake-cxx-compiler">
-<span id="index-79"></span><span id="id4"></span><h3>CMAKE_CXX_COMPILER<a class="headerlink" href="#cmake-cxx-compiler" title="Permalink to this headline">¶</a></h3>
+<span id="index-84"></span><span id="id4"></span><h3>CMAKE_CXX_COMPILER<a class="headerlink" href="#cmake-cxx-compiler" title="Permalink to this headline">¶</a></h3>
 <blockquote>
 <p>Sets the compiler.  If you have a nonstandard compiler and no
 default compiler, you may have to pass the value of this option on
@@ -277,7 +291,7 @@ the commandline, for example:</p>
 <div class="section" id="options-for-customizing-installation">
 <h2>Options for customizing installation<a class="headerlink" href="#options-for-customizing-installation" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="cmake-install-prefix">
-<span id="index-80"></span><span id="id5"></span><h3>CMAKE_INSTALL_PREFIX<a class="headerlink" href="#cmake-install-prefix" title="Permalink to this headline">¶</a></h3>
+<span id="index-85"></span><span id="id5"></span><h3>CMAKE_INSTALL_PREFIX<a class="headerlink" href="#cmake-install-prefix" title="Permalink to this headline">¶</a></h3>
 <p>This is a standard cmake option that sets the path to which boost will
 be installed.</p>
 </div>
@@ -318,7 +332,7 @@ use:</p>
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version 7b5a224f51a18210b1912ead7bea8f27b25f2d53, Sun, 25 Oct 2009.
+      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version 0b51c1d946b3c4cec20295590fabb4108b0ca203, Sun, 25 Oct 2009.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>
