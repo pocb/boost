@@ -36,6 +36,16 @@ number, we anticipate that only testing nodes will want to test ALL,
 whereas developers will want to test the library under development and
 those that are dependent on it.  
 
+.. index:: NMake
+.. index:: Visual Studio
+.. index:: tests, running all of them
+
+.. warning:: It is **not** recommended to set ``BUILD_TESTS`` to
+   	     ``"ALL"`` when using Visual Studio generators.  A very
+   	     large number (thousands) of targets are generated and
+   	     this can bring VS to grinding halt.  To run all tests,
+   	     choose the ``NMake`` generator, see :ref:`NMake`.
+
 Be sure to re-configure CMake once you are done tweaking these
 options, and generate makefiles or project files, as mentioned in
 :ref:`quickstart`.  

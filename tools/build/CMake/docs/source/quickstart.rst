@@ -194,6 +194,7 @@ Run CMake by selecting it from the Start menu.
   binaries* directory from the cmake gui.
 
 .. index:: NMake
+.. _NMake:
 
 Configuration for NMake
 ^^^^^^^^^^^^^^^^^^^^^^^
