@@ -280,9 +280,18 @@ endmacro(boost_test_known_failures)
 #   boost_test_run(signal_test DEPENDS boost_signals)
 macro(boost_test_run testname)
   boost_test_parse_args(${testname} ${ARGN} RUN)
+  #
+  # On windows, tests have to go in the same directory as
+  # DLLs.  
+  # 
+  if (CMAKE_HOST_WIN32)
+    set(OUTPUT_NAME tests/${BOOST_PROJECT_NAME}/${testname})
+  else()
+    set(OUTPUT_NAME ${BOOST_PROJECT_NAME}-${testname})
+  endif()
   if (BOOST_TEST_OKAY)  
     boost_add_executable(${testname} ${BOOST_TEST_SOURCES}
-      OUTPUT_NAME tests/${BOOST_PROJECT_NAME}/${testname}
+      OUTPUT_NAME ${OUTPUT_NAME}
       DEPENDS "${BOOST_TEST_DEPENDS}"
       LINK_LIBS ${BOOST_TEST_LINK_LIBS}
       LINK_FLAGS ${BOOST_TEST_LINK_FLAGS}
