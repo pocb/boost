@@ -19,7 +19,7 @@
 #     packages.                                                          #
 #                                                                        #
 #   On Windows:                                                          #
-#     run the CMake GNU, load the Boost directory, and generate          #
+#     run the CMake GUI, load the Boost directory, and generate          #
 #     project files or makefiles for your environment.                   #
 #                                                                        #
 # For more information about CMake, see http://www.cmake.org             #
@@ -47,6 +47,36 @@ else()
 endif()
 
 #
+# BOOST_MAINTAINER: undocced variable that sets up maintainer mode
+#
+if(BOOST_MAINTAINER)  
+  #
+  #  Put the boost.cmake version someplace sphinx can get it
+  #  for use in generated documentation
+  #
+  set(BOOST_CMAKE_VERSION "${BOOST_VERSION}.cmake3")
+  set(CMAKE_DOCS_DIR ${CMAKE_SOURCE_DIR}/tools/build/CMake/docs/)
+  configure_file(${CMAKE_DOCS_DIR}/source/boost_cmake_version.py.in
+    ${CMAKE_DOCS_DIR}/source/boost_cmake_version.py)
+  configure_file(${CMAKE_DOCS_DIR}/Makefile.in
+    ${CMAKE_DOCS_DIR}/Makefile)
+  
+  set(BOOST_CMAKE_HOST sodium)
+  set(BOOST_CMAKE_DOCROOT /var/www/htdocs/boost-cmake/${BOOST_CMAKE_VERSION})
+
+  add_custom_target(do-release
+    COMMAND git archive --format=tar --prefix=boost-${BOOST_CMAKE_VERSION} ${BOOST_CMAKE_VERSION} | gzip --best > boost-${BOOST_CMAKE_VERSION}.tar.gz
+    COMMAND git archive --format=zip -9 --prefix=boost-${BOOST_CMAKE_VERSION} ${BOOST_CMAKE_VERSION} > boost-${BOOST_CMAKE_VERSION}.zip
+    COMMAND git log --quiet ${BOOST_CMAKE_VERSION} > /dev/null
+    COMMAND ssh ${BOOST_CMAKE_HOST} mkdir -p ${BOOST_CMAKE_DOCROOT}
+    COMMAND scp boost-${BOOST_CMAKE_VERSION}.tar.gz boost-${BOOST_CMAKE_VERSION}.zip 
+    ${BOOST_CMAKE_HOST}:${BOOST_CMAKE_DOCROOT}
+    )
+    
+
+endif()
+
+#
 # Make sure that we reconfigure when boost/version.hpp changes.
 #
 configure_file(boost/version.hpp
@@ -58,8 +88,8 @@ configure_file(boost/version.hpp
 # directories. This simplifies manual testing and the use of the build
 # tree rather than installed Boost libraries.
 SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 ##########################################################################
 # Boost CMake modules                                                    #

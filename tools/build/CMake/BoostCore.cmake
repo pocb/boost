@@ -54,12 +54,6 @@
 #     SRCDIRS src 
 #     TESTDIRS test
 #     )
-set(BUILD_EXAMPLES "NONE" CACHE STRING "Semicolon-separated list of lowercase project names that should have their examples built, or \"ALL\"")
-
-set(BOOST_INSTALL_LIB_SUBDIR_NAME "lib" 
-  CACHE STRING 
-  "Name of directory under CMAKE_INSTALL_PREFIX to which libraries will be installed")
-
 macro(boost_library_project LIBNAME)
   parse_arguments(THIS_PROJECT
     "SRCDIRS;TESTDIRS;EXAMPLEDIRS;HEADERS;DOCDIRS;DESCRIPTION;AUTHORS;MAINTAINERS"
@@ -346,11 +340,11 @@ macro(boost_tool_project TOOLNAME)
   set(THIS_PROJECT_OKAY ON)
   set(THIS_PROJECT_FAILED_DEPS "")
   foreach(DEP ${BOOST_${UTOOLNAME}_DEPENDS})
-    string(TOUPPER "BUILD_BOOST_${DEP}" BOOST_LIB_DEP)
-    if (NOT ${BOOST_LIB_DEP})
+    get_target_property(dep_location ${DEP} LOCATION)
+    if (NOT ${dep_location})
       set(THIS_PROJECT_OKAY OFF)
       set(THIS_PROJECT_FAILED_DEPS "${THIS_PROJECT_FAILED_DEPS}  ${DEP}\n")
-    endif (NOT ${BOOST_LIB_DEP})
+    endif (NOT ${dep_location})
   endforeach(DEP)
 
   option(BUILD_${UTOOLNAME} "Build ${TOOLNAME}" ON)

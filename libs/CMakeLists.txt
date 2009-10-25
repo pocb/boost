@@ -18,13 +18,6 @@ macro(BOOST_COLLECT_SUBPROJECT_DIRECTORY_NAMES varname filename)
   endforeach(BOOST_LIB_CMAKE_FILE ${BOOST_LIBRARY_CMAKE_FILES})
 endmacro(BOOST_COLLECT_SUBPROJECT_DIRECTORY_NAMES varname)
 
-macro(ADD_SUBDIRECTORIES prefix)
-  foreach(subdir ${ARGN})
-    message(STATUS "${prefix}${subdir}")
-    add_subdirectory(${subdir})
-  endforeach(subdir ${ARGN})
-endmacro(ADD_SUBDIRECTORIES prefix)
-
 # Find all of the subdirectories with .cmake files in them. These are
 # the libraries with dependencies.
 boost_collect_subproject_directory_names(BOOST_MODULE_DIRS "module.cmake")
@@ -41,7 +34,29 @@ boost_collect_subproject_directory_names(BOOST_SUBPROJECT_DIRS "CMakeLists.txt")
 set(CPACK_INSTALL_CMAKE_COMPONENTS_ALL)
 list(SORT BOOST_SUBPROJECT_DIRS)
 topological_sort(BOOST_SUBPROJECT_DIRS BOOST_ _DEPENDS)
-add_subdirectories(" + " ${BOOST_SUBPROJECT_DIRS})
+
+#
+# Sanity-check for typos: all projects in BUILD_PROJECTS must exist
+#
+if (NOT BUILD_PROJECTS STREQUAL "ALL")
+  foreach(project ${BUILD_PROJECTS})
+    list(FIND BOOST_SUBPROJECT_DIRS ${project} THIS_SUBPROJECT_DIRS_INDEX)
+    if (THIS_SUBPROJECT_DIRS_INDEX LESS 0)
+      message(FATAL_ERROR "Nonexistant project \"${project}\" specified in BUILD_PROJECTS")
+    endif()
+  endforeach()
+endif()
+
+#
+# include only directories of projects in BUILD_PROJECTS
+#
+foreach(subdir ${BOOST_SUBPROJECT_DIRS})
+  list(FIND BUILD_PROJECTS ${subdir} THIS_BUILD_PROJECTS_INDEX)
+  if ((THIS_BUILD_PROJECTS_INDEX GREATER -1) OR (BUILD_PROJECTS STREQUAL "ALL"))
+    message(STATUS "+ ${subdir}")
+    add_subdirectory(${subdir})
+  endif()
+endforeach()
 
 # Write out a GraphViz file containing inter-library dependencies. 
 set(BOOST_DEPENDENCY_GRAPHVIZ_FILE "${Boost_BINARY_DIR}/dependencies.dot")

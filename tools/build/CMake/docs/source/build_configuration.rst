@@ -151,6 +151,22 @@ segment is omitted::
 
   /usr/local/include/boost/...
 
+
+.. index:: BUILD_PROJECTS
+.. _BUILD_PROJECTS:
+
+BUILD_PROJECTS
+^^^^^^^^^^^^^^
+
+This is a semicolon-separated list of projects to be built, or
+``"ALL"`` (the default) for all projects.  Projects not appearing in
+this list (if list not "ALL") are ignored; no targets in this project
+will appear.  Example::
+
+  BUILD_PROJECTS=thread;python
+
+See also the :ref:`boost_library_project_macro` macro.
+
 .. index:: BUILD_EXAMPLES
 .. _BUILD_EXAMPLES:
 
