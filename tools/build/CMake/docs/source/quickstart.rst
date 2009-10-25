@@ -63,7 +63,9 @@ source directory::
 
   cmake -DCMAKE_INSTALL_PREFIX=/somewhere $BOOST/src 
 
-(``CMAKE_INSTALL_PREFIX`` defaults to ``/usr/local``).  You'll see output
+(:ref:`CMAKE_INSTALL_PREFIX` defaults to ``/usr/local`` on unix and
+``C:\\Program Files\Boost`` on windows).  Replace ``/somewhere`` above
+with a path you like if the defaults aren't okay.  You'll see output
 from ``cmake``.  It looks somewhat like this::
 
   -- Check for working C compiler: /usr/bin/gcc
@@ -126,7 +128,7 @@ You'll see::
 And you're done. Once the build completes (which make take a while, if
 you are building all of the Boost libraries), the Boost libraries will
 be in a predictable layout under the directory passed to
-``CMAKE_INSTALL_PREFIX`` (default ``/usr/local``)
+:ref:`CMAKE_INSTALL_PREFIX` (default ``/usr/local``)
 
 Windows
 -------

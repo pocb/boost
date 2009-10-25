@@ -179,6 +179,12 @@ generation phase.  If you should need to trigger this regeneration
 manually you may execute</p>
 <div class="highlight-python"><pre>make rebuild_cache</pre>
 </div>
+<p class="rubric">Deleting the cache</p>
+<p>You may find yourself wanting to start from scratch, for instance if
+you want to switch from using Visual Studio to using NMake.  To do
+this, <strong>delete the cache file</strong>.  On windows, there is a <em>Delete
+Cache</em> option in the CMake gui&#8217;s <em>File</em> menu.  On unix you can simply
+<tt class="docutils literal"><span class="pre">rm</span> <span class="pre">CMakeCache.txt</span></tt>.</p>
 <div class="section" id="a-few-useful-options">
 <span id="useful-options"></span><h2>A few useful options<a class="headerlink" href="#a-few-useful-options" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="cmake-osx-architectures">
@@ -229,7 +235,7 @@ segment is omitted:</p>
 </div>
 </div>
 <div class="section" id="build-projects">
-<span id="index-81"></span><span id="id2"></span><h3>BUILD_PROJECTS<a class="headerlink" href="#build-projects" title="Permalink to this headline">¶</a></h3>
+<span id="index-98"></span><span id="id2"></span><h3>BUILD_PROJECTS<a class="headerlink" href="#build-projects" title="Permalink to this headline">¶</a></h3>
 <p>This is a semicolon-separated list of projects to be built, or
 <tt class="docutils literal"><span class="pre">&quot;ALL&quot;</span></tt> (the default) for all projects, or <tt class="docutils literal"><span class="pre">&quot;NONE&quot;</span></tt>.  Projects not
 appearing in this list (if list not <tt class="docutils literal"><span class="pre">&quot;ALL&quot;</span></tt>) are ignored; no targets in
@@ -254,7 +260,7 @@ Call Stack (most recent call first):
 </div>
 </div>
 <div class="section" id="build-examples">
-<span id="index-82"></span><span id="id3"></span><h3>BUILD_EXAMPLES<a class="headerlink" href="#build-examples" title="Permalink to this headline">¶</a></h3>
+<span id="index-99"></span><span id="id3"></span><h3>BUILD_EXAMPLES<a class="headerlink" href="#build-examples" title="Permalink to this headline">¶</a></h3>
 <p>This is a semicolon-separated list of projects whose examples should
 be built, e.g.:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">BUILD_EXAMPLES</span><span class="o">=</span><span class="n">iostreams</span><span class="p">;</span><span class="n">accumulators</span>
@@ -269,7 +275,7 @@ argument to the <a class="reference external" href="reference/boost_library_proj
 <p><tt class="docutils literal"><span class="pre">ccmake</span></tt> provides the keystroke option <tt class="docutils literal"><span class="pre">t</span></tt> which toggles advanced
 mode.  Some of the useful options here are:</p>
 <span class="target" id="verbosity"></span><div class="section" id="cmake-verbose-makefile">
-<span id="index-83"></span><h3>CMAKE_VERBOSE_MAKEFILE<a class="headerlink" href="#cmake-verbose-makefile" title="Permalink to this headline">¶</a></h3>
+<span id="index-100"></span><h3>CMAKE_VERBOSE_MAKEFILE<a class="headerlink" href="#cmake-verbose-makefile" title="Permalink to this headline">¶</a></h3>
 <blockquote>
 Displays full build commands during build.  Good for debugging.
 This option will generate permanently verbose makefiles; it is
@@ -277,32 +283,37 @@ generally easier to invoke make with the option <tt class="docutils literal"><sp
 instead (this has the same effect, but for one build only).</blockquote>
 </div>
 <div class="section" id="cmake-cxx-compiler">
-<span id="index-84"></span><span id="id4"></span><h3>CMAKE_CXX_COMPILER<a class="headerlink" href="#cmake-cxx-compiler" title="Permalink to this headline">¶</a></h3>
+<span id="index-101"></span><span id="id4"></span><h3>CMAKE_CXX_COMPILER<a class="headerlink" href="#cmake-cxx-compiler" title="Permalink to this headline">¶</a></h3>
 <blockquote>
 <p>Sets the compiler.  If you have a nonstandard compiler and no
 default compiler, you may have to pass the value of this option on
 the commandline, for example:</p>
 <div class="highlight-python"><pre>cmake ../src -DCMAKE_CXX_COMPILER=gcc-4.4</pre>
 </div>
-<p>On windows just set it in the gui.</p>
+<p>On windows you can set this in the gui, but you will probably prefer
+to have cmake generate a set of nmake or project files by choosing
+an appropriate generator.</p>
 </blockquote>
 </div>
 </div>
 <div class="section" id="options-for-customizing-installation">
 <h2>Options for customizing installation<a class="headerlink" href="#options-for-customizing-installation" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="cmake-install-prefix">
-<span id="index-85"></span><span id="id5"></span><h3>CMAKE_INSTALL_PREFIX<a class="headerlink" href="#cmake-install-prefix" title="Permalink to this headline">¶</a></h3>
-<p>This is a standard cmake option that sets the path to which boost will
-be installed.</p>
+<span id="index-102"></span><span id="id5"></span><h3>CMAKE_INSTALL_PREFIX<a class="headerlink" href="#cmake-install-prefix" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+This is a standard cmake option that sets the path to which boost
+will be installed.</blockquote>
 </div>
 <div class="section" id="boost-install-lib-subdir-name">
 <span id="id6"></span><h3>BOOST_INSTALL_LIB_SUBDIR_NAME<a class="headerlink" href="#boost-install-lib-subdir-name" title="Permalink to this headline">¶</a></h3>
+<blockquote>
 <p>This defines the subdirectory of <tt class="docutils literal"><span class="pre">CMAKE_INSTALL_PREFIX</span></tt> to which
-libraries will be installed.  The default is <tt class="docutils literal"><span class="pre">lib</span></tt>. For example, if
-I&#8217;m on 64-bit fedora, I want the libs installed to <tt class="docutils literal"><span class="pre">/usr/lib64</span></tt>, I&#8217;d
-use:</p>
+libraries will be installed.  The default is <tt class="docutils literal"><span class="pre">lib</span></tt>. For example,
+if I&#8217;m on 64-bit fedora, I want the libs installed to
+<tt class="docutils literal"><span class="pre">/usr/lib64</span></tt>, I&#8217;d use:</p>
 <div class="highlight-python"><pre>cmake ../src -DCMAKE_INSTALL_PREFIX=/usr -DBOOST_INSTALL_LIB_SUBDIR_NAME=lib64</pre>
 </div>
+</blockquote>
 </div>
 </div>
 </div>
@@ -332,7 +343,7 @@ use:</p>
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version 0b51c1d946b3c4cec20295590fabb4108b0ca203, Sun, 25 Oct 2009.
+      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version 52f8055afd6de1521ff44d7ae493331d203f5579, Sun, 25 Oct 2009.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

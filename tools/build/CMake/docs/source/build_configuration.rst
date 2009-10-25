@@ -99,6 +99,14 @@ manually you may execute ::
 
   make rebuild_cache
 
+.. rubric:: Deleting the cache
+
+You may find yourself wanting to start from scratch, for instance if
+you want to switch from using Visual Studio to using NMake.  To do
+this, **delete the cache file**.  On windows, there is a *Delete
+Cache* option in the CMake gui's *File* menu.  On unix you can simply
+``rm CMakeCache.txt``.
+
 .. _useful_options:
 
 A few useful options
@@ -227,7 +235,9 @@ CMAKE_CXX_COMPILER
 
     cmake ../src -DCMAKE_CXX_COMPILER=gcc-4.4
 
-  On windows just set it in the gui.
+  On windows you can set this in the gui, but you will probably prefer
+  to have cmake generate a set of nmake or project files by choosing
+  an appropriate generator.
 
 Options for customizing installation
 ------------------------------------
@@ -240,20 +250,20 @@ Options for customizing installation
 CMAKE_INSTALL_PREFIX
 ^^^^^^^^^^^^^^^^^^^^
 
-This is a standard cmake option that sets the path to which boost will
-be installed.
+  This is a standard cmake option that sets the path to which boost
+  will be installed.
 
 .. _boost_install_lib_subdir_name:
 
 BOOST_INSTALL_LIB_SUBDIR_NAME
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-This defines the subdirectory of ``CMAKE_INSTALL_PREFIX`` to which
-libraries will be installed.  The default is ``lib``. For example, if
-I'm on 64-bit fedora, I want the libs installed to ``/usr/lib64``, I'd
-use:: 
+  This defines the subdirectory of ``CMAKE_INSTALL_PREFIX`` to which
+  libraries will be installed.  The default is ``lib``. For example,
+  if I'm on 64-bit fedora, I want the libs installed to
+  ``/usr/lib64``, I'd use::
 
-  cmake ../src -DCMAKE_INSTALL_PREFIX=/usr -DBOOST_INSTALL_LIB_SUBDIR_NAME=lib64
+    cmake ../src -DCMAKE_INSTALL_PREFIX=/usr -DBOOST_INSTALL_LIB_SUBDIR_NAME=lib64
 
 
 
