@@ -718,7 +718,11 @@ macro(boost_library_variant LIBNAME)
       
       # Installation of this library variant
       string(TOLOWER ${BOOST_PROJECT_NAME} libname)
-      install(TARGETS ${VARIANT_LIBNAME} DESTINATION lib COMPONENT ${LIB_COMPONENT})
+
+      install(TARGETS ${VARIANT_LIBNAME} 
+	DESTINATION lib${LIB_SUFFIX} # LIB_SUFFIX makes this e.g. lib64
+	COMPONENT ${LIB_COMPONENT})
+
       set_property( 
             TARGET ${VARIANT_LIBNAME}
             PROPERTY BOOST_CPACK_COMPONENT
