@@ -314,10 +314,13 @@ macro(boost_library_project LIBNAME)
             ${${LIBNAME}-modularize-commands}
           )
         endif (NOT modularize_debug)
-        add_custom_target(${LIBNAME}-modularize
-          ${${LIBNAME}-modularize-commands}
-          COMMENT "Modularizing ${LIBNAME} headers to project-local dir from monolithic boost dir"
-      )
+	#
+	#  Modularization temporarily disabled
+	#
+        #add_custom_target(${LIBNAME}-modularize
+        # ${${LIBNAME}-modularize-commands}
+        #  COMMENT "Modularizing ${LIBNAME} headers to project-local dir from monolithic boost dir"
+	#)
 
         if(THIS_PROJECT_MODULARIZED)
           #
@@ -782,7 +785,11 @@ macro(boost_library_variant LIBNAME)
       
       # Installation of this library variant
       string(TOLOWER ${PROJECT_NAME} libname)
-      install(TARGETS ${VARIANT_LIBNAME} DESTINATION lib COMPONENT ${LIB_COMPONENT})
+
+      install(TARGETS ${VARIANT_LIBNAME} 
+	DESTINATION lib${LIB_SUFFIX}
+	COMPONENT ${LIB_COMPONENT})
+
       set_property( 
             TARGET ${VARIANT_LIBNAME}
             PROPERTY BOOST_CPACK_COMPONENT
