@@ -56,23 +56,28 @@ if(BOOST_MAINTAINER)
   #
   set(BOOST_CMAKE_VERSION "${BOOST_VERSION}.cmake3")
   set(CMAKE_DOCS_DIR ${CMAKE_SOURCE_DIR}/tools/build/CMake/docs/)
+  set(BOOST_CMAKE_HOST sodium)
+  set(BOOST_CMAKE_DOCROOT /var/www/htdocs/boost-cmake/${BOOST_CMAKE_VERSION})
+  set(BOOST_CMAKE_URL ${BOOST_CMAKE_HOST}:${BOOST_CMAKE_DOCROOT})
+
+
   configure_file(${CMAKE_DOCS_DIR}/source/boost_cmake_version.py.in
     ${CMAKE_DOCS_DIR}/source/boost_cmake_version.py)
   configure_file(${CMAKE_DOCS_DIR}/Makefile.in
     ${CMAKE_DOCS_DIR}/Makefile)
   
-  set(BOOST_CMAKE_HOST sodium)
-  set(BOOST_CMAKE_DOCROOT /var/www/htdocs/boost-cmake/${BOOST_CMAKE_VERSION})
 
   add_custom_target(do-release
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
     COMMAND git archive --format=tar --prefix=boost-${BOOST_CMAKE_VERSION} ${BOOST_CMAKE_VERSION} | gzip --best > boost-${BOOST_CMAKE_VERSION}.tar.gz
     COMMAND git archive --format=zip -9 --prefix=boost-${BOOST_CMAKE_VERSION} ${BOOST_CMAKE_VERSION} > boost-${BOOST_CMAKE_VERSION}.zip
     COMMAND git log --quiet ${BOOST_CMAKE_VERSION} > /dev/null
     COMMAND ssh ${BOOST_CMAKE_HOST} mkdir -p ${BOOST_CMAKE_DOCROOT}
-    COMMAND scp boost-${BOOST_CMAKE_VERSION}.tar.gz boost-${BOOST_CMAKE_VERSION}.zip 
-    ${BOOST_CMAKE_HOST}:${BOOST_CMAKE_DOCROOT}
+    COMMAND scp boost-${BOOST_CMAKE_VERSION}.tar.gz boost-${BOOST_CMAKE_VERSION}.zip ${BOOST_CMAKE_URL}
+    COMMAND make -C ${CMAKE_DOCS_DIR} deploy
     )
     
+  message(STATUS "*** MAINTAINER TARGETS ADDED ***")
 
 endif()
 

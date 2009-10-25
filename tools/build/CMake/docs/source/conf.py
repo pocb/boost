@@ -187,7 +187,7 @@ htmlhelp_basename = 'boost-cmakedoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'gitting-boost.tex', ur'Gitting Boost',
+  ('index', 'boost-' + boost_cmake_version.version + '.tex', ur'Gitting Boost',
    ur'troy d. straszheim', 'manual'),
 ]
 
