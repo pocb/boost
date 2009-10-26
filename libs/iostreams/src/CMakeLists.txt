@@ -7,6 +7,9 @@
 set(BOOST_IOSTREAMS_EXTRA_SOURCES)
 set(BOOST_IOSTREAMS_LIBRARIES)
 
+#
+# These finds are done upstairs in libs/iostreams/CMakeLists.txt
+#
 if (ZLIB_FOUND)
   include_directories(${ZLIB_INCLUDE_DIR})
   set(ZLIB_EXTRA_SOURCES zlib.cpp gzip.cpp)
@@ -22,8 +25,12 @@ if (BZIP2_FOUND)
 endif(BZIP2_FOUND)
 
 boost_add_library(boost_iostreams
-  file_descriptor.cpp mapped_file.cpp 
-  ${ZLIB_EXTRA_SOURCES} ${BZIP2_EXTRA_SOURCES}
+
+  file_descriptor.cpp 
+  mapped_file.cpp 
+  ${ZLIB_EXTRA_SOURCES} 
+  ${BZIP2_EXTRA_SOURCES}
+
   LINK_LIBS ${ZLIB_EXTRA_LIBRARIES} ${BZIP2_EXTRA_LIBRARIES}
   SHARED_COMPILE_FLAGS "-DBOOST_IOSTREAMS_DYN_LINK=1"
   )
