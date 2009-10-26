@@ -16,6 +16,12 @@ Notes by Boost Version
 * :ref:`BOOST_INSTALL_LIB_SUBDIR_NAME` for installing libs to
   nonstandard lib directory name, e.g. ``$PREFIX/lib64``
 
+1.41.0
+------
+
+This release (as released by upstream Boost) does **not** contain
+CMake support.  See above for independenly released CMake versions.
+
 1.40.0.cmake2
 -------------
 
