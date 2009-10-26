@@ -51,15 +51,16 @@
             <ul>
 <li><a class="reference external" href="">Notes by Boost Version</a><ul>
 <li><a class="reference external" href="#cmakebeta1">1.41.0.cmakebeta1</a></li>
+<li><a class="reference external" href="#id1">1.41.0</a></li>
 <li><a class="reference external" href="#cmake2">1.40.0.cmake2</a></li>
 <li><a class="reference external" href="#cmake1">1.40.0.cmake1</a></li>
 <li><a class="reference external" href="#cmake0">1.40.0.cmake0</a></li>
-<li><a class="reference external" href="#id1">1.40.0</a></li>
+<li><a class="reference external" href="#id2">1.40.0</a></li>
 <li><a class="reference external" href="#and-1-39-0">1.38.0 and 1.39.0</a><ul>
 <li><a class="reference external" href="#known-issues">Known Issues</a></li>
 </ul>
 </li>
-<li><a class="reference external" href="#id2">1.35.0 - 1.37</a></li>
+<li><a class="reference external" href="#id3">1.35.0 - 1.37</a></li>
 </ul>
 </li>
 </ul>
@@ -91,11 +92,23 @@
 <li><a class="reference external" href="build_variants.html#variants"><em>Build Variants and Features</em></a> names switched to <tt class="docutils literal"><span class="pre">ENABLE_&lt;feature&gt;</span></tt> to distinguish
 from <tt class="docutils literal"><span class="pre">BUILD_*</span></tt> options.</li>
 <li>Many docs improvements</li>
-<li>Maintainer (of boost-cmake) targets</li>
-<li><a class="reference external" href="build_configuration.html#build-projects"><em>BUILD_PROJECTS</em></a> variable for building only certain projects.</li>
+<li>Special targets for the boost-cmake maintainer</li>
+<li><a class="reference external" href="build_configuration.html#build-projects"><em>BUILD_PROJECTS</em></a> <tt class="docutils literal"><span class="pre">(=</span> <span class="pre">NONE|ALL|proj1;proj2;...;projN)</span></tt>
+variable for building only certain projects.</li>
+<li><a class="reference external" href="build_configuration.html#build-examples"><em>BUILD_EXAMPLES</em></a> <tt class="docutils literal"><span class="pre">(=</span> <span class="pre">NONE|ALL|proj1;proj2;...;projN)</span></tt>
+variable for building examples only of certain projects.</li>
 <li><a class="reference external" href="build_configuration.html#boost-install-lib-subdir-name"><em>BOOST_INSTALL_LIB_SUBDIR_NAME</em></a> for installing libs to
 nonstandard lib directory name, e.g. <tt class="docutils literal"><span class="pre">$PREFIX/lib64</span></tt></li>
+<li>Testing improvements: cmake now runs 2408 tests, 99% of which pass.
+This isn&#8217;t the full set, upstream is a moving target.  The few
+remaining failures (assuming upstream is bug-free) are assumed to be
+problems in the testing setup, not the underlying libraries.</li>
 </ul>
+</div>
+<div class="section" id="id1">
+<h2>1.41.0<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<p>This release (as released by upstream Boost) does <strong>not</strong> contain
+CMake support.  See above for independenly released CMake versions.</p>
 </div>
 <div class="section" id="cmake2">
 <h2>1.40.0.cmake2<a class="headerlink" href="#cmake2" title="Permalink to this headline">¶</a></h2>
@@ -126,8 +139,8 @@ writing, in beta).</p>
 <h2>1.40.0.cmake0<a class="headerlink" href="#cmake0" title="Permalink to this headline">¶</a></h2>
 <p>This version works on windows with MSVC and linux with gcc.</p>
 </div>
-<div class="section" id="id1">
-<h2>1.40.0<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id2">
+<h2>1.40.0<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <p>This version is <strong>broken</strong> in the svn distribution.  See later
 releases with the <tt class="docutils literal"><span class="pre">.cmakeN</span></tt> suffix.</p>
 </div>
@@ -233,8 +246,8 @@ these libraries.</li>
 </ul>
 </div>
 </div>
-<div class="section" id="id2">
-<h2>1.35.0 - 1.37<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id3">
+<h2>1.35.0 - 1.37<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
 <p>There was a CMake branch that built these releases, but Boost.CMake
 was not included in the official distribution.</p>
 </div>
@@ -265,7 +278,7 @@ was not included in the official distribution.</p>
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version b03d312263c41eb4bc26472b6658afa33c7d0475, Mon, 26 Oct 2009.
+      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version 4df366a1f41a4ba0f12f47d617917b1074a53b1b, Mon, 26 Oct 2009.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

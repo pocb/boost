@@ -9,12 +9,21 @@ Notes by Boost Version
 
 * Many docs improvements
 
-* Maintainer (of boost-cmake) targets
+* Special targets for the boost-cmake maintainer
 
-* :ref:`BUILD_PROJECTS` variable for building only certain projects.
+* :ref:`BUILD_PROJECTS` ``(= NONE|ALL|proj1;proj2;...;projN)``
+  variable for building only certain projects.
+
+* :ref:`BUILD_EXAMPLES` ``(= NONE|ALL|proj1;proj2;...;projN)``
+  variable for building examples only of certain projects.
 
 * :ref:`BOOST_INSTALL_LIB_SUBDIR_NAME` for installing libs to
   nonstandard lib directory name, e.g. ``$PREFIX/lib64``
+
+* Testing improvements: cmake now runs 2408 tests, 99% of which pass.
+  This isn't the full set, upstream is a moving target.  The few
+  remaining failures (assuming upstream is bug-free) are assumed to be
+  problems in the testing setup, not the underlying libraries.
 
 1.41.0
 ------
