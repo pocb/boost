@@ -20,7 +20,7 @@ if (MPI_FOUND)
       set(MPI_EXAMPLE_SOURCES "${testname}.cpp")
     endif (MPI_EXAMPLE_DEFAULT_ARGS)
 
-    set(THIS_EXAMPLE_LOCATION tests/${PROJECT_NAME}/${testname})
+    set(THIS_EXAMPLE_LOCATION tests/${BOOST_PROJECT_NAME}/${testname})
 
     # Build the example executable
     boost_add_executable(${testname} 
@@ -40,7 +40,7 @@ if (MPI_FOUND)
       endif (NOT MPI_EXAMPLE_NUMPROCS)
 
       foreach(PROCS ${MPI_EXAMPLE_NUMPROCS})
-        add_test("${PROJECT_NAME}-${testname}-${PROCS}"
+        add_test("${BOOST_PROJECT_NAME}-${testname}-${PROCS}"
           ${MPIEXEC}
           -n ${PROCS}
           ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${THIS_EXAMPLE_LOCATION}

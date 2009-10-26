@@ -5,10 +5,9 @@
 # See http://www.boost.org/LICENSE_1_0.txt
 #
 if (WIN32)
-  set(THREAD_SOURCES win32/thread.cpp win32/exceptions.cpp win32/tss_dll.cpp
-                     win32/tss_pe.cpp)
+  set(THREAD_SOURCES win32/thread.cpp win32/tss_dll.cpp win32/tss_pe.cpp)
 else (WIN32)
-  set(THREAD_SOURCES pthread/thread.cpp pthread/exceptions.cpp pthread/once.cpp)
+  set(THREAD_SOURCES pthread/thread.cpp pthread/once.cpp)
 endif (WIN32)
 
 boost_add_library(

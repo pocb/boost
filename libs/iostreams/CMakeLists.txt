@@ -11,25 +11,17 @@ set (lib_headers
     iostreams
 )
 
-# find zlib up here... used lower down in various places
-include(FindZLIB)
-if (ZLIB_FOUND)
-  message(STATUS "Zlib found, enabling extra components.")
-endif()
+# Find BZip2. If it's available, test it
 include(FindBZip2)
-if(BZIP2_FOUND)
-  message(STATUS "BZip2 found, enabling extra components.")
-endif()
 
-#
+# Find zlib. If it's available, test it
+include(FindZLIB)
+
 # Add a library target to the build system
-#
-
 boost_library_project(
   iostreams
   SRCDIRS  src
   TESTDIRS  test
-  EXAMPLEDIRS  example
   HEADERS ${lib_headers}
   #  DOCDIRS 
   DESCRIPTION  "Framework for defining streams, stream buffers and i/o filters"

@@ -15,14 +15,15 @@ set (lib_headers
 # Add a library target to the build system
 boost_library_project(
   thread
-  SRCDIRS  src 
-  TESTDIRS  test
-  HEADERS ${lib_headers}
-  #  DOCDIRS 
-  #  DESCRIPTION 
+  SRCDIRS      src 
+  TESTDIRS     test
+  EXAMPLEDIRS  example
+  HEADERS      ${lib_headers}
+  # DOCDIRS 
+  DESCRIPTION  "Boost.Thread"
   MODULARIZED 
-  #  AUTHORS 
-  #  MAINTAINERS 
+  # AUTHORS 
+  # MAINTAINERS 
 )
 
 

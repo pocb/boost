@@ -1,4 +1,5 @@
 .. index:: boost_add_executable
+.. _boost_add_executable_macro:
 
 boost_add_executable
 --------------------

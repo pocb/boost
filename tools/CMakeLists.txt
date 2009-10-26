@@ -21,7 +21,6 @@ endmacro(boost_collect_lib_dependencies varname)
 # the libraries with dependencies.
 boost_collect_lib_dependencies(BOOST_MODULE_DIRS "module.cmake")
 foreach(subdir ${BOOST_MODULE_DIRS})
-#  message(STATUS "${Boost_SOURCE_DIR}/libs/${subdir}/module.cmake")
   include("${Boost_SOURCE_DIR}/libs/${subdir}/module.cmake")
 endforeach(subdir)
 
@@ -29,7 +28,6 @@ endforeach(subdir)
 ###############################################################################
 # This macro is an internal utility macro 
 # TODO: Document this if it stays around
-#
 #
 # example usage:
 #  boost_tool_dependencies( BOOST_DEPENDS test)

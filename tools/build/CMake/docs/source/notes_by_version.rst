@@ -1,12 +1,20 @@
 Notes by Boost Version
 ======================
 
-.. warning:: -DCMAKE_IS_EXPERIMENTAL=ORLY_YARLY
+1.41.0.cmakebeta1
+-----------------
 
-   This guard variable is included in releases of Boost.CMake through
-   version 1.38.  You just need to set this variable to some value (be
-   creative) when running cmake for the first time to disable the
-   guard.
+* :ref:`variants` names switched to ``ENABLE_<feature>`` to distinguish 
+  from ``BUILD_*`` options.
+
+* Many docs improvements
+
+* Maintainer (of boost-cmake) targets
+
+* :ref:`BUILD_PROJECTS` variable for building only certain projects.
+
+* :ref:`BOOST_INSTALL_LIB_SUBDIR_NAME` for installing libs to
+  nonstandard lib directory name, e.g. ``$PREFIX/lib64``
 
 1.40.0.cmake2
 -------------
@@ -47,6 +55,13 @@ releases with the ``.cmakeN`` suffix.
 
 1.38.0 and 1.39.0
 -----------------
+
+.. warning:: -DCMAKE_IS_EXPERIMENTAL=ORLY_YARLY
+
+   This guard variable is included in releases of Boost.CMake through
+   version 1.38.  You just need to set this variable to some value (be
+   creative) when running cmake for the first time to disable the
+   guard.
 
 Boost.CMake was included as an experimental system for the first time.
 It is perfectly capable of doing the basic build and install of boost.

@@ -46,9 +46,10 @@ Reference
 =========
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 1
 
    reference/boost_library_project
+   reference/boost_module
    reference/boost_add_library
    reference/boost_add_executable
    reference/boost_additional_test_dependencies

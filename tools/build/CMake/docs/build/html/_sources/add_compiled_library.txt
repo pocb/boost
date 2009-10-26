@@ -24,7 +24,7 @@ directories listed after ``SRCDIRS``, follow these steps for each one.
 1. Create a new file ``libs/libname/src/CMakeLists.txt`` with your
    favorite text editor. This file will contain build rules for your
    compiled library. In this file, we will create one or more
-   invocations of the :ref:`boost_add_library` macro, which adds a
+   invocations of the :ref:`boost_add_library_macro` macro, which adds a
    compiled Boost library to the CMake system. This macro provides the
    name of the library, the source files from which the library will
    be built, and any specific compiler and linker options needed to
@@ -213,7 +213,7 @@ different variants of each Boost library.
 
 Since some features conflict with certain libraries (a threading
 library cannot be ``SINGLE_THREADED``!), one can pass additional flags
-to :ref:`boost_add_library` stating which features should the library
+to :ref:`boost_add_library_macro` stating which features should the library
 cannot be built with.  For example, say that our library cannot be
 built as a multi-threaded library, because it uses thread-unsafe
 routines from the underlying C library. To disable multi-threaded

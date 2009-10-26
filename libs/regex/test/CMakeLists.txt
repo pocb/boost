@@ -6,22 +6,6 @@
 #
 boost_additional_test_dependencies(regex BOOST_DEPENDS test)
 
-# TODO: Default to multi-threaded?
-macro(regex_test TESTNAME)
-  parse_arguments(REGEX_TEST "" "" ${ARGN})
-
-  if (REGEX_TEST_DEFAULT_ARGS)
-    set(REGEX_TEST_SOURCES ${REGEX_TEST_DEFAULT_ARGS})
-  else (REGEX_TEST_DEFAULT_ARGS)
-    set(REGEX_TEST_SOURCES "${TESTNAME}.cpp")
-  endif (REGEX_TEST_DEFAULT_ARGS)
-
-  boost_test_run(${TESTNAME} ${REGEX_TEST_SOURCES} 
-    COMPILE_FLAGS "-DBOOST_REGEX_DYN_LINK=1"
-    DEPENDS boost_regex 
-    EXTRA_OPTIONS SHARED)
-endmacro(regex_test)
-
 set(R_SOURCES
   regress/basic_tests.cpp
   regress/main.cpp
@@ -47,11 +31,17 @@ set(R_SOURCES
   regress/test_operators.cpp
   )
 
-boost_test_run(regex_regress ${R_SOURCES} DEPENDS boost_regex STATIC)
+if (NOT ICU_FOUND)
+  # static tests eliminiated if ICU is found
+  boost_test_run(regex_regress ${R_SOURCES} 
+    DEPENDS boost_regex STATIC)
+endif()
+
 boost_test_run(regex_regress_dll ${R_SOURCES} 
   COMPILE_FLAGS "-DBOOST_REGEX_DYN_LINK=1"
   DEPENDS boost_regex 
   EXTRA_OPTIONS SHARED)
+
 boost_test_run(regex_regress_threaded ${R_SOURCES} 
   COMPILE_FLAGS "-DTEST_THREADS -DBOOST_REGEX_DYN_LINK=1"
   DEPENDS boost_regex boost_thread
@@ -70,9 +60,12 @@ boost_test_run(static_mutex_test static_mutex/static_mutex_test.cpp
   EXTRA_OPTIONS MULTI_THREADED SHARED)
 
 regex_test(object_cache_test object_cache/object_cache_test.cpp)
-boost_test_run(regex_config_info config_info/regex_config_info.cpp
-  DEPENDS boost_regex 
-  EXTRA_OPTIONS STATIC)
+
+if(NOT ICU_FOUND)
+  boost_test_run(regex_config_info config_info/regex_config_info.cpp
+    DEPENDS boost_regex 
+    EXTRA_OPTIONS STATIC)
+endif()
 
 boost_test_run(regex_dll_config_info config_info/regex_config_info.cpp
   COMPILE_FLAGS "-DBOOST_REGEX_DYN_LINK=1"

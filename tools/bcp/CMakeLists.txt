@@ -5,32 +5,32 @@
 # See http://www.boost.org/LICENSE_1_0.txt
 #
 boost_tool_project(bcp
-DESCRIPTION "The bcp utility is a tool for extracting subsets of Boost."
-AUTHORS "John Maddock")
+  DESCRIPTION "The bcp utility is a tool for extracting subsets of Boost."
+  AUTHORS "John Maddock"
+  )
 
-IF (BUILD_BCP)
+if (BUILD_BCP)
 
+  add_definitions(-DBOOST_REGEX_NO_LIB=1)
 
-set (bcp_sources
-  add_path.cpp 
-  bcp_imp.cpp 
-  copy_path.cpp 
-  file_types.cpp
-  fileview.cpp 
-  main.cpp 
-  path_operations.cpp 
-  scan_cvs_path.cpp 
-  licence_info.cpp 
-  scan_licence.cpp 
-  output_licence_info.cpp
-)
+  boost_add_executable( bcp
 
-boost_tool_dependencies( BOOST_DEPENDS filesystem test regex)
+    add_path.cpp 
+    bcp_imp.cpp 
+    copy_path.cpp 
+    file_types.cpp
+    fileview.cpp 
+    main.cpp 
+    path_operations.cpp 
+    scan_cvs_path.cpp 
+    licence_info.cpp 
+    scan_licence.cpp 
+    output_licence_info.cpp
 
-boost_add_executable(
-  bcp
-  ${bcp_sources}
-  DEPENDS boost_system boost_filesystem boost_prg_exec_monitor boost_regex
-)
+    STATIC
+    MULTI_THREADED
+    DEBUG
+    DEPENDS boost_system boost_filesystem boost_prg_exec_monitor boost_regex
+    )
 
-ENDIF (BUILD_BCP)
+endif (BUILD_BCP)

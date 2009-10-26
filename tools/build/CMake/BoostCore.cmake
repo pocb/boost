@@ -54,8 +54,6 @@
 #     SRCDIRS src 
 #     TESTDIRS test
 #     )
-set(BUILD_EXAMPLES "NONE" CACHE STRING "Semicolon-separated list of lowercase project names that should have their examples built, or \"ALL\"")
-
 macro(boost_library_project LIBNAME)
   parse_arguments(THIS_PROJECT
     "SRCDIRS;TESTDIRS;EXAMPLEDIRS;HEADERS;DOCDIRS;DESCRIPTION;AUTHORS;MAINTAINERS"
@@ -342,11 +340,11 @@ macro(boost_tool_project TOOLNAME)
   set(THIS_PROJECT_OKAY ON)
   set(THIS_PROJECT_FAILED_DEPS "")
   foreach(DEP ${BOOST_${UTOOLNAME}_DEPENDS})
-    string(TOUPPER "BUILD_BOOST_${DEP}" BOOST_LIB_DEP)
-    if (NOT ${BOOST_LIB_DEP})
+    get_target_property(dep_location ${DEP} LOCATION)
+    if (NOT ${dep_location})
       set(THIS_PROJECT_OKAY OFF)
       set(THIS_PROJECT_FAILED_DEPS "${THIS_PROJECT_FAILED_DEPS}  ${DEP}\n")
-    endif (NOT ${BOOST_LIB_DEP})
+    endif (NOT ${dep_location})
   endforeach(DEP)
 
   option(BUILD_${UTOOLNAME} "Build ${TOOLNAME}" ON)
@@ -395,6 +393,7 @@ endmacro(boost_tool_project)
 #     SRCDIRS src 
 #     TESTDIRS test
 #     )
+#
 macro(boost_module LIBNAME)
   parse_arguments(THIS_MODULE
     "DEPENDS"
@@ -405,15 +404,15 @@ macro(boost_module LIBNAME)
   # Export BOOST_${LIBNAME}_DEPENDS
   string(TOUPPER "BOOST_${LIBNAME}_DEPENDS" THIS_MODULE_LIBNAME_DEPENDS)
   set(${THIS_MODULE_LIBNAME_DEPENDS} ${THIS_MODULE_DEPENDS})
-  #
-  #message(STATUS "----------------------------------------------------------------")
-  #message(STATUS "LIBNAME: ${LIBNAME}")
-  #message(STATUS "THIS_MODULE_DEPENDS: ${THIS_MODULE_DEPENDS}")
-  #message(STATUS "THIS_MODULE_LIBNAME_DEPENDS: ${THIS_MODULE_LIBNAME_DEPENDS}")
-  #message(STATUS "${THIS_MODULE_LIBNAME_DEPENDS}: ${${THIS_MODULE_LIBNAME_DEPENDS}}")
-  #message(STATUS "THIS_MODULE_TEST_DEPENDS: ${THIS_MODULE_TEST_DEPENDS}")
-  #message(STATUS "THIS_MODULE_LIBNAME_TEST_DEPENDS: ${THIS_MODULE_LIBNAME_TEST_DEPENDS}")
-  #message(STATUS "${THIS_MODULE_LIBNAME_TEST_DEPENDS}: ${${THIS_MODULE_LIBNAME_TEST_DEPENDS}}")
+
+  # message(STATUS "----------------------------------------------------------------")
+  # message(STATUS "LIBNAME: ${LIBNAME}")
+  # message(STATUS "THIS_MODULE_DEPENDS: ${THIS_MODULE_DEPENDS}")
+  # message(STATUS "THIS_MODULE_LIBNAME_DEPENDS: ${THIS_MODULE_LIBNAME_DEPENDS}")
+  # message(STATUS "${THIS_MODULE_LIBNAME_DEPENDS}: ${${THIS_MODULE_LIBNAME_DEPENDS}}")
+  # message(STATUS "THIS_MODULE_TEST_DEPENDS: ${THIS_MODULE_TEST_DEPENDS}")
+  # message(STATUS "THIS_MODULE_LIBNAME_TEST_DEPENDS: ${THIS_MODULE_LIBNAME_TEST_DEPENDS}")
+  # message(STATUS "${THIS_MODULE_LIBNAME_TEST_DEPENDS}: ${${THIS_MODULE_LIBNAME_TEST_DEPENDS}}")
 endmacro(boost_module)
 
 # This macro is an internal utility macro that builds the name of a
@@ -720,13 +719,13 @@ macro(boost_library_variant LIBNAME)
       string(TOLOWER ${BOOST_PROJECT_NAME} libname)
 
       install(TARGETS ${VARIANT_LIBNAME} 
-	DESTINATION lib${LIB_SUFFIX} # LIB_SUFFIX makes this e.g. lib64
+	DESTINATION ${BOOST_INSTALL_LIB_SUBDIR_NAME}
 	COMPONENT ${LIB_COMPONENT})
 
       set_property( 
-            TARGET ${VARIANT_LIBNAME}
-            PROPERTY BOOST_CPACK_COMPONENT
-            ${LIB_COMPONENT})
+        TARGET ${VARIANT_LIBNAME}
+        PROPERTY BOOST_CPACK_COMPONENT
+        ${LIB_COMPONENT})
       
       # Make the library installation component dependent on the library
       # installation components of dependent libraries.
@@ -1102,9 +1101,9 @@ endmacro(boost_select_variant)
 #   normal shared library. Modules have special meaning an behavior on
 #   some platforms, such as Mac OS X.
 #
-#   NOT_feature: States that library variants containing a particular
+#   NO_feature: States that library variants containing a particular
 #   feature should not be built. For example, passing
-#   NOT_SINGLE_THREADED suppresses generation of single-threaded
+#   NO_SINGLE_THREADED suppresses generation of single-threaded
 #   variants of this library.
 #
 #   EXTRA_VARIANTS: Specifies that extra variants of this library
@@ -1126,7 +1125,7 @@ endmacro(boost_select_variant)
 #     tss.cpp xtime.cpp
 #     SHARED_COMPILE_FLAGS "-DBOOST_THREAD_BUILD_DLL=1"
 #     STATIC_COMPILE_FLAGS "-DBOOST_THREAD_BUILD_LIB=1"
-#     NOT_SINGLE_THREADED
+#     NO_SINGLE_THREADED
 #   )
 macro(boost_add_library LIBNAME)
   parse_arguments(THIS_LIB

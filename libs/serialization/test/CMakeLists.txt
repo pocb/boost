@@ -108,11 +108,8 @@ serialization_test_allarchives(test_derived_class test_derived_class.cpp A.cpp)
 serialization_test_allarchives(test_derived_class_ptr test_derived_class_ptr.cpp A.cpp)
 serialization_test_allarchives(test_diamond)
 serialization_test_allarchives(test_exported test_exported.cpp polymorphic_base.cpp)
-
-# put the save first so's the load ones have something to load
-serialization_test_allarchives(test_class_info_save)
 serialization_test_allarchives(test_class_info_load)
-
+serialization_test_allarchives(test_class_info_save)
 serialization_test_allarchives(test_object)
 serialization_test_allarchives(test_primitive)
 serialization_test_allarchives(test_list test_list.cpp A.cpp)

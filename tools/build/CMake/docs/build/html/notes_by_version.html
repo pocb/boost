@@ -5,13 +5,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Notes by Boost Version &mdash; Boost.CMake 1.41.0.cmake0</title>
+    <title>Notes by Boost Version &mdash; Boost.CMake 1.41.0.cmakebeta1</title>
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '1.41.0.cmake0',
+        VERSION:     '1.41.0.cmakebeta1',
         COLLAPSE_MODINDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -19,7 +19,7 @@
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Boost.CMake 1.41.0.cmake0" href="index.html" />
+    <link rel="top" title="Boost.CMake 1.41.0.cmakebeta1" href="index.html" />
     <link rel="next" title="boost_library_project" href="reference/boost_library_project.html" />
     <link rel="prev" title="Building a Binary Installer" href="build_installer.html" /> 
   </head>
@@ -38,7 +38,7 @@
              accesskey="P">previous</a> |</li>
     <li><a href="http://www.boost.org/">Boost</a> &raquo;</li>
     
-        <li><a href="index.html">Boost.CMake 1.41.0.cmake0</a> &raquo;</li>
+        <li><a href="index.html">Boost.CMake 1.41.0.cmakebeta1</a> &raquo;</li>
  
       </ul>
     </div>
@@ -50,6 +50,7 @@
             <h3><a href="index.html">Table Of Contents</a></h3>
             <ul>
 <li><a class="reference external" href="">Notes by Boost Version</a><ul>
+<li><a class="reference external" href="#cmakebeta1">1.41.0.cmakebeta1</a></li>
 <li><a class="reference external" href="#cmake2">1.40.0.cmake2</a></li>
 <li><a class="reference external" href="#cmake1">1.40.0.cmake1</a></li>
 <li><a class="reference external" href="#cmake0">1.40.0.cmake0</a></li>
@@ -84,13 +85,17 @@
             
   <div class="section" id="notes-by-boost-version">
 <h1>Notes by Boost Version<a class="headerlink" href="#notes-by-boost-version" title="Permalink to this headline">¶</a></h1>
-<div class="admonition warning">
-<p class="first admonition-title">Warning</p>
-<p>-DCMAKE_IS_EXPERIMENTAL=ORLY_YARLY</p>
-<p class="last">This guard variable is included in releases of Boost.CMake through
-version 1.38.  You just need to set this variable to some value (be
-creative) when running cmake for the first time to disable the
-guard.</p>
+<div class="section" id="cmakebeta1">
+<h2>1.41.0.cmakebeta1<a class="headerlink" href="#cmakebeta1" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference external" href="build_variants.html#variants"><em>Build Variants and Features</em></a> names switched to <tt class="docutils literal"><span class="pre">ENABLE_&lt;feature&gt;</span></tt> to distinguish
+from <tt class="docutils literal"><span class="pre">BUILD_*</span></tt> options.</li>
+<li>Many docs improvements</li>
+<li>Maintainer (of boost-cmake) targets</li>
+<li><a class="reference external" href="build_configuration.html#build-projects"><em>BUILD_PROJECTS</em></a> variable for building only certain projects.</li>
+<li><a class="reference external" href="build_configuration.html#boost-install-lib-subdir-name"><em>BOOST_INSTALL_LIB_SUBDIR_NAME</em></a> for installing libs to
+nonstandard lib directory name, e.g. <tt class="docutils literal"><span class="pre">$PREFIX/lib64</span></tt></li>
+</ul>
 </div>
 <div class="section" id="cmake2">
 <h2>1.40.0.cmake2<a class="headerlink" href="#cmake2" title="Permalink to this headline">¶</a></h2>
@@ -128,6 +133,14 @@ releases with the <tt class="docutils literal"><span class="pre">.cmakeN</span><
 </div>
 <div class="section" id="and-1-39-0">
 <h2>1.38.0 and 1.39.0<a class="headerlink" href="#and-1-39-0" title="Permalink to this headline">¶</a></h2>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p>-DCMAKE_IS_EXPERIMENTAL=ORLY_YARLY</p>
+<p class="last">This guard variable is included in releases of Boost.CMake through
+version 1.38.  You just need to set this variable to some value (be
+creative) when running cmake for the first time to disable the
+guard.</p>
+</div>
 <p>Boost.CMake was included as an experimental system for the first time.
 It is perfectly capable of doing the basic build and install of boost.
 You <em>must</em> pass the argument</p>
@@ -247,12 +260,12 @@ was not included in the official distribution.</p>
              >previous</a> |</li>
     <li><a href="http://www.boost.org/">Boost</a> &raquo;</li>
     
-        <li><a href="index.html">Boost.CMake 1.41.0.cmake0</a> &raquo;</li>
+        <li><a href="index.html">Boost.CMake 1.41.0.cmakebeta1</a> &raquo;</li>
  
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version aebbb6724dfa22d490a01ca55a92f23585ee9613, Tue, 20 Oct 2009.
+      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version b03d312263c41eb4bc26472b6658afa33c7d0475, Mon, 26 Oct 2009.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

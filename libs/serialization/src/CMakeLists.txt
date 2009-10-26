@@ -6,6 +6,7 @@
 #
 
 set(SOURCES
+
     basic_archive.cpp
     basic_iarchive.cpp
     basic_iserializer.cpp
@@ -37,6 +38,7 @@ set(SOURCES
     )
     
 set(WSOURCES
+
     basic_text_wiprimitive.cpp
     basic_text_woprimitive.cpp
     text_wiarchive.cpp
