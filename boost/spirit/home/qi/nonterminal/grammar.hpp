@@ -18,6 +18,7 @@
 #include <boost/spirit/home/qi/nonterminal/rule.hpp>
 #include <boost/spirit/home/qi/reference.hpp>
 #include <boost/noncopyable.hpp>
+#include <boost/type_traits/is_same.hpp>
 
 namespace boost { namespace spirit { namespace qi
 {
@@ -51,7 +52,7 @@ namespace boost { namespace spirit { namespace qi
         grammar(
             start_type const& start
           , std::string const& name_ = "unnamed-grammar")
-        : proto::extends<terminal, base_type>(terminal::make(start.alias()))
+        : proto::extends<terminal, base_type>(terminal::make(reference_(start)))
         , name_(name_)
         {}
 
@@ -65,8 +66,9 @@ namespace boost { namespace spirit { namespace qi
             // If you see the assertion below failing then the start rule 
             // passed to the constructor of the grammar is not compatible with 
             // the grammar (i.e. it uses different template parameters).
-            BOOST_SPIRIT_ASSERT_MSG(false, incompatible_start_rule, 
-                (rule<Iterator_, T1_, T2_, T3_>));
+            BOOST_SPIRIT_ASSERT_MSG(
+                (is_same<start_type, rule<Iterator_, T1_, T2_, T3_> >::value)
+              , incompatible_start_rule, (rule<Iterator_, T1_, T2_, T3_>));
         }
 
         std::string name() const
