@@ -194,20 +194,20 @@ install(DIRECTORY boost
 ##########################################################################
 # Binary packages                                                        #
 ##########################################################################
-set(CPACK_PACKAGE_NAME "Boost")
+set(CPACK_PACKAGE_NAME "Boost C++ Libraries")
 set(CPACK_PACKAGE_VENDOR "Boost.org")
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Boost ${BOOST_VERSION}")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Boost ${BOOST_VERSION} prerelease")
 
-if (EXISTS "${Boost_SOURCE_DIR}/README.txt")
+if (EXISTS "${CMAKE_SOURCE_DIR}/README.txt")
   message(STATUS "Using generic cpack package description file.")
-  set(CPACK_PACKAGE_DESCRIPTION_FILE "${Boost_SOURCE_DIR}/README.txt")
-  set(CPACK_RESOURCE_FILE_README "${Boost_SOURCE_DIR}/README.txt")
+  set(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_SOURCE_DIR}/README.txt")
+  set(CPACK_RESOURCE_FILE_README "${CMAKE_SOURCE_DIR}/README.txt")
 endif ()
 
-set(CPACK_RESOURCE_FILE_LICENSE "${Boost_SOURCE_DIR}/LICENSE_1_0.txt")
-if (EXISTS "${Boost_SOURCE_DIR}/Welcome.txt")
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE_1_0.txt")
+if (EXISTS "${CMAKE_SOURCE_DIR}/Welcome.txt")
   message(STATUS "Using generic cpack welcome file.")
-  set(CPACK_RESOURCE_FILE_WELCOME "${Boost_SOURCE_DIR}/Welcome.txt")
+  set(CPACK_RESOURCE_FILE_WELCOME "${CMAKE_SOURCE_DIR}/Welcome.txt")
 endif()
 
 set(CPACK_PACKAGE_VERSION "${BOOST_VERSION}")
@@ -220,9 +220,10 @@ if(WIN32 AND NOT UNIX)
   # There is a bug in NSI that does not handle full unix paths properly. Make
   # sure there is at least one set of four (4) backlasshes.
   # NOTE: No Boost icon yet
-#  set(CPACK_PACKAGE_ICON "${Boost_SOURCE_DIR}/tools/build/CMake\\\\InstallIcon.bmp")
+  set(CPACK_MONOLITHIC_INSTALL ON) # don't be modular for now
+  set(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/tools/build/CMake\\\\Boost.bmp")
 #  set(CPACK_NSIS_INSTALLED_ICON_NAME "bin\\\\MyExecutable.exe")
-  set(CPACK_NSIS_DISPLAY_NAME "Boost ${BOOST_VERSION_MAJOR}.${BOOST_VERSION_MINOR}.${BOOST_VERSION_SUBMINOR}")
+  set(CPACK_NSIS_DISPLAY_NAME "Boost ${BOOST_VERSION_MAJOR}.${BOOST_VERSION_MINOR}.${BOOST_VERSION_SUBMINOR} prerelease")
   set(CPACK_NSIS_HELP_LINK "http:\\\\\\\\www.boost.org")
   set(CPACK_NSIS_URL_INFO_ABOUT "http:\\\\\\\\www.boost.org")
   set(CPACK_NSIS_CONTACT "boost-users@lists.boost.org")
@@ -274,7 +275,7 @@ if (TEST_INSTALLED_TREE)
   include_directories("${CMAKE_INSTALL_PREFIX}/${BOOST_HEADER_DIR}")
 else (TEST_INSTALLED_TREE)
   # Use the headers directly from the Boost source tree (in boost/)
-  include_directories(${Boost_SOURCE_DIR})
+  include_directories(${CMAKE_SOURCE_DIR})
 endif (TEST_INSTALLED_TREE)
 
 # Boost.Build version 2 does this due to trouble with autolinking

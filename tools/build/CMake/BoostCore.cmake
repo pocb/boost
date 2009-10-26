@@ -718,14 +718,14 @@ macro(boost_library_variant LIBNAME)
       # Installation of this library variant
       string(TOLOWER ${BOOST_PROJECT_NAME} libname)
 
-      install(TARGETS ${VARIANT_LIBNAME} 
-	DESTINATION ${BOOST_INSTALL_LIB_SUBDIR_NAME}
-	COMPONENT ${LIB_COMPONENT})
-
-      set_property( 
-        TARGET ${VARIANT_LIBNAME}
-        PROPERTY BOOST_CPACK_COMPONENT
-        ${LIB_COMPONENT})
+      #
+      # tds:  componentization disabled for the moment
+      #
+      install(TARGETS ${VARIANT_LIBNAME} DESTINATION lib COMPONENT Boost) #${LIB_COMPONENT})
+      # set_property( 
+      #      TARGET ${VARIANT_LIBNAME}
+      #      PROPERTY BOOST_CPACK_COMPONENT
+      #      ${LIB_COMPONENT})
       
       # Make the library installation component dependent on the library
       # installation components of dependent libraries.
