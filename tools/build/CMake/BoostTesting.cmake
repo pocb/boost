@@ -284,12 +284,13 @@ macro(boost_test_run testname)
   # On windows, tests have to go in the same directory as
   # DLLs.  
   # 
-  if (CMAKE_HOST_WIN32)
+  if (NOT CMAKE_HOST_WIN32)
     set(OUTPUT_NAME tests/${BOOST_PROJECT_NAME}/${testname})
   else()
     set(OUTPUT_NAME ${BOOST_PROJECT_NAME}-${testname})
   endif()
   if (BOOST_TEST_OKAY)  
+
     boost_add_executable(${testname} ${BOOST_TEST_SOURCES}
       OUTPUT_NAME ${OUTPUT_NAME}
       DEPENDS "${BOOST_TEST_DEPENDS}"
@@ -300,8 +301,6 @@ macro(boost_test_run testname)
       ${BOOST_TEST_EXTRA_OPTIONS})
 
     if (THIS_EXE_OKAY)
-      get_target_property(THIS_TEST_OUTPUT_DIRECTORY ${testname} 
-        RUNTIME_OUTPUT_DIRECTORY)
       #
       # Fixup path for visual studio per instructions from Brad King:  
       #

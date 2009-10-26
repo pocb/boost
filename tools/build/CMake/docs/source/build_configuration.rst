@@ -204,6 +204,13 @@ be built, e.g.::
 Per-library examples are specified with the :ref:`EXAMPLEDIRS`
 argument to the :ref:`boost_library_project_macro` macro.
 
+.. rubric:: Note:
+
+A project's examples will only be built if the project appears in
+**both** :ref:`BUILD_PROJECTS` and :ref:`BUILD_EXAMPLES`.  I.e., the
+``BUILD_PROJECTS`` filter is applied first, and the ``BUILD_EXAMPLES``
+filter has no ability to reverse the result. 
+
 Advanced options
 ----------------
 

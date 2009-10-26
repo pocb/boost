@@ -11,7 +11,10 @@ boost_tool_project(bcp
 
 if (BUILD_BCP)
 
-  set (bcp_sources
+  add_definitions(-DBOOST_REGEX_NO_LIB=1)
+
+  boost_add_executable( bcp
+
     add_path.cpp 
     bcp_imp.cpp 
     copy_path.cpp 
@@ -23,13 +26,10 @@ if (BUILD_BCP)
     licence_info.cpp 
     scan_licence.cpp 
     output_licence_info.cpp
-    )
 
-  boost_tool_dependencies( BOOST_DEPENDS filesystem test regex)
-
-  boost_add_executable(
-    bcp
-    ${bcp_sources}
+    STATIC
+    MULTI_THREADED
+    DEBUG
     DEPENDS boost_system boost_filesystem boost_prg_exec_monitor boost_regex
     )
 

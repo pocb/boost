@@ -15,11 +15,31 @@ set (lib_headers
     cregex.hpp
 )
 
+# TODO: Default to multi-threaded?
+#
+# Used in test/ and examples/
+#
+macro(regex_test TESTNAME)
+  parse_arguments(REGEX_TEST "" "" ${ARGN})
+
+  if (REGEX_TEST_DEFAULT_ARGS)
+    set(REGEX_TEST_SOURCES ${REGEX_TEST_DEFAULT_ARGS})
+  else (REGEX_TEST_DEFAULT_ARGS)
+    set(REGEX_TEST_SOURCES "${TESTNAME}.cpp")
+  endif (REGEX_TEST_DEFAULT_ARGS)
+
+  boost_test_run(${TESTNAME} ${REGEX_TEST_SOURCES} 
+    COMPILE_FLAGS "-DBOOST_REGEX_DYN_LINK=1"
+    DEPENDS boost_regex 
+    EXTRA_OPTIONS SHARED)
+endmacro(regex_test)
+
 # Add a library target to the build system
 boost_library_project(
   regex
   SRCDIRS  src
   TESTDIRS  test
+  EXAMPLEDIRS  example
   HEADERS ${lib_headers}
   #  DOCDIRS 
   DESCRIPTION  "A regular expression library"

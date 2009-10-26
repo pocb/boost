@@ -393,6 +393,7 @@ endmacro(boost_tool_project)
 #     SRCDIRS src 
 #     TESTDIRS test
 #     )
+#
 macro(boost_module LIBNAME)
   parse_arguments(THIS_MODULE
     "DEPENDS"
@@ -403,15 +404,15 @@ macro(boost_module LIBNAME)
   # Export BOOST_${LIBNAME}_DEPENDS
   string(TOUPPER "BOOST_${LIBNAME}_DEPENDS" THIS_MODULE_LIBNAME_DEPENDS)
   set(${THIS_MODULE_LIBNAME_DEPENDS} ${THIS_MODULE_DEPENDS})
-  #
-  #message(STATUS "----------------------------------------------------------------")
-  #message(STATUS "LIBNAME: ${LIBNAME}")
-  #message(STATUS "THIS_MODULE_DEPENDS: ${THIS_MODULE_DEPENDS}")
+
+  message(STATUS "----------------------------------------------------------------")
+  message(STATUS "LIBNAME: ${LIBNAME}")
+  message(STATUS "THIS_MODULE_DEPENDS: ${THIS_MODULE_DEPENDS}")
   #message(STATUS "THIS_MODULE_LIBNAME_DEPENDS: ${THIS_MODULE_LIBNAME_DEPENDS}")
   #message(STATUS "${THIS_MODULE_LIBNAME_DEPENDS}: ${${THIS_MODULE_LIBNAME_DEPENDS}}")
   #message(STATUS "THIS_MODULE_TEST_DEPENDS: ${THIS_MODULE_TEST_DEPENDS}")
   #message(STATUS "THIS_MODULE_LIBNAME_TEST_DEPENDS: ${THIS_MODULE_LIBNAME_TEST_DEPENDS}")
-  #message(STATUS "${THIS_MODULE_LIBNAME_TEST_DEPENDS}: ${${THIS_MODULE_LIBNAME_TEST_DEPENDS}}")
+  # message(STATUS "${THIS_MODULE_LIBNAME_TEST_DEPENDS}: ${${THIS_MODULE_LIBNAME_TEST_DEPENDS}}")
 endmacro(boost_module)
 
 # This macro is an internal utility macro that builds the name of a
