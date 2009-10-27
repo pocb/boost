@@ -68,7 +68,7 @@
 </li>
 <li><a class="reference external" href="#options-for-customizing-installation">Options for customizing installation</a><ul>
 <li><a class="reference external" href="#cmake-install-prefix">CMAKE_INSTALL_PREFIX</a></li>
-<li><a class="reference external" href="#boost-install-lib-subdir-name">BOOST_INSTALL_LIB_SUBDIR_NAME</a></li>
+<li><a class="reference external" href="#lib-suffix">LIB_SUFFIX</a></li>
 </ul>
 </li>
 </ul>
@@ -235,7 +235,7 @@ segment is omitted:</p>
 </div>
 </div>
 <div class="section" id="build-projects">
-<span id="index-121"></span><span id="id2"></span><h3>BUILD_PROJECTS<a class="headerlink" href="#build-projects" title="Permalink to this headline">¶</a></h3>
+<span id="index-171"></span><span id="id2"></span><h3>BUILD_PROJECTS<a class="headerlink" href="#build-projects" title="Permalink to this headline">¶</a></h3>
 <p>This is a semicolon-separated list of projects to be built, or
 <tt class="docutils literal"><span class="pre">&quot;ALL&quot;</span></tt> (the default) for all projects, or <tt class="docutils literal"><span class="pre">&quot;NONE&quot;</span></tt>.  Projects not
 appearing in this list (if list not <tt class="docutils literal"><span class="pre">&quot;ALL&quot;</span></tt>) are ignored; no targets in
@@ -260,7 +260,7 @@ Call Stack (most recent call first):
 </div>
 </div>
 <div class="section" id="build-examples">
-<span id="index-122"></span><span id="id3"></span><h3>BUILD_EXAMPLES<a class="headerlink" href="#build-examples" title="Permalink to this headline">¶</a></h3>
+<span id="index-172"></span><span id="id3"></span><h3>BUILD_EXAMPLES<a class="headerlink" href="#build-examples" title="Permalink to this headline">¶</a></h3>
 <p>This is a semicolon-separated list of projects whose examples should
 be built, e.g.:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">BUILD_EXAMPLES</span><span class="o">=</span><span class="n">iostreams</span><span class="p">;</span><span class="n">accumulators</span>
@@ -280,7 +280,7 @@ filter has no ability to reverse the result.</p>
 <p><tt class="docutils literal"><span class="pre">ccmake</span></tt> provides the keystroke option <tt class="docutils literal"><span class="pre">t</span></tt> which toggles advanced
 mode.  Some of the useful options here are:</p>
 <span class="target" id="verbosity"></span><div class="section" id="cmake-verbose-makefile">
-<span id="index-123"></span><h3>CMAKE_VERBOSE_MAKEFILE<a class="headerlink" href="#cmake-verbose-makefile" title="Permalink to this headline">¶</a></h3>
+<span id="index-173"></span><h3>CMAKE_VERBOSE_MAKEFILE<a class="headerlink" href="#cmake-verbose-makefile" title="Permalink to this headline">¶</a></h3>
 <blockquote>
 Displays full build commands during build.  Good for debugging.
 This option will generate permanently verbose makefiles; it is
@@ -288,7 +288,7 @@ generally easier to invoke make with the option <tt class="docutils literal"><sp
 instead (this has the same effect, but for one build only).</blockquote>
 </div>
 <div class="section" id="cmake-cxx-compiler">
-<span id="index-124"></span><span id="id4"></span><h3>CMAKE_CXX_COMPILER<a class="headerlink" href="#cmake-cxx-compiler" title="Permalink to this headline">¶</a></h3>
+<span id="index-174"></span><span id="id4"></span><h3>CMAKE_CXX_COMPILER<a class="headerlink" href="#cmake-cxx-compiler" title="Permalink to this headline">¶</a></h3>
 <blockquote>
 <p>Sets the compiler.  If you have a nonstandard compiler and no
 default compiler, you may have to pass the value of this option on
@@ -304,19 +304,19 @@ an appropriate generator.</p>
 <div class="section" id="options-for-customizing-installation">
 <h2>Options for customizing installation<a class="headerlink" href="#options-for-customizing-installation" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="cmake-install-prefix">
-<span id="index-125"></span><span id="id5"></span><h3>CMAKE_INSTALL_PREFIX<a class="headerlink" href="#cmake-install-prefix" title="Permalink to this headline">¶</a></h3>
+<span id="index-175"></span><span id="id5"></span><h3>CMAKE_INSTALL_PREFIX<a class="headerlink" href="#cmake-install-prefix" title="Permalink to this headline">¶</a></h3>
 <blockquote>
 This is a standard cmake option that sets the path to which boost
 will be installed.</blockquote>
 </div>
-<div class="section" id="boost-install-lib-subdir-name">
-<span id="id6"></span><h3>BOOST_INSTALL_LIB_SUBDIR_NAME<a class="headerlink" href="#boost-install-lib-subdir-name" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="lib-suffix">
+<span id="id6"></span><h3>LIB_SUFFIX<a class="headerlink" href="#lib-suffix" title="Permalink to this headline">¶</a></h3>
 <blockquote>
 <p>This defines the subdirectory of <tt class="docutils literal"><span class="pre">CMAKE_INSTALL_PREFIX</span></tt> to which
 libraries will be installed.  The default is <tt class="docutils literal"><span class="pre">lib</span></tt>. For example,
 if I&#8217;m on 64-bit fedora, I want the libs installed to
 <tt class="docutils literal"><span class="pre">/usr/lib64</span></tt>, I&#8217;d use:</p>
-<div class="highlight-python"><pre>cmake ../src -DCMAKE_INSTALL_PREFIX=/usr -DBOOST_INSTALL_LIB_SUBDIR_NAME=lib64</pre>
+<div class="highlight-python"><pre>cmake ../src -DCMAKE_INSTALL_PREFIX=/usr -DLIB_SUFFIX=64</pre>
 </div>
 </blockquote>
 </div>
@@ -348,7 +348,7 @@ if I&#8217;m on 64-bit fedora, I want the libs installed to
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version 4df366a1f41a4ba0f12f47d617917b1074a53b1b, Mon, 26 Oct 2009.
+      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version fc08f4084fe018da4c3cd638c042639d6436d9df, Mon, 26 Oct 2009.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

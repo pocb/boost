@@ -17,8 +17,8 @@ Notes by Boost Version
 * :ref:`BUILD_EXAMPLES` ``(= NONE|ALL|proj1;proj2;...;projN)``
   variable for building examples only of certain projects.
 
-* :ref:`BOOST_INSTALL_LIB_SUBDIR_NAME` for installing libs to
-  nonstandard lib directory name, e.g. ``$PREFIX/lib64``
+* :ref:`LIB_SUFFIX` for installing libs to nonstandard lib directory
+  name, e.g. for LIB_SUFFIX=64, libs installed to ``$PREFIX/lib64``
 
 * Testing improvements: cmake now runs 2408 tests, 99% of which pass.
   This isn't the full set, upstream is a moving target.  The few

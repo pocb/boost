@@ -260,17 +260,19 @@ CMAKE_INSTALL_PREFIX
   This is a standard cmake option that sets the path to which boost
   will be installed.
 
-.. _boost_install_lib_subdir_name:
+.. _lib_suffix:
 
-BOOST_INSTALL_LIB_SUBDIR_NAME
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+LIB_SUFFIX
+^^^^^^^^^^
 
   This defines the subdirectory of ``CMAKE_INSTALL_PREFIX`` to which
   libraries will be installed.  The default is ``lib``. For example,
   if I'm on 64-bit fedora, I want the libs installed to
   ``/usr/lib64``, I'd use::
 
-    cmake ../src -DCMAKE_INSTALL_PREFIX=/usr -DBOOST_INSTALL_LIB_SUBDIR_NAME=lib64
+    cmake ../src -DCMAKE_INSTALL_PREFIX=/usr -DLIB_SUFFIX=64
+
+
 
 
 

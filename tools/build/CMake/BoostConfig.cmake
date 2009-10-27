@@ -30,8 +30,29 @@ include(CheckCXXSourceCompiles)
 #
 #  Python interpreter
 #
-include(FindPythonInterp)
-include(FindPythonLibs)
+if ($ENV{BOOST_PYTHON_EXECUTABLE})
+  set(PYTHONINTERP_FOUND TRUE 
+    CACHE BOOL "Python interpreter found")
+  set(PYTHON_EXECUTABLE 
+    $ENV{BOOST_PYTHON_EXECUTABLE} CACHE FILEPATH "Python interpreter found")
+else()
+  include(FindPythonInterp)
+endif()
+
+if($ENV{BOOST_PYTHON_LIBRARIES})
+  set(PYTHONLIBS_FOUND TRUE
+    CACHE BOOL "Python libraries found")
+  set(PYTHON_LIBRARIES $ENV{BOOST_PYTHON_LIBRARIES}
+    CACHE FILEPATH "Full path to python library libpythonX.Y")
+
+  set(PYTHON_DEBUG_LIBRARIES $ENV{BOOST_PYTHON_DEBUG_LIBRARIES}
+    CACHE FILEPATH "Full path to python debug library libpythonX.Y")
+
+  set(PYTHON_INCLUDE_PATH $ENV{BOOST_PYTHON_INCLUDE_PATH}
+    CACHE FILEPATH "Path to python includes (should contain Python.h)")
+else()
+  include(FindPythonLibs)
+endif()
 
 # Toolset detection.
 if (NOT BOOST_TOOLSET)
@@ -227,7 +248,6 @@ set(BUILD_EXAMPLES "NONE" CACHE STRING "Semicolon-separated list of lowercase pr
 
 set(BUILD_PROJECTS "ALL"  CACHE STRING "Semicolon-separated list of project to build, or \"ALL\"")
 
-set(BOOST_INSTALL_LIB_SUBDIR_NAME "lib" 
-  CACHE STRING 
-  "Name of directory under CMAKE_INSTALL_PREFIX to which libraries will be installed")
+set(LIB_SUFFIX "lib" CACHE STRING "Name of suffix on 'lib' directory to which libs will be installed (e.g. add '64' here on certain 64 bit unices)")
+
 

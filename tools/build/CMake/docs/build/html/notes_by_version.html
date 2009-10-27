@@ -97,8 +97,8 @@ from <tt class="docutils literal"><span class="pre">BUILD_*</span></tt> options.
 variable for building only certain projects.</li>
 <li><a class="reference external" href="build_configuration.html#build-examples"><em>BUILD_EXAMPLES</em></a> <tt class="docutils literal"><span class="pre">(=</span> <span class="pre">NONE|ALL|proj1;proj2;...;projN)</span></tt>
 variable for building examples only of certain projects.</li>
-<li><a class="reference external" href="build_configuration.html#boost-install-lib-subdir-name"><em>BOOST_INSTALL_LIB_SUBDIR_NAME</em></a> for installing libs to
-nonstandard lib directory name, e.g. <tt class="docutils literal"><span class="pre">$PREFIX/lib64</span></tt></li>
+<li><em class="xref">LIB_SUFFIX</em> for installing libs to nonstandard lib directory
+name, e.g. for LIB_SUFFIX=64, libs installed to <tt class="docutils literal"><span class="pre">$PREFIX/lib64</span></tt></li>
 <li>Testing improvements: cmake now runs 2408 tests, 99% of which pass.
 This isn&#8217;t the full set, upstream is a moving target.  The few
 remaining failures (assuming upstream is bug-free) are assumed to be
@@ -278,7 +278,7 @@ was not included in the official distribution.</p>
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version 4df366a1f41a4ba0f12f47d617917b1074a53b1b, Mon, 26 Oct 2009.
+      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version fc08f4084fe018da4c3cd638c042639d6436d9df, Mon, 26 Oct 2009.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>
