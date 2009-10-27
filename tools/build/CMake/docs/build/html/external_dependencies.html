@@ -1,0 +1,173 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>External Dependencies &mdash; Boost.CMake 1.41.0.cmakebeta2</title>
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.41.0.cmakebeta2',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Boost.CMake 1.41.0.cmakebeta2" href="index.html" />
+    <link rel="next" title="Notes by Boost Version" href="notes_by_version.html" />
+    <link rel="prev" title="Building a Binary Installer" href="build_installer.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="notes_by_version.html" title="Notes by Boost Version"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="build_installer.html" title="Building a Binary Installer"
+             accesskey="P">previous</a> |</li>
+    <li><a href="http://www.boost.org/">Boost</a> &raquo;</li>
+    
+        <li><a href="index.html">Boost.CMake 1.41.0.cmakebeta2</a> &raquo;</li>
+ 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/boost-small.png" alt="Logo"/>
+            </a></p>
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">External Dependencies</a><ul>
+<li><a class="reference external" href="#python">Python</a><ul>
+<li><a class="reference external" href="#python-executable">PYTHON_EXECUTABLE</a></li>
+<li><a class="reference external" href="#python-debug-libraries">PYTHON_DEBUG_LIBRARIES</a></li>
+<li><a class="reference external" href="#python-libraries">PYTHON_LIBRARIES</a></li>
+<li><a class="reference external" href="#python-include-path">PYTHON_INCLUDE_PATH</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="build_installer.html"
+                                  title="previous chapter">Building a Binary Installer</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="notes_by_version.html"
+                                  title="next chapter">Notes by Boost Version</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/external_dependencies.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="external-dependencies">
+<span id="id1"></span><h1>External Dependencies<a class="headerlink" href="#external-dependencies" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="python">
+<h2>Python<a class="headerlink" href="#python" title="Permalink to this headline">¶</a></h2>
+<p>By default, Boost.CMake will use the python detection built in to
+cmake.  The relevant variables (command line or environment) are:</p>
+<div class="section" id="python-executable">
+<span id="index-79"></span><span id="id2"></span><h3>PYTHON_EXECUTABLE<a class="headerlink" href="#python-executable" title="Permalink to this headline">¶</a></h3>
+<p>The path to the python executable, e.g. <tt class="docutils literal"><span class="pre">/usr/local/Python-3.1.1/bin/python3</span></tt></p>
+</div>
+<div class="section" id="python-debug-libraries">
+<span id="index-80"></span><span id="id3"></span><h3>PYTHON_DEBUG_LIBRARIES<a class="headerlink" href="#python-debug-libraries" title="Permalink to this headline">¶</a></h3>
+<p>The path to the python debug library,  typically only used by developers.</p>
+</div>
+<div class="section" id="python-libraries">
+<span id="index-81"></span><span id="id4"></span><h3>PYTHON_LIBRARIES<a class="headerlink" href="#python-libraries" title="Permalink to this headline">¶</a></h3>
+<p>The path to the python library,
+e.g. <tt class="docutils literal"><span class="pre">/usr/local/Python-3.1.1/lib/libpython3.1.so</span></tt></p>
+<span class="target" id="index-82"></span></div>
+<div class="section" id="python-include-path">
+<span id="index-83"></span><span id="id5"></span><h3>PYTHON_INCLUDE_PATH<a class="headerlink" href="#python-include-path" title="Permalink to this headline">¶</a></h3>
+<p>The path to the include directory,
+e.g. <tt class="docutils literal"><span class="pre">/usr/local/Python-3.1.1/include/python3.1</span></tt>.  Note that cmake
+will check for the file <tt class="docutils literal"><span class="pre">Python.h</span></tt> in this directory and complain if
+it is not found.</p>
+<p>There are two ways to specify these, on the command line or via
+environment variables.  Environment variables will override command
+line flags if present.</p>
+<p class="rubric">Command line</p>
+<div class="highlight-python"><pre>% cmake ../src -DPYTHON_EXECUTABLE=/path/to/bin/python3          \
+               -DPYTHON_LIBRARIES=/path/to/libpython3.1.so       \
+               -DPYTHON_INCLUDE_PATH=/path/to/include/python3.1</pre>
+</div>
+<p class="rubric">Exported environment variables</p>
+<div class="highlight-python"><pre>% export PYTHON_EXECUTABLE=/path/to/bin/python
+% export PYTHON_LIBRARIES=/path/to/libpython3.1.so
+% export PYTHON_INCLUDE_PATH=/path/to/include/python3.1
+% cmake ../src</pre>
+</div>
+<p>Either way, in the configuration output, you should see something
+like:</p>
+<div class="highlight-python"><pre>-- Testing PYTHON_EXECUTABLE from environment
+-- Ok, using /path/to/bin/python3
+-- Testing PYTHON_LIBRARIES from environment
+-- Ok, using /path/to/lib/libpython3.1.so.
+-- Skipping optional PYTHON_DEBUG_LIBRARIES:  not set.
+-- Testing PYTHON_INCLUDE_PATH from environment
+-- Ok, using /path/to/include/python3.1
+-- Python:
+--   executable:   /path/to/bin/python3
+--   lib:          /path/to/lib/libpython3.1.so
+--   debug lib:
+--   include path: /path/to/include/python3.1</pre>
+</div>
+<p><strong>NOTE</strong>, once successfully detected, the python configuration will
+not be redetected.  To modify, edit the relevant entries in your
+CMakeCache.txt, or delete it entirely to trigger redetection.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="notes_by_version.html" title="Notes by Boost Version"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="build_installer.html" title="Building a Binary Installer"
+             >previous</a> |</li>
+    <li><a href="http://www.boost.org/">Boost</a> &raquo;</li>
+    
+        <li><a href="index.html">Boost.CMake 1.41.0.cmakebeta2</a> &raquo;</li>
+ 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version 1dc1b912727fb70f32d0883cdade5c52be702c54, Tue, 27 Oct 2009.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
+    </div>
+  </body>
+</html>

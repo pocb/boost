@@ -40,12 +40,15 @@ if (BOOST_VERSIONSTR)
   math(EXPR BOOST_VERSION_MINOR "${BOOST_VERSIONSTR} / 100 % 1000")
   math(EXPR BOOST_VERSION_SUBMINOR "${BOOST_VERSIONSTR} % 100")
   set(BOOST_VERSION "${BOOST_VERSION_MAJOR}.${BOOST_VERSION_MINOR}.${BOOST_VERSION_SUBMINOR}")
-  message(STATUS "Boost version ${BOOST_VERSION}")
 else()
   message(FATAL_ERROR 
     "Unable to parse Boost version from ${CMAKE_CURRENT_SOURCE_DIR}/boost/version.hpp")
 endif()
 
+set(BOOST_CMAKE_VERSION "${BOOST_VERSION}.cmakebeta2" 
+  CACHE STRING "Boost.CMake version")
+
+message(STATUS "Boost.CMake version ${BOOST_CMAKE_VERSION}")
 #
 # BOOST_MAINTAINER: undocced variable that sets up maintainer mode
 #
@@ -54,7 +57,6 @@ if(BOOST_MAINTAINER)
   #  Put the boost.cmake version someplace sphinx can get it
   #  for use in generated documentation
   #
-  set(BOOST_CMAKE_VERSION "${BOOST_VERSION}.cmakebeta1")
   set(CMAKE_DOCS_DIR ${CMAKE_SOURCE_DIR}/tools/build/CMake/docs/)
   set(BOOST_CMAKE_HOST sodium)
   set(BOOST_CMAKE_DOCROOT /var/www/htdocs/boost-cmake/${BOOST_CMAKE_VERSION})

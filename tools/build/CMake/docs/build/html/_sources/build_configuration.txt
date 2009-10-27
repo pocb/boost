@@ -273,7 +273,8 @@ LIB_SUFFIX
     cmake ../src -DCMAKE_INSTALL_PREFIX=/usr -DLIB_SUFFIX=64
 
 
-
+See :ref:`external_dependencies` for information about configuring
+things like python.
 
 
 
