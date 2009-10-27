@@ -58,7 +58,7 @@ if(BOOST_MAINTAINER)
   #  for use in generated documentation
   #
   set(CMAKE_DOCS_DIR ${CMAKE_SOURCE_DIR}/tools/build/CMake/docs/)
-  set(BOOST_CMAKE_HOST sodium)
+  set(BOOST_CMAKE_HOST sodium.resophonic.com)
   set(BOOST_CMAKE_DOCROOT /var/www/htdocs/boost-cmake/${BOOST_CMAKE_VERSION})
   set(BOOST_CMAKE_URL ${BOOST_CMAKE_HOST}:${BOOST_CMAKE_DOCROOT})
 
