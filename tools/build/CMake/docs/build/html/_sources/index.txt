@@ -75,6 +75,16 @@ When you're ready to see the html::
 Once you've written a ton of docs, push them someplace where I can see
 them (or use ``git diff`` to send a patch).
 
+Release checklist
+=================
+
+* Update ``BOOST_CMAKE_VERSION`` in toplevel ``CMakeLists.txt``
+* Update notes by version in ``tools/build/CMake/docs/notes_by_version.rst``
+* Reconfig cmake with ``BOOST_MAINTAINER`` set to ON
+* Rebuild docs and commit
+* Tag commit with ``BOOST_CMAKE_VERSION``
+* ``make do-release``
+
 Index
 =====
 

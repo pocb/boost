@@ -1,7 +1,7 @@
 Notes by Boost Version
 ======================
 
-1.41.0.cmakebeta1
+1.41.0.cmakebeta3
 -----------------
 
 * :ref:`variants` names switched to ``ENABLE_<feature>`` to distinguish 
@@ -25,8 +25,13 @@ Notes by Boost Version
   remaining failures (assuming upstream is bug-free) are assumed to be
   problems in the testing setup, not the underlying libraries.
 
-1.41.0
-------
+* Python: python location customizable via command line or environment
+  variables, see :ref:`external_dependencies`.
+  
+(1.41.0.cmakebeta1 and 2 omitted)
+
+1.41.0 (upstream)
+-----------------
 
 This release (as released by upstream Boost) does **not** contain
 CMake support.  See above for independenly released CMake versions.

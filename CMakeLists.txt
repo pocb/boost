@@ -45,8 +45,8 @@ else()
     "Unable to parse Boost version from ${CMAKE_CURRENT_SOURCE_DIR}/boost/version.hpp")
 endif()
 
-set(BOOST_CMAKE_VERSION "${BOOST_VERSION}.cmakebeta2" 
-  CACHE STRING "Boost.CMake version")
+set(BOOST_CMAKE_VERSION "${BOOST_VERSION}.cmakebeta3"
+  CACHE STRING "Boost.CMake version" FORCE)
 
 message(STATUS "Boost.CMake version ${BOOST_CMAKE_VERSION}")
 #

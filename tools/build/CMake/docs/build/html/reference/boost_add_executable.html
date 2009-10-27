@@ -5,13 +5,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>boost_add_executable &mdash; Boost.CMake 1.41.0.cmakebeta2</title>
+    <title>boost_add_executable &mdash; Boost.CMake 1.41.0.cmakebeta3</title>
     <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.41.0.cmakebeta2',
+        VERSION:     '1.41.0.cmakebeta3',
         COLLAPSE_MODINDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -19,7 +19,7 @@
     </script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Boost.CMake 1.41.0.cmakebeta2" href="../index.html" />
+    <link rel="top" title="Boost.CMake 1.41.0.cmakebeta3" href="../index.html" />
     <link rel="next" title="boost_additional_test_dependencies" href="boost_additional_test_dependencies.html" />
     <link rel="prev" title="boost_add_library" href="boost_add_library.html" /> 
   </head>
@@ -38,7 +38,7 @@
              accesskey="P">previous</a> |</li>
     <li><a href="http://www.boost.org/">Boost</a> &raquo;</li>
     
-        <li><a href="../index.html">Boost.CMake 1.41.0.cmakebeta2</a> &raquo;</li>
+        <li><a href="../index.html">Boost.CMake 1.41.0.cmakebeta3</a> &raquo;</li>
  
       </ul>
     </div>
@@ -67,7 +67,7 @@
           <div class="body">
             
   <div class="section" id="boost-add-executable">
-<span id="boost-add-executable-macro"></span><span id="index-87"></span><h1>boost_add_executable<a class="headerlink" href="#boost-add-executable" title="Permalink to this headline">¶</a></h1>
+<span id="boost-add-executable-macro"></span><span id="index-145"></span><h1>boost_add_executable<a class="headerlink" href="#boost-add-executable" title="Permalink to this headline">¶</a></h1>
 <p>Adds an executable to the build</p>
 <dl class="cmake">
 <dt id="boost_add_executable">
@@ -104,11 +104,11 @@ of these features, please refer to the CMakeLists.txt file in the
 root of the Boost distribution, which defines the set of features
 that will be used to build Boost libraries by default.</p>
 <p>The options that affect this macro&#8217;s behavior are:</p>
-<span class="target" id="compile-flags"></span><ul class="simple" id="index-88">
+<span class="target" id="compile-flags"></span><ul class="simple" id="index-146">
 <li><strong>COMPILE_FLAGS</strong> &#8211; Provides additional compilation flags that will be
 used when building the executable.</li>
 </ul>
-<span class="target" id="feature-compile-flags"></span><ul class="simple" id="index-89">
+<span class="target" id="feature-compile-flags"></span><ul class="simple" id="index-147">
 <li><strong>feature_COMPILE_FLAGS</strong> &#8211; Provides additional compilation flags that
 will be used only when building the executable with the given
 feature (e.g., <tt class="docutils literal"><span class="pre">SHARED_COMPILE_FLAGS</span></tt> when we&#8217;re linking against
@@ -117,29 +117,29 @@ executable depends both on the arguments given to
 boost_add_executable (see the &#8220;feature&#8221; argument description, below)
 and on the user&#8217;s choice of variants to build.</li>
 </ul>
-<span class="target" id="link-flags"></span><ul class="simple" id="index-90">
+<span class="target" id="link-flags"></span><ul class="simple" id="index-148">
 <li><strong>LINK_FLAGS</strong> &#8211; Provides additional flags that will be passed to the
 linker when linking the executable. This option should not be used
 to link in additional libraries; see <tt class="docutils literal"><span class="pre">LINK_LIBS</span></tt> and <tt class="docutils literal"><span class="pre">DEPENDS</span></tt>.</li>
 </ul>
-<span class="target" id="feature-link-flags"></span><ul class="simple" id="index-91">
+<span class="target" id="feature-link-flags"></span><ul class="simple" id="index-149">
 <li><strong>feature_LINK_FLAGS</strong> &#8211; Provides additional flags that will be passed
 to the linker when linking the executable with the given feature
 (e.g., <tt class="docutils literal"><span class="pre">MULTI_THREADED_LINK_FLAGS</span></tt> when we&#8217;re linking a multi-threaded
 executable).</li>
 </ul>
-<span class="target" id="link-libs"></span><ul class="simple" id="index-92">
+<span class="target" id="link-libs"></span><ul class="simple" id="index-150">
 <li><strong>LINK_LIBS</strong> &#8211; Provides additional libraries against which the
 executable will be linked. For example, one might provide &#8220;expat&#8221; as
 options to <tt class="docutils literal"><span class="pre">LINK_LIBS</span></tt>, to state that the executable will link against
 the expat library binary. Use <tt class="docutils literal"><span class="pre">LINK_LIBS</span></tt> for libraries external to
 Boost; for Boost libraries, use <tt class="docutils literal"><span class="pre">DEPENDS</span></tt>.</li>
 </ul>
-<span class="target" id="feature-link-libs"></span><ul class="simple" id="index-93">
+<span class="target" id="feature-link-libs"></span><ul class="simple" id="index-151">
 <li><strong>feature_LINK_LIBS</strong> &#8211; Provides additional libraries to link against
 when linking an executable built with the given feature.</li>
 </ul>
-<span class="target" id="depends"></span><ul class="simple" id="index-94">
+<span class="target" id="depends"></span><ul class="simple" id="index-152">
 <li><strong>DEPENDS</strong> &#8211; States that this executable depends on and links
 against a Boost library. The arguments to <tt class="docutils literal"><span class="pre">DEPENDS</span></tt> should be the
 unversioned name of the Boost library, such as
@@ -151,17 +151,17 @@ example, if the <tt class="docutils literal"><span class="pre">MULTI_THREADED</s
 boost_add_executable, <tt class="docutils literal"><span class="pre">DEPENDS</span></tt> will ensure that we only link against
 multi-threaded libraries.</li>
 </ul>
-<span class="target" id="feature"></span><ul class="simple" id="index-95">
+<span class="target" id="feature"></span><ul class="simple" id="index-153">
 <li><strong>feature</strong> &#8211; States that the executable should always be built using a
 given feature, e.g., <tt class="docutils literal"><span class="pre">SHARED</span></tt> linking (against its libraries) or
 <tt class="docutils literal"><span class="pre">MULTI_THREADED</span></tt> (for multi-threaded builds). If that feature has
 been turned off by the user, the executable will not build.</li>
 </ul>
-<span class="target" id="no-install"></span><ul class="simple" id="index-96">
+<span class="target" id="no-install"></span><ul class="simple" id="index-154">
 <li><strong>NO_INSTALL</strong> &#8211; Don&#8217;t install this executable with the rest of
 Boost.</li>
 </ul>
-<span class="target" id="output-name"></span><ul class="simple" id="index-97">
+<span class="target" id="output-name"></span><ul class="simple" id="index-155">
 <li><strong>OUTPUT_NAME</strong> &#8211; If you want the executable to be generated
 somewhere other than the binary directory, pass the path (including
 directory and file name) via the <tt class="docutils literal"><span class="pre">OUTPUT_NAME</span></tt> parameter.</li>
@@ -198,12 +198,12 @@ directory and file name) via the <tt class="docutils literal"><span class="pre">
              >previous</a> |</li>
     <li><a href="http://www.boost.org/">Boost</a> &raquo;</li>
     
-        <li><a href="../index.html">Boost.CMake 1.41.0.cmakebeta2</a> &raquo;</li>
+        <li><a href="../index.html">Boost.CMake 1.41.0.cmakebeta3</a> &raquo;</li>
  
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version 1dc1b912727fb70f32d0883cdade5c52be702c54, Tue, 27 Oct 2009.
+      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version eb42b2e15246f8c822377955851d01aee6214fd6, Tue, 27 Oct 2009.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>
