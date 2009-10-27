@@ -27,32 +27,6 @@
 ##########################################################################
 include(CheckCXXSourceCompiles)
 
-#
-#  Python interpreter
-#
-if ($ENV{BOOST_PYTHON_EXECUTABLE})
-  set(PYTHONINTERP_FOUND TRUE 
-    CACHE BOOL "Python interpreter found")
-  set(PYTHON_EXECUTABLE 
-    $ENV{BOOST_PYTHON_EXECUTABLE} CACHE FILEPATH "Python interpreter found")
-else()
-  include(FindPythonInterp)
-endif()
-
-if($ENV{BOOST_PYTHON_LIBRARIES})
-  set(PYTHONLIBS_FOUND TRUE
-    CACHE BOOL "Python libraries found")
-  set(PYTHON_LIBRARIES $ENV{BOOST_PYTHON_LIBRARIES}
-    CACHE FILEPATH "Full path to python library libpythonX.Y")
-
-  set(PYTHON_DEBUG_LIBRARIES $ENV{BOOST_PYTHON_DEBUG_LIBRARIES}
-    CACHE FILEPATH "Full path to python debug library libpythonX.Y")
-
-  set(PYTHON_INCLUDE_PATH $ENV{BOOST_PYTHON_INCLUDE_PATH}
-    CACHE FILEPATH "Path to python includes (should contain Python.h)")
-else()
-  include(FindPythonLibs)
-endif()
 
 # Toolset detection.
 if (NOT BOOST_TOOLSET)
@@ -184,7 +158,7 @@ if(CMAKE_CXX_FLAGS_DEBUG)
   if(MSVC)
     # Eliminate the /MDd flag; we'll add it back when we need it
     string(REPLACE "/MDd" "" CMAKE_CXX_FLAGS_DEBUG 
-           "${CMAKE_CXX_FLAGS_DEBUG}") 
+      "${CMAKE_CXX_FLAGS_DEBUG}") 
   endif(MSVC)
   set(DEBUG_COMPILE_FLAGS "${CMAKE_CXX_FLAGS_DEBUG}" CACHE STRING "Compilation flags for debug libraries")
 endif(CMAKE_CXX_FLAGS_DEBUG)
@@ -192,7 +166,7 @@ if(CMAKE_CXX_FLAGS_RELEASE)
   if(MSVC)
     # Eliminate the /MD flag; we'll add it back when we need it
     string(REPLACE "/MD" "" CMAKE_CXX_FLAGS_RELEASE
-           "${CMAKE_CXX_FLAGS_RELEASE}") 
+      "${CMAKE_CXX_FLAGS_RELEASE}") 
   endif(MSVC)
   set(RELEASE_COMPILE_FLAGS "${CMAKE_CXX_FLAGS_RELEASE}" CACHE STRING "Compilation flags for release libraries")
 endif(CMAKE_CXX_FLAGS_RELEASE)
@@ -249,5 +223,96 @@ set(BUILD_EXAMPLES "NONE" CACHE STRING "Semicolon-separated list of lowercase pr
 set(BUILD_PROJECTS "ALL"  CACHE STRING "Semicolon-separated list of project to build, or \"ALL\"")
 
 set(LIB_SUFFIX "lib" CACHE STRING "Name of suffix on 'lib' directory to which libs will be installed (e.g. add '64' here on certain 64 bit unices)")
+
+#
+#  Python interpreter
+#
+set(ENV_PYTHON_EXECUTABLE $ENV{PYTHON_EXECUTABLE})
+
+if ((NOT PYTHONINTERP_FOUND) AND ENV_PYTHON_EXECUTABLE)
+  message(STATUS "Testing PYTHON_EXECUTABLE from environment")
+  find_program(PYTHON_EXECUTABLE ${ENV_PYTHON_EXECUTABLE})
+  if (NOT PYTHON_EXECUTABLE)
+    message(FATAL_ERROR "Environment supplied PYTHON_EXECUTABLE=${ENV_PYTHON_EXECUTABLE} but this file does not exist or is not a program.")
+  endif()
+  set(PYTHONINTERP_FOUND TRUE 
+    CACHE BOOL "Python interpreter found")
+  set(PYTHON_EXECUTABLE 
+    ${ENV_PYTHON_EXECUTABLE} CACHE FILEPATH "Python interpreter found")
+  message(STATUS "Ok, using ${PYTHON_EXECUTABLE}")
+else()
+  find_package(PythonInterp)
+endif()
+
+#
+#  Python libs
+#
+set(ENV_PYTHON_LIBRARIES $ENV{PYTHON_LIBRARIES})
+
+if ((NOT PYTHONLIBS_FOUND) AND ENV_PYTHON_LIBRARIES)
+  message(STATUS "Testing PYTHON_LIBRARIES from environment")
+  get_filename_component(pythonlib_searchpath ${ENV_PYTHON_LIBRARIES} PATH)
+  get_filename_component(pythonlib_filename   ${ENV_PYTHON_LIBRARIES} NAME)
+  find_library(PYTHON_LIBRARIES ${pythonlib_filename} 
+    PATHS ${pythonlib_searchpath}
+    NO_DEFAULT_PATH)
+
+  if (NOT PYTHON_LIBRARIES)
+    message(FATAL_ERROR "Environment supplied PYTHON_LIBRARIES=${ENV_PYTHON_LIBRARIES} but that isn't a library.")
+  endif()
+  message(STATUS "Ok, using ${PYTHON_LIBRARIES}.")
+
+  #
+  #  Python debug libraries
+  #
+  set(ENV_PYTHON_DEBUG_LIBRARIES $ENV{PYTHON_DEBUG_LIBRARIES})
+  if(ENV_PYTHON_DEBUG_LIBRARIES)
+    message(STATUS "Testing PYTHON_DEBUG_LIBRARIES from environment")
+    get_filename_component(pythonlib_searchpath 
+      ${ENV_PYTHON_DEBUG_LIBRARIES} PATH)
+    get_filename_component(pythonlib_filename   
+      ${ENV_PYTHON_DEBUG_LIBRARIES} NAME)
+    find_library(PYTHON_DEBUG_LIBRARIES ${pythonlib_filename} 
+      PATHS ${pythonlib_searchpath}
+      NO_DEFAULT_PATH)
+
+    if (NOT PYTHON_DEBUG_LIBRARIES)
+      message(FATAL_ERROR "Environment supplied PYTHON_DEBUG_LIBRARIES=${ENV_PYTHON_DEBUG_LIBRARIES} but it isn't a library.")
+    endif()
+    message(STATUS "Ok, using ${PYTHON_DEBUG_LIBRARIES}")
+  else()
+    message(STATUS "Skipping optional PYTHON_DEBUG_LIBRARIES:  not set.")
+  endif()
+
+  #
+  #  Python includes
+  #
+  set(ENV_PYTHON_INCLUDE_PATH $ENV{PYTHON_INCLUDE_PATH})
+  if(ENV_PYTHON_INCLUDE_PATH)
+    message(STATUS "Testing PYTHON_INCLUDE_PATH from environment")
+    find_path(PYTHON_INCLUDE_PATH
+      Python.h
+      PATHS ${ENV_PYTHON_INCLUDE_PATH}
+      NO_DEFAULT_PATH)
+
+    if(PYTHON_INCLUDE_PATH)
+      set(PYTHON_INCLUDE_PATH ${ENV_PYTHON_INCLUDE_PATH})
+      message(STATUS "Ok, using ${PYTHON_INCLUDE_PATH}")
+    else()
+      message(FATAL_ERROR "Environment supplied PYTHON_INCLUDE_PATH=${ENV_PYTHON_INCLUDE_PATH} but this directory does not contain file Python.h")
+    endif()
+  endif()
+
+  set(PYTHONLIBS_FOUND TRUE CACHE BOOL "Python libraries found, don't redetect at configure time")
+elseif(NOT PYTHONLIBS_FOUND)
+  find_package(PythonLibs)
+endif()
+
+message(STATUS "Python:")
+message(STATUS "  executable:   ${PYTHON_EXECUTABLE}")
+message(STATUS "  lib:          ${PYTHON_LIBRARIES}")
+message(STATUS "  debug lib:    ${PYTHON_DEBUG_LIBRARIES}")
+message(STATUS "  include path: ${PYTHON_INCLUDE_PATH}")
+
 
 

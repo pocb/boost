@@ -38,6 +38,7 @@ Users's guide
    add_compiled_library
    adding_regression_tests
    build_installer
+   external_dependencies
    notes_by_version
 
 .. modularize_library
