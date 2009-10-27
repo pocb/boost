@@ -12,17 +12,20 @@ set (lib_headers
     mpi
 )
 
-# Add a library target to the build system
-boost_library_project(
-  mpi
-  SRCDIRS  src
-  TESTDIRS  test
-  HEADERS ${lib_headers}
-  DOCDIRS  doc
-  #  DESCRIPTION 
-  MODULARIZED
-  #  AUTHORS 
-  #  MAINTAINERS 
-)
+if (NOT MPI_FOUND)
+  message(STATUS "+-- MPI not found, disabling.")
+else()
 
+  boost_library_project(
+    mpi
+    SRCDIRS  src
+    TESTDIRS  test
+    HEADERS ${lib_headers}
+    DOCDIRS  doc
+    #  DESCRIPTION 
+    MODULARIZED
+    #  AUTHORS 
+    #  MAINTAINERS 
+    )
 
+endif()

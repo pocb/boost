@@ -315,4 +315,18 @@ message(STATUS "  debug lib:    ${PYTHON_DEBUG_LIBRARIES}")
 message(STATUS "  include path: ${PYTHON_INCLUDE_PATH}")
 
 
-
+#
+# MPI 
+#
+message(STATUS "MPI:")
+set(MPI_FIND_QUIETLY TRUE)
+FIND_PACKAGE(MPI)
+if (MPI_FOUND)
+  message(STATUS "  include path: ${MPI_INCLUDE_PATH}")
+  message(STATUS " compile flags: ${MPI_COMPILE_FLAGS}")
+  message(STATUS "    link flags: ${MPI_LINK_FLAGS}")
+  message(STATUS "     libraries: ${MPI_LIBRARIES}")
+else()
+  message(STATUS "  not found, some libraries will be disabled.")
+endif()
+  

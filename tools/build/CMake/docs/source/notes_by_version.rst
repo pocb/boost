@@ -1,6 +1,13 @@
 Notes by Boost Version
 ======================
 
+1.41.0.cmakebeta4
+-----------------
+
+* CMake minimum 2.6.4 required (found bugs with 2.6.2)
+* Move MPI detection up 
+* Clean up output
+
 1.41.0.cmakebeta3
 -----------------
 
@@ -35,6 +42,16 @@ Notes by Boost Version
 
 This release (as released by upstream Boost) does **not** contain
 CMake support.  See above for independenly released CMake versions.
+
+1.40.0.cmake4
+-------------
+
+Backport features from 1.41.0.cmakebeta3
+
+1.40.0.cmake3
+-------------
+
+Skipped
 
 1.40.0.cmake2
 -------------

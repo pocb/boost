@@ -11,16 +11,12 @@ if (MSVC)
   add_definitions(-GR-)
 endif (MSVC)
 
-if (MPI_FOUND)
+# Add Boost.MPI link and add parallel source files
+include_directories(${MPI_INCLUDE_PATH})
 
-  # Add Boost.MPI link and add parallel source files
-  include_directories(${MPI_INCLUDE_PATH})
-
-  boost_add_library(
-    boost_graph_parallel
-    mpi_process_group.cpp tag_allocator.cpp
-    DEPENDS boost_mpi
-    SHARED_COMPILE_FLAGS "-DBOOST_GRAPH_DYN_LINK=1"
-    )
-
-endif (MPI_FOUND)
+boost_add_library(
+  boost_graph_parallel
+  mpi_process_group.cpp tag_allocator.cpp
+  DEPENDS boost_mpi
+  SHARED_COMPILE_FLAGS "-DBOOST_GRAPH_DYN_LINK=1"
+  )

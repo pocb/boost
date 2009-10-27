@@ -24,7 +24,7 @@
 #                                                                        #
 # For more information about CMake, see http://www.cmake.org             #
 ##########################################################################
-cmake_minimum_required(VERSION 2.6.0 FATAL_ERROR)
+cmake_minimum_required(VERSION 2.6.4 FATAL_ERROR)
 project(Boost)
 
 ##########################################################################
@@ -45,7 +45,7 @@ else()
     "Unable to parse Boost version from ${CMAKE_CURRENT_SOURCE_DIR}/boost/version.hpp")
 endif()
 
-set(BOOST_CMAKE_VERSION "${BOOST_VERSION}.cmakebeta3"
+set(BOOST_CMAKE_VERSION "${BOOST_VERSION}.cmakebeta4"
   CACHE STRING "Boost.CMake version" FORCE)
 
 message(STATUS "Boost.CMake version ${BOOST_CMAKE_VERSION}")
@@ -71,8 +71,8 @@ if(BOOST_MAINTAINER)
 
   add_custom_target(do-release
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-    COMMAND git archive --format=tar --prefix=boost-${BOOST_CMAKE_VERSION} ${BOOST_CMAKE_VERSION} | gzip --best > boost-${BOOST_CMAKE_VERSION}.tar.gz
-    COMMAND git archive --format=zip -9 --prefix=boost-${BOOST_CMAKE_VERSION} ${BOOST_CMAKE_VERSION} > boost-${BOOST_CMAKE_VERSION}.zip
+    COMMAND git archive --format=tar --prefix=boost-${BOOST_CMAKE_VERSION}/ ${BOOST_CMAKE_VERSION} | gzip --best > boost-${BOOST_CMAKE_VERSION}.tar.gz
+    COMMAND git archive --format=zip -9 --prefix=boost-${BOOST_CMAKE_VERSION}/ ${BOOST_CMAKE_VERSION} > boost-${BOOST_CMAKE_VERSION}.zip
     COMMAND git log --quiet ${BOOST_CMAKE_VERSION} > /dev/null
     COMMAND ssh ${BOOST_CMAKE_HOST} mkdir -p ${BOOST_CMAKE_DOCROOT}
     COMMAND scp boost-${BOOST_CMAKE_VERSION}.tar.gz boost-${BOOST_CMAKE_VERSION}.zip ${BOOST_CMAKE_URL}

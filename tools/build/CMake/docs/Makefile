@@ -90,9 +90,9 @@ doctest:
 
 deploy:
 	make html
-	rsync --delete -va build/html/ sodium:/var/www/htdocs/boost-cmake/1.41.0.cmakebeta3/doc/
+	rsync --delete -va build/html/ sodium:/var/www/htdocs/boost-cmake/1.41.0.cmakebeta4/doc/
 
 	make latex
 	make -C build/latex all-pdf
-	scp build/latex/boost-1.41.0.cmakebeta3.pdf sodium:/var/www/htdocs/boost-cmake/1.41.0.cmakebeta3
+	scp build/latex/boost-1.41.0.cmakebeta4.pdf sodium:/var/www/htdocs/boost-cmake/1.41.0.cmakebeta4
 
