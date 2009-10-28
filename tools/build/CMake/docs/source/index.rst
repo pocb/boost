@@ -32,6 +32,7 @@ Users's guide
    quickstart
    build_configuration
    build_variants
+   exported_targets
    testing
    individual_libraries
    add_boost_library
