@@ -25,9 +25,12 @@ endif (EXPAT_FOUND)
 
 boost_add_library(boost_graph
 
-  read_graphviz_new.cpp 
+  read_graphviz_new.cpp
   ${BOOST_GRAPH_OPTIONAL_SOURCES}
 
+  NO_STATIC 
+  # don't build static, as there might not be a static regex
+  # if ICU is found.  Fix this.
   DEPENDS boost_regex
   LINK_LIBS ${BOOST_GRAPH_OPTIONAL_LIBRARIES}
   SHARED_COMPILE_FLAGS "-DBOOST_GRAPH_DYN_LINK=1"
