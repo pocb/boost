@@ -54,6 +54,7 @@ Reference
    reference/boost_module
    reference/boost_add_library
    reference/boost_add_executable
+   reference/boost_python_module
    reference/boost_additional_test_dependencies
    reference/boost_test_compile
    reference/boost_test_compile_fail
