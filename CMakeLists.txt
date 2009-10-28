@@ -282,10 +282,20 @@ else (TEST_INSTALLED_TREE)
   include_directories(${CMAKE_SOURCE_DIR})
 endif (TEST_INSTALLED_TREE)
 
+set(BOOST_COMPILED_PROJECTS "" CACHE INTERNAL "Compiled projects list" FORCE)
+
 # Boost.Build version 2 does this due to trouble with autolinking
 # during building and testing.  
 # TODO: See if we can actually use auto-linking in our regression tests.
 add_definitions(-DBOOST_ALL_NO_LIB=1)
+
+set(BOOST_BUILD_EXPORTS_FILE ${CMAKE_BINARY_DIR}/Boost.cmake
+  CACHE FILEPATH "File to export targets from boost build directory")
+
+file(REMOVE ${BOOST_BUILD_EXPORTS_FILE})
+
+set(BOOST_INSTALL_EXPORTS_FILE "lib${LIB_SUFFIX}"
+  CACHE STRING "Install location for cmake exports")
 
 # Add build rules for documentation
 add_subdirectory(doc)
@@ -301,3 +311,6 @@ add_subdirectory(tools)
 if (UNIX)
   add_custom_target(plastic_cats_and_dogs COMMENT "How the factory should be modeled?")
 endif()
+
+install(EXPORT Boost DESTINATION ${BOOST_INSTALL_EXPORTS_FILE})
+
