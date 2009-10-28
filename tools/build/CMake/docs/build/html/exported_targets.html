@@ -1,0 +1,203 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Developing with Boost.CMake &mdash; Boost.CMake 1.41.0.cmakebeta4</title>
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.41.0.cmakebeta4',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Boost.CMake 1.41.0.cmakebeta4" href="index.html" />
+    <link rel="next" title="Testing" href="testing.html" />
+    <link rel="prev" title="Build Variants and Features" href="build_variants.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="testing.html" title="Testing"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="build_variants.html" title="Build Variants and Features"
+             accesskey="P">previous</a> |</li>
+    <li><a href="http://www.boost.org/">Boost</a> &raquo;</li>
+    
+        <li><a href="index.html">Boost.CMake 1.41.0.cmakebeta4</a> &raquo;</li>
+ 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/boost-small.png" alt="Logo"/>
+            </a></p>
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">Developing with Boost.CMake</a><ul>
+<li><a class="reference external" href="#examples">Examples</a><ul>
+<li><a class="reference external" href="#with-an-uninstalled-build">With an uninstalled build</a></li>
+<li><a class="reference external" href="#with-an-installed-boost">With an installed boost</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="build_variants.html"
+                                  title="previous chapter">Build Variants and Features</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="testing.html"
+                                  title="next chapter">Testing</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/exported_targets.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <span class="target" id="index-274"></span><div class="section" id="developing-with-boost-cmake">
+<span id="features"></span><span id="variants"></span><span id="index-275"></span><h1>Developing with Boost.CMake<a class="headerlink" href="#developing-with-boost-cmake" title="Permalink to this headline">¶</a></h1>
+<p>Boost.CMake <em>exports</em> its targets, making developing independent
+projects against an installed boost, or simply against a build tree
+sitting on disk.</p>
+<p>You only need to do three things:</p>
+<ol class="arabic">
+<li><p class="first">Add the appropriate include directory.  This is either
+<tt class="docutils literal"><span class="pre">${</span></tt><a class="reference external" href="build_configuration.html#cmake-install-prefix"><em>CMAKE_INSTALL_PREFIX</em></a><tt class="docutils literal"><span class="pre">}/include</span></tt>, if installed, or the
+toplevel of the boost source directory if not.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">include</span></tt> the generated <tt class="docutils literal"><span class="pre">Boost.cmake</span></tt> file containing the
+exported targets.  In an installation, this file is in directory
+<tt class="docutils literal"><span class="pre">${</span></tt><a class="reference external" href="build_configuration.html#cmake-install-prefix"><em>CMAKE_INSTALL_PREFIX</em></a><tt class="docutils literal"><span class="pre">}/lib/Boost.cmake</span></tt> <a class="footnote-reference" href="#libsuffix" id="id1">[1]</a>, and
+in a not-installed build tree it is located in
+<tt class="docutils literal"><span class="pre">${</span></tt><em class="xref">CMAKE_BINARY_DIR</em><tt class="docutils literal"><span class="pre">}/lib/Boost.cmake</span></tt></p>
+</li>
+<li><p class="first">Tell cmake about your link dependencies with
+<tt class="docutils literal"><span class="pre">target_link_libraries</span></tt>.  Note that you use the <strong>names of the
+cmake targets</strong>, not the shorter names that the libraries have on
+disk.   <tt class="docutils literal"><span class="pre">make</span> <span class="pre">help</span></tt> shows a list:</p>
+<div class="highlight-python"><pre>% make help | grep signals
+... boost_signals
+... boost_signals-mt-shared
+... boost_signals-mt-shared-debug
+... boost_signals-mt-static
+... boost_signals-mt-static-debug</pre>
+</div>
+<p>See also <em class="xref">fixme</em> for details on the naming conventions.</p>
+</li>
+</ol>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="with-an-uninstalled-build">
+<h3>With an uninstalled build<a class="headerlink" href="#with-an-uninstalled-build" title="Permalink to this headline">¶</a></h3>
+<p>There is an unpacked boost in <tt class="docutils literal"><span class="pre">/home/troy/boost-1.41.0/src</span></tt> and
+built boost in directory <tt class="docutils literal"><span class="pre">/home/troy/boost/1.41.0/build</span></tt> ::, you
+need do only two things to build your code against the build tree.  I
+have a program that builds from one file, <tt class="docutils literal"><span class="pre">main.cpp</span></tt>.  My <tt class="docutils literal"><span class="pre">CMakeLists.txt</span></tt>:</p>
+<div class="highlight-python"><pre>include_directories("/home/troy/boost-1.41.0/src")
+include("/home/troy/boost-1.41.0/build/Boost.cmake")
+
+add_executable(my_program main.cpp)
+target_link_libraries(my_program boost_thread-mt-shared-debug)</pre>
+</div>
+<p>When you build, you&#8217;ll see
+(wrapped, and some output replaced with ... for brevity):</p>
+<div class="highlight-python"><pre>% make VERBOSE=1
+...
+[100%] Building CXX object CMakeFiles/main.dir/main.cpp.o
+/usr/bin/c++ -I/home/troy/boost-1.41.0/src -o CMakeFiles/main.dir/main.cpp.o -c /home/troy/myproject/main.cpp
+...
+Linking CXX executable main
+/usr/bin/c++ -fPIC CMakeFiles/main.dir/main.cpp.o -o main -rdynamic /home/troy/boost-1.41.0/build/lib/libboost_thread-mt-d.so.1.41.0 -Wl,-rpath,/home/troy/boost-1.41.0/build/lib
+...
+[100%] Built target main</pre>
+</div>
+</div>
+<div class="section" id="with-an-installed-boost">
+<h3>With an installed boost<a class="headerlink" href="#with-an-installed-boost" title="Permalink to this headline">¶</a></h3>
+<p>Here, I&#8217;ve installed boost to <tt class="docutils literal"><span class="pre">/usr/local/boost-1.41.0</span></tt></p>
+<div class="highlight-python"><pre>include(/usr/local/boost-1.41.0/lib/Boost.cmake)
+include_directories(/usr/local/boost-1.41.0/include)
+
+add_executable(main main.cpp)
+
+target_link_libraries(main boost_thread-mt-shared-debug)</pre>
+</div>
+<p>And I see</p>
+<div class="highlight-python"><pre>% make VERBOSE=1
+...
+[100%] Building CXX object CMakeFiles/main.dir/main.cpp.o
+/usr/bin/c++    -I/usr/local/boost-1.41.0/include   -o CMakeFiles/main.dir/main.cpp.o -c /home/troy/Projects/boost/cmake/proj/main.cpp
+...
+Linking CXX executable main
+/usr/bin/c++     -fPIC CMakeFiles/main.dir/main.cpp.o  -o main -rdynamic /usr/local/boost-1.41.0/lib/libboost_thread-mt-d.so.1.41.0 -lpthread -lrt -Wl,-rpath,/usr/local/boost-1.41.0/lib
+...
+[100%] Built target main</pre>
+</div>
+<p class="rubric">Footnotes</p>
+<table class="docutils footnote" frame="void" id="libsuffix" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>If your distribution specifies a <a class="reference external" href="build_configuration.html#lib-suffix"><em>LIB_SUFFIX</em></a> (e.g. if
+it installs libraries to
+<tt class="docutils literal"><span class="pre">${</span></tt><a class="reference external" href="build_configuration.html#cmake-install-prefix"><em>CMAKE_INSTALL_PREFIX</em></a><tt class="docutils literal"><span class="pre">/lib64</span></tt>, you will find
+<cite>Boost.cmake</cite> there.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="testing.html" title="Testing"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="build_variants.html" title="Build Variants and Features"
+             >previous</a> |</li>
+    <li><a href="http://www.boost.org/">Boost</a> &raquo;</li>
+    
+        <li><a href="index.html">Boost.CMake 1.41.0.cmakebeta4</a> &raquo;</li>
+ 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version b2a1e8286e3edbd875f02e1452bad81c38a8bb94, Wed, 28 Oct 2009.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
+    </div>
+  </body>
+</html>

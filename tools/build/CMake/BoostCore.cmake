@@ -85,7 +85,9 @@ macro(boost_library_project LIBNAME)
   string(TOUPPER "${LIBNAME}" ULIBNAME)
   project(${LIBNAME})
   
+
   if (THIS_PROJECT_MODULARIZED OR THIS_PROJECT_SRCDIRS)
+    
     # We only build a component group for modularized libraries or libraries
     # that have compiled parts.
     if (COMMAND cpack_add_component_group)
@@ -706,7 +708,9 @@ macro(boost_library_variant LIBNAME)
     # The basic LIBNAME target depends on each of the variants
     add_dependencies(${LIBNAME} ${VARIANT_LIBNAME})
 
-    export(TARGETS ${VARIANT_LIBNAME} FILE ${CMAKE_BINARY_DIR}/exports/${VARIANT_LIBNAME}.cmake)
+    export(TARGETS ${VARIANT_LIBNAME} 
+      APPEND
+      FILE ${BOOST_BUILD_EXPORTS_FILE})
 
     # Link against whatever libraries this library depends on
     target_link_libraries(${VARIANT_LIBNAME} ${THIS_VARIANT_LINK_LIBS})
@@ -725,7 +729,11 @@ macro(boost_library_variant LIBNAME)
       #
       # tds:  componentization disabled for the moment
       #
-      install(TARGETS ${VARIANT_LIBNAME} DESTINATION lib${LIB_SUFFIX} COMPONENT Boost) #${LIB_COMPONENT})
+      install(TARGETS ${VARIANT_LIBNAME} 
+	EXPORT Boost 
+	DESTINATION lib${LIB_SUFFIX} 
+	COMPONENT Boost) #${LIB_COMPONENT})
+
       # set_property( 
       #      TARGET ${VARIANT_LIBNAME}
       #      PROPERTY BOOST_CPACK_COMPONENT
