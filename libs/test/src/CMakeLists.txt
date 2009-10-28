@@ -5,7 +5,7 @@
 # See http://www.boost.org/LICENSE_1_0.txt
 #
 # Test library configuration
-add_definitions(-DBOOST_TEST_NO_AUTO_LINK=1)
+# add_definitions(-DBOOST_TEST_NO_AUTO_LINK=1)
 
 # Compiler-specific configuration
 set(BOOST_SHARED_COMPILE_FLAGS "")
@@ -42,7 +42,7 @@ boost_add_library(boost_test_exec_monitor
   unit_test_suite.cpp
   xml_log_formatter.cpp
   xml_report_formatter.cpp
-  SHARED_COMPILE_FLAGS -DBOOST_TEST_DYN_LINK=1 ${BOOST_SHARED_COMPILE_FLAGS}
+  NO_SHARED
   )
 
 boost_add_library(boost_unit_test_framework
