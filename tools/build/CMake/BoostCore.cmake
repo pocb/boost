@@ -1389,7 +1389,6 @@ macro(boost_add_executable EXENAME)
         )
     endif()
 
-    message(">>>>>> ${THIS_EXE_ACTUAL_DEPENDS}")
     # Link against the various libraries 
     if (THIS_EXE_DEBUG_AND_RELEASE)
       # Configuration-agnostic libraries
