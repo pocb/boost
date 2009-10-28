@@ -28,6 +28,7 @@ boost_add_library(boost_graph
   read_graphviz_new.cpp 
   ${BOOST_GRAPH_OPTIONAL_SOURCES}
 
+  DEPENDS boost_regex
   LINK_LIBS ${BOOST_GRAPH_OPTIONAL_LIBRARIES}
   SHARED_COMPILE_FLAGS "-DBOOST_GRAPH_DYN_LINK=1"
   )
