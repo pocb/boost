@@ -4,9 +4,6 @@
 # Distributed under the Boost Software License, Version 1.0.
 # See http://www.boost.org/LICENSE_1_0.txt
 #
-#-- Make sure MPI is installed on the users system
-set(MPI_FIND_QUIETLY TRUE)
-FIND_PACKAGE(MPI)
 
 if (NOT MPI_FOUND)
  message(STATUS "+-- MPI not available, skipping Boost.MPI ")
