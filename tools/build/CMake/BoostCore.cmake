@@ -683,7 +683,8 @@ macro(boost_library_variant LIBNAME)
         LINK_FLAGS "${THIS_VARIANT_LINK_FLAGS}"
         LABELS "${BOOST_PROJECT_NAME}"
         PREFIX ""
-       # SOVERSION "${BOOST_VERSION}"
+	VERSION "${BOOST_VERSION}"
+	SOVERSION "${BOOST_VERSION_MAJOR}.${BOOST_VERSION_MINOR}"
         )
     else (THIS_LIB_IS_STATIC)
       #TODO: Check the SOVERSION behavior on Linux and Windows
@@ -697,7 +698,8 @@ macro(boost_library_variant LIBNAME)
         COMPILE_FLAGS "${THIS_VARIANT_COMPILE_FLAGS}"
         LINK_FLAGS "${THIS_VARIANT_LINK_FLAGS}"
         LABELS "${BOOST_PROJECT_NAME}"
-        # SOVERSION "${BOOST_VERSION}"
+	VERSION "${BOOST_VERSION}"
+	SOVERSION "${BOOST_VERSION_MAJOR}.${BOOST_VERSION_MINOR}"
         )
     endif (THIS_LIB_IS_STATIC)
       
