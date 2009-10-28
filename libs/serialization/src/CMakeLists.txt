@@ -5,7 +5,7 @@
 # See http://www.boost.org/LICENSE_1_0.txt
 #
 
-set(SOURCES
+boost_add_library(boost_serialization
 
     basic_archive.cpp
     basic_iarchive.cpp
@@ -35,9 +35,14 @@ set(SOURCES
     xml_oarchive.cpp
     xml_archive_exception.cpp
     shared_ptr_helper.cpp
-    )
-    
-set(WSOURCES
+
+  SHARED_COMPILE_FLAGS -DBOOST_SERIALIZATION_DYN_LINK=1
+)
+
+option(BUILD_BOOST_WSERIALIZATION "Build wide-char boost serialization libs" ON)
+if (BUILD_BOOST_WSERIALIZATION)
+
+  boost_add_library(boost_wserialization
 
     basic_text_wiprimitive.cpp
     basic_text_woprimitive.cpp
@@ -48,18 +53,9 @@ set(WSOURCES
     xml_wiarchive.cpp
     xml_woarchive.cpp
     codecvt_null.cpp
-    )
 
-boost_add_library(boost_serialization
-  ${SOURCES}
-  SHARED_COMPILE_FLAGS -DBOOST_SERIALIZATION_DYN_LINK=1
-)
-
-option(BUILD_BOOST_WSERIALIZATION "Build wide-char boost serialization libs" ON)
-if (BUILD_BOOST_WSERIALIZATION)
-  boost_add_library(boost_wserialization
-    ${WSOURCES}
     SHARED_COMPILE_FLAGS -DBOOST_SERIALIZATION_DYN_LINK=1
     DEPENDS boost_serialization
     )
+
 endif(BUILD_BOOST_WSERIALIZATION)
