@@ -30,7 +30,10 @@ if (BUILD_BCP)
     STATIC
     MULTI_THREADED
     DEBUG
-    DEPENDS boost_system boost_filesystem boost_prg_exec_monitor boost_regex
+    DEPENDS boost_system boost_filesystem boost_prg_exec_monitor 
+    # we specify the shared regex as the static might not exist 
+    # if ICU is enabled
+    boost_regex-mt-shared 
     )
 
 endif (BUILD_BCP)

@@ -11,12 +11,6 @@ set (lib_headers
     iostreams
 )
 
-# Find BZip2. If it's available, test it
-include(FindBZip2)
-
-# Find zlib. If it's available, test it
-include(FindZLIB)
-
 # Add a library target to the build system
 boost_library_project(
   iostreams

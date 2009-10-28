@@ -225,3 +225,29 @@ macro(fix_cpack_component_name varname name)
     set(${varname} ${name})
   endif()
 endmacro()
+
+
+#
+#  pretty-prints the value of a variable so that the 
+#  equals signs align
+#
+macro(boost_report_value NAME)
+    string(LENGTH "${NAME}" varlen)
+    math(EXPR padding_len 22-${varlen})
+    string(SUBSTRING "                                      " 
+      0 ${padding_len} varpadding)
+    message(STATUS "${NAME}${varpadding} = ${${NAME}}")
+endmacro()
+
+#
+#  pretty-prints the value of a variable so that the 
+#  equals signs align
+#
+macro(boost_report_pretty PRETTYNAME VARNAME)
+    string(LENGTH "${PRETTYNAME}" varlen)
+    math(EXPR padding_len 22-${varlen})
+    string(SUBSTRING "                                      " 
+      0 ${padding_len} varpadding)
+    message(STATUS "${PRETTYNAME}${varpadding} = ${${VARNAME}}")
+endmacro()
+

@@ -1,0 +1,97 @@
+# Copyright (C) Troy Straszheim
+#
+# Distributed under the Boost Software License, Version 1.0. 
+# See accompanying file LICENSE_1_0.txt or copy at 
+#   http://www.boost.org/LICENSE_1_0.txt 
+#
+
+
+#
+#  Python interpreter
+#
+set(ENV_PYTHON_EXECUTABLE $ENV{PYTHON_EXECUTABLE})
+
+if ((NOT PYTHONINTERP_FOUND) AND ENV_PYTHON_EXECUTABLE)
+  message(STATUS "Testing PYTHON_EXECUTABLE from environment")
+  find_program(PYTHON_EXECUTABLE ${ENV_PYTHON_EXECUTABLE})
+  if (NOT PYTHON_EXECUTABLE)
+    message(FATAL_ERROR "Environment supplied PYTHON_EXECUTABLE=${ENV_PYTHON_EXECUTABLE} but this file does not exist or is not a program.")
+  endif()
+  set(PYTHONINTERP_FOUND TRUE 
+    CACHE BOOL "Python interpreter found")
+  set(PYTHON_EXECUTABLE 
+    ${ENV_PYTHON_EXECUTABLE} CACHE FILEPATH "Python interpreter found")
+  message(STATUS "Ok, using ${PYTHON_EXECUTABLE}")
+else()
+  set(PythonInterp_FIND_QUIETLY TRUE)
+  find_package(PythonInterp)
+endif()
+
+#
+#  Python libs
+#
+set(ENV_PYTHON_LIBRARIES $ENV{PYTHON_LIBRARIES})
+
+if ((NOT PYTHONLIBS_FOUND) AND ENV_PYTHON_LIBRARIES)
+  message(STATUS "Testing PYTHON_LIBRARIES from environment")
+  get_filename_component(pythonlib_searchpath ${ENV_PYTHON_LIBRARIES} PATH)
+  get_filename_component(pythonlib_filename   ${ENV_PYTHON_LIBRARIES} NAME)
+  find_library(PYTHON_LIBRARIES ${pythonlib_filename} 
+    PATHS ${pythonlib_searchpath}
+    NO_DEFAULT_PATH)
+
+  if (NOT PYTHON_LIBRARIES)
+    message(FATAL_ERROR "Environment supplied PYTHON_LIBRARIES=${ENV_PYTHON_LIBRARIES} but that isn't a library.")
+  endif()
+  message(STATUS "Ok, using ${PYTHON_LIBRARIES}.")
+
+  #
+  #  Python debug libraries
+  #
+  set(ENV_PYTHON_DEBUG_LIBRARIES $ENV{PYTHON_DEBUG_LIBRARIES})
+  if(ENV_PYTHON_DEBUG_LIBRARIES)
+    message(STATUS "Testing PYTHON_DEBUG_LIBRARIES from environment")
+    get_filename_component(pythonlib_searchpath 
+      ${ENV_PYTHON_DEBUG_LIBRARIES} PATH)
+    get_filename_component(pythonlib_filename   
+      ${ENV_PYTHON_DEBUG_LIBRARIES} NAME)
+    find_library(PYTHON_DEBUG_LIBRARIES ${pythonlib_filename} 
+      PATHS ${pythonlib_searchpath}
+      NO_DEFAULT_PATH)
+
+    if (NOT PYTHON_DEBUG_LIBRARIES)
+      message(FATAL_ERROR "Environment supplied PYTHON_DEBUG_LIBRARIES=${ENV_PYTHON_DEBUG_LIBRARIES} but it isn't a library.")
+    endif()
+    message(STATUS "Ok, using ${PYTHON_DEBUG_LIBRARIES}")
+  else()
+    message(STATUS "Skipping optional PYTHON_DEBUG_LIBRARIES:  not set.")
+  endif()
+
+  #
+  #  Python includes
+  #
+  set(ENV_PYTHON_INCLUDE_PATH $ENV{PYTHON_INCLUDE_PATH})
+  if(ENV_PYTHON_INCLUDE_PATH)
+    message(STATUS "Testing PYTHON_INCLUDE_PATH from environment")
+    find_path(PYTHON_INCLUDE_PATH
+      Python.h
+      PATHS ${ENV_PYTHON_INCLUDE_PATH}
+      NO_DEFAULT_PATH)
+
+    if(PYTHON_INCLUDE_PATH)
+      set(PYTHON_INCLUDE_PATH ${ENV_PYTHON_INCLUDE_PATH})
+      message(STATUS "Ok, using ${PYTHON_INCLUDE_PATH}")
+    else()
+      message(FATAL_ERROR "Environment supplied PYTHON_INCLUDE_PATH=${ENV_PYTHON_INCLUDE_PATH} but this directory does not contain file Python.h")
+    endif()
+  endif()
+
+  set(PYTHONLIBS_FOUND TRUE CACHE BOOL "Python libraries found, don't redetect at configure time")
+elseif(NOT PYTHONLIBS_FOUND)
+  set(PythonLibs_FIND_QUIETLY TRUE)
+  find_package(PythonLibs)
+endif()
+
+set(PYTHON_FOUND (PYTHONINTERP_FOUND AND PYTHONLIBS_FOUND))
+
+boost_external_report(Python EXECUTABLE LIBRARIES DEBUG_LIBRARIES INCLUDE_PATH)
