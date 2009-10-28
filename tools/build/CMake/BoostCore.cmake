@@ -1415,3 +1415,23 @@ macro(boost_add_executable EXENAME)
     endif (NOT THIS_EXE_NO_INSTALL)
   endif ()
 endmacro(boost_add_executable)
+
+
+#
+#  Macro for building boost.python extensions
+#
+macro(boost_python_extension MODULE_NAME)
+  parse_arguments(BPL_EXT 
+    "" 
+    "" 
+    ${ARGN})
+  
+  boost_add_single_library(
+    ${MODULE_NAME}
+    ${BPL_EXT_DEFAULT_ARGS}
+    MODULE
+    LINK_LIBS ${PYTHON_LIBRARIES}
+    DEPENDS boost_python
+    SHARED
+    )
+endmacro()

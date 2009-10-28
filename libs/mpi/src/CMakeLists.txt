@@ -54,6 +54,16 @@ if (MPI_FOUND)
 
     boost_add_library(boost_mpi_python
       
+      python/serialize.cpp
+
+      DEPENDS boost_python boost_mpi
+      SHARED_COMPILE_FLAGS "-DBOOST_MPI_DYN_LINK=1 -DBOOST_MPI_PYTHON_DYN_LINK=1 -DBOOST_PYTHON_DYN_LINK=1"
+      LINK_FLAGS ${MPI_LINK_FLAGS}
+      LINK_LIBS ${MPI_LIBRARIES} ${PYTHON_LIBRARIES}
+      NO_STATIC)
+
+    boost_python_extension(mpi
+      
       python/collectives.cpp
       python/py_communicator.cpp
       python/datatypes.cpp
@@ -72,6 +82,9 @@ if (MPI_FOUND)
       LINK_FLAGS ${MPI_LINK_FLAGS}
       LINK_LIBS ${MPI_LIBRARIES} ${PYTHON_LIBRARIES}
       NO_STATIC)
+
+    
+
 
   endif()
 
