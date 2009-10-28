@@ -217,11 +217,14 @@ set(CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO "" CACHE INTERNAL "Unused by Boost")
 
 # Set the build name 
 set(BUILDNAME "${BOOST_COMPILER}-${BOOST_COMPILER_VERSION}-${BOOST_PLATFORM}")
+boost_report_pretty("Build name" BUILDNAME)
 
 set(BUILD_EXAMPLES "NONE" CACHE STRING "Semicolon-separated list of lowercase project names that should have their examples built, or \"ALL\"")
 
 set(BUILD_PROJECTS "ALL"  CACHE STRING "Semicolon-separated list of project to build, or \"ALL\"")
 
-set(LIB_SUFFIX "lib" CACHE STRING "Name of suffix on 'lib' directory to which libs will be installed (e.g. add '64' here on certain 64 bit unices)")
-
+set(LIB_SUFFIX "" CACHE STRING "Name of suffix on 'lib' directory to which libs will be installed (e.g. add '64' here on certain 64 bit unices)")
+if(LIB_SUFFIX)
+  boost_report_pretty("Lib suffix" LIB_SUFFIX)
+endif()
 

@@ -102,8 +102,8 @@ SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 list(APPEND CMAKE_MODULE_PATH ${Boost_SOURCE_DIR}/tools/build/CMake)
 include(BoostUtils)
 
+message(STATUS "")
 boost_report_pretty("Boost.CMake version" BOOST_CMAKE_VERSION)
-boost_report_pretty("Build name" BUILDNAME)
 
 include(BoostConfig)
 include(BoostExternals)

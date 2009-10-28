@@ -5,6 +5,7 @@
 #   http://www.boost.org/LICENSE_1_0.txt 
 #
 
+message(STATUS "")
 message(STATUS "Looking for (optional) dependencies on the system")
 
 macro(boost_external_report NAME)
@@ -26,7 +27,11 @@ foreach(external
     Python
     BZip2
     ZLib
-    Expat)
-  message(STATUS "-- ${external}--")
+    Expat
+    Doxygen
+    Xsltproc
+    )
+  message(STATUS "")
+  message(STATUS "${external}:")
   include(${CMAKE_SOURCE_DIR}/tools/build/CMake/externals/${external}.cmake)
 endforeach()

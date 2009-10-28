@@ -50,6 +50,9 @@ endif()
 #
 # include only directories of projects in BUILD_PROJECTS
 #
+message(STATUS "")
+message(STATUS "Reading boost project directories...")
+message(STATUS "")
 foreach(subdir ${BOOST_SUBPROJECT_DIRS})
   list(FIND BUILD_PROJECTS ${subdir} THIS_BUILD_PROJECTS_INDEX)
   if ((THIS_BUILD_PROJECTS_INDEX GREATER -1) OR (BUILD_PROJECTS STREQUAL "ALL"))

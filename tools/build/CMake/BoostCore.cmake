@@ -723,7 +723,7 @@ macro(boost_library_variant LIBNAME)
       #
       # tds:  componentization disabled for the moment
       #
-      install(TARGETS ${VARIANT_LIBNAME} DESTINATION lib COMPONENT Boost) #${LIB_COMPONENT})
+      install(TARGETS ${VARIANT_LIBNAME} DESTINATION lib${LIB_SUFFIX} COMPONENT Boost) #${LIB_COMPONENT})
       # set_property( 
       #      TARGET ${VARIANT_LIBNAME}
       #      PROPERTY BOOST_CPACK_COMPONENT
