@@ -1,5 +1,5 @@
 #
-# Copyright Troy D. Straszheim
+# Copyright Troy D. Straszheim, Doug Gregor
 #
 # Distributed under the Boost Software License, Version 1.0.
 # See http://www.boost.org/LICENSE_1_0.txt
@@ -84,7 +84,33 @@ endmacro(boost_tool_dependencies)
 #
 ###############################################################################
 
-# add_subdirectory(quickbook)
-# add_subdirectory(wave)
-add_subdirectory(bcp)
-add_subdirectory(inspect)
+set(BUILD_TOOLS "ALL" CACHE STRING "Semicolon-separated list of tools to build")
+
+message(STATUS "")
+if (BUILD_TOOLS STREQUAL "NONE")
+
+  message(STATUS "Skipping config of tools since BUILD_TOOLS is \"NONE\"")
+
+else()
+
+  message(STATUS "Reading tools...")
+  message(STATUS "")
+  foreach(tooldir 
+
+      quickbook
+      wave
+      bcp
+      inspect)
+
+    list(FIND BUILD_TOOLS ${tooldir} THIS_BUILD_TOOLS_INDEX)
+    if ((THIS_BUILD_TOOLS_INDEX GREATER -1) OR (BUILD_TOOLS STREQUAL "ALL"))
+      message(STATUS "+ ${tooldir}")
+      add_subdirectory(${tooldir})
+    endif()
+
+  endforeach()
+
+endif()
+  
+message(STATUS "")
+

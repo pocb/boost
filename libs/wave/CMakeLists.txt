@@ -13,8 +13,8 @@ set (lib_headers
 )
 
 # Add a library target to the build system
-boost_library_project(
-  wave
+boost_library_project(wave
+
   SRCDIRS  src 
   TESTDIRS  test
   HEADERS ${lib_headers}

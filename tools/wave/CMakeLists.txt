@@ -7,7 +7,16 @@
 # DPG: tools need modular dependencies just like libraries have
 # them. For now, we just include the appropriate directories.
 
-boost_add_executable(wave cpp.cpp 
+boost_tool_project(Wave
+  DESCRIPTION "Boost wave, the C preprocessor")
+
+boost_add_executable(wave 
+
+  cpp.cpp 
+
   DEPENDS boost_wave boost_program_options boost_filesystem boost_serialization
+
   MULTI_THREADED
+  SHARED
+  RELEASE
   )

@@ -660,10 +660,8 @@ macro(boost_library_variant LIBNAME)
         set(LIBPREFIX "")
       endif(WIN32 AND NOT CYGWIN)
       
-      # Add the library itself
       add_library(${VARIANT_LIBNAME} STATIC ${THIS_LIB_SOURCES})
 
-      # Set properties on this library
       set_target_properties(${VARIANT_LIBNAME}
         PROPERTIES
         OUTPUT_NAME "${LIBPREFIX}${LIBNAME}${VARIANT_VERSIONED_NAME}"
@@ -672,11 +670,11 @@ macro(boost_library_variant LIBNAME)
         LINK_FLAGS "${THIS_VARIANT_LINK_FLAGS}"
         LABELS "${BOOST_PROJECT_NAME}"
         )
+
     elseif (THIS_LIB_MODULE)
-      # Add a module
+
       add_library(${VARIANT_LIBNAME} MODULE ${THIS_LIB_SOURCES})
 
-      # Set properties on this library
       # VERSION and SOVERSION omitted, they piss off the mac linker
       set_target_properties(${VARIANT_LIBNAME}
         PROPERTIES
@@ -689,10 +687,9 @@ macro(boost_library_variant LIBNAME)
         )
 	
     else (THIS_LIB_IS_STATIC)
-      #TODO: Check the SOVERSION behavior on Linux and Windows
-      # Add a module
+
       add_library(${VARIANT_LIBNAME} SHARED ${THIS_LIB_SOURCES})
-      # Set properties on this library
+
       set_target_properties(${VARIANT_LIBNAME}
         PROPERTIES
         OUTPUT_NAME "${LIBNAME}${VARIANT_VERSIONED_NAME}"
@@ -703,6 +700,7 @@ macro(boost_library_variant LIBNAME)
 	VERSION "${BOOST_VERSION}"
 	SOVERSION "${BOOST_VERSION_MAJOR}.${BOOST_VERSION_MINOR}"
         )
+
     endif (THIS_LIB_IS_STATIC)
       
     # The basic LIBNAME target depends on each of the variants

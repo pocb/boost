@@ -297,6 +297,8 @@ file(REMOVE ${BOOST_BUILD_EXPORTS_FILE})
 set(BOOST_INSTALL_EXPORTS_FILE "lib${LIB_SUFFIX}"
   CACHE STRING "Install location for cmake exports")
 
+mark_as_advanced(BOOST_BUILD_EXPORTS_FILE BOOST_INSTALL_EXPORTS_FILE)
+
 # Add build rules for documentation
 add_subdirectory(doc)
 

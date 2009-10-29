@@ -211,6 +211,22 @@ A project's examples will only be built if the project appears in
 ``BUILD_PROJECTS`` filter is applied first, and the ``BUILD_EXAMPLES``
 filter has no ability to reverse the result. 
 
+.. index:: BUILD_TOOLS
+.. _BUILD_TOOLS:
+
+BUILD_TOOLS
+^^^^^^^^^^^
+
+Similar to BUILD_EXAMPLES and BUILD_PROJECTS above, this is a
+semicolon-separated list of tools (in subdirectory
+``$BOOST_ROOT/tools/``) that should be built, e.g.::
+
+  BUILD_TOOLS=quickbook;wave
+
+``"ALL"`` will build all tools, ``"NONE"`` will build none.  Note that
+the values here are lowercase (only subdirectories of ``tools/``
+matching one of the strings in the list will be traversed by cmake).
+
 Advanced options
 ----------------
 
