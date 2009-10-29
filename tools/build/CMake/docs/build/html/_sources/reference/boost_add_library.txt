@@ -44,7 +44,7 @@ several cases, we use the placeholder "feature" in the option name
 to indicate that there are actually several different kinds of
 options, each referring to a different build feature, e.g., shared
 libraries, multi-threaded, debug build, etc. For a complete listing
-of these features, see :ref:`features`.
+of these features, see :ref:`variants`.
 
 The options that affect this macro's behavior are:
 

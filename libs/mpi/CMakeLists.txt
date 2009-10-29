@@ -18,10 +18,10 @@ else()
 
   boost_library_project(
     mpi
-    SRCDIRS  src
+    SRCDIRS   src
     TESTDIRS  test
-    HEADERS ${lib_headers}
-    DOCDIRS  doc
+    HEADERS   ${lib_headers}
+    DOCDIRS   doc
     #  DESCRIPTION 
     MODULARIZED
     #  AUTHORS 

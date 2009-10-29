@@ -91,7 +91,7 @@ configure_file(boost/version.hpp
 # tree rather than installed Boost libraries.
 SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 # we have to do this to export targets from the build tree
-file(MAKE_DIRECTORY ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
+file(MAKE_DIRECTORY ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/cmake)
 
 SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
@@ -332,12 +332,12 @@ set(BOOST_COMPILED_PROJECTS "" CACHE INTERNAL "Compiled projects list" FORCE)
 # TODO: See if we can actually use auto-linking in our regression tests.
 add_definitions(-DBOOST_ALL_NO_LIB=1)
 
-set(BOOST_BUILD_EXPORTS_FILE ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/Boost.cmake
+set(BOOST_EXPORTS_FILE ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/cmake/Boost.cmake
   CACHE FILEPATH "File to export targets from boost build directory")
 
-file(REMOVE ${BOOST_BUILD_EXPORTS_FILE})
+file(REMOVE ${BOOST_EXPORTS_FILE})
 
-set(BOOST_INSTALL_EXPORTS_FILE ${BOOST_LIB_INSTALL_DIR}
+set(BOOST_INSTALL_EXPORTS_FILE ${BOOST_LIB_INSTALL_DIR}/cmake
   CACHE STRING "Install location for cmake exports")
 
 mark_as_advanced(BOOST_BUILD_EXPORTS_FILE BOOST_INSTALL_EXPORTS_FILE)
@@ -352,10 +352,6 @@ add_subdirectory(libs)
 # TODO: On hold while I work on the modularity code
 add_subdirectory(tools)
 ##########################################################################
-
-if (UNIX)
-  add_custom_target(plastic_cats_and_dogs COMMENT "How the factory should be modeled?")
-endif()
 
 install(EXPORT Boost DESTINATION ${BOOST_INSTALL_EXPORTS_FILE})
 

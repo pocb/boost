@@ -78,8 +78,8 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <span class="target" id="index-491"></span><div class="section" id="developing-with-boost-cmake">
-<span id="exported-targets"></span><span id="index-492"></span><h1>Developing with Boost.CMake<a class="headerlink" href="#developing-with-boost-cmake" title="Permalink to this headline">¶</a></h1>
+  <span class="target" id="index-509"></span><div class="section" id="developing-with-boost-cmake">
+<span id="exported-targets"></span><span id="index-510"></span><h1>Developing with Boost.CMake<a class="headerlink" href="#developing-with-boost-cmake" title="Permalink to this headline">¶</a></h1>
 <p>Boost.CMake <em>exports</em> its targets, making developing independent
 projects against an installed boost, or simply against a build tree
 sitting on disk.</p>
@@ -91,9 +91,9 @@ toplevel of the boost source directory if not.</p>
 </li>
 <li><p class="first"><tt class="docutils literal"><span class="pre">include</span></tt> the generated <tt class="docutils literal"><span class="pre">Boost.cmake</span></tt> file containing the
 exported targets.  In an installation, this file is in directory
-<tt class="docutils literal"><span class="pre">${</span></tt><a class="reference external" href="build_configuration.html#cmake-install-prefix"><em>CMAKE_INSTALL_PREFIX</em></a><tt class="docutils literal"><span class="pre">}/lib/Boost.cmake</span></tt> <a class="footnote-reference" href="#libsuffix" id="id1">[1]</a>, and
+<tt class="docutils literal"><span class="pre">${</span></tt><a class="reference external" href="build_configuration.html#cmake-install-prefix"><em>CMAKE_INSTALL_PREFIX</em></a><tt class="docutils literal"><span class="pre">}/lib/cmake/Boost.cmake</span></tt> <a class="footnote-reference" href="#libsuffix" id="id1">[1]</a>, and
 in a not-installed build tree it is located in
-<tt class="docutils literal"><span class="pre">${</span></tt><a class="reference external" href="build_configuration.html#cmake-binary-dir"><em>CMAKE_BINARY_DIR</em></a><tt class="docutils literal"><span class="pre">}/lib/Boost.cmake</span></tt></p>
+<tt class="docutils literal"><span class="pre">${</span></tt><a class="reference external" href="build_configuration.html#cmake-binary-dir"><em>CMAKE_BINARY_DIR</em></a><tt class="docutils literal"><span class="pre">}/lib/cmake/Boost.cmake</span></tt></p>
 </li>
 <li><p class="first">Tell cmake about your link dependencies with
 <tt class="docutils literal"><span class="pre">target_link_libraries</span></tt>.  Note that you use the <strong>names of the
@@ -109,6 +109,9 @@ disk.   <tt class="docutils literal"><span class="pre">make</span> <span class="
 <p>See also <em class="xref">fixme</em> for details on the naming conventions.</p>
 </li>
 </ol>
+<p>Since these are exported targets, CMake will add appropriate rpaths as
+necessary so, fiddling with <tt class="docutils literal"><span class="pre">LD_LIBRARY_PATH</span></tt> should not be
+necessary.</p>
 <div class="section" id="examples">
 <h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="with-an-uninstalled-build">
@@ -118,7 +121,7 @@ built boost in directory <tt class="docutils literal"><span class="pre">/home/tr
 need do only two things to build your code against the build tree.  I
 have a program that builds from one file, <tt class="docutils literal"><span class="pre">main.cpp</span></tt>.  My <tt class="docutils literal"><span class="pre">CMakeLists.txt</span></tt>:</p>
 <div class="highlight-python"><pre>include_directories("/home/troy/boost-1.41.0/src")
-include("/home/troy/boost-1.41.0/build/lib/Boost.cmake")
+include("/home/troy/boost-1.41.0/build/lib/cmake/Boost.cmake")
 
 add_executable(my_program main.cpp)
 target_link_libraries(my_program boost_thread-mt-shared-debug)</pre>
@@ -131,7 +134,7 @@ target_link_libraries(my_program boost_thread-mt-shared-debug)</pre>
 /usr/bin/c++ -I/home/troy/boost-1.41.0/src -o CMakeFiles/main.dir/main.cpp.o -c /home/troy/myproject/main.cpp
 ...
 Linking CXX executable main
-/usr/bin/c++ -fPIC CMakeFiles/main.dir/main.cpp.o -o main -rdynamic /home/troy/boost-1.41.0/build/lib/libboost_thread-mt-d.so.1.41.0 -Wl,-rpath,/home/troy/boost-1.41.0/build/lib
+/usr/bin/c++ -fPIC CMakeFiles/main.dir/main.cpp.o -o main -rdynamic /home/troy/boost-1.41.0/build/lib/libboost_thread-mt-d.so.1.41.0 -lpthread -lrt -Wl,-rpath,/home/troy/boost-1.41.0/build/lib
 ...
 [100%] Built target main</pre>
 </div>
@@ -139,7 +142,7 @@ Linking CXX executable main
 <div class="section" id="with-an-installed-boost">
 <h3>With an installed boost<a class="headerlink" href="#with-an-installed-boost" title="Permalink to this headline">¶</a></h3>
 <p>Here, I&#8217;ve installed boost to <tt class="docutils literal"><span class="pre">/usr/local/boost-1.41.0</span></tt></p>
-<div class="highlight-python"><pre>include(/usr/local/boost-1.41.0/lib/Boost.cmake)
+<div class="highlight-python"><pre>include(/usr/local/boost-1.41.0/lib/cmake/Boost.cmake)
 include_directories(/usr/local/boost-1.41.0/include)
 
 add_executable(main main.cpp)
@@ -161,10 +164,12 @@ Linking CXX executable main
 <table class="docutils footnote" frame="void" id="libsuffix" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>If your distribution specifies a <a class="reference external" href="build_configuration.html#lib-suffix"><em>LIB_SUFFIX</em></a> (e.g. if
-it installs libraries to
-<tt class="docutils literal"><span class="pre">${</span></tt><a class="reference external" href="build_configuration.html#cmake-install-prefix"><em>CMAKE_INSTALL_PREFIX</em></a><tt class="docutils literal"><span class="pre">/lib64</span></tt>, you will find
-<cite>Boost.cmake</cite> there.</td></tr>
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>If your distribution specifies a <a class="reference external" href="build_configuration.html#lib-suffix"><em>LIB_SUFFIX</em></a>
+(e.g. if it installs libraries to
+<tt class="docutils literal"><span class="pre">${</span></tt><a class="reference external" href="build_configuration.html#cmake-install-prefix"><em>CMAKE_INSTALL_PREFIX</em></a><tt class="docutils literal"><span class="pre">/lib64</span></tt>, you
+will find <cite>Boost.cmake</cite> there.  If the installation is
+&#8216;versioned&#8217;, the <tt class="docutils literal"><span class="pre">Boost.cmake</span></tt> file may be in a
+versioned subdirectory of lib, e.g. <tt class="docutils literal"><span class="pre">lib/boost-1.41.0</span></tt>.</td></tr>
 </tbody>
 </table>
 </div>
@@ -196,7 +201,7 @@ it installs libraries to
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version f108eb37e2a7010746ce2c8da08f07fc2a868250, Thu, 29 Oct 2009.
+      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version e6921920b76eb5c427ca8e787f530614f6697c56, Thu, 29 Oct 2009.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

@@ -16,9 +16,9 @@ You only need to do three things:
     toplevel of the boost source directory if not.
 2.  ``include`` the generated ``Boost.cmake`` file containing the
     exported targets.  In an installation, this file is in directory
-    ``${``:ref:`CMAKE_INSTALL_PREFIX`\ ``}/lib/Boost.cmake`` [#libsuffix]_, and
+    ``${``:ref:`CMAKE_INSTALL_PREFIX`\ ``}/lib/cmake/Boost.cmake`` [#libsuffix]_, and
     in a not-installed build tree it is located in
-    ``${``:ref:`CMAKE_BINARY_DIR`\ ``}/lib/Boost.cmake``
+    ``${``:ref:`CMAKE_BINARY_DIR`\ ``}/lib/cmake/Boost.cmake``
 3.  Tell cmake about your link dependencies with
     ``target_link_libraries``.  Note that you use the **names of the
     cmake targets**, not the shorter names that the libraries have on
@@ -33,6 +33,11 @@ You only need to do three things:
               
     See also :ref:`fixme` for details on the naming conventions.
 
+Since these are exported targets, CMake will add appropriate rpaths as
+necessary so, fiddling with ``LD_LIBRARY_PATH`` should not be
+necessary.  
+
+
 Examples
 --------
 
@@ -45,7 +50,7 @@ need do only two things to build your code against the build tree.  I
 have a program that builds from one file, ``main.cpp``.  My ``CMakeLists.txt``::
 
    include_directories("/home/troy/boost-1.41.0/src")
-   include("/home/troy/boost-1.41.0/build/lib/Boost.cmake")
+   include("/home/troy/boost-1.41.0/build/lib/cmake/Boost.cmake")
 
    add_executable(my_program main.cpp)
    target_link_libraries(my_program boost_thread-mt-shared-debug)
@@ -59,7 +64,7 @@ When you build, you'll see
   /usr/bin/c++ -I/home/troy/boost-1.41.0/src -o CMakeFiles/main.dir/main.cpp.o -c /home/troy/myproject/main.cpp
   ...
   Linking CXX executable main
-  /usr/bin/c++ -fPIC CMakeFiles/main.dir/main.cpp.o -o main -rdynamic /home/troy/boost-1.41.0/build/lib/libboost_thread-mt-d.so.1.41.0 -Wl,-rpath,/home/troy/boost-1.41.0/build/lib 
+  /usr/bin/c++ -fPIC CMakeFiles/main.dir/main.cpp.o -o main -rdynamic /home/troy/boost-1.41.0/build/lib/libboost_thread-mt-d.so.1.41.0 -lpthread -lrt -Wl,-rpath,/home/troy/boost-1.41.0/build/lib 
   ...
   [100%] Built target main
 
@@ -69,7 +74,7 @@ With an installed boost
 
 Here, I've installed boost to ``/usr/local/boost-1.41.0`` ::
 
-  include(/usr/local/boost-1.41.0/lib/Boost.cmake)
+  include(/usr/local/boost-1.41.0/lib/cmake/Boost.cmake)
   include_directories(/usr/local/boost-1.41.0/include)
   
   add_executable(main main.cpp)
@@ -91,7 +96,9 @@ And I see ::
 
 .. rubric:: Footnotes
 
-.. [#libsuffix] If your distribution specifies a :ref:`LIB_SUFFIX` (e.g. if 
-   		it installs libraries to
-   		``${``:ref:`CMAKE_INSTALL_PREFIX`\ ``/lib64``, you will find
-   		`Boost.cmake` there.
+.. [#libsuffix] If your distribution specifies a :ref:`LIB_SUFFIX`
+   		(e.g. if it installs libraries to
+   		``${``:ref:`CMAKE_INSTALL_PREFIX`\ ``/lib64``, you
+   		will find `Boost.cmake` there.  If the installation is
+   		'versioned', the ``Boost.cmake`` file may be in a
+   		versioned subdirectory of lib, e.g. ``lib/boost-1.41.0``.

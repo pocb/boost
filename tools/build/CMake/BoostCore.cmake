@@ -689,7 +689,6 @@ macro(boost_library_variant LIBNAME)
 
       add_library(${VARIANT_LIBNAME} MODULE ${THIS_LIB_SOURCES})
 
-      # VERSION and SOVERSION omitted, they piss off the mac linker
       set_target_properties(${VARIANT_LIBNAME}
         PROPERTIES
         OUTPUT_NAME ${LIBNAME}
@@ -700,6 +699,14 @@ macro(boost_library_variant LIBNAME)
         PREFIX ""
         )
       
+      # VERSION and SOVERSION omitted, they piss off the mac linker
+      if (BUILD_SOVERSIONED AND UNIX)
+	set_target_properties(${VARIANT_LIBNAME}
+	  PROPERTIES
+	  SOVERSION "${BOOST_VERSION}"
+	  )
+      endif()
+
     else (THIS_LIB_IS_STATIC)
 
       add_library(${VARIANT_LIBNAME} SHARED ${THIS_LIB_SOURCES})
@@ -716,7 +723,7 @@ macro(boost_library_variant LIBNAME)
       if (BUILD_SOVERSIONED)
 	set_target_properties(${VARIANT_LIBNAME}
 	  PROPERTIES
-	  VERSION "${BOOST_VERSION}"
+	  SOVERSION "${BOOST_VERSION}"
 	  )
       endif()
     endif ()
@@ -734,7 +741,7 @@ macro(boost_library_variant LIBNAME)
 
     export(TARGETS ${VARIANT_LIBNAME} 
       APPEND
-      FILE ${BOOST_BUILD_EXPORTS_FILE})
+      FILE ${BOOST_EXPORTS_FILE})
 
     if(NOT THIS_LIB_NO_INSTALL)
       # Setup installation properties
