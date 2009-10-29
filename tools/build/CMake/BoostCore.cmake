@@ -689,7 +689,6 @@ macro(boost_library_variant LIBNAME)
 
       add_library(${VARIANT_LIBNAME} MODULE ${THIS_LIB_SOURCES})
 
-      # VERSION and SOVERSION omitted, they piss off the mac linker
       set_target_properties(${VARIANT_LIBNAME}
         PROPERTIES
         OUTPUT_NAME ${LIBNAME}
@@ -699,6 +698,13 @@ macro(boost_library_variant LIBNAME)
         LABELS "${BOOST_PROJECT_NAME}"
         PREFIX ""
         )
+      # VERSION and SOVERSION omitted, they piss off the mac linker
+      if(UNIX AND NOT APPLE)		
+        set_target_properties(${VARIANT_LIBNAME}
+          PROPERTIES
+          SOVERSION "${BOOST_VERSION_MAJOR}.${BOOST_VERSION_MINOR}"
+          )
+      endif()		
       
     else (THIS_LIB_IS_STATIC)
 
