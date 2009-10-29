@@ -98,7 +98,7 @@ else()
   message(STATUS "")
 
   file(GLOB BOOST_TOOL_CMAKE_FILES 
-       RELATIVE "${CMAKE_TOOLS_SOURCE_DIR}" "${BOOST_TOOLS_SOURCE_DIR}/*/CMakeLists.txt")
+       RELATIVE "${CMAKE_TOOLS_PARENT_DIR}" "${BOOST_TOOLS_PARENT_DIR}/*/CMakeLists.txt")
   foreach(BOOST_TOOL_CMAKE_FILE ${BOOST_TOOL_CMAKE_FILES})
     get_filename_component(BOOST_TOOL_DIR ${BOOST_TOOL_CMAKE_FILE} PATH)
     set(tooldirs ${tooldirs} ${BOOST_TOOL_DIR})

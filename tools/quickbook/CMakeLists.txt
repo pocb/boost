@@ -14,6 +14,7 @@ if (MSVC)
 endif (MSVC)
 
 boost_add_executable(quickbook
+
   detail/quickbook.cpp
   detail/actions.cpp
   detail/actions_class.cpp
@@ -23,6 +24,10 @@ boost_add_executable(quickbook
   detail/input_path.cpp
   detail/template_stack.cpp
   detail/markups.cpp
+
   DEPENDS boost_program_options boost_filesystem
+  MULTI_THREADED
+  SHARED
+  RELEASE
   )  
 

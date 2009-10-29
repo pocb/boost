@@ -20,9 +20,9 @@ boost_add_executable(SHARED-RELEASE-MULTI_THREADED main.cpp  DEPENDS b-mt-shared
 boost_add_executable(SHARED-RELEASE-SINGLE_THREADED main.cpp DEPENDS b-shared)
 boost_add_executable(STATIC-RELEASE-MULTI_THREADED main.cpp  DEPENDS b-mt-static)
 boost_add_executable(STATIC-RELEASE-SINGLE_THREADED main.cpp DEPENDS b-static)
-boost_add_executable(SHARED-DEBUG-MULTI_THREADED main.cpp  DEPENDS b-mt-shared-debug)
-boost_add_executable(SHARED-DEBUG-SINGLE_THREADED main.cpp DEPENDS b-shared-debug)
-boost_add_executable(STATIC-DEBUG-MULTI_THREADED main.cpp  DEPENDS b-mt-static-debug)
-boost_add_executable(STATIC-DEBUG-SINGLE_THREADED main.cpp DEPENDS b-static-debug)
+boost_add_executable(SHARED-DEBUG-MULTI_THREADED main.cpp    DEPENDS b-mt-shared-debug)
+boost_add_executable(SHARED-DEBUG-SINGLE_THREADED main.cpp   DEPENDS b-shared-debug)
+boost_add_executable(STATIC-DEBUG-MULTI_THREADED main.cpp    DEPENDS b-mt-static-debug)
+boost_add_executable(STATIC-DEBUG-SINGLE_THREADED main.cpp   DEPENDS b-static-debug)
 
 
