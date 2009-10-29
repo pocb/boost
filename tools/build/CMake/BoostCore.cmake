@@ -698,6 +698,13 @@ macro(boost_library_variant LIBNAME)
         LABELS "${BOOST_PROJECT_NAME}"
         PREFIX ""
         )
+      # VERSION and SOVERSION omitted, they piss off the mac linker
+      if(UNIX AND NOT APPLE)		
+        set_target_properties(${VARIANT_LIBNAME}
+          PROPERTIES
+          SOVERSION "${BOOST_VERSION_MAJOR}.${BOOST_VERSION_MINOR}"
+          )
+      endif()		
       
       # VERSION and SOVERSION omitted, they piss off the mac linker
       if (BUILD_SOVERSIONED AND UNIX)
