@@ -282,6 +282,7 @@ elseif (BOOST_CMAKE_SELFTEST)
   include_directories("${BOOST_CMAKE_SELFTEST_ROOT}/include")
   # and regular boost headers
   include_directories(${CMAKE_SOURCE_DIR})
+
 else()
   # Use the headers directly from the Boost source tree (in boost/)
   include_directories(${CMAKE_SOURCE_DIR})

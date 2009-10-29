@@ -38,7 +38,13 @@
 # is significantly faster when we aren't also building regression
 # tests.
 
-set(BUILD_TESTS "NONE" CACHE STRING "Semicolon-separated list of lowercase librarary names to test, or \"ALL\"")
+if (BOOST_CMAKE_SELFTEST)
+  set(tests "ALL")
+else()
+  set(tests "NONE")
+endif()
+
+set(BUILD_TESTS ${tests} CACHE STRING "Semicolon-separated list of lowercase librarary names to test, or \"ALL\"")
 enable_testing()
 
 if (BUILD_TESTS STREQUAL "NONE")
