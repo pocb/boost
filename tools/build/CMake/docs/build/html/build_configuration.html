@@ -54,6 +54,7 @@
 </ul>
 </li>
 <li><a class="reference external" href="#cmakecache-txt">CMakeCache.txt</a><ul>
+<li><a class="reference external" href="#cmake-binary-dir">CMAKE_BINARY_DIR</a></li>
 <li><a class="reference external" href="#a-few-useful-options">A few useful options</a><ul>
 <li><a class="reference external" href="#cmake-osx-architectures">CMAKE_OSX_ARCHITECTURES</a></li>
 <li><a class="reference external" href="#build-versioned">BUILD_VERSIONED</a></li>
@@ -65,13 +66,19 @@
 <li><a class="reference external" href="#advanced-options">Advanced options</a><ul>
 <li><a class="reference external" href="#cmake-verbose-makefile">CMAKE_VERBOSE_MAKEFILE</a></li>
 <li><a class="reference external" href="#cmake-cxx-compiler">CMAKE_CXX_COMPILER</a></li>
+<li><a class="reference external" href="#build-soversioned">BUILD_SOVERSIONED</a></li>
 </ul>
 </li>
 <li><a class="reference external" href="#options-for-customizing-installation">Options for customizing installation</a><ul>
 <li><a class="reference external" href="#cmake-install-prefix">CMAKE_INSTALL_PREFIX</a></li>
 <li><a class="reference external" href="#lib-suffix">LIB_SUFFIX</a></li>
+<li><a class="reference external" href="#install-versioned">INSTALL_VERSIONED</a><ul>
+<li><a class="reference external" href="#example">Example</a></li>
 </ul>
 </li>
+</ul>
+</li>
+<li><a class="reference external" href="#system-dependencies">System Dependencies</a></li>
 </ul>
 </li>
 </ul>
@@ -147,7 +154,7 @@ have stabilized, CMake will give you the (g)enerate option. If you do
 not see this option, press <tt class="docutils literal"><span class="pre">c</span></tt> again to reconfigure.  Try the
 <tt class="docutils literal"><span class="pre">t</span></tt> key to see more options.  When you&#8217;re done press <tt class="docutils literal"><span class="pre">g</span></tt> to
 generate makefiles and exit.</p>
-<p>See <a class="reference external" href="build_variants.html#variants"><em>Build Variants and Features</em></a> for information about the feature-specific options
+<p>See <a class="reference external" href="add_compiled_library.html#variants"><em>Build Variants</em></a> for information about the feature-specific options
 (ie <tt class="docutils literal"><span class="pre">ENABLE_whatever</span></tt> listed above.)</p>
 </div>
 </div>
@@ -186,6 +193,11 @@ you want to switch from using Visual Studio to using NMake.  To do
 this, <strong>delete the cache file</strong>.  On windows, there is a <em>Delete
 Cache</em> option in the CMake gui&#8217;s <em>File</em> menu.  On unix you can simply
 <tt class="docutils literal"><span class="pre">rm</span> <span class="pre">CMakeCache.txt</span></tt>.</p>
+<div class="section" id="cmake-binary-dir">
+<span id="index-494"></span><span id="id2"></span><h2>CMAKE_BINARY_DIR<a class="headerlink" href="#cmake-binary-dir" title="Permalink to this headline">¶</a></h2>
+<p>This variable is set by cmake and corresponds to the toplevel of your
+<tt class="docutils literal"><span class="pre">build/</span></tt> directory.</p>
+</div>
 <div class="section" id="a-few-useful-options">
 <span id="useful-options"></span><h2>A few useful options<a class="headerlink" href="#a-few-useful-options" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="cmake-osx-architectures">
@@ -198,7 +210,7 @@ Cache</em> option in the CMake gui&#8217;s <em>File</em> menu.  On unix you can 
 </blockquote>
 </div>
 <div class="section" id="build-versioned">
-<h3>BUILD_VERSIONED<a class="headerlink" href="#build-versioned" title="Permalink to this headline">¶</a></h3>
+<span id="index-495"></span><span id="id3"></span><h3>BUILD_VERSIONED<a class="headerlink" href="#build-versioned" title="Permalink to this headline">¶</a></h3>
 <p>This option controls whether libraries will be built with mangled-in
 compiler name/version and boost version.  For example, with
 <tt class="docutils literal"><span class="pre">BUILD_VERSIONED</span></tt> set to <tt class="docutils literal"><span class="pre">OFF</span></tt>, the signals library looks like
@@ -218,25 +230,16 @@ lib/libboost_signals-gcc43-mt-d-1_40.so*</pre>
 than unix users.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">The on-disk names of library <a class="reference external" href="build_variants.html#variants"><em>variants</em></a> are
-always mangled with the active <a class="reference external" href="build_variants.html#features"><em>features</em></a>.
+<p class="last">The on-disk names of library <a class="reference external" href="add_compiled_library.html#variants"><em>variants</em></a> are
+always mangled with the active <a class="reference external" href="exported_targets.html#features"><em>features</em></a>.
 <tt class="docutils literal"><span class="pre">BUILD_VERSIONED</span></tt> affects mangling of compiler and boost
 version only.</p>
 </div>
-<p>In addition, with <tt class="docutils literal"><span class="pre">BUILD_VERSIONED</span></tt> on, the install destination for
-header files will contain a subdirectory containing <tt class="docutils literal"><span class="pre">boost-VERSION</span></tt>.
-For example, on boost 1.40.0 with <tt class="docutils literal"><span class="pre">BUILD_VERSIONED</span></tt> ON, and a
-default <tt class="docutils literal"><span class="pre">CMAKE_INSTALL_PREFIX</span></tt> of <tt class="docutils literal"><span class="pre">/usr/local</span></tt>, headers are
-installed to:</p>
-<div class="highlight-python"><pre>/usr/local/include/boost-1_40/boost/...</pre>
-</div>
-<p>and with <tt class="docutils literal"><span class="pre">BUILD_VERSIONED</span></tt> set to <tt class="docutils literal"><span class="pre">OFF</span></tt>, the <tt class="docutils literal"><span class="pre">boost-1_40</span></tt>
-segment is omitted:</p>
-<div class="highlight-python"><pre>/usr/local/include/boost/...</pre>
-</div>
+<p><tt class="docutils literal"><span class="pre">BUILD_VERSIONED</span></tt> does not affect the locations to which files are
+installed.  For this see <a class="reference internal" href="#install-versioned"><em>INSTALL_VERSIONED</em></a>.</p>
 </div>
 <div class="section" id="build-projects">
-<span id="index-354"></span><span id="id2"></span><h3>BUILD_PROJECTS<a class="headerlink" href="#build-projects" title="Permalink to this headline">¶</a></h3>
+<span id="index-496"></span><span id="id4"></span><h3>BUILD_PROJECTS<a class="headerlink" href="#build-projects" title="Permalink to this headline">¶</a></h3>
 <p>This is a semicolon-separated list of projects to be built, or
 <tt class="docutils literal"><span class="pre">&quot;ALL&quot;</span></tt> (the default) for all projects, or <tt class="docutils literal"><span class="pre">&quot;NONE&quot;</span></tt>.  Projects not
 appearing in this list (if list not <tt class="docutils literal"><span class="pre">&quot;ALL&quot;</span></tt>) are ignored; no targets in
@@ -261,7 +264,7 @@ Call Stack (most recent call first):
 </div>
 </div>
 <div class="section" id="build-examples">
-<span id="index-355"></span><span id="id3"></span><h3>BUILD_EXAMPLES<a class="headerlink" href="#build-examples" title="Permalink to this headline">¶</a></h3>
+<span id="index-497"></span><span id="id5"></span><h3>BUILD_EXAMPLES<a class="headerlink" href="#build-examples" title="Permalink to this headline">¶</a></h3>
 <p>This is a semicolon-separated list of projects whose examples should
 be built, e.g.:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">BUILD_EXAMPLES</span><span class="o">=</span><span class="n">iostreams</span><span class="p">;</span><span class="n">accumulators</span>
@@ -276,7 +279,7 @@ argument to the <a class="reference external" href="reference/boost_library_proj
 filter has no ability to reverse the result.</p>
 </div>
 <div class="section" id="build-tools">
-<span id="index-356"></span><span id="id4"></span><h3>BUILD_TOOLS<a class="headerlink" href="#build-tools" title="Permalink to this headline">¶</a></h3>
+<span id="index-498"></span><span id="id6"></span><h3>BUILD_TOOLS<a class="headerlink" href="#build-tools" title="Permalink to this headline">¶</a></h3>
 <p>Similar to BUILD_EXAMPLES and BUILD_PROJECTS above, this is a
 semicolon-separated list of tools (in subdirectory
 <tt class="docutils literal"><span class="pre">$BOOST_ROOT/tools/</span></tt>) that should be built, e.g.:</p>
@@ -293,7 +296,7 @@ matching one of the strings in the list will be traversed by cmake).</p>
 <p><tt class="docutils literal"><span class="pre">ccmake</span></tt> provides the keystroke option <tt class="docutils literal"><span class="pre">t</span></tt> which toggles advanced
 mode.  Some of the useful options here are:</p>
 <span class="target" id="verbosity"></span><div class="section" id="cmake-verbose-makefile">
-<span id="index-357"></span><h3>CMAKE_VERBOSE_MAKEFILE<a class="headerlink" href="#cmake-verbose-makefile" title="Permalink to this headline">¶</a></h3>
+<span id="index-499"></span><h3>CMAKE_VERBOSE_MAKEFILE<a class="headerlink" href="#cmake-verbose-makefile" title="Permalink to this headline">¶</a></h3>
 <blockquote>
 Displays full build commands during build.  Good for debugging.
 This option will generate permanently verbose makefiles; it is
@@ -301,7 +304,7 @@ generally easier to invoke make with the option <tt class="docutils literal"><sp
 instead (this has the same effect, but for one build only).</blockquote>
 </div>
 <div class="section" id="cmake-cxx-compiler">
-<span id="index-358"></span><span id="id5"></span><h3>CMAKE_CXX_COMPILER<a class="headerlink" href="#cmake-cxx-compiler" title="Permalink to this headline">¶</a></h3>
+<span id="index-500"></span><span id="id7"></span><h3>CMAKE_CXX_COMPILER<a class="headerlink" href="#cmake-cxx-compiler" title="Permalink to this headline">¶</a></h3>
 <blockquote>
 <p>Sets the compiler.  If you have a nonstandard compiler and no
 default compiler, you may have to pass the value of this option on
@@ -312,29 +315,131 @@ the commandline, for example:</p>
 to have cmake generate a set of nmake or project files by choosing
 an appropriate generator.</p>
 </blockquote>
+<span class="target" id="index-501"></span><span class="target" id="index-502"></span></div>
+<div class="section" id="build-soversioned">
+<span id="build-with-soversion"></span><span id="index-503"></span><h3>BUILD_SOVERSIONED<a class="headerlink" href="#build-soversioned" title="Permalink to this headline">¶</a></h3>
+<p>Enables the setting of SOVERSION in built libraries.  If
+this is on:</p>
+<div class="highlight-python"><pre>% ls -l lib/*signal*
+lrwxrwxrwx 1 troy troy      29 Oct 29 02:22 lib/libboost_signals-mt-d.so -&gt; libboost_signals-mt-d.so.1.41*
+lrwxrwxrwx 1 troy troy      31 Oct 29 02:22 lib/libboost_signals-mt-d.so.1.41 -&gt; libboost_signals-mt-d.so.1.41.0*
+-rwxr-xr-x 1 troy troy  835522 Oct 29 02:22 lib/libboost_signals-mt-d.so.1.41.0*
+lrwxrwxrwx 1 troy troy      27 Oct 29 02:22 lib/libboost_signals-mt.so -&gt; libboost_signals-mt.so.1.41*
+lrwxrwxrwx 1 troy troy      29 Oct 29 02:22 lib/libboost_signals-mt.so.1.41 -&gt; libboost_signals-mt.so.1.41.0*
+-rwxr-xr-x 1 troy troy  121886 Oct 29 02:22 lib/libboost_signals-mt.so.1.41.0*
+
+% readelf -a lib/libboost_signals-mt-d.so | grep -i SONAME
+ 0x000000000000000e (SONAME)             Library soname: [libboost_signals-mt-d.so.1.41]</pre>
+</div>
+<p>and if off:</p>
+<div class="highlight-python"><pre>% ls -l lib/*signals*
+-rwxr-xr-x 1 troy troy  835522 Oct 29 15:10 lib/libboost_signals-mt-d.so*
+-rwxr-xr-x 1 troy troy  121886 Oct 29 15:10 lib/libboost_signals-mt.so*</pre>
+</div>
+<p>(Unix only, <tt class="docutils literal"><span class="pre">ON</span></tt> by default)</p>
 </div>
 </div>
 <div class="section" id="options-for-customizing-installation">
 <h2>Options for customizing installation<a class="headerlink" href="#options-for-customizing-installation" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="cmake-install-prefix">
-<span id="index-359"></span><span id="id6"></span><h3>CMAKE_INSTALL_PREFIX<a class="headerlink" href="#cmake-install-prefix" title="Permalink to this headline">¶</a></h3>
+<span id="index-504"></span><span id="id8"></span><h3>CMAKE_INSTALL_PREFIX<a class="headerlink" href="#cmake-install-prefix" title="Permalink to this headline">¶</a></h3>
 <blockquote>
 This is a standard cmake option that sets the path to which boost
 will be installed.</blockquote>
 </div>
 <div class="section" id="lib-suffix">
-<span id="id7"></span><h3>LIB_SUFFIX<a class="headerlink" href="#lib-suffix" title="Permalink to this headline">¶</a></h3>
+<span id="index-505"></span><span id="id9"></span><h3>LIB_SUFFIX<a class="headerlink" href="#lib-suffix" title="Permalink to this headline">¶</a></h3>
 <blockquote>
 <p>This defines the subdirectory of <tt class="docutils literal"><span class="pre">CMAKE_INSTALL_PREFIX</span></tt> to which
-libraries will be installed.  The default is <tt class="docutils literal"><span class="pre">lib</span></tt>. For example,
+libraries will be installed.  It is empty by default. For example,
 if I&#8217;m on 64-bit fedora, I want the libs installed to
 <tt class="docutils literal"><span class="pre">/usr/lib64</span></tt>, I&#8217;d use:</p>
 <div class="highlight-python"><pre>cmake ../src -DCMAKE_INSTALL_PREFIX=/usr -DLIB_SUFFIX=64</pre>
 </div>
 </blockquote>
-<p>See <a class="reference external" href="external_dependencies.html#external-dependencies"><em>External Dependencies</em></a> for information about configuring
-things like python.</p>
 </div>
+<div class="section" id="install-versioned">
+<span id="index-506"></span><span id="id10"></span><h3>INSTALL_VERSIONED<a class="headerlink" href="#install-versioned" title="Permalink to this headline">¶</a></h3>
+<p>This variable controls whether boost versions will be mangled into the
+names of <strong>directories</strong> into which boost is installed.  This is
+different than <a class="reference internal" href="#build-versioned"><em>BUILD_VERSIONED</em></a>.  This option has effect only
+when run with an empty cache: they will be set as explained below the
+first time CMake is run and thereafter not modified (so that they are
+customizable by users).</p>
+<div class="section" id="example">
+<h4>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h4>
+<p>For boost version 1.41.0, with this option ON, the installation tree
+is:</p>
+<div class="highlight-python"><pre>$CMAKE_INSTALL_PREFIX/
+  include/
+    boost-1.41.0/
+      boost/
+        version.hpp
+        ...
+  lib/
+    boost-1.41.0/
+      libboost_signals-mt-d.so
+      ...
+  bin/
+    boost-1.41.0/
+      wave
+      quickbook
+      ...</pre>
+</div>
+<p>and without it,</p>
+<div class="highlight-python"><pre>$CMAKE_INSTALL_PREFIX/
+  include/
+    boost/
+      version.hpp
+      ...
+  lib/
+    boost/
+      libboost_signals-mt-d.so
+      ...
+  bin/
+    wave
+    quickbook
+    ...</pre>
+</div>
+<p><strong>Note:</strong> <tt class="docutils literal"><span class="pre">lib/</span></tt> above will contain <a class="reference internal" href="#lib-suffix"><em>LIB_SUFFIX</em></a> if set.</p>
+<p>The relative lib/bin/executable pathnames can be controlled
+individually with the following variables:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="35%" />
+<col width="24%" />
+<col width="41%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">Variable</th>
+<th class="head">Default Unversioned</th>
+<th class="head">Default Versioned</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td>BOOST_INCLUDE_INSTALL_DIR</td>
+<td>include/</td>
+<td>include/boost-X.YY.ZZ</td>
+</tr>
+<tr><td>BOOST_LIB_INSTALL_DIR</td>
+<td>lib${LIB_SUFFIX}</td>
+<td>lib${LIB_SUFFIX}/boost-X.YY.ZZ</td>
+</tr>
+<tr><td>BOOST_EXE_INSTALL_DIR</td>
+<td>bin/</td>
+<td>bin/boost-X.YY.ZZ</td>
+</tr>
+</tbody>
+</table>
+<p>The versioned bin/ path is kind of ugly, see <a class="reference internal" href="#build-tools"><em>BUILD_TOOLS</em></a> to
+disable the build of these utilities.</p>
+</div>
+</div>
+</div>
+<div class="section" id="system-dependencies">
+<h2>System Dependencies<a class="headerlink" href="#system-dependencies" title="Permalink to this headline">¶</a></h2>
+<p>See <a class="reference external" href="external_dependencies.html#external-dependencies"><em>External Dependencies</em></a> for information about configuring
+detection of system packages like python and bzip2.</p>
 </div>
 </div>
 
@@ -363,7 +468,7 @@ things like python.</p>
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version 906201deec0a5cab3ba14af49cde72fbcf23b147, Wed, 28 Oct 2009.
+      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version f108eb37e2a7010746ce2c8da08f07fc2a868250, Thu, 29 Oct 2009.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

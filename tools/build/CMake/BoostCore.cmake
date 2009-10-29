@@ -711,18 +711,19 @@ macro(boost_library_variant LIBNAME)
         COMPILE_FLAGS "${THIS_VARIANT_COMPILE_FLAGS}"
         LINK_FLAGS "${THIS_VARIANT_LINK_FLAGS}"
         LABELS "${BOOST_PROJECT_NAME}"
-	VERSION "${BOOST_VERSION}"
-	SOVERSION "${BOOST_VERSION_MAJOR}.${BOOST_VERSION_MINOR}"
         )
 
-    endif (THIS_LIB_IS_STATIC)
+      if (BUILD_SOVERSIONED)
+	set_target_properties(${VARIANT_LIBNAME}
+	  PROPERTIES
+	  VERSION "${BOOST_VERSION}"
+	  SOVERSION "${BOOST_VERSION_MAJOR}.${BOOST_VERSION_MINOR}"
+	  )
+      endif()
+    endif ()
     
     # The basic LIBNAME target depends on each of the variants
     add_dependencies(${LIBNAME} ${VARIANT_LIBNAME})
-
-    export(TARGETS ${VARIANT_LIBNAME} 
-      APPEND
-      FILE ${BOOST_BUILD_EXPORTS_FILE})
 
     # Link against whatever libraries this library depends on
     target_link_libraries(${VARIANT_LIBNAME} ${THIS_VARIANT_LINK_LIBS})
@@ -731,6 +732,10 @@ macro(boost_library_variant LIBNAME)
       # message(STATUS "linking ${d}")
       target_link_libraries(${VARIANT_LIBNAME} "${d}${VARIANT_TARGET_NAME}")
     endforeach()
+
+    export(TARGETS ${VARIANT_LIBNAME} 
+      APPEND
+      FILE ${BOOST_BUILD_EXPORTS_FILE})
 
     if(NOT THIS_LIB_NO_INSTALL)
       # Setup installation properties
@@ -745,7 +750,7 @@ macro(boost_library_variant LIBNAME)
       #
       install(TARGETS ${VARIANT_LIBNAME} 
 	EXPORT Boost 
-	DESTINATION lib${LIB_SUFFIX} 
+	DESTINATION ${BOOST_LIB_INSTALL_DIR}
 	COMPONENT Boost) #${LIB_COMPONENT})
 
       # set_property( 
@@ -1454,7 +1459,7 @@ macro(boost_add_executable EXENAME)
 
     # Install the executable, if not suppressed
     if (NOT THIS_EXE_NO_INSTALL)
-      install(TARGETS ${THIS_EXE_NAME} DESTINATION bin)
+      install(TARGETS ${THIS_EXE_NAME} DESTINATION ${BOOST_EXE_INSTALL_DIR})
     endif (NOT THIS_EXE_NO_INSTALL)
   endif ()
 endmacro(boost_add_executable)

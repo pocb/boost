@@ -1,8 +1,6 @@
-.. index:: variants
-.. index:: features
-
-.. _VARIANTS:
-.. _features:
+.. index:: targets, exported
+.. index:: uninstalled tree, building against
+.. _exported_targets:
 
 Developing with Boost.CMake
 ===========================
@@ -47,7 +45,7 @@ need do only two things to build your code against the build tree.  I
 have a program that builds from one file, ``main.cpp``.  My ``CMakeLists.txt``::
 
    include_directories("/home/troy/boost-1.41.0/src")
-   include("/home/troy/boost-1.41.0/build/Boost.cmake")
+   include("/home/troy/boost-1.41.0/build/lib/Boost.cmake")
 
    add_executable(my_program main.cpp)
    target_link_libraries(my_program boost_thread-mt-shared-debug)
