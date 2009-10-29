@@ -10,9 +10,7 @@
 
 # return a list of directories that we should add_subdirectory()
 macro(BOOST_COLLECT_SUBPROJECT_DIRECTORY_NAMES dirname varname filename)
-  message(">>> ${dirname}")
   file(GLOB globbed RELATIVE "${dirname}" "${dirname}/*/${filename}")
-  message(">>> ${BOOST_LIBRARY_CMAKE_FILES}")
   foreach(file ${globbed})
     get_filename_component(dir ${file} PATH)
     set(${varname} ${${varname}} ${dir})
