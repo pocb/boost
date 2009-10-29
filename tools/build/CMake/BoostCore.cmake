@@ -717,7 +717,6 @@ macro(boost_library_variant LIBNAME)
 	set_target_properties(${VARIANT_LIBNAME}
 	  PROPERTIES
 	  VERSION "${BOOST_VERSION}"
-	  SOVERSION "${BOOST_VERSION_MAJOR}.${BOOST_VERSION_MINOR}"
 	  )
       endif()
     endif ()
