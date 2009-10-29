@@ -251,3 +251,16 @@ macro(boost_report_pretty PRETTYNAME VARNAME)
     message(STATUS "${PRETTYNAME}${varpadding} = ${${VARNAME}}")
 endmacro()
 
+#
+#  assert that ARG is actually a library target
+#
+macro(assert_is_lib_target ARG)
+  if (NOT ("${ARG}" STREQUAL ""))
+    # message(STATUS ">>> ${ARG}")
+    get_target_property(deptype ${ARG} TYPE)
+    if(NOT deptype MATCHES ".*_LIBRARY$")
+      set(DEPENDENCY_OKAY FALSE)
+      list(APPEND DEPENDENCY_FAILURES ${ARG})
+    endif()
+  endif()
+endmacro()
