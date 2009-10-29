@@ -25,10 +25,5 @@ boost_add_executable( bcp
   scan_licence.cpp 
   output_licence_info.cpp
 
-  DEPENDS boost_system boost_filesystem boost_prg_exec_monitor boost_regex
-
-  SHARED
-  MULTI_THREADED
-  DEBUG
-
+  DEPENDS boost_system boost_filesystem boost_prg_exec_monitor boost_regex-mt-shared
   )

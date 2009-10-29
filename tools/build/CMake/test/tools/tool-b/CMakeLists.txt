@@ -28,8 +28,8 @@ foreach(shared_or_static SHARED STATIC)
 	PROPERTIES
 	PASS_REGULAR_EXPRESSION "${testname}")
 
-    endforeach()    
-  endforeach()    
+    endforeach() 
+  endforeach() 
 endforeach()
 
 
