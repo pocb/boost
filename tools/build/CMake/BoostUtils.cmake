@@ -233,7 +233,7 @@ endmacro()
 #
 macro(boost_report_value NAME)
     string(LENGTH "${NAME}" varlen)
-    math(EXPR padding_len 22-${varlen})
+    math(EXPR padding_len 30-${varlen})
     string(SUBSTRING "                                      " 
       0 ${padding_len} varpadding)
     message(STATUS "${NAME}${varpadding} = ${${NAME}}")
@@ -245,7 +245,7 @@ endmacro()
 #
 macro(boost_report_pretty PRETTYNAME VARNAME)
     string(LENGTH "${PRETTYNAME}" varlen)
-    math(EXPR padding_len 22-${varlen})
+    math(EXPR padding_len 30-${varlen})
     string(SUBSTRING "                                      " 
       0 ${padding_len} varpadding)
     message(STATUS "${PRETTYNAME}${varpadding} = ${${VARNAME}}")

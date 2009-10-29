@@ -107,6 +107,16 @@ this, **delete the cache file**.  On windows, there is a *Delete
 Cache* option in the CMake gui's *File* menu.  On unix you can simply
 ``rm CMakeCache.txt``.
 
+.. index:: CMAKE_BINARY_DIR
+.. _CMAKE_BINARY_DIR:
+
+CMAKE_BINARY_DIR
+----------------
+
+This variable is set by cmake and corresponds to the toplevel of your
+``build/`` directory.
+
+
 .. _useful_options:
 
 A few useful options
@@ -117,6 +127,9 @@ CMAKE_OSX_ARCHITECTURES
 
   *Mac OS X users*: to build universal binaries, set this to
    ``ppc;i386``.
+
+.. index:: BUILD_VERSIONED
+.. _build_versioned:
 
 BUILD_VERSIONED
 ^^^^^^^^^^^^^^^
@@ -146,19 +159,8 @@ than unix users.
    	  ``BUILD_VERSIONED`` affects mangling of compiler and boost
    	  version only.
 
-In addition, with ``BUILD_VERSIONED`` on, the install destination for
-header files will contain a subdirectory containing ``boost-VERSION``.
-For example, on boost 1.40.0 with ``BUILD_VERSIONED`` ON, and a
-default ``CMAKE_INSTALL_PREFIX`` of ``/usr/local``, headers are
-installed to::
-
-  /usr/local/include/boost-1_40/boost/...
-
-and with ``BUILD_VERSIONED`` set to ``OFF``, the ``boost-1_40``
-segment is omitted::
-
-  /usr/local/include/boost/...
-
+``BUILD_VERSIONED`` does not affect the locations to which files are
+installed.  For this see :ref:`INSTALL_VERSIONED`. 
 
 .. index:: BUILD_PROJECTS
 .. _BUILD_PROJECTS:
@@ -262,6 +264,37 @@ CMAKE_CXX_COMPILER
   to have cmake generate a set of nmake or project files by choosing
   an appropriate generator.
 
+.. index:: BUILD_SOVERSIONED
+.. index:: soversion
+.. index:: soname
+.. _build_with_soversion:
+
+BUILD_SOVERSIONED
+^^^^^^^^^^^^^^^^^
+
+Enables the setting of SOVERSION in built libraries.  If
+this is on::
+
+  % ls -l lib/*signal*
+  lrwxrwxrwx 1 troy troy      29 Oct 29 02:22 lib/libboost_signals-mt-d.so -> libboost_signals-mt-d.so.1.41*
+  lrwxrwxrwx 1 troy troy      31 Oct 29 02:22 lib/libboost_signals-mt-d.so.1.41 -> libboost_signals-mt-d.so.1.41.0*
+  -rwxr-xr-x 1 troy troy  835522 Oct 29 02:22 lib/libboost_signals-mt-d.so.1.41.0*
+  lrwxrwxrwx 1 troy troy      27 Oct 29 02:22 lib/libboost_signals-mt.so -> libboost_signals-mt.so.1.41*
+  lrwxrwxrwx 1 troy troy      29 Oct 29 02:22 lib/libboost_signals-mt.so.1.41 -> libboost_signals-mt.so.1.41.0*
+  -rwxr-xr-x 1 troy troy  121886 Oct 29 02:22 lib/libboost_signals-mt.so.1.41.0*
+
+  % readelf -a lib/libboost_signals-mt-d.so | grep -i SONAME
+   0x000000000000000e (SONAME)             Library soname: [libboost_signals-mt-d.so.1.41]
+    
+and if off::
+
+  % ls -l lib/*signals*
+  -rwxr-xr-x 1 troy troy  835522 Oct 29 15:10 lib/libboost_signals-mt-d.so*
+  -rwxr-xr-x 1 troy troy  121886 Oct 29 15:10 lib/libboost_signals-mt.so*
+  
+(Unix only, ``ON`` by default)
+
+
 Options for customizing installation
 ------------------------------------
 
@@ -276,21 +309,91 @@ CMAKE_INSTALL_PREFIX
   This is a standard cmake option that sets the path to which boost
   will be installed.
 
+.. index:: LIB_SUFFIX
 .. _lib_suffix:
 
 LIB_SUFFIX
 ^^^^^^^^^^
 
   This defines the subdirectory of ``CMAKE_INSTALL_PREFIX`` to which
-  libraries will be installed.  The default is ``lib``. For example,
+  libraries will be installed.  It is empty by default. For example,
   if I'm on 64-bit fedora, I want the libs installed to
   ``/usr/lib64``, I'd use::
 
     cmake ../src -DCMAKE_INSTALL_PREFIX=/usr -DLIB_SUFFIX=64
 
+.. index:: INSTALL_VERSIONED
+.. _install_versioned:
+
+INSTALL_VERSIONED
+^^^^^^^^^^^^^^^^^
+
+This variable controls whether boost versions will be mangled into the
+names of **directories** into which boost is installed.  This is
+different than :ref:`BUILD_VERSIONED`.  This option has effect only
+when run with an empty cache: they will be set as explained below the
+first time CMake is run and thereafter not modified (so that they are
+customizable by users).
+
+Example
+"""""""
+
+For boost version 1.41.0, with this option ON, the installation tree
+is::
+
+  $CMAKE_INSTALL_PREFIX/
+    include/
+      boost-1.41.0/
+        boost/
+          version.hpp 
+          ...
+    lib/    
+      boost-1.41.0/
+        libboost_signals-mt-d.so
+        ...
+    bin/
+      boost-1.41.0/
+        wave
+        quickbook 
+        ...
+
+and without it, ::
+
+  $CMAKE_INSTALL_PREFIX/
+    include/
+      boost/
+        version.hpp 
+        ...
+    lib/
+      boost/
+        libboost_signals-mt-d.so
+        ...
+    bin/
+      wave
+      quickbook 
+      ...
+   
+**Note:** ``lib/`` above will contain :ref:`LIB_SUFFIX` if set.
+
+The relative lib/bin/executable pathnames can be controlled
+individually with the following variables:
+
+============================  =================== ================================
+Variable                      Default Unversioned Default Versioned
+============================  =================== ================================
+BOOST_INCLUDE_INSTALL_DIR     include/            include/boost-X.YY.ZZ
+BOOST_LIB_INSTALL_DIR         lib${LIB_SUFFIX}    lib${LIB_SUFFIX}/boost-X.YY.ZZ
+BOOST_EXE_INSTALL_DIR         bin/                bin/boost-X.YY.ZZ
+============================  =================== ================================
+
+The versioned bin/ path is kind of ugly, see :ref:`BUILD_TOOLS` to
+disable the build of these utilities.
+
+System Dependencies
+-------------------
 
 See :ref:`external_dependencies` for information about configuring
-things like python.
+detection of system packages like python and bzip2.
 
 
 

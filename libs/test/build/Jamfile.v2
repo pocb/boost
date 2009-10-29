@@ -69,7 +69,7 @@ UTF_SOURCES =
   ;
 
 lib boost_prg_exec_monitor 
-  : # sources
+  : # sourcess
     $(PRG_EXEC_MON_SOURCES).cpp 
   : # requirements
   : # default build
