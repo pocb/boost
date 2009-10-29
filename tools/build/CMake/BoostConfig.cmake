@@ -229,11 +229,21 @@ if(LIB_SUFFIX)
 endif()
 
 #
-#  Only modify these if you're testing the cmake built itself
+#  Only modify these if you're testing the cmake build itself
 #
-set(BOOST_LIBS_SOURCE_DIR "${CMAKE_SOURCE_DIR}/libs" CACHE INTERNAL
+if(BOOST_CMAKE_SELFTEST)
+  message(STATUS "***")
+  message(STATUS "*** SELFTEST ENABLED")
+  message(STATUS "***")
+  set(root "${CMAKE_SOURCE_DIR}/tools/build/CMake/test")
+  set(BOOST_CMAKE_SELFTEST_ROOT ${root})
+else()
+  set(root "${CMAKE_SOURCE_DIR}")
+endif()
+
+set(BOOST_LIBS_PARENT_DIR "${root}/libs" CACHE INTERNAL
   "Directory to glob tools from...  only change to test the build system itself")
 
-set(BOOST_TOOLS_SOURCE_DIR "${CMAKE_SOURCE_DIR}/tools" CACHE INTERNAL
+set(BOOST_TOOLS_PARENT_DIR "${root}/tools" CACHE INTERNAL
   "Directory to glob tools from...  only change to test the build system itself")
 

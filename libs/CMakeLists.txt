@@ -8,29 +8,27 @@
 # it. This avoids the need to manually list which libraries in Boost
 # have CMakeLists.txt files.
 
-set(BOOST_LIBS_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}" CACHE INTERNAL
-  "Directory to glob projects from...  only change to test the build system itself")
-
 # return a list of directories that we should add_subdirectory()
 macro(BOOST_COLLECT_SUBPROJECT_DIRECTORY_NAMES dirname varname filename)
-  file(GLOB BOOST_LIBRARY_CMAKE_FILES 
-    RELATIVE "${dirname}" "*/${filename}")
-  foreach(BOOST_LIB_CMAKE_FILE ${BOOST_LIBRARY_CMAKE_FILES})
-    get_filename_component(BOOST_LIB_DIR ${BOOST_LIB_CMAKE_FILE} PATH)
-    set(${varname} ${${varname}} ${BOOST_LIB_DIR})
-  endforeach(BOOST_LIB_CMAKE_FILE ${BOOST_LIBRARY_CMAKE_FILES})
-endmacro(BOOST_COLLECT_SUBPROJECT_DIRECTORY_NAMES varname)
+  message(">>> ${dirname}")
+  file(GLOB globbed RELATIVE "${dirname}" "${dirname}/*/${filename}")
+  message(">>> ${BOOST_LIBRARY_CMAKE_FILES}")
+  foreach(file ${globbed})
+    get_filename_component(dir ${file} PATH)
+    set(${varname} ${${varname}} ${dir})
+  endforeach()
+endmacro()
 
 # Find all of the subdirectories with .cmake files in them. These are
 # the libraries with dependencies.
-boost_collect_subproject_directory_names(${BOOST_LIBS_SOURCE_DIR} BOOST_MODULE_DIRS "module.cmake")
+boost_collect_subproject_directory_names(${BOOST_LIBS_PARENT_DIR} BOOST_MODULE_DIRS "module.cmake")
 foreach(subdir ${BOOST_MODULE_DIRS})
-  include("${BOOST_LIBS_SOURCE_DIR}/${subdir}/module.cmake")
+  include("${BOOST_LIBS_PARENT_DIR}/${subdir}/module.cmake")
 endforeach(subdir)
 
 # Find all of the subdirectories with CMakeLists.txt files in
 # them. This contains all of the Boost libraries.
-boost_collect_subproject_directory_names(${BOOST_LIBS_SOURCE_DIR} BOOST_SUBPROJECT_DIRS "CMakeLists.txt")
+boost_collect_subproject_directory_names(${BOOST_LIBS_PARENT_DIR} BOOST_SUBPROJECT_DIRS "CMakeLists.txt")
 
 # Add all of the Boost projects in reverse topological order, so that
 # a library's dependencies show up before the library itself.
@@ -60,7 +58,7 @@ foreach(subdir ${BOOST_SUBPROJECT_DIRS})
   list(FIND BUILD_PROJECTS ${subdir} THIS_BUILD_PROJECTS_INDEX)
   if ((THIS_BUILD_PROJECTS_INDEX GREATER -1) OR (BUILD_PROJECTS STREQUAL "ALL"))
     message(STATUS "+ ${subdir}")
-    add_subdirectory(${BOOST_LIBS_SOURCE_DIR}/${subdir})
+    add_subdirectory(${BOOST_LIBS_PARENT_DIR}/${subdir} ${CMAKE_BINARY_DIR}/libs/${subdir})
   endif()
 endforeach()
 

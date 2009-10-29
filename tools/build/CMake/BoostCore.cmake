@@ -1443,6 +1443,7 @@ macro(boost_add_executable EXENAME)
       endforeach(LIB ${THIS_EXE_DEBUG_ACTUAL_DEPENDS} ${THIS_EXE_DEBUG_LINK_LIBS})     
 
     else (THIS_EXE_DEBUG_AND_RELEASE)
+      message(">>>>> ${THIS_EXE_ACTUAL_DEPENDS}")
       foreach(lib ${THIS_EXE_ACTUAL_DEPENDS})
 	assert_is_lib_target(${lib})
       endforeach()
