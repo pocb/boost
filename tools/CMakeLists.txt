@@ -4,11 +4,11 @@
 # Distributed under the Boost Software License, Version 1.0.
 # See http://www.boost.org/LICENSE_1_0.txt
 #
-# return a list of directories that we should add_subdirectory()
+
 macro(boost_collect_lib_dependencies varname filename)
   #message(STATUS "boost_collect_lib_dependencies.... ${Boost_SOURCE_DIR}/libs")
   file(GLOB BOOST_LIBRARY_CMAKE_FILES 
-       RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${Boost_SOURCE_DIR}/libs/*/${filename}")
+       RELATIVE "${CMAKE_LIBS_SOURCE_DIR}" "${BOOST_LIBS_SOURCE_DIR}/*/${filename}")
   foreach(BOOST_LIB_CMAKE_FILE ${BOOST_LIBRARY_CMAKE_FILES})
     #message(STATUS "-- BOOST_LIB_CMAKE_FILE: ${BOOST_LIB_CMAKE_FILE}")
     get_filename_component(BOOST_LIB_DIR ${BOOST_LIB_CMAKE_FILE} PATH)
@@ -21,7 +21,8 @@ endmacro(boost_collect_lib_dependencies varname)
 # the libraries with dependencies.
 boost_collect_lib_dependencies(BOOST_MODULE_DIRS "module.cmake")
 foreach(subdir ${BOOST_MODULE_DIRS})
-  include("${Boost_SOURCE_DIR}/libs/${subdir}/module.cmake")
+  #message("BOOST_MODULE_DIRS=${BOOST_MODULE_DIRS}")
+  include("${subdir}/module.cmake")
 endforeach(subdir)
 
 
@@ -95,16 +96,21 @@ else()
 
   message(STATUS "Reading tools...")
   message(STATUS "")
+
+  file(GLOB BOOST_TOOL_CMAKE_FILES 
+       RELATIVE "${CMAKE_TOOLS_SOURCE_DIR}" "${BOOST_TOOLS_SOURCE_DIR}/*/CMakeLists.txt")
+  foreach(BOOST_TOOL_CMAKE_FILE ${BOOST_TOOL_CMAKE_FILES})
+    get_filename_component(BOOST_TOOL_DIR ${BOOST_TOOL_CMAKE_FILE} PATH)
+    set(tooldirs ${tooldirs} ${BOOST_TOOL_DIR})
+  endforeach()
+
   foreach(tooldir 
-
-      quickbook
-      wave
-      bcp
-      inspect)
-
+      ${tooldirs}
+      )
+    get_filename_component(tooldirname ${tooldir} NAME)
     list(FIND BUILD_TOOLS ${tooldir} THIS_BUILD_TOOLS_INDEX)
     if ((THIS_BUILD_TOOLS_INDEX GREATER -1) OR (BUILD_TOOLS STREQUAL "ALL"))
-      message(STATUS "+ ${tooldir}")
+      message(STATUS "+ ${tooldirname}")
       add_subdirectory(${tooldir})
     endif()
 

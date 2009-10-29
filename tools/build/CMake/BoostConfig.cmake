@@ -228,3 +228,12 @@ if(LIB_SUFFIX)
   boost_report_pretty("Lib suffix" LIB_SUFFIX)
 endif()
 
+#
+#  Only modify these if you're testing the cmake built itself
+#
+set(BOOST_LIBS_SOURCE_DIR "${CMAKE_SOURCE_DIR}/libs" CACHE INTERNAL
+  "Directory to glob tools from...  only change to test the build system itself")
+
+set(BOOST_TOOLS_SOURCE_DIR "${CMAKE_SOURCE_DIR}/tools" CACHE INTERNAL
+  "Directory to glob tools from...  only change to test the build system itself")
+
