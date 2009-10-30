@@ -1,0 +1,258 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Developing with Boost.CMake &mdash; Boost.CMake 1.40.0.cmake5</title>
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.40.0.cmake5',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Boost.CMake 1.40.0.cmake5" href="index.html" />
+    <link rel="next" title="Testing" href="testing.html" />
+    <link rel="prev" title="Build Variants and Features" href="build_variants.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="testing.html" title="Testing"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="build_variants.html" title="Build Variants and Features"
+             accesskey="P">previous</a> |</li>
+    <li><a href="http://www.boost.org/">Boost</a> &raquo;</li>
+    
+        <li><a href="index.html">Boost.CMake 1.40.0.cmake5</a> &raquo;</li>
+ 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/boost-small.png" alt="Logo"/>
+            </a></p>
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">Developing with Boost.CMake</a><ul>
+<li><a class="reference external" href="#with-an-uninstalled-build">With an uninstalled build</a><ul>
+<li><a class="reference external" href="#example">Example</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#with-an-installed-boost">With an installed boost</a><ul>
+<li><a class="reference external" href="#the-easy-way">The Easy Way</a></li>
+<li><a class="reference external" href="#the-somewhat-harder-way">The Somewhat harder way</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="build_variants.html"
+                                  title="previous chapter">Build Variants and Features</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="testing.html"
+                                  title="next chapter">Testing</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/exported_targets.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <span class="target" id="index-872"></span><div class="section" id="developing-with-boost-cmake">
+<span id="exported-targets"></span><span id="index-873"></span><h1>Developing with Boost.CMake<a class="headerlink" href="#developing-with-boost-cmake" title="Permalink to this headline">¶</a></h1>
+<p>Boost.CMake <em>exports</em> its targets, making developing independent
+projects against an installed boost, or simply against a build tree
+sitting on disk.  There are a variety of ways to use these to ease
+configuration of boost in your external project.</p>
+<p>You only need to do three things:</p>
+<ol class="arabic">
+<li><p class="first">Add the appropriate include directory.  This is either
+<tt class="docutils literal"><span class="pre">${</span></tt><a class="reference external" href="build_configuration.html#cmake-install-prefix"><em>CMAKE_INSTALL_PREFIX</em></a><tt class="docutils literal"><span class="pre">}/include</span></tt>, if installed, or the
+toplevel of the boost source directory if not.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">include</span></tt> the generated <tt class="docutils literal"><span class="pre">Boost.cmake</span></tt> file containing the
+exported targets.  In an installation, this file is in directory
+<tt class="docutils literal"><span class="pre">${</span></tt><a class="reference external" href="build_configuration.html#cmake-install-prefix"><em>CMAKE_INSTALL_PREFIX</em></a><tt class="docutils literal"><span class="pre">}/lib/cmake/Boost.cmake</span></tt> <a class="footnote-reference" href="#libsuffix" id="id1">[1]</a>, and
+in a not-installed build tree it is located in
+<tt class="docutils literal"><span class="pre">${</span></tt><a class="reference external" href="build_configuration.html#cmake-binary-dir"><em>CMAKE_BINARY_DIR</em></a><tt class="docutils literal"><span class="pre">}/lib/cmake/Boost.cmake</span></tt></p>
+</li>
+<li><p class="first">Tell cmake about your link dependencies with
+<tt class="docutils literal"><span class="pre">target_link_libraries</span></tt>.  Note that you use the <strong>names of the
+cmake targets</strong>, not the shorter names that the libraries have on
+disk.   <tt class="docutils literal"><span class="pre">make</span> <span class="pre">help</span></tt> shows a list:</p>
+<div class="highlight-python"><pre>% make help | grep signals
+... boost_signals
+... boost_signals-mt-shared
+... boost_signals-mt-shared-debug
+... boost_signals-mt-static
+... boost_signals-mt-static-debug</pre>
+</div>
+<p>See also <em class="xref">fixme</em> for details on the naming conventions.</p>
+</li>
+</ol>
+<div class="section" id="with-an-uninstalled-build">
+<span id="uninstalled"></span><span id="index-874"></span><h2>With an uninstalled build<a class="headerlink" href="#with-an-uninstalled-build" title="Permalink to this headline">¶</a></h2>
+<p>You only need to do three things:</p>
+<ol class="arabic">
+<li><p class="first">Add the appropriate include directory.  This is either
+<tt class="docutils literal"><span class="pre">${</span></tt><a class="reference external" href="build_configuration.html#cmake-install-prefix"><em>CMAKE_INSTALL_PREFIX</em></a><tt class="docutils literal"><span class="pre">}/include</span></tt>, if installed, or the
+toplevel of the boost source directory if not.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">include</span></tt> the generated <tt class="docutils literal"><span class="pre">Boost.cmake</span></tt> from the build tree
+containing the exported targets.  I is located in
+<tt class="docutils literal"><span class="pre">${</span></tt><a class="reference external" href="build_configuration.html#cmake-binary-dir"><em>CMAKE_BINARY_DIR</em></a><tt class="docutils literal"><span class="pre">}/lib/cmake/Boost.cmake</span></tt></p>
+</li>
+<li><p class="first">Tell cmake about your link dependencies with
+<tt class="docutils literal"><span class="pre">target_link_libraries</span></tt>.  Note that you use the <strong>names of the
+cmake targets</strong>, not the shorter names that the libraries have on
+disk.   <tt class="docutils literal"><span class="pre">make</span> <span class="pre">help</span></tt> shows a list:</p>
+<div class="highlight-python"><pre>% make help | grep signals
+... boost_signals
+... boost_signals-mt-shared
+... boost_signals-mt-shared-debug
+... boost_signals-mt-static
+... boost_signals-mt-static-debug</pre>
+</div>
+<p>See also <em class="xref">fixme</em> for details on the naming conventions.</p>
+</li>
+</ol>
+<p>Since these are exported targets, CMake will add appropriate <em>rpaths</em>
+as necessary; fiddling with <tt class="docutils literal"><span class="pre">LD_LIBRARY_PATH</span></tt> should not be
+necessary.</p>
+<div class="section" id="example">
+<h3>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h3>
+<p>There is an unpacked boost in <tt class="docutils literal"><span class="pre">/home/troy/boost-1.41.0/src</span></tt> and
+built boost in directory <tt class="docutils literal"><span class="pre">/home/troy/boost/1.41.0/build</span></tt>. I have a
+program that builds from one file, <tt class="docutils literal"><span class="pre">main.cpp</span></tt> and uses boost
+threads.  My <tt class="docutils literal"><span class="pre">CMakeLists.txt</span></tt> looks like this:</p>
+<div class="highlight-python"><pre>include_directories("/home/troy/boost-1.41.0/src")
+include("/home/troy/boost-1.41.0/build/lib/cmake/Boost.cmake")
+
+add_executable(my_program main.cpp)
+target_link_libraries(my_program boost_thread-mt-shared-debug)</pre>
+</div>
+<p>When I build, I see
+(wrapped, and some output replaced with ... for brevity):</p>
+<div class="highlight-python"><pre>% make VERBOSE=1
+...
+[100%] Building CXX object CMakeFiles/main.dir/main.cpp.o
+/usr/bin/c++ -I/home/troy/boost-1.41.0/src -o CMakeFiles/main.dir/main.cpp.o -c /home/troy/myproject/main.cpp
+...
+linking CXX executable main
+/usr/bin/c++ -fPIC CMakeFiles/main.dir/main.cpp.o -o main -rdynamic /home/troy/boost-1.41.0/build/lib/libboost_thread-mt-d.so.1.41.0 -lpthread -lrt -Wl,-rpath,/home/troy/boost-1.41.0/build/lib
+...
+[100%] Built target main</pre>
+</div>
+</div>
+</div>
+<div class="section" id="with-an-installed-boost">
+<h2>With an installed boost<a class="headerlink" href="#with-an-installed-boost" title="Permalink to this headline">¶</a></h2>
+<p>There is an easy way, and a hard way, depending on your your boost was
+installed.</p>
+<div class="section" id="the-easy-way">
+<h3>The Easy Way<a class="headerlink" href="#the-easy-way" title="Permalink to this headline">¶</a></h3>
+<p>If your boost was installed with
+<a class="reference external" href="build_configuration.html#boost-install-findboost-cmake-drivers"><em>BOOST_INSTALL_FINDBOOST_CMAKE_DRIVERS</em></a> on and an appropriate
+<a class="reference external" href="build_configuration.html#boost-cmake-infrastructure-dir"><em>BOOST_CMAKE_INFRASTRUCTURE_DIR</em></a>, cmake&#8217;s <tt class="docutils literal"><span class="pre">find_package</span></tt> will
+find without setting any particular path:</p>
+<div class="highlight-python"><pre>set(Boost_USE_MULTITHREADED ON)
+find_package(Boost 1.41.0 COMPONENTS thread NO_MODULE)
+
+include(${Boost_INCLUDE_DIR})
+add_executable(main main.cpp)
+target_link_libraries(main ${Boost_LIBRARIES})</pre>
+</div>
+<p class="rubric">Note</p>
+<p>the <tt class="docutils literal"><span class="pre">NO_MODULE</span></tt> is required if your cmake is older than (FIXME,
+currently required with all versions, modification to the
+FindBoost.cmake distributed with cmake itself is required).</p>
+<p>Here, having installed to <tt class="docutils literal"><span class="pre">/usr/local/boost-1.41.0</span></tt>, I see:</p>
+<div class="highlight-python"><pre>% make VERBOSE=1
+...
+[100%] Building CXX object CMakeFiles/main.dir/main.cpp.o
+/usr/bin/c++    -I/usr/local/boost-1.41.0/include   -o CMakeFiles/main.dir/main.cpp.o -c /home/troy/Projects/boost/cmake/proj/main.cpp
+...
+Linking CXX executable main
+/usr/bin/c++     -fPIC CMakeFiles/main.dir/main.cpp.o  -o main -rdynamic /usr/local/boost-1.41.0/lib/libboost_thread-mt-d.so.1.41.0 -lpthread -lrt -Wl,-rpath,/usr/local/boost-1.41.0/lib
+...
+[100%] Built target main</pre>
+</div>
+<p>See also the documentation for <tt class="docutils literal"><span class="pre">FindBoost.cmake</span></tt>.</p>
+</div>
+<div class="section" id="the-somewhat-harder-way">
+<h3>The Somewhat harder way<a class="headerlink" href="#the-somewhat-harder-way" title="Permalink to this headline">¶</a></h3>
+<p>If your boost installation does <em>not</em> come with the file installed
+when <a class="reference external" href="build_configuration.html#boost-install-findboost-cmake-drivers"><em>BOOST_INSTALL_FINDBOOST_CMAKE_DRIVERS</em></a>, you will need to
+specify the path to the Boost.cmake file installed in
+<a class="reference external" href="build_configuration.html#install-paths"><em>BOOST_LIB_INSTALL_DIR</em></a> (try
+<tt class="docutils literal"><span class="pre">$CMAKE_INSTALL_PREFIX/lib/boost/cmake/Boost.cmake</span></tt></p>
+<p class="rubric">Footnotes</p>
+<table class="docutils footnote" frame="void" id="libsuffix" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>If your distribution specifies a <a class="reference external" href="build_configuration.html#lib-suffix"><em>LIB_SUFFIX</em></a>
+(e.g. if it installs libraries to
+<tt class="docutils literal"><span class="pre">${</span></tt><a class="reference external" href="build_configuration.html#cmake-install-prefix"><em>CMAKE_INSTALL_PREFIX</em></a><tt class="docutils literal"><span class="pre">/lib64</span></tt>, you
+will find <cite>Boost.cmake</cite> there.  If the installation is
+&#8216;versioned&#8217;, the <tt class="docutils literal"><span class="pre">Boost.cmake</span></tt> file may be in a
+versioned subdirectory of lib, e.g. <tt class="docutils literal"><span class="pre">lib/boost-1.41.0</span></tt>.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="testing.html" title="Testing"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="build_variants.html" title="Build Variants and Features"
+             >previous</a> |</li>
+    <li><a href="http://www.boost.org/">Boost</a> &raquo;</li>
+    
+        <li><a href="index.html">Boost.CMake 1.40.0.cmake5</a> &raquo;</li>
+ 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version 31c30425cf29d2ae048ffb07c8284cee1e095b7a, Mon, 26 Oct 2009.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
+    </div>
+  </body>
+</html>

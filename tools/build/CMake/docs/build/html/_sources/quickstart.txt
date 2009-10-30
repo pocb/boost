@@ -28,7 +28,7 @@ Check out the code
 ------------------
 
 The code associated with these docs is available at
-http://gitorious.org/boost/cmake with tag |version|.  You can clone
+http://gitorious.org/boost/cmake with tag |release|.  You can clone
 the repository locally and then check out the tag.  Tarballs and
 zipfiles corresponding to these tags are avaiable at
 http://sodium.resophonic.com/boost-cmake.

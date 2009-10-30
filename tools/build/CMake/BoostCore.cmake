@@ -85,7 +85,9 @@ macro(boost_library_project LIBNAME)
   string(TOUPPER "${LIBNAME}" ULIBNAME)
   project(${LIBNAME})
   
+
   if (THIS_PROJECT_MODULARIZED OR THIS_PROJECT_SRCDIRS)
+    
     # We only build a component group for modularized libraries or libraries
     # that have compiled parts.
     if (COMMAND cpack_add_component_group)
@@ -307,6 +309,7 @@ macro(boost_library_project LIBNAME)
     # Include the test directories.
     project(${libname}-tests)
     foreach(SUBDIR ${THIS_PROJECT_TESTDIRS})
+      message(STATUS "+-- ${SUBDIR}")
       add_subdirectory(${SUBDIR})
     endforeach()
   endif()
@@ -316,6 +319,7 @@ macro(boost_library_project LIBNAME)
     project(${libname}-examples)
     # Include the example directories.
     foreach(SUBDIR ${THIS_PROJECT_EXAMPLEDIRS})
+      message(STATUS "+-- ${SUBDIR}")
       add_subdirectory(${SUBDIR})
     endforeach()
   endif()
@@ -337,47 +341,50 @@ macro(boost_tool_project TOOLNAME)
   set(THIS_PROJECT_IS_TOOL TRUE)
 
   string(TOUPPER ${TOOLNAME} UTOOLNAME)
+  project(${TOOLNAME})
+
+  include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+
   set(THIS_PROJECT_OKAY ON)
   set(THIS_PROJECT_FAILED_DEPS "")
-  foreach(DEP ${BOOST_${UTOOLNAME}_DEPENDS})
-    get_target_property(dep_location ${DEP} LOCATION)
-    if (NOT ${dep_location})
-      set(THIS_PROJECT_OKAY OFF)
-      set(THIS_PROJECT_FAILED_DEPS "${THIS_PROJECT_FAILED_DEPS}  ${DEP}\n")
-    endif (NOT ${dep_location})
-  endforeach(DEP)
 
-  option(BUILD_${UTOOLNAME} "Build ${TOOLNAME}" ON)
-
-  if (NOT THIS_PROJECT_OKAY)
-    if (BUILD_${UTOOLNAME})
-      # The user explicitly turned on this tool in a prior
-      # iteration, but it can no longer be built because one of the
-      # dependencies was turned off. Force this option off and
-      # complain about it.
-      set(BUILD_${UTOOLNAME} OFF CACHE BOOL "Build ${TOOLNAME}" FORCE)
-      message(SEND_ERROR "Cannot build ${TOOLNAME} due to missing library dependencies:\n${THIS_PROJECT_FAILED_DEPS}")
-    endif ()
-  endif (NOT THIS_PROJECT_OKAY)
-
-  if(BUILD_${UTOOLNAME} AND THIS_PROJECT_OKAY)
-    string(TOLOWER "${TOOLNAME}" toolname)
-    project(${TOOLNAME})
-    
-    # Add this module's include directory
-    include_directories("${Boost_SOURCE_DIR}/libs/${toolname}/include")
-
-    # For each of the modular libraries on which this project depends,
-    # add the include path for that library.
-    foreach(DEP ${BOOST_${UTOOLNAME}_DEPENDS})
-      string(TOUPPER ${DEP} UDEP)
-      #
-      # Modularization disabled
-      #
-      # include_directories("${Boost_SOURCE_DIR}/libs/${DEP}/include")
-      #
-    endforeach(DEP)
-  endif()
+  #   message(">>> ${BOOST_${UTOOLNAME}_DEPENDS}")
+  #   foreach(DEP ${BOOST_${UTOOLNAME}_DEPENDS})
+  #     get_target_property(dep_location boost_${DEP} TYPE)
+  #     message("${DEP} TYPE=${dep_location}")
+  #     if (NOT ${dep_location})
+  #       set(THIS_PROJECT_OKAY OFF)
+  #       set(THIS_PROJECT_FAILED_DEPS "${THIS_PROJECT_FAILED_DEPS}  ${DEP}\n")
+  #     endif (NOT ${dep_location})
+  #   endforeach(DEP)
+  # 
+  #   if (NOT THIS_PROJECT_OKAY)
+  #     #if (BUILD_${UTOOLNAME})
+  #       # The user explicitly turned on this tool in a prior
+  #       # iteration, but it can no longer be built because one of the
+  #       # dependencies was turned off. Force this option off and
+  #       # complain about it.
+  #       set(BUILD_${UTOOLNAME} OFF CACHE BOOL "Build ${TOOLNAME}" FORCE)
+  #       message(SEND_ERROR "Cannot build ${TOOLNAME} due to missing library dependencies:\n${THIS_PROJECT_FAILED_DEPS}")
+  #     #endif ()
+  #   endif (NOT THIS_PROJECT_OKAY)
+  # 
+  #   if(BUILD_${UTOOLNAME} AND THIS_PROJECT_OKAY)
+  #     string(TOLOWER "${TOOLNAME}" toolname)
+  #     
+  #     # Add this module's include directory
+  # 
+  #     # For each of the modular libraries on which this project depends,
+  #     # add the include path for that library.
+  #     foreach(DEP ${BOOST_${UTOOLNAME}_DEPENDS})
+  #       string(TOUPPER ${DEP} UDEP)
+  #       #
+  #       # Modularization disabled
+  #       #
+  #       # include_directories("${Boost_SOURCE_DIR}/libs/${DEP}/include")
+  #       #
+  #     endforeach(DEP)
+  #   endif()
 endmacro(boost_tool_project)
 
 #TODO: Finish this documentation
@@ -405,13 +412,13 @@ macro(boost_module LIBNAME)
   string(TOUPPER "BOOST_${LIBNAME}_DEPENDS" THIS_MODULE_LIBNAME_DEPENDS)
   set(${THIS_MODULE_LIBNAME_DEPENDS} ${THIS_MODULE_DEPENDS})
 
-  message(STATUS "----------------------------------------------------------------")
-  message(STATUS "LIBNAME: ${LIBNAME}")
-  message(STATUS "THIS_MODULE_DEPENDS: ${THIS_MODULE_DEPENDS}")
-  #message(STATUS "THIS_MODULE_LIBNAME_DEPENDS: ${THIS_MODULE_LIBNAME_DEPENDS}")
-  #message(STATUS "${THIS_MODULE_LIBNAME_DEPENDS}: ${${THIS_MODULE_LIBNAME_DEPENDS}}")
-  #message(STATUS "THIS_MODULE_TEST_DEPENDS: ${THIS_MODULE_TEST_DEPENDS}")
-  #message(STATUS "THIS_MODULE_LIBNAME_TEST_DEPENDS: ${THIS_MODULE_LIBNAME_TEST_DEPENDS}")
+  # message(STATUS "----------------------------------------------------------------")
+  # message(STATUS "LIBNAME: ${LIBNAME}")
+  # message(STATUS "THIS_MODULE_DEPENDS: ${THIS_MODULE_DEPENDS}")
+  # message(STATUS "THIS_MODULE_LIBNAME_DEPENDS: ${THIS_MODULE_LIBNAME_DEPENDS}")
+  # message(STATUS "${THIS_MODULE_LIBNAME_DEPENDS}: ${${THIS_MODULE_LIBNAME_DEPENDS}}")
+  # message(STATUS "THIS_MODULE_TEST_DEPENDS: ${THIS_MODULE_TEST_DEPENDS}")
+  # message(STATUS "THIS_MODULE_LIBNAME_TEST_DEPENDS: ${THIS_MODULE_LIBNAME_TEST_DEPENDS}")
   # message(STATUS "${THIS_MODULE_LIBNAME_TEST_DEPENDS}: ${${THIS_MODULE_LIBNAME_TEST_DEPENDS}}")
 endmacro(boost_module)
 
@@ -530,10 +537,10 @@ macro(boost_library_variant_target_name)
     # Append the Boost version number to the versioned name
     if(BOOST_VERSION_SUBMINOR GREATER 0)
       set(VARIANT_VERSIONED_NAME
-    "${VARIANT_VERSIONED_NAME}-${BOOST_VERSION_MAJOR}_${BOOST_VERSION_MINOR}_${BOOST_VERSION_SUBMINOR}")
+	"${VARIANT_VERSIONED_NAME}-${BOOST_VERSION_MAJOR}_${BOOST_VERSION_MINOR}_${BOOST_VERSION_SUBMINOR}")
     else(BOOST_VERSION_SUBMINOR GREATER 0)
       set(VARIANT_VERSIONED_NAME 
-    "${VARIANT_VERSIONED_NAME}-${BOOST_VERSION_MAJOR}_${BOOST_VERSION_MINOR}")
+	"${VARIANT_VERSIONED_NAME}-${BOOST_VERSION_MAJOR}_${BOOST_VERSION_MINOR}")
     endif(BOOST_VERSION_SUBMINOR GREATER 0)
   endif(BUILD_VERSIONED)
 endmacro(boost_library_variant_target_name)
@@ -636,13 +643,24 @@ macro(boost_library_variant LIBNAME)
     set(THIS_VARIANT_LINK_LIBS ${THIS_VARIANT_LINK_LIBS} ${THIS_LIB_${ARG}_LINK_LIBS} ${${ARG}_LINK_LIBS})
   endforeach(ARG ${ARGN})
 
+  # message("boost_library_variant(${LIBNAME} ${ARGN})")
+
   # Handle feature interactions
   boost_feature_interactions("THIS_VARIANT" ${ARGN})
+  boost_library_variant_target_name(${ARGN})
+  # Determine the suffix for this library target
+  set(VARIANT_LIBNAME "${LIBNAME}${VARIANT_TARGET_NAME}")
+
+  set(DEPENDENCY_FAILURES "")
+  foreach(dep ${THIS_LIB_DEPENDS})
+    assert_is_lib_target("${dep}${VARIANT_TARGET_NAME}")
+  endforeach()
+
+  if (DEPENDENCY_FAILURES)
+    set(THIS_VARIANT_OKAY FALSE)
+  endif()
 
   if (THIS_VARIANT_OKAY)
-    # Determine the suffix for this library target
-    boost_library_variant_target_name(${ARGN})
-    set(VARIANT_LIBNAME "${LIBNAME}${VARIANT_TARGET_NAME}")
 
     # We handle static vs. dynamic libraries differently
     list_contains(THIS_LIB_IS_STATIC "STATIC" ${ARGN})
@@ -656,10 +674,8 @@ macro(boost_library_variant LIBNAME)
         set(LIBPREFIX "")
       endif(WIN32 AND NOT CYGWIN)
       
-      # Add the library itself
       add_library(${VARIANT_LIBNAME} STATIC ${THIS_LIB_SOURCES})
 
-      # Set properties on this library
       set_target_properties(${VARIANT_LIBNAME}
         PROPERTIES
         OUTPUT_NAME "${LIBPREFIX}${LIBNAME}${VARIANT_VERSIONED_NAME}"
@@ -668,11 +684,11 @@ macro(boost_library_variant LIBNAME)
         LINK_FLAGS "${THIS_VARIANT_LINK_FLAGS}"
         LABELS "${BOOST_PROJECT_NAME}"
         )
+
     elseif (THIS_LIB_MODULE)
-      # Add a module
+
       add_library(${VARIANT_LIBNAME} MODULE ${THIS_LIB_SOURCES})
 
-      # Set properties on this library
       set_target_properties(${VARIANT_LIBNAME}
         PROPERTIES
         OUTPUT_NAME ${LIBNAME}
@@ -681,13 +697,27 @@ macro(boost_library_variant LIBNAME)
         LINK_FLAGS "${THIS_VARIANT_LINK_FLAGS}"
         LABELS "${BOOST_PROJECT_NAME}"
         PREFIX ""
-       # SOVERSION "${BOOST_VERSION}"
         )
+      # VERSION and SOVERSION omitted, they piss off the mac linker
+      if(UNIX AND NOT APPLE)		
+        set_target_properties(${VARIANT_LIBNAME}
+          PROPERTIES
+          SOVERSION "${BOOST_VERSION_MAJOR}.${BOOST_VERSION_MINOR}"
+          )
+      endif()		
+      
+      # VERSION and SOVERSION omitted, they piss off the mac linker
+      if (BUILD_SOVERSIONED AND UNIX)
+	set_target_properties(${VARIANT_LIBNAME}
+	  PROPERTIES
+	  SOVERSION "${BOOST_VERSION}"
+	  )
+      endif()
+
     else (THIS_LIB_IS_STATIC)
-      #TODO: Check the SOVERSION behavior on Linux and Windows
-      # Add a module
+
       add_library(${VARIANT_LIBNAME} SHARED ${THIS_LIB_SOURCES})
-      # Set properties on this library
+
       set_target_properties(${VARIANT_LIBNAME}
         PROPERTIES
         OUTPUT_NAME "${LIBNAME}${VARIANT_VERSIONED_NAME}"
@@ -695,20 +725,30 @@ macro(boost_library_variant LIBNAME)
         COMPILE_FLAGS "${THIS_VARIANT_COMPILE_FLAGS}"
         LINK_FLAGS "${THIS_VARIANT_LINK_FLAGS}"
         LABELS "${BOOST_PROJECT_NAME}"
-        # SOVERSION "${BOOST_VERSION}"
         )
-    endif (THIS_LIB_IS_STATIC)
-      
+
+      if (BUILD_SOVERSIONED)
+	set_target_properties(${VARIANT_LIBNAME}
+	  PROPERTIES
+	  SOVERSION "${BOOST_VERSION}"
+	  )
+      endif()
+    endif ()
+    
     # The basic LIBNAME target depends on each of the variants
     add_dependencies(${LIBNAME} ${VARIANT_LIBNAME})
 
-    export(TARGETS ${VARIANT_LIBNAME} FILE ${CMAKE_BINARY_DIR}/exports/${VARIANT_LIBNAME}.cmake)
-
     # Link against whatever libraries this library depends on
     target_link_libraries(${VARIANT_LIBNAME} ${THIS_VARIANT_LINK_LIBS})
-    foreach(dependency ${THIS_LIB_DEPENDS})
-      target_link_libraries(${VARIANT_LIBNAME} "${dependency}${VARIANT_TARGET_NAME}")
-    endforeach(dependency)
+
+    foreach(d ${THIS_LIB_DEPENDS})
+      # message(STATUS "linking ${d}")
+      target_link_libraries(${VARIANT_LIBNAME} "${d}${VARIANT_TARGET_NAME}")
+    endforeach()
+
+    export(TARGETS ${VARIANT_LIBNAME} 
+      APPEND
+      FILE ${BOOST_EXPORTS_FILE})
 
     if(NOT THIS_LIB_NO_INSTALL)
       # Setup installation properties
@@ -718,14 +758,18 @@ macro(boost_library_variant LIBNAME)
       # Installation of this library variant
       string(TOLOWER ${BOOST_PROJECT_NAME} libname)
 
+      #
+      # tds:  componentization disabled for the moment
+      #
       install(TARGETS ${VARIANT_LIBNAME} 
-	DESTINATION ${BOOST_INSTALL_LIB_SUBDIR_NAME}
-	COMPONENT ${LIB_COMPONENT})
+	EXPORT Boost 
+	DESTINATION ${BOOST_LIB_INSTALL_DIR}
+	COMPONENT Boost) #${LIB_COMPONENT})
 
-      set_property( 
-        TARGET ${VARIANT_LIBNAME}
-        PROPERTY BOOST_CPACK_COMPONENT
-        ${LIB_COMPONENT})
+      # set_property( 
+      #      TARGET ${VARIANT_LIBNAME}
+      #      PROPERTY BOOST_CPACK_COMPONENT
+      #      ${LIB_COMPONENT})
       
       # Make the library installation component dependent on the library
       # installation components of dependent libraries.
@@ -738,14 +782,14 @@ macro(boost_library_variant LIBNAME)
           TARGET "${DEP}${VARIANT_TARGET_NAME}"
           PROPERTY BOOST_CPACK_COMPONENT)
         
-    if (DEP_COMPONENT)
+	if (DEP_COMPONENT)
           if (DEP_COMPONENT STREQUAL LIB_COMPONENT)
             # Do nothing: we have library dependencies within one 
             # Boost library
           else()
             list(APPEND THIS_LIB_COMPONENT_DEPENDS ${DEP_COMPONENT})
           endif()
-    endif()
+	endif()
       endforeach(DEP)
       
       if (COMMAND cpack_add_component)
@@ -995,15 +1039,15 @@ macro(boost_select_variant NAME PREFIX)
     foreach (FEATURE ${${PREFIX}_VARIANT})
       # Add all of the flags for this feature
       set(${PREFIX}_COMPILE_FLAGS 
-          "${${PREFIX}_COMPILE_FLAGS} ${${PREFIX}_${FEATURE}_COMPILE_FLAGS} ${${FEATURE}_COMPILE_FLAGS}")
+        "${${PREFIX}_COMPILE_FLAGS} ${${PREFIX}_${FEATURE}_COMPILE_FLAGS} ${${FEATURE}_COMPILE_FLAGS}")
       set(${PREFIX}_LINK_FLAGS 
-          "${${PREFIX}_LINK_FLAGS} ${${PREFIX}_${FEATURE}_LINK_FLAGS} ${${FEATURE}_LINK_FLAGS}")
+        "${${PREFIX}_LINK_FLAGS} ${${PREFIX}_${FEATURE}_LINK_FLAGS} ${${FEATURE}_LINK_FLAGS}")
       if (${PREFIX} STREQUAL "THIS_EXE")
         set(${PREFIX}_LINK_FLAGS 
           "${${PREFIX}_LINK_FLAGS} ${${FEATURE}_EXE_LINK_FLAGS}")
       endif()
       set(${PREFIX}_LINK_LIBS 
-          ${${PREFIX}_LINK_LIBS} ${${PREFIX}_${FEATURE}_LINK_LIBS} ${${FEATURE}_LINK_LIBS})
+        ${${PREFIX}_LINK_LIBS} ${${PREFIX}_${FEATURE}_LINK_LIBS} ${${FEATURE}_LINK_LIBS})
     endforeach (FEATURE ${${PREFIX}_VARIANT})
 
     # Handle feature interactions
@@ -1173,7 +1217,7 @@ macro(boost_add_library LIBNAME)
   
   if (THIS_LIB_FORCE_VARIANTS)
     set(ENABLE_${THIS_LIB_FORCE_VARIANTS} ${ENABLE_${THIS_LIB_FORCE_VARIANTS}_PREV} )
-   # message(STATUS "* ^^ ENABLE_${THIS_LIB_FORCE_VARIANTS}  ${ENABLE_${THIS_LIB_FORCE_VARIANTS}}")
+    # message(STATUS "* ^^ ENABLE_${THIS_LIB_FORCE_VARIANTS}  ${ENABLE_${THIS_LIB_FORCE_VARIANTS}}")
   endif (THIS_LIB_FORCE_VARIANTS)  
 endmacro(boost_add_library)
 
@@ -1307,49 +1351,61 @@ macro(boost_add_executable EXENAME)
   # boost_add_executable and what options the user has set.
   boost_select_variant(${EXENAME} THIS_EXE)
 
+  # Compute the name of the variant targets that we'll be linking
+  # against. We'll use this to link against the appropriate
+  # dependencies. For IDE targets where we can build both debug and
+  # release configurations, create DEBUG_ and RELEASE_ versions of
+  # the macros.
+  if (THIS_EXE_DEBUG_AND_RELEASE)
+    boost_library_variant_target_name(RELEASE ${THIS_EXE_VARIANT})
+    set(RELEASE_VARIANT_TARGET_NAME "${VARIANT_TARGET_NAME}")
+    boost_library_variant_target_name(DEBUG ${THIS_EXE_VARIANT})
+    set(DEBUG_VARIANT_TARGET_NAME "${VARIANT_TARGET_NAME}")
+  else (THIS_EXE_DEBUG_AND_RELEASE)
+    boost_library_variant_target_name(${THIS_EXE_VARIANT})
+  endif (THIS_EXE_DEBUG_AND_RELEASE)
+
+  # Compute the actual set of library dependencies, based on the
+  # variant name we computed above. The RELEASE and DEBUG versions
+  # only apply when THIS_EXE_DEBUG_AND_RELEASE.
+  set(THIS_EXE_ACTUAL_DEPENDS)
+  set(THIS_EXE_RELEASE_ACTUAL_DEPENDS)
+  set(THIS_EXE_DEBUG_ACTUAL_DEPENDS)
+  set(DEPENDENCIES_OKAY TRUE)
+  foreach(LIB ${THIS_EXE_DEPENDS})
+    if (LIB MATCHES ".*-.*")
+      # The user tried to state exactly which variant to use. Just
+      # propagate the dependency and hope that s/he was
+      # right. Eventually, this should at least warn, because it is
+      # not the "proper" way to do things
+      list(APPEND THIS_EXE_ACTUAL_DEPENDS ${LIB})
+      list(APPEND THIS_EXE_RELEASE_ACTUAL_DEPENDS ${LIB})
+      list(APPEND THIS_EXE_DEBUG_ACTUAL_DEPENDS ${LIB})
+      assert_is_lib_target(${LIB})
+    else ()
+      # The user has given the name of just the library target,
+      # e.g., "boost_filesystem". We add on the appropriate variant
+      # name(s).
+      list(APPEND THIS_EXE_ACTUAL_DEPENDS "${LIB}${VARIANT_TARGET_NAME}")
+      list(APPEND THIS_EXE_RELEASE_ACTUAL_DEPENDS "${LIB}${RELEASE_VARIANT_TARGET_NAME}")
+      list(APPEND THIS_EXE_DEBUG_ACTUAL_DEPENDS "${LIB}${DEBUG_VARIANT_TARGET_NAME}")
+      if(THIS_EXE_RELEASE_AND_DEBUG)
+	assert_is_lib_target("${LIB}${RELEASE_VARIANT_TARGET_NAME}")
+	assert_is_lib_target("${LIB}${DEBUG_VARIANT_TARGET_NAME}")
+      else()
+	assert_is_lib_target("${LIB}${VARIANT_TARGET_NAME}")
+      endif()
+    endif ()
+  endforeach()
+
   set(THIS_EXE_OKAY FALSE)
+
+  if(DEPENDENCY_FAILURES)
+    set(THIS_EXE_OKAY FALSE)
+  endif()
+
   if (THIS_EXE_VARIANT)
     # It's okay to build this executable
-    set(THIS_EXE_OKAY TRUE)
-
-    # Compute the name of the variant targets that we'll be linking
-    # against. We'll use this to link against the appropriate
-    # dependencies. For IDE targets where we can build both debug and
-    # release configurations, create DEBUG_ and RELEASE_ versions of
-    # the macros.
-    if (THIS_EXE_DEBUG_AND_RELEASE)
-      boost_library_variant_target_name(RELEASE ${THIS_EXE_VARIANT})
-      set(RELEASE_VARIANT_TARGET_NAME "${VARIANT_TARGET_NAME}")
-      boost_library_variant_target_name(DEBUG ${THIS_EXE_VARIANT})
-      set(DEBUG_VARIANT_TARGET_NAME "${VARIANT_TARGET_NAME}")
-    else (THIS_EXE_DEBUG_AND_RELEASE)
-      boost_library_variant_target_name(${THIS_EXE_VARIANT})
-    endif (THIS_EXE_DEBUG_AND_RELEASE)
-
-    # Compute the actual set of library dependencies, based on the
-    # variant name we computed above. The RELEASE and DEBUG versions
-    # only apply when THIS_EXE_DEBUG_AND_RELEASE.
-    set(THIS_EXE_ACTUAL_DEPENDS)
-    set(THIS_EXE_RELEASE_ACTUAL_DEPENDS)
-    set(THIS_EXE_DEBUG_ACTUAL_DEPENDS)
-    foreach(LIB ${THIS_EXE_DEPENDS})
-      if (LIB MATCHES ".*-.*")
-        # The user tried to state exactly which variant to use. Just
-        # propagate the dependency and hope that s/he was
-        # right. Eventually, this should at least warn, because it is
-        # not the "proper" way to do things
-        list(APPEND THIS_EXE_ACTUAL_DEPENDS ${LIB})
-        list(APPEND THIS_EXE_RELEASE_ACTUAL_DEPENDS ${LIB})
-        list(APPEND THIS_EXE_DEBUG_ACTUAL_DEPENDS ${LIB})
-      else (LIB MATCHES ".*-.*")
-        # The user has given the name of just the library target,
-        # e.g., "boost_filesystem". We add on the appropriate variant
-        # name(s).
-        list(APPEND THIS_EXE_ACTUAL_DEPENDS "${LIB}${VARIANT_TARGET_NAME}")
-        list(APPEND THIS_EXE_RELEASE_ACTUAL_DEPENDS "${LIB}${RELEASE_VARIANT_TARGET_NAME}")
-        list(APPEND THIS_EXE_DEBUG_ACTUAL_DEPENDS "${LIB}${DEBUG_VARIANT_TARGET_NAME}")
-      endif (LIB MATCHES ".*-.*")
-    endforeach(LIB ${THIS_EXE_DEPENDS})
 
     # Build the executable
     if (THIS_PROJECT_IS_TOOL)
@@ -1393,15 +1449,22 @@ macro(boost_add_executable EXENAME)
       target_link_libraries(${THIS_EXE_NAME} ${THIS_EXE_LINK_LIBS})
       
       # Link against libraries for "release" configuration
+      assert_is_lib_target(${THIS_EXE_RELEASE_ACTUAL_DEPENDS})
       foreach(LIB ${THIS_EXE_RELEASE_ACTUAL_DEPENDS} ${THIS_EXE_RELEASE_LINK_LIBS})     
         target_link_libraries(${THIS_EXE_NAME} optimized ${LIB})
       endforeach(LIB ${THIS_EXE_RELEASE_ACTUAL_DEPENDS} ${THIS_EXE_RELEASE_LINK_LIBS})     
-        
+      
       # Link against libraries for "debug" configuration
+      assert_is_lib_target(${THIS_EXE_DEBUG_ACTUAL_DEPENDS})
       foreach(LIB ${THIS_EXE_DEBUG_ACTUAL_DEPENDS} ${THIS_EXE_DEBUG_LINK_LIBS})     
         target_link_libraries(${THIS_EXE_NAME} debug ${LIB})
       endforeach(LIB ${THIS_EXE_DEBUG_ACTUAL_DEPENDS} ${THIS_EXE_DEBUG_LINK_LIBS})     
+
     else (THIS_EXE_DEBUG_AND_RELEASE)
+      # message(">>>>> ${THIS_EXE_ACTUAL_DEPENDS}")
+      foreach(lib ${THIS_EXE_ACTUAL_DEPENDS})
+	assert_is_lib_target(${lib})
+      endforeach()
       target_link_libraries(${THIS_EXE_NAME} 
         ${THIS_EXE_ACTUAL_DEPENDS} 
         ${THIS_EXE_LINK_LIBS})
@@ -1409,7 +1472,27 @@ macro(boost_add_executable EXENAME)
 
     # Install the executable, if not suppressed
     if (NOT THIS_EXE_NO_INSTALL)
-      install(TARGETS ${THIS_EXE_NAME} DESTINATION bin)
+      install(TARGETS ${THIS_EXE_NAME} DESTINATION ${BOOST_EXE_INSTALL_DIR})
     endif (NOT THIS_EXE_NO_INSTALL)
   endif ()
 endmacro(boost_add_executable)
+
+
+#
+#  Macro for building boost.python extensions
+#
+macro(boost_python_extension MODULE_NAME)
+  parse_arguments(BPL_EXT 
+    "" 
+    "" 
+    ${ARGN})
+  
+  boost_add_single_library(
+    ${MODULE_NAME}
+    ${BPL_EXT_DEFAULT_ARGS}
+    MODULE
+    LINK_LIBS ${PYTHON_LIBRARIES}
+    DEPENDS boost_python
+    SHARED
+    )
+endmacro()

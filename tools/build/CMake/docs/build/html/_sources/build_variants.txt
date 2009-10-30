@@ -36,6 +36,54 @@ The configuration and build of the library for each *feature* is
 (dis|en)abled with a boolean option ``ENABLE_``\ *feature*, which set
 in :ref:`cmakecache.txt`.  The available features are:
 
+Name Mangling
+-------------
+
+Libraries have their features mangled in to distinguish the variants
+from one another.  CMake's symbolic target names correspond:
+
+============== ===========   ======================
+Feature        Target Name   Library Name Component
+============== ===========   ======================
+shared         -shared       (none)
+static         -static       (none)
+multithreaded  -mt           -mt
+release        (none)        (none)
+debug          -debug        -d
+============== ===========   ======================
+
+The make target ``help`` will show the available options::
+
+  ``make help`` shows a list::
+
+  % make help | grep signals
+  ... boost_signals
+  ... boost_signals-mt-shared
+  ... boost_signals-mt-shared-debug
+  ... boost_signals-mt-static
+  ... boost_signals-mt-static-debug
+  ... boost_signals-shared
+  ... boost_signals-shared-debug
+  ... boost_signals-static
+  ... boost_signals-static-debug
+           
+And you can see the correspondence to the libraries on disk::
+
+  % ls lib/libboost_signals*
+  lib/libboost_signals-d.a              lib/libboost_signals-mt.a
+  lib/libboost_signals-d.so             lib/libboost_signals-mt.so
+  lib/libboost_signals-mt-d.a           lib/libboost_signals.a
+  lib/libboost_signals-mt-d.so          lib/libboost_signals.so
+    
+(Note: on most unix you will see more than this, as some of them
+contain version numbers and are symbolic links to one another).
+
+Configuring features
+--------------------
+
+You can globally (en|dis)able the build of these various features
+through the following cmake variables:
+
 .. index:: 
    single: ENABLE_STATIC
    pair: STATIC; feature
@@ -43,20 +91,18 @@ in :ref:`cmakecache.txt`.  The available features are:
 .. _enable_static:
 
 ENABLE_STATIC
--------------
+^^^^^^^^^^^^^
 
   The `STATIC` feature identifies static builds of libraries, i.e., a
   `.lib` (library) file on Microsoft Windows or a `.a` (archive) file
   on Unix systems.
-
-  **Mangling**: Static libraries have ``-s`` mangled in to the name.
 
 .. index:: 
    single: ENABLE_SHARED
    pair: SHARED; feature
 
 ENABLE_SHARED
--------------
+^^^^^^^^^^^^^
 
   The `SHARED` feature identifies shared builds of libraries, i.e.,
   a `.dll` (dynamically linked library) file on Microsoft Windows or
@@ -70,7 +116,7 @@ ENABLE_SHARED
    pair: DEBUG; feature
 
 ENABLE_DEBUG
-------------
+^^^^^^^^^^^^
 
   The `DEBUG` feature identifies builds of libraries that retain
   complete debugging information and prohibit optimization, making
@@ -81,7 +127,7 @@ ENABLE_DEBUG
    pair: RELEASE; feature
 
 ENABLE_RELEASE
---------------
+^^^^^^^^^^^^^^
 
   The `RELEASE` feature identifies builds of libraries that use full
   optimization and eliminate extraneous information such as debug
@@ -95,7 +141,7 @@ ENABLE_RELEASE
    pair: SINGLE_THREADED; feature
     
 ENABLE_SINGLE_THREADED
-----------------------
+^^^^^^^^^^^^^^^^^^^^^^
 
   The `SINGLE_THREADED` feature identifies builds of libraries that
   assume that the program using them is single-threaded. These
@@ -108,7 +154,7 @@ ENABLE_SINGLE_THREADED
    pair: MULTI_THREADED; feature
 
 ENABLE_MULTI_THREADED
----------------------
+^^^^^^^^^^^^^^^^^^^^^
 
   The `MULTI_THREADED` feature identifies builds of libraries that
   assume that the program using them is multi-threaded. These
@@ -123,7 +169,7 @@ ENABLE_MULTI_THREADED
    pair: STATIC_RUNTIME; feature
 
 ENABLE_STATIC_RUNTIME
----------------------
+^^^^^^^^^^^^^^^^^^^^^
 
   The `STATIC_RUNTIME` feature identifies builds that link against
   the C and C++ run-time libraries statically, which directly
@@ -136,11 +182,10 @@ ENABLE_STATIC_RUNTIME
    pair: DYNAMIC_RUNTIME; feature
 
 ENABLE_DYNAMIC_RUNTIME
-----------------------
+^^^^^^^^^^^^^^^^^^^^^^
 
   The `DYNAMIC_RUNTIME` feature identifies builds that link against
   the dynamic C and C++ run-time libraries.
-
 
 Per-feature Compilation and Linker Options
 ------------------------------------------

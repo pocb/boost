@@ -16,5 +16,9 @@ boost_add_executable(inspect
   end_check.cpp unnamed_namespace_check.cpp ascii_check.cpp
   copyright_check.cpp minmax_check.cpp 
 
+  SHARED
+  MULTI_THREADED
+  DEBUG
   DEPENDS boost_filesystem boost_system boost_regex
+  NO_INSTALL
   )

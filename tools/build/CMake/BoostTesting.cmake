@@ -38,7 +38,13 @@
 # is significantly faster when we aren't also building regression
 # tests.
 
-set(BUILD_TESTS "NONE" CACHE STRING "Semicolon-separated list of lowercase librarary names to test, or \"ALL\"")
+if (BOOST_CMAKE_SELFTEST)
+  set(tests "ALL")
+else()
+  set(tests "NONE")
+endif()
+
+set(BUILD_TESTS ${tests} CACHE STRING "Semicolon-separated list of lowercase librarary names to test, or \"ALL\"")
 enable_testing()
 
 if (BUILD_TESTS STREQUAL "NONE")
@@ -216,9 +222,7 @@ endmacro(boost_test_parse_args)
 # failures.
 macro(boost_test_known_failures TEST)
   foreach(PATTERN ${ARGN})
-    message(STATUS "${BUILDNAME} matches ${PATTERN} ?")
     if (${BUILDNAME} MATCHES ${PATTERN})
-      message(STATUS "YES")
       set_tests_properties("${BOOST_PROJECT_NAME}-${TEST}"
         PROPERTIES 
 	LABELS "${BOOST_PROJECT_NAME};known-failure"

@@ -27,11 +27,6 @@
 ##########################################################################
 include(CheckCXXSourceCompiles)
 
-#
-#  Python interpreter
-#
-include(FindPythonInterp)
-include(FindPythonLibs)
 
 # Toolset detection.
 if (NOT BOOST_TOOLSET)
@@ -100,8 +95,8 @@ if (NOT BOOST_TOOLSET)
   endif(MSVC60)
 endif (NOT BOOST_TOOLSET)
 
-message(STATUS "Boost compiler: ${BOOST_COMPILER}")
-message(STATUS "Boost toolset:  ${BOOST_TOOLSET}")
+boost_report_pretty("Boost compiler" BOOST_COMPILER)
+boost_report_pretty("Boost toolset"  BOOST_TOOLSET)
 
 # create cache entry
 set(BOOST_PLATFORM "unknown")
@@ -155,7 +150,7 @@ endif()
 # create cache entry
 set(BOOST_PLATFORM ${BOOST_PLATFORM} CACHE STRING "Boost platform name")
 
-message(STATUS "Boost platform: ${BOOST_PLATFORM}")
+boost_report_pretty("Boost platform" BOOST_PLATFORM)
 
 # Setup DEBUG_COMPILE_FLAGS, RELEASE_COMPILE_FLAGS, DEBUG_LINK_FLAGS and
 # and RELEASE_LINK_FLAGS based on the CMake equivalents
@@ -163,7 +158,7 @@ if(CMAKE_CXX_FLAGS_DEBUG)
   if(MSVC)
     # Eliminate the /MDd flag; we'll add it back when we need it
     string(REPLACE "/MDd" "" CMAKE_CXX_FLAGS_DEBUG 
-           "${CMAKE_CXX_FLAGS_DEBUG}") 
+      "${CMAKE_CXX_FLAGS_DEBUG}") 
   endif(MSVC)
   set(DEBUG_COMPILE_FLAGS "${CMAKE_CXX_FLAGS_DEBUG}" CACHE STRING "Compilation flags for debug libraries")
 endif(CMAKE_CXX_FLAGS_DEBUG)
@@ -171,7 +166,7 @@ if(CMAKE_CXX_FLAGS_RELEASE)
   if(MSVC)
     # Eliminate the /MD flag; we'll add it back when we need it
     string(REPLACE "/MD" "" CMAKE_CXX_FLAGS_RELEASE
-           "${CMAKE_CXX_FLAGS_RELEASE}") 
+      "${CMAKE_CXX_FLAGS_RELEASE}") 
   endif(MSVC)
   set(RELEASE_COMPILE_FLAGS "${CMAKE_CXX_FLAGS_RELEASE}" CACHE STRING "Compilation flags for release libraries")
 endif(CMAKE_CXX_FLAGS_RELEASE)
@@ -222,12 +217,33 @@ set(CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO "" CACHE INTERNAL "Unused by Boost")
 
 # Set the build name 
 set(BUILDNAME "${BOOST_COMPILER}-${BOOST_COMPILER_VERSION}-${BOOST_PLATFORM}")
+boost_report_pretty("Build name" BUILDNAME)
 
 set(BUILD_EXAMPLES "NONE" CACHE STRING "Semicolon-separated list of lowercase project names that should have their examples built, or \"ALL\"")
 
 set(BUILD_PROJECTS "ALL"  CACHE STRING "Semicolon-separated list of project to build, or \"ALL\"")
 
-set(BOOST_INSTALL_LIB_SUBDIR_NAME "lib" 
-  CACHE STRING 
-  "Name of directory under CMAKE_INSTALL_PREFIX to which libraries will be installed")
+set(LIB_SUFFIX "" CACHE STRING "Name of suffix on 'lib' directory to which libs will be installed (e.g. add '64' here on certain 64 bit unices)")
+if(LIB_SUFFIX)
+  boost_report_pretty("Lib suffix" LIB_SUFFIX)
+endif()
+
+#
+#  Only modify these if you're testing the cmake build itself
+#
+if(BOOST_CMAKE_SELFTEST)
+  message(STATUS "***")
+  message(STATUS "*** SELFTEST ENABLED")
+  message(STATUS "***")
+  set(root "${CMAKE_SOURCE_DIR}/tools/build/CMake/test")
+  set(BOOST_CMAKE_SELFTEST_ROOT ${root})
+else()
+  set(root "${CMAKE_SOURCE_DIR}")
+endif()
+
+set(BOOST_LIBS_PARENT_DIR "${root}/libs" CACHE INTERNAL
+  "Directory to glob tools from...  only change to test the build system itself")
+
+set(BOOST_TOOLS_PARENT_DIR "${root}/tools" CACHE INTERNAL
+  "Directory to glob tools from...  only change to test the build system itself")
 

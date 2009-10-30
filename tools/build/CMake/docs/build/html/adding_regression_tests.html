@@ -5,13 +5,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Adding Regression Tests &mdash; Boost.CMake 1.40.0.cmake3</title>
+    <title>Adding Regression Tests &mdash; Boost.CMake 1.40.0.cmake5</title>
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '1.40.0.cmake3',
+        VERSION:     '1.40.0.cmake5',
         COLLAPSE_MODINDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -19,7 +19,7 @@
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Boost.CMake 1.40.0.cmake3" href="index.html" />
+    <link rel="top" title="Boost.CMake 1.40.0.cmake5" href="index.html" />
     <link rel="next" title="Building a Binary Installer" href="build_installer.html" />
     <link rel="prev" title="Adding a Compiled Library to CMake" href="add_compiled_library.html" /> 
   </head>
@@ -38,7 +38,7 @@
              accesskey="P">previous</a> |</li>
     <li><a href="http://www.boost.org/">Boost</a> &raquo;</li>
     
-        <li><a href="index.html">Boost.CMake 1.40.0.cmake3</a> &raquo;</li>
+        <li><a href="index.html">Boost.CMake 1.40.0.cmake5</a> &raquo;</li>
  
       </ul>
     </div>
@@ -67,24 +67,23 @@
           <div class="body">
             
   <div class="section" id="adding-regression-tests">
-<span id="index-0"></span><span id="id1"></span><h1>Adding Regression Tests<a class="headerlink" href="#adding-regression-tests" title="Permalink to this headline">¶</a></h1>
+<span id="index-804"></span><span id="id1"></span><h1>Adding Regression Tests<a class="headerlink" href="#adding-regression-tests" title="Permalink to this headline">¶</a></h1>
 <p>This page describes how to add regression tests for a Boost library in
 the CMake-based build system. Before adding regression tests, make
 sure you have already followed the directions for
-<a class="reference external" href="reference/boost_library_project.html#boost-library-project-macro"><em>boost_library_project</em></a> , so that the CMake system recognizes
-your Boost library project, and (if necessary)
+<a class="reference external" href="reference/boost_library_project.html#boost-library-project-macro"><em>boost_library_project</em></a> , so that the CMake system
+recognizes your Boost library project, and (if necessary)
 <a class="reference external" href="add_compiled_library.html#add-compiled-library"><em>Adding a Compiled Library to CMake</em></a>. We also assume that you have already
-configured your build</p>
-<p id="build-tests"><span id="index-1"></span>tree for regression testing of your library, by adding your library
-project&#8217;s name to the <tt class="docutils literal"><span class="pre">BUILD_TESTS</span></tt> option described in the section
-<a class="reference external" href="testing.html#testing"><em>Testing</em></a>.</p>
+configured your build tree for regression testing of your library, by
+adding your library project&#8217;s name to the <a class="reference external" href="testing.html#build-tests"><em>BUILD_TESTS</em></a> option
+described in the section <a class="reference external" href="testing.html#testing"><em>Testing</em></a>.</p>
 <p>In this page, we will assume that your library resides in the
 subdirectory <tt class="docutils literal"><span class="pre">libs/libname</span></tt>, and that tests for this library are
 stored in <tt class="docutils literal"><span class="pre">libs/libname/test</span></tt>. The test directory should be listed
-via <tt class="docutils literal"><span class="pre">TESTDIRS</span></tt> in the call of
+via <a class="reference external" href="reference/boost_library_project.html#testdirs"><em>TESTDIRS</em></a> in the call of
 <a class="reference external" href="reference/boost_library_project.html#boost-library-project-macro"><em>boost_library_project</em></a>. Follow these steps to add this new
 library into Boost&#8217;s build system. If your library has multiple
-testing directories listed after <tt class="docutils literal"><span class="pre">TESTDIRS</span></tt>, follow these steps for
+testing directories listed after <a class="reference external" href="reference/boost_library_project.html#testdirs"><em>TESTDIRS</em></a>, follow these steps for
 each one.</p>
 <ol class="arabic">
 <li><p class="first">Create a new file <tt class="docutils literal"><span class="pre">libs/libname/test/CMakeLists.txt</span></tt> file with
@@ -190,12 +189,12 @@ many different platforms.</p>
              >previous</a> |</li>
     <li><a href="http://www.boost.org/">Boost</a> &raquo;</li>
     
-        <li><a href="index.html">Boost.CMake 1.40.0.cmake3</a> &raquo;</li>
+        <li><a href="index.html">Boost.CMake 1.40.0.cmake5</a> &raquo;</li>
  
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version b495b1467c7f0d88065fc345ea07c8ddfa432d58, Sun, 25 Oct 2009.
+      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version 31c30425cf29d2ae048ffb07c8284cee1e095b7a, Mon, 26 Oct 2009.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

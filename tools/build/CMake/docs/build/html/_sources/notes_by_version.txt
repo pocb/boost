@@ -1,20 +1,62 @@
 Notes by Boost Version
 ======================
 
-1.40.0.cmake3
--------------
+1.41.0.cmakebeta4
+-----------------
+
+* CMake minimum 2.6.4 required (found bugs with 2.6.2)
+* Move MPI detection up 
+* Clean up output
+
+1.41.0.cmakebeta3
+-----------------
 
 * :ref:`variants` names switched to ``ENABLE_<feature>`` to distinguish 
   from ``BUILD_*`` options.
 
 * Many docs improvements
 
-* Maintainer (of boost-cmake) targets
+* Special targets for the boost-cmake maintainer
 
-* :ref:`BUILD_PROJECTS` variable for building only certain projects.
+* :ref:`BUILD_PROJECTS` ``(= NONE|ALL|proj1;proj2;...;projN)``
+  variable for building only certain projects.
 
-* :ref:`BOOST_INSTALL_LIB_SUBDIR_NAME` for installing libs to
-  nonstandard lib directory name, e.g. ``$PREFIX/lib64``
+* :ref:`BUILD_EXAMPLES` ``(= NONE|ALL|proj1;proj2;...;projN)``
+  variable for building examples only of certain projects.
+
+* :ref:`LIB_SUFFIX` for installing libs to nonstandard lib directory
+  name, e.g. for LIB_SUFFIX=64, libs installed to ``$PREFIX/lib64``
+
+* Testing improvements: cmake now runs 2408 tests, 99% of which pass.
+  This isn't the full set, upstream is a moving target.  The few
+  remaining failures (assuming upstream is bug-free) are assumed to be
+  problems in the testing setup, not the underlying libraries.
+
+* Python: python location customizable via command line or environment
+  variables, see :ref:`external_dependencies`.
+  
+(1.41.0.cmakebeta1 and 2 omitted)
+
+1.41.0 (upstream)
+-----------------
+
+This release (as released by upstream Boost) does **not** contain
+CMake support.  See above for independenly released CMake versions.
+
+1.40.0.cmake5
+-------------
+
+Backport of features from 1.41.0.cmakebeta5
+
+1.40.0.cmake4
+-------------
+
+Backport features from 1.41.0.cmakebeta3
+
+1.40.0.cmake3
+-------------
+
+Skipped
 
 1.40.0.cmake2
 -------------

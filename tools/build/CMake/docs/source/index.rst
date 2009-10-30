@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 
-Boost-CMake |version|
+Boost-CMake |release|
 =====================
 
 Boost.\ `CMake <http://www.cmake.org>`_ is an alternate
@@ -32,12 +32,14 @@ Users's guide
    quickstart
    build_configuration
    build_variants
+   exported_targets
    testing
    individual_libraries
    add_boost_library
    add_compiled_library
    adding_regression_tests
    build_installer
+   external_dependencies
    notes_by_version
 
 .. modularize_library
@@ -52,6 +54,7 @@ Reference
    reference/boost_module
    reference/boost_add_library
    reference/boost_add_executable
+   reference/boost_python_module
    reference/boost_additional_test_dependencies
    reference/boost_test_compile
    reference/boost_test_compile_fail
@@ -73,6 +76,16 @@ When you're ready to see the html::
 
 Once you've written a ton of docs, push them someplace where I can see
 them (or use ``git diff`` to send a patch).
+
+Release checklist
+=================
+
+* Update ``BOOST_CMAKE_VERSION`` in toplevel ``CMakeLists.txt``
+* Update notes by version in ``tools/build/CMake/docs/notes_by_version.rst``
+* Reconfig cmake with ``BOOST_MAINTAINER`` set to ON
+* Rebuild docs and commit
+* Tag commit with ``BOOST_CMAKE_VERSION``
+* ``make do-release``
 
 Index
 =====

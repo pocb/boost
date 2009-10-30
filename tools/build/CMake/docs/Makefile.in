@@ -96,3 +96,6 @@ deploy:
 	make -C build/latex all-pdf
 	scp build/latex/boost-@BOOST_CMAKE_VERSION@.pdf @BOOST_CMAKE_URL@
 
+deploy-current-docs:
+	make html
+	rsync --delete -va build/html/ @BOOST_CMAKE_HOST@:@BOOST_CMAKE_DOCROOT@/current-docs/

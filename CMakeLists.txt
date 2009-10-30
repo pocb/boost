@@ -24,7 +24,7 @@
 #                                                                        #
 # For more information about CMake, see http://www.cmake.org             #
 ##########################################################################
-cmake_minimum_required(VERSION 2.6.0 FATAL_ERROR)
+cmake_minimum_required(VERSION 2.6.4 FATAL_ERROR)
 project(Boost)
 
 ##########################################################################
@@ -40,11 +40,20 @@ if (BOOST_VERSIONSTR)
   math(EXPR BOOST_VERSION_MINOR "${BOOST_VERSIONSTR} / 100 % 1000")
   math(EXPR BOOST_VERSION_SUBMINOR "${BOOST_VERSIONSTR} % 100")
   set(BOOST_VERSION "${BOOST_VERSION_MAJOR}.${BOOST_VERSION_MINOR}.${BOOST_VERSION_SUBMINOR}")
-  message(STATUS "Boost version ${BOOST_VERSION}")
 else()
   message(FATAL_ERROR 
     "Unable to parse Boost version from ${CMAKE_CURRENT_SOURCE_DIR}/boost/version.hpp")
 endif()
+
+set(BOOST_CMAKE_VERSION "${BOOST_VERSION}.cmake5")
+
+#
+#  For intermittent deployment of docs
+#
+set(BOOST_CMAKE_HOST sodium.resophonic.com)
+set(BOOST_CMAKE_DOCROOT /var/www/htdocs/boost-cmake/)
+set(BOOST_CMAKE_VERSIONED_DOCROOT ${BOOST_CMAKE_DOCROOT}/${BOOST_CMAKE_VERSION})
+set(BOOST_CMAKE_URL ${BOOST_CMAKE_HOST}:${BOOST_CMAKE_VERSIONED_DOCROOT})
 
 #
 # BOOST_MAINTAINER: undocced variable that sets up maintainer mode
@@ -54,23 +63,11 @@ if(BOOST_MAINTAINER)
   #  Put the boost.cmake version someplace sphinx can get it
   #  for use in generated documentation
   #
-  set(BOOST_CMAKE_VERSION "${BOOST_VERSION}.cmake3")
   set(CMAKE_DOCS_DIR ${CMAKE_SOURCE_DIR}/tools/build/CMake/docs/)
-  set(BOOST_CMAKE_HOST sodium)
-  set(BOOST_CMAKE_DOCROOT /var/www/htdocs/boost-cmake/${BOOST_CMAKE_VERSION})
-  set(BOOST_CMAKE_URL ${BOOST_CMAKE_HOST}:${BOOST_CMAKE_DOCROOT})
-
-
-  configure_file(${CMAKE_DOCS_DIR}/source/boost_cmake_version.py.in
-    ${CMAKE_DOCS_DIR}/source/boost_cmake_version.py)
-  configure_file(${CMAKE_DOCS_DIR}/Makefile.in
-    ${CMAKE_DOCS_DIR}/Makefile)
-  
-
   add_custom_target(do-release
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-    COMMAND git archive --format=tar --prefix=boost-${BOOST_CMAKE_VERSION} ${BOOST_CMAKE_VERSION} | gzip --best > boost-${BOOST_CMAKE_VERSION}.tar.gz
-    COMMAND git archive --format=zip -9 --prefix=boost-${BOOST_CMAKE_VERSION} ${BOOST_CMAKE_VERSION} > boost-${BOOST_CMAKE_VERSION}.zip
+    COMMAND git archive --format=tar --prefix=boost-${BOOST_CMAKE_VERSION}/ ${BOOST_CMAKE_VERSION} | gzip --best > boost-${BOOST_CMAKE_VERSION}.tar.gz
+    COMMAND git archive --format=zip -9 --prefix=boost-${BOOST_CMAKE_VERSION}/ ${BOOST_CMAKE_VERSION} > boost-${BOOST_CMAKE_VERSION}.zip
     COMMAND git log --quiet ${BOOST_CMAKE_VERSION} > /dev/null
     COMMAND ssh ${BOOST_CMAKE_HOST} mkdir -p ${BOOST_CMAKE_DOCROOT}
     COMMAND scp boost-${BOOST_CMAKE_VERSION}.tar.gz boost-${BOOST_CMAKE_VERSION}.zip ${BOOST_CMAKE_URL}
@@ -92,20 +89,27 @@ configure_file(boost/version.hpp
 # top of the build tree rather than in hard-to-find leaf
 # directories. This simplifies manual testing and the use of the build
 # tree rather than installed Boost libraries.
-SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+# we have to do this to export targets from the build tree
+file(MAKE_DIRECTORY ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/cmake)
+
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 ##########################################################################
 # Boost CMake modules                                                    #
 ##########################################################################
 list(APPEND CMAKE_MODULE_PATH ${Boost_SOURCE_DIR}/tools/build/CMake)
 include(BoostUtils)
+
+message(STATUS "")
+boost_report_pretty("Boost.CMake version" BOOST_CMAKE_VERSION)
+
 include(BoostConfig)
+include(BoostExternals)
 include(BoostCore)
 include(BoostDocs)
 include(BoostTesting)
-message(STATUS "Build name: ${BUILDNAME}")
 ##########################################################################
 
 ##########################################################################
@@ -129,9 +133,16 @@ option(ENABLE_SINGLE_THREADED "Whether to build single-threaded libraries"
 option(ENABLE_MULTI_THREADED "Whether to build multi-threaded libraries" ON)
 
 if(UNIX)
-  option(BUILD_VERSIONED "Add versioning information to names of built files" OFF)
+  option(BUILD_VERSIONED 
+    "Mangle compiler and OS versioning information to into library names" 
+    OFF)
+
+  option(BUILD_SOVERSIONED "Create libraries with soversion set" ON)
+
+  option(INSTALL_VERSIONED "Install to versioned *directories*" OFF)
+
 else(UNIX)
-  option(BUILD_VERSIONED "Add versioning information to names of built files" ON)
+  option(BUILD_VERSIONED "Mangle compiler and OS versioning information to into library names" ON)
 endif(UNIX)
 
 # For now, we only actually support static/dynamic run-time variants for 
@@ -159,19 +170,49 @@ boost_add_extra_variant(PYTHON_NODEBUG PYTHON_DEBUG)
 ##########################################################################
 # Installation                                                           #
 ##########################################################################
-if(BUILD_VERSIONED)
-  if(BOOST_VERSION_SUBMINOR GREATER 0)
-    set(BOOST_HEADER_DIR 
-      "include/boost-${BOOST_VERSION_MAJOR}_${BOOST_VERSION_MINOR}_${BOOST_VERSION_SUBMINOR}")
-  else(BOOST_VERSION_SUBMINOR GREATER 0)
-    set(BOOST_HEADER_DIR 
-      "include/boost-${BOOST_VERSION_MAJOR}_${BOOST_VERSION_MINOR}")  
-  endif(BOOST_VERSION_SUBMINOR GREATER 0)
-else(BUILD_VERSIONED)
-  set(BOOST_HEADER_DIR "include/")
-endif(BUILD_VERSIONED)
+if(INSTALL_VERSIONED)
+
+  if (WIN32)
+    set(sep "_")
+  else()
+    set(sep ".")
+  endif()
+
+  set(verstring "${BOOST_VERSION_MAJOR}${sep}${BOOST_VERSION_MINOR}${sep}${BOOST_VERSION_SUBMINOR}")
+  set(BOOST_INCLUDE_INSTALL_DIR 
+    "include/boost-${verstring}"
+    CACHE STRING "Destination path under CMAKE_INSTALL_PREFIX for header files")
+
+  set(BOOST_LIB_INSTALL_DIR
+    "lib${LIB_SUFFIX}/boost-${verstring}"
+    CACHE STRING "Destination path under CMAKE_INSTALL_PREFIX for libraries")
+
+  set(BOOST_EXE_INSTALL_DIR
+    "bin/boost-${verstring}"
+    CACHE STRING "Destination path under CMAKE_INSTALL_PREFIX for executables")
+
+else()
+
+  set(BOOST_INCLUDE_INSTALL_DIR 
+    "include/"
+    CACHE STRING "Destination path under CMAKE_INSTALL_PREFIX for header files")
+
+  set(BOOST_LIB_INSTALL_DIR
+    "lib${LIB_SUFFIX}"
+    CACHE STRING "Destination path under CMAKE_INSTALL_PREFIX for libraries")
+    
+  set(BOOST_EXE_INSTALL_DIR
+    "bin"
+    CACHE STRING "Destination path under CMAKE_INSTALL_PREFIX for executables")
+
+endif()
+
+# boost_report_pretty("Install include dir:" BOOST_INCLUDE_INSTALL_DIR)
+# boost_report_pretty("Install lib dir:" BOOST_LIB_INSTALL_DIR)
+# boost_report_pretty("Install executable dir:" BOOST_EXE_INSTALL_DIR)
+
 install(DIRECTORY boost 
-  DESTINATION ${BOOST_HEADER_DIR}
+  DESTINATION ${BOOST_INCLUDE_INSTALL_DIR}
   PATTERN "CVS" EXCLUDE
   PATTERN ".svn" EXCLUDE)
 #
@@ -194,20 +235,20 @@ install(DIRECTORY boost
 ##########################################################################
 # Binary packages                                                        #
 ##########################################################################
-set(CPACK_PACKAGE_NAME "Boost")
+set(CPACK_PACKAGE_NAME "Boost C++ Libraries")
 set(CPACK_PACKAGE_VENDOR "Boost.org")
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Boost ${BOOST_VERSION}")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Boost ${BOOST_VERSION} prerelease")
 
-if (EXISTS "${Boost_SOURCE_DIR}/README.txt")
+if (EXISTS "${CMAKE_SOURCE_DIR}/README.txt")
   message(STATUS "Using generic cpack package description file.")
-  set(CPACK_PACKAGE_DESCRIPTION_FILE "${Boost_SOURCE_DIR}/README.txt")
-  set(CPACK_RESOURCE_FILE_README "${Boost_SOURCE_DIR}/README.txt")
+  set(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_SOURCE_DIR}/README.txt")
+  set(CPACK_RESOURCE_FILE_README "${CMAKE_SOURCE_DIR}/README.txt")
 endif ()
 
-set(CPACK_RESOURCE_FILE_LICENSE "${Boost_SOURCE_DIR}/LICENSE_1_0.txt")
-if (EXISTS "${Boost_SOURCE_DIR}/Welcome.txt")
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE_1_0.txt")
+if (EXISTS "${CMAKE_SOURCE_DIR}/Welcome.txt")
   message(STATUS "Using generic cpack welcome file.")
-  set(CPACK_RESOURCE_FILE_WELCOME "${Boost_SOURCE_DIR}/Welcome.txt")
+  set(CPACK_RESOURCE_FILE_WELCOME "${CMAKE_SOURCE_DIR}/Welcome.txt")
 endif()
 
 set(CPACK_PACKAGE_VERSION "${BOOST_VERSION}")
@@ -220,9 +261,10 @@ if(WIN32 AND NOT UNIX)
   # There is a bug in NSI that does not handle full unix paths properly. Make
   # sure there is at least one set of four (4) backlasshes.
   # NOTE: No Boost icon yet
-#  set(CPACK_PACKAGE_ICON "${Boost_SOURCE_DIR}/tools/build/CMake\\\\InstallIcon.bmp")
+  set(CPACK_MONOLITHIC_INSTALL ON) # don't be modular for now
+  set(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/tools/build/CMake\\\\Boost.bmp")
 #  set(CPACK_NSIS_INSTALLED_ICON_NAME "bin\\\\MyExecutable.exe")
-  set(CPACK_NSIS_DISPLAY_NAME "Boost ${BOOST_VERSION_MAJOR}.${BOOST_VERSION_MINOR}.${BOOST_VERSION_SUBMINOR}")
+  set(CPACK_NSIS_DISPLAY_NAME "Boost ${BOOST_VERSION_MAJOR}.${BOOST_VERSION_MINOR}.${BOOST_VERSION_SUBMINOR} prerelease")
   set(CPACK_NSIS_HELP_LINK "http:\\\\\\\\www.boost.org")
   set(CPACK_NSIS_URL_INFO_ABOUT "http:\\\\\\\\www.boost.org")
   set(CPACK_NSIS_CONTACT "boost-users@lists.boost.org")
@@ -272,15 +314,33 @@ endif()
 if (TEST_INSTALLED_TREE)
   # Use the headers from the installation directory
   include_directories("${CMAKE_INSTALL_PREFIX}/${BOOST_HEADER_DIR}")
-else (TEST_INSTALLED_TREE)
+elseif (BOOST_CMAKE_SELFTEST)
+  # Use selftest headers
+  include_directories("${BOOST_CMAKE_SELFTEST_ROOT}/include")
+  # and regular boost headers
+  include_directories(${CMAKE_SOURCE_DIR})
+
+else()
   # Use the headers directly from the Boost source tree (in boost/)
-  include_directories(${Boost_SOURCE_DIR})
+  include_directories(${CMAKE_SOURCE_DIR})
 endif (TEST_INSTALLED_TREE)
+
+set(BOOST_COMPILED_PROJECTS "" CACHE INTERNAL "Compiled projects list" FORCE)
 
 # Boost.Build version 2 does this due to trouble with autolinking
 # during building and testing.  
 # TODO: See if we can actually use auto-linking in our regression tests.
 add_definitions(-DBOOST_ALL_NO_LIB=1)
+
+set(BOOST_EXPORTS_FILE ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/cmake/Boost.cmake
+  CACHE FILEPATH "File to export targets from boost build directory")
+
+file(REMOVE ${BOOST_EXPORTS_FILE})
+
+set(BOOST_INSTALL_EXPORTS_FILE ${BOOST_LIB_INSTALL_DIR}/cmake
+  CACHE STRING "Install location for cmake exports")
+
+mark_as_advanced(BOOST_BUILD_EXPORTS_FILE BOOST_INSTALL_EXPORTS_FILE)
 
 # Add build rules for documentation
 add_subdirectory(doc)
@@ -293,6 +353,7 @@ add_subdirectory(libs)
 add_subdirectory(tools)
 ##########################################################################
 
-if (UNIX)
-  add_custom_target(plastic_cats_and_dogs COMMENT "How the factory should be modeled?")
-endif()
+install(EXPORT Boost DESTINATION ${BOOST_INSTALL_EXPORTS_FILE})
+
+add_subdirectory(tools/build/CMake)
+

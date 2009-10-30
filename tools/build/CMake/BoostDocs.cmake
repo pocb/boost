@@ -101,7 +101,7 @@ macro(xsl_transform OUTPUT INPUT)
   else()
     # Run the XSLT processor to do the XML transformation.
     add_custom_command(OUTPUT ${THIS_XSL_OUTPUT_FILE}
-      COMMAND ${THIS_XSL_CATALOG} ${XSLTPROC} ${XSLTPROC_FLAGS} 
+      COMMAND ${THIS_XSL_CATALOG} ${XSLTPROC_EXECUTABLE} ${XSLTPROC_FLAGS} 
               ${THIS_XSL_EXTRA_FLAGS} -o ${THIS_XSL_OUTPUT} 
               --path ${CMAKE_CURRENT_BINARY_DIR}
               ${THIS_XSL_STYLESHEET} ${INPUT}
@@ -157,7 +157,7 @@ macro(doxygen_to_boostbook OUTPUT)
   get_filename_component(DOXYFILE_NAME ${OUTPUT} NAME_WE)
   set(DOXYFILE ${DOXYFILE_PATH}/${DOXYFILE_NAME}.doxyfile)
   execute_process(
-    COMMAND ${DOXYGEN} -s -g ${DOXYFILE}
+    COMMAND ${DOXYGEN_EXECUTABLE} -s -g ${DOXYFILE}
     OUTPUT_QUIET ERROR_QUIET)
 
   # Update the Doxygen configuration file for XML generation
@@ -182,7 +182,7 @@ macro(doxygen_to_boostbook OUTPUT)
 
   # Generate Doxygen XML
   add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/xml/index.xml
-    COMMAND ${DOXYGEN} ${DOXYFILE}
+    COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYFILE}
     COMMENT "Generating Doxygen XML output for Boost.${BOOST_PROJECT_NAME}..."
     DEPENDS ${THIS_DOXY_HEADERS})
 
@@ -443,11 +443,6 @@ endmacro(download_docbook_xsl)
 set(WANT_DOCBOOK_DTD_VERSION 4.2)
 set(WANT_DOCBOOK_XSL_VERSION 1.73.2)
 
-# Find xsltproc to transform XML documents via XSLT
-find_program(XSLTPROC xsltproc DOC "xsltproc transforms XML via XSLT")
-set(XSLTPROC_FLAGS "--xinclude" CACHE STRING 
-  "Flags to pass to xsltproc to transform XML documents")
-
 # Find the DocBook DTD (version 4.2)
 find_path(DOCBOOK_DTD_DIR docbookx.dtd
   PATHS "${CMAKE_BINARY_DIR}/docbook-dtd-${WANT_DOCBOOK_DTD_VERSION}"
@@ -470,10 +465,7 @@ find_path(BOOSTBOOK_XSL_DIR docbook.xsl
   DOC "Path to the BoostBook XSL stylesheets")
 mark_as_advanced(BOOSTBOOK_XSL_DIR)
 
-# Try to find Doxygen
-find_package(Doxygen)
-
-if (XSLTPROC AND DOXYGEN)
+if (XSLTPROC_EXECUTABLE AND DOXYGEN)
   if (DOCBOOK_DTD_DIR AND DOCBOOK_XSL_DIR)
     # Documentation build options
     option(BUILD_DOCUMENTATION "Whether to build library documentation" ON)
@@ -507,10 +499,10 @@ endif()
 # Turn off BUILD_DOCUMENTATION if it isn't going to succeed.
 if (BUILD_DOCUMENTATION)
   set(BUILD_DOCUMENTATION_OKAY TRUE)
-  if (NOT XSLTPROC)
+  if (NOT XSLTPROC_FOUND)
     set(BUILD_DOCUMENTATION_OKAY FALSE)
     message(STATUS "Docs build disabled due to missing xsltproc")
-  elseif (NOT DOXYGEN)
+  elseif (NOT DOXYGEN_FOUND)
     set(BUILD_DOCUMENTATION_OKAY FALSE)
     message(STATUS "Docs build disabled due to missing doxygen")
   elseif (NOT DOCBOOK_DTD_DIR)

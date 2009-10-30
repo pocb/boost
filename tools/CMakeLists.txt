@@ -1,14 +1,14 @@
 #
-# Copyright Troy D. Straszheim
+# Copyright Troy D. Straszheim, Doug Gregor
 #
 # Distributed under the Boost Software License, Version 1.0.
 # See http://www.boost.org/LICENSE_1_0.txt
 #
-# return a list of directories that we should add_subdirectory()
+
 macro(boost_collect_lib_dependencies varname filename)
   #message(STATUS "boost_collect_lib_dependencies.... ${Boost_SOURCE_DIR}/libs")
   file(GLOB BOOST_LIBRARY_CMAKE_FILES 
-       RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${Boost_SOURCE_DIR}/libs/*/${filename}")
+       RELATIVE "${CMAKE_LIBS_SOURCE_DIR}" "${BOOST_LIBS_SOURCE_DIR}/*/${filename}")
   foreach(BOOST_LIB_CMAKE_FILE ${BOOST_LIBRARY_CMAKE_FILES})
     #message(STATUS "-- BOOST_LIB_CMAKE_FILE: ${BOOST_LIB_CMAKE_FILE}")
     get_filename_component(BOOST_LIB_DIR ${BOOST_LIB_CMAKE_FILE} PATH)
@@ -21,7 +21,8 @@ endmacro(boost_collect_lib_dependencies varname)
 # the libraries with dependencies.
 boost_collect_lib_dependencies(BOOST_MODULE_DIRS "module.cmake")
 foreach(subdir ${BOOST_MODULE_DIRS})
-  include("${Boost_SOURCE_DIR}/libs/${subdir}/module.cmake")
+  #message("BOOST_MODULE_DIRS=${BOOST_MODULE_DIRS}")
+  include("${subdir}/module.cmake")
 endforeach(subdir)
 
 
@@ -84,7 +85,38 @@ endmacro(boost_tool_dependencies)
 #
 ###############################################################################
 
-# add_subdirectory(quickbook)
-# add_subdirectory(wave)
-add_subdirectory(bcp)
-add_subdirectory(inspect)
+set(BUILD_TOOLS "ALL" CACHE STRING "Semicolon-separated list of tools to build")
+
+message(STATUS "")
+if (BUILD_TOOLS STREQUAL "NONE")
+
+  message(STATUS "Skipping config of tools since BUILD_TOOLS is \"NONE\"")
+
+else()
+
+  message(STATUS "Reading tools...")
+  message(STATUS "")
+
+  file(GLOB BOOST_TOOL_CMAKE_FILES 
+       RELATIVE "${CMAKE_TOOLS_PARENT_DIR}" "${BOOST_TOOLS_PARENT_DIR}/*/CMakeLists.txt")
+  foreach(BOOST_TOOL_CMAKE_FILE ${BOOST_TOOL_CMAKE_FILES})
+    get_filename_component(BOOST_TOOL_DIR ${BOOST_TOOL_CMAKE_FILE} PATH)
+    set(tooldirs ${tooldirs} ${BOOST_TOOL_DIR})
+  endforeach()
+
+  foreach(tooldir 
+      ${tooldirs}
+      )
+    get_filename_component(tooldirname ${tooldir} NAME)
+    list(FIND BUILD_TOOLS ${tooldir} THIS_BUILD_TOOLS_INDEX)
+    if ((THIS_BUILD_TOOLS_INDEX GREATER -1) OR (BUILD_TOOLS STREQUAL "ALL"))
+      message(STATUS "+ ${tooldirname}")
+      add_subdirectory(${tooldir})
+    endif()
+
+  endforeach()
+
+endif()
+  
+message(STATUS "")
+
