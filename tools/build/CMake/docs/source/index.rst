@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 
-Boost-CMake |version|
+Boost-CMake |release|
 =====================
 
 Boost.\ `CMake <http://www.cmake.org>`_ is an alternate

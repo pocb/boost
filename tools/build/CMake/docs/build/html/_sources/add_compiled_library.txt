@@ -200,7 +200,6 @@ check out the build rules for the Boost.IOStreams library at
 http://svn.boost.org/svn/boost/branches/release/libs/iostreams/src/CMakeLists.txt
 
 .. index:: Variants
-.. _variants:
 
 Build Variants
 --------------

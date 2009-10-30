@@ -1,7 +1,7 @@
 .. _configure_and_build:
 
 Configuring the buildspace
-===========================
+==========================
 
 Configuration tools
 -------------------
@@ -275,17 +275,15 @@ BUILD_SOVERSIONED
 Enables the setting of SOVERSION in built libraries.  If
 this is on::
 
-  % ls -l lib/*signal*
-  lrwxrwxrwx 1 troy troy      29 Oct 29 02:22 lib/libboost_signals-mt-d.so -> libboost_signals-mt-d.so.1.41*
-  lrwxrwxrwx 1 troy troy      31 Oct 29 02:22 lib/libboost_signals-mt-d.so.1.41 -> libboost_signals-mt-d.so.1.41.0*
-  -rwxr-xr-x 1 troy troy  835522 Oct 29 02:22 lib/libboost_signals-mt-d.so.1.41.0*
-  lrwxrwxrwx 1 troy troy      27 Oct 29 02:22 lib/libboost_signals-mt.so -> libboost_signals-mt.so.1.41*
-  lrwxrwxrwx 1 troy troy      29 Oct 29 02:22 lib/libboost_signals-mt.so.1.41 -> libboost_signals-mt.so.1.41.0*
-  -rwxr-xr-x 1 troy troy  121886 Oct 29 02:22 lib/libboost_signals-mt.so.1.41.0*
-
-  % readelf -a lib/libboost_signals-mt-d.so | grep -i SONAME
-   0x000000000000000e (SONAME)             Library soname: [libboost_signals-mt-d.so.1.41]
-    
+  % ls -l libboost_thread*.so*
+  lrwxrwxrwx 1 troy troy     30 Oct 29 18:37 libboost_thread-mt-d.so -> libboost_thread-mt-d.so.1.41.0*
+  -rwxr-xr-x 1 troy troy 571361 Oct 29 18:37 libboost_thread-mt-d.so.1.41.0*
+  lrwxrwxrwx 1 troy troy     28 Oct 29 18:37 libboost_thread-mt.so -> libboost_thread-mt.so.1.41.0*
+  -rwxr-xr-x 1 troy troy 114963 Oct 29 18:37 libboost_thread-mt.so.1.41.0*
+  
+  % readelf -a libboost_thread-mt.so | grep SONAME
+   0x000000000000000e (SONAME)             Library soname: [libboost_thread-mt.so.1.41.0]
+      
 and if off::
 
   % ls -l lib/*signals*
@@ -331,9 +329,9 @@ INSTALL_VERSIONED
 This variable controls whether boost versions will be mangled into the
 names of **directories** into which boost is installed.  This is
 different than :ref:`BUILD_VERSIONED`.  This option has effect only
-when run with an empty cache: they will be set as explained below the
-first time CMake is run and thereafter not modified (so that they are
-customizable by users).
+when CMake is run the first time: they will be set as explained below
+the first time thereafter not modified (so that they are customizable
+by users).
 
 Example
 """""""
@@ -378,6 +376,12 @@ and without it, ::
 The relative lib/bin/executable pathnames can be controlled
 individually with the following variables:
 
+.. index:: install paths
+.. _install_paths:
+.. _boost_lib_install_dir:
+.. _boost_include_install_dir:
+.. _boost_exe_install_dir:
+
 ============================  =================== ================================
 Variable                      Default Unversioned Default Versioned
 ============================  =================== ================================
@@ -389,12 +393,66 @@ BOOST_EXE_INSTALL_DIR         bin/                bin/boost-X.YY.ZZ
 The versioned bin/ path is kind of ugly, see :ref:`BUILD_TOOLS` to
 disable the build of these utilities.
 
+.. index:: BOOST_CMAKE_INFRASTRUCTURE_DIR
+.. _boost_cmake_infrastructure_dir:
+
+BOOST_CMAKE_INFRASTRUCTURE_DIR
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This is a directory **outside** the boost install tree, by default
+``/usr/share/boost/cmake``, to which the targets from this boost
+install will be exported: this significanly eases detection of boost
+on the systems by developers who use both Boost and CMake.  The name
+of the file is Boost-|version|.cmake.  See :ref:`exported_targets` for
+more information about how users employ this file.
+
+.. index:: BOOST_INSTALL_FINDBOOST_CMAKE_DRIVERS
+.. _boost_install_findboost_cmake_drivers:
+
+BOOST_INSTALL_FINDBOOST_CMAKE_DRIVERS
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+There are two optional driver files that can be installed to
+``BOOST_CMAKE_INFRASTRUCTURE_DIR``, named ``BoostConfig.cmake`` and
+``BoostConfigVersion.cmake``.  These two files coordinate with
+Boost-|version|.cmake to enable cmake developers to find boost
+installations via the standard cmake incantation::
+
+  find_package(Boost 1.41.0 COMPONENTS thread iostreams)
+
+in their ``CMakeLists.txt``.  These files should be the same from
+release to release, so you may wish to disable their installation.
+
+.. index:: BOOST_EXPORTS_FILE
+.. _BOOST_EXPORTS_FILE:
+
+BOOST_EXPORTS_FILE
+^^^^^^^^^^^^^^^^^^
+
+This is the path to the file that will contain CMake exported targets
+in the build tree, by default it is::
+
+  ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/cmake/Boost.cmake
+
+See :ref:`exported_targets` for information on how to use this handy
+file to simply building against an **uninstalled** boost.
+
+.. index:: BOOST_INSTALL_EXPORTS_FILE
+.. _BOOST_INSTALL_EXPORTS_FILE:
+
+BOOST_INSTALL_EXPORTS_FILE
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This is the path to which the exports file will be installed (only has
+effect when making 'install').  By default it is::
+
+  ${BOOST_LIB_INSTALL_DIR}/cmake
+
+See :ref:`exported_targets` for information on how to use this handy
+file to simply building against an **installed** boost.
+
 System Dependencies
 -------------------
 
 See :ref:`external_dependencies` for information about configuring
 detection of system packages like python and bzip2.
-
-
-
-
