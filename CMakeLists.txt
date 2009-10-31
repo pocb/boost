@@ -337,8 +337,13 @@ set(BOOST_EXPORTS_FILE ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/cmake/Boost.cmake
 
 file(REMOVE ${BOOST_EXPORTS_FILE})
 
-set(BOOST_INSTALL_EXPORTS_FILE ${BOOST_LIB_INSTALL_DIR}/cmake
-  CACHE STRING "Install location for cmake exports")
+if(INSTALL_VERSIONED)
+  set(BOOST_INSTALL_EXPORTS_FILE ${BOOST_LIB_INSTALL_DIR}
+    CACHE STRING "Install location for cmake exports")
+else()
+  set(BOOST_INSTALL_EXPORTS_FILE ${BOOST_LIB_INSTALL_DIR}/boost/cmake
+    CACHE STRING "Install location for cmake exports")
+endif()
 
 mark_as_advanced(BOOST_BUILD_EXPORTS_FILE BOOST_INSTALL_EXPORTS_FILE)
 
