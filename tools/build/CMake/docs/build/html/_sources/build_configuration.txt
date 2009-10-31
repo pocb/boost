@@ -226,14 +226,6 @@ semicolon-separated list of tools (in subdirectory
 the values here are lowercase (only subdirectories of ``tools/``
 matching one of the strings in the list will be traversed by cmake).
 
-Advanced options
-----------------
-
-``ccmake`` provides the keystroke option ``t`` which toggles advanced
-mode.  Some of the useful options here are:
-
-.. _verbosity:
-
 .. index:: verbosity; CMAKE_VERBOSE_MAKEFILE
 
 CMAKE_VERBOSE_MAKEFILE
@@ -242,7 +234,7 @@ CMAKE_VERBOSE_MAKEFILE
   Displays full build commands during build.  Good for debugging.
   This option will generate permanently verbose makefiles; it is
   generally easier to invoke make with the option ``VERBOSE=1``
-  instead (this has the same effect, but for one build only).
+  instead (this has the same effect, but is not persistent).
 
 .. index:: CMAKE_CXX_COMPILER
 

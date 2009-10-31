@@ -1470,10 +1470,6 @@ macro(boost_add_executable EXENAME)
         ${THIS_EXE_LINK_LIBS})
     endif (THIS_EXE_DEBUG_AND_RELEASE)
 
-    # Install the executable, if not suppressed
-    if (NOT THIS_EXE_NO_INSTALL)
-      install(TARGETS ${THIS_EXE_NAME} DESTINATION ${BOOST_EXE_INSTALL_DIR})
-    endif (NOT THIS_EXE_NO_INSTALL)
   endif ()
 endmacro(boost_add_executable)
 

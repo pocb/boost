@@ -178,15 +178,13 @@ if(INSTALL_VERSIONED)
   set(verstring "${BOOST_VERSION_MAJOR}${sep}${BOOST_VERSION_MINOR}${sep}${BOOST_VERSION_SUBMINOR}")
   set(BOOST_INCLUDE_INSTALL_DIR 
     "include/boost-${verstring}"
-    CACHE STRING "Destination path under CMAKE_INSTALL_PREFIX for header files")
+    CACHE STRING "Destination path under CMAKE_INSTALL_PREFIX for header files"
+    FORCE)
 
   set(BOOST_LIB_INSTALL_DIR
     "lib${LIB_SUFFIX}/boost-${verstring}"
-    CACHE STRING "Destination path under CMAKE_INSTALL_PREFIX for libraries")
-
-  set(BOOST_EXE_INSTALL_DIR
-    "bin/boost-${verstring}"
-    CACHE STRING "Destination path under CMAKE_INSTALL_PREFIX for executables")
+    CACHE STRING "Destination path under CMAKE_INSTALL_PREFIX for libraries"
+    FORCE)
 
 else()
 
@@ -198,10 +196,6 @@ else()
     "lib${LIB_SUFFIX}"
     CACHE STRING "Destination path under CMAKE_INSTALL_PREFIX for libraries")
     
-  set(BOOST_EXE_INSTALL_DIR
-    "bin"
-    CACHE STRING "Destination path under CMAKE_INSTALL_PREFIX for executables")
-
 endif()
 
 boost_report_pretty("Install include dir:" BOOST_INCLUDE_INSTALL_DIR)
