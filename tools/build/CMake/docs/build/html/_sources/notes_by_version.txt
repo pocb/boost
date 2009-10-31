@@ -43,11 +43,6 @@ Notes by Boost Version
 This release (as released by upstream Boost) does **not** contain
 CMake support.  See above for independenly released CMake versions.
 
-1.40.0.cmake5
--------------
-
-Backport of features from 1.41.0.cmakebeta5
-
 1.40.0.cmake4
 -------------
 

@@ -34,7 +34,7 @@ Users's guide
    build_variants
    exported_targets
    install_customization
-   external_dependencies
+   externals/index
 
 Developer's guide
 =================
@@ -49,8 +49,6 @@ Developer's guide
    adding_regression_tests
    build_installer
    notes_by_version
-
-.. modularize_library
 
 Reference
 =========

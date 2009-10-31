@@ -1,0 +1,23 @@
+.. _external_dependencies:
+
+External Dependencies
+=====================
+
+Each external dependency has an associated option ``WITH_``\
+*dependency* that controls whether detection of the dependency will
+happen at all.  These options default to ``ON``.  
+
+Each external will set a variable *external*\ ``_FOUND`` if detection
+was successful.  You can 
+
+.. toctree::
+   :maxdepth: 3
+
+   bzip2
+   doxygen
+   expat
+   icu
+   mpi
+   python
+   xsltproc
+   zlib

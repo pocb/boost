@@ -5,13 +5,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Boost-CMake 1.40.0.cmake5 &mdash; Boost.CMake 1.40.0.cmake5</title>
+    <title>Boost-CMake 1.41.0.cmakebeta5 &mdash; Boost.CMake 1.41.0.cmakebeta5</title>
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '1.40.0.cmake5',
+        VERSION:     '1.41.0.cmakebeta5',
         COLLAPSE_MODINDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -19,7 +19,7 @@
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Boost.CMake 1.40.0.cmake5" href="" />
+    <link rel="top" title="Boost.CMake 1.41.0.cmakebeta5" href="" />
     <link rel="next" title="Quickstart" href="quickstart.html" /> 
   </head>
   <body>
@@ -34,7 +34,7 @@
              accesskey="N">next</a> |</li>
     <li><a href="http://www.boost.org/">Boost</a> &raquo;</li>
     
-        <li><a href="">Boost.CMake 1.40.0.cmake5</a> &raquo;</li>
+        <li><a href="">Boost.CMake 1.41.0.cmakebeta5</a> &raquo;</li>
  
       </ul>
     </div>
@@ -45,7 +45,7 @@
             </a></p>
             <h3><a href="">Table Of Contents</a></h3>
             <ul>
-<li><a class="reference external" href="">Boost-CMake 1.40.0.cmake5</a></li>
+<li><a class="reference external" href="">Boost-CMake 1.41.0.cmakebeta5</a></li>
 <li><a class="reference external" href="#users-s-guide">Users&#8217;s guide</a><ul>
 </ul>
 </li>
@@ -77,12 +77,12 @@
           <div class="body">
             
   <div class="section" id="boost-cmake-release">
-<h1>Boost-CMake 1.40.0.cmake5<a class="headerlink" href="#boost-cmake-release" title="Permalink to this headline">¶</a></h1>
+<h1>Boost-CMake 1.41.0.cmakebeta5<a class="headerlink" href="#boost-cmake-release" title="Permalink to this headline">¶</a></h1>
 <p>Boost.<a class="reference external" href="http://www.cmake.org">CMake</a> is an alternate
 build system for boost, under development since boost version 1.35.
 As of Boost version 1.38, boost.cmake can reliably build and
 package boost.</p>
-<dl class="docutils" id="index-980">
+<dl class="docutils" id="index-128">
 <dt><strong>boost-cmake mailing list</strong></dt>
 <dd><a class="reference external" href="http://lists.boost.org/mailman/listinfo.cgi/boost-cmake">http://lists.boost.org/mailman/listinfo.cgi/boost-cmake</a></dd>
 <dt><strong>IRC</strong></dt>
@@ -179,14 +179,21 @@ package boost.</p>
 <li class="toctree-l2"><a class="reference external" href="install_customization.html#boost-install-exports-file">BOOST_INSTALL_EXPORTS_FILE</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference external" href="external_dependencies.html">External Dependencies</a><ul>
-<li class="toctree-l2"><a class="reference external" href="external_dependencies.html#python">Python</a><ul>
-<li class="toctree-l3"><a class="reference external" href="external_dependencies.html#python-executable">PYTHON_EXECUTABLE</a></li>
-<li class="toctree-l3"><a class="reference external" href="external_dependencies.html#python-debug-libraries">PYTHON_DEBUG_LIBRARIES</a></li>
-<li class="toctree-l3"><a class="reference external" href="external_dependencies.html#python-libraries">PYTHON_LIBRARIES</a></li>
-<li class="toctree-l3"><a class="reference external" href="external_dependencies.html#python-include-path">PYTHON_INCLUDE_PATH</a></li>
+<li class="toctree-l1"><a class="reference external" href="externals/index.html">External Dependencies</a><ul>
+<li class="toctree-l2"><a class="reference external" href="externals/bzip2.html">BZip2</a></li>
+<li class="toctree-l2"><a class="reference external" href="externals/doxygen.html">Doxygen</a></li>
+<li class="toctree-l2"><a class="reference external" href="externals/expat.html">Expat</a></li>
+<li class="toctree-l2"><a class="reference external" href="externals/icu.html">ICU (International Components for Unicode)</a></li>
+<li class="toctree-l2"><a class="reference external" href="externals/mpi.html">MPI</a></li>
+<li class="toctree-l2"><a class="reference external" href="externals/python.html">Python</a><ul>
+<li class="toctree-l3"><a class="reference external" href="externals/python.html#python-executable">PYTHON_EXECUTABLE</a></li>
+<li class="toctree-l3"><a class="reference external" href="externals/python.html#python-debug-libraries">PYTHON_DEBUG_LIBRARIES</a></li>
+<li class="toctree-l3"><a class="reference external" href="externals/python.html#python-libraries">PYTHON_LIBRARIES</a></li>
+<li class="toctree-l3"><a class="reference external" href="externals/python.html#python-include-path">PYTHON_INCLUDE_PATH</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference external" href="externals/xsltproc.html">Xsltproc</a></li>
+<li class="toctree-l2"><a class="reference external" href="externals/zlib.html">Zlib</a></li>
 </ul>
 </li>
 </ul>
@@ -232,7 +239,6 @@ package boost.</p>
 <li class="toctree-l2"><a class="reference external" href="notes_by_version.html#cmakebeta4">1.41.0.cmakebeta4</a></li>
 <li class="toctree-l2"><a class="reference external" href="notes_by_version.html#cmakebeta3">1.41.0.cmakebeta3</a></li>
 <li class="toctree-l2"><a class="reference external" href="notes_by_version.html#upstream">1.41.0 (upstream)</a></li>
-<li class="toctree-l2"><a class="reference external" href="notes_by_version.html#cmake5">1.40.0.cmake5</a></li>
 <li class="toctree-l2"><a class="reference external" href="notes_by_version.html#cmake4">1.40.0.cmake4</a></li>
 <li class="toctree-l2"><a class="reference external" href="notes_by_version.html#cmake3">1.40.0.cmake3</a></li>
 <li class="toctree-l2"><a class="reference external" href="notes_by_version.html#cmake2">1.40.0.cmake2</a></li>
@@ -308,12 +314,12 @@ them (or use <tt class="docutils literal"><span class="pre">git</span> <span cla
              >next</a> |</li>
     <li><a href="http://www.boost.org/">Boost</a> &raquo;</li>
     
-        <li><a href="">Boost.CMake 1.40.0.cmake5</a> &raquo;</li>
+        <li><a href="">Boost.CMake 1.41.0.cmakebeta5</a> &raquo;</li>
  
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version 8636cf96fb05ae09d21c260dcaa332961bfebcb8, Fri, 30 Oct 2009.
+      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version b3866dd5749c928c9673dc5acd39a15c21d1c52f, Sat, 31 Oct 2009.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

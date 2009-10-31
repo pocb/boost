@@ -144,7 +144,7 @@ The Somewhat harder way
 If your boost installation does *not* come with the file installed
 when :ref:`BOOST_INSTALL_FINDBOOST_CMAKE_DRIVERS`, you will need to
 specify the path to the Boost.cmake file installed in
-:ref:`BOOST_LIB_INSTALL_DIR <install_paths>` (try
+:ref:`BOOST_LIB_INSTALL_DIR` (try
 ``$CMAKE_INSTALL_PREFIX/lib/boost/cmake/Boost.cmake``
 
 

@@ -5,13 +5,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Tricks for Building against Boost with CMake &mdash; Boost.CMake 1.40.0.cmake5</title>
+    <title>Tricks for Building against Boost with CMake &mdash; Boost.CMake 1.41.0.cmakebeta5</title>
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '1.40.0.cmake5',
+        VERSION:     '1.41.0.cmakebeta5',
         COLLAPSE_MODINDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -19,7 +19,7 @@
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Boost.CMake 1.40.0.cmake5" href="index.html" />
+    <link rel="top" title="Boost.CMake 1.41.0.cmakebeta5" href="index.html" />
     <link rel="next" title="Customizing the install" href="install_customization.html" />
     <link rel="prev" title="Build Variants and Features" href="build_variants.html" /> 
   </head>
@@ -38,7 +38,7 @@
              accesskey="P">previous</a> |</li>
     <li><a href="http://www.boost.org/">Boost</a> &raquo;</li>
     
-        <li><a href="index.html">Boost.CMake 1.40.0.cmake5</a> &raquo;</li>
+        <li><a href="index.html">Boost.CMake 1.41.0.cmakebeta5</a> &raquo;</li>
  
       </ul>
     </div>
@@ -82,8 +82,8 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <span class="target" id="index-1019"></span><div class="section" id="tricks-for-building-against-boost-with-cmake">
-<span id="exported-targets"></span><span id="index-1020"></span><h1>Tricks for Building against Boost with CMake<a class="headerlink" href="#tricks-for-building-against-boost-with-cmake" title="Permalink to this headline">¶</a></h1>
+  <span class="target" id="index-112"></span><div class="section" id="tricks-for-building-against-boost-with-cmake">
+<span id="exported-targets"></span><span id="index-113"></span><h1>Tricks for Building against Boost with CMake<a class="headerlink" href="#tricks-for-building-against-boost-with-cmake" title="Permalink to this headline">¶</a></h1>
 <p>Boost.CMake <em>exports</em> its targets, making developing independent
 projects against an installed boost, or simply against a build tree
 sitting on disk.  There are a variety of ways to use these to ease
@@ -115,7 +115,7 @@ disk.   <tt class="docutils literal"><span class="pre">make</span> <span class="
 </li>
 </ol>
 <div class="section" id="with-an-uninstalled-build">
-<span id="uninstalled"></span><span id="index-1021"></span><h2>With an uninstalled build<a class="headerlink" href="#with-an-uninstalled-build" title="Permalink to this headline">¶</a></h2>
+<span id="uninstalled"></span><span id="index-114"></span><h2>With an uninstalled build<a class="headerlink" href="#with-an-uninstalled-build" title="Permalink to this headline">¶</a></h2>
 <p>You only need to do three things:</p>
 <ol class="arabic">
 <li><p class="first">Add the appropriate include directory.  This is either
@@ -208,7 +208,7 @@ Linking CXX executable main
 <p>If your boost installation does <em>not</em> come with the file installed
 when <a class="reference external" href="install_customization.html#boost-install-findboost-cmake-drivers"><em>BOOST_INSTALL_FINDBOOST_CMAKE_DRIVERS</em></a>, you will need to
 specify the path to the Boost.cmake file installed in
-<a class="reference external" href="install_customization.html#install-paths"><em>BOOST_LIB_INSTALL_DIR</em></a> (try
+<a class="reference external" href="install_customization.html#boost-lib-install-dir"><em>BOOST_LIB_INSTALL_DIR</em></a> (try
 <tt class="docutils literal"><span class="pre">$CMAKE_INSTALL_PREFIX/lib/boost/cmake/Boost.cmake</span></tt></p>
 <p class="rubric">Footnotes</p>
 <table class="docutils footnote" frame="void" id="libsuffix" rules="none">
@@ -246,12 +246,12 @@ versioned subdirectory of lib, e.g. <tt class="docutils literal"><span class="pr
              >previous</a> |</li>
     <li><a href="http://www.boost.org/">Boost</a> &raquo;</li>
     
-        <li><a href="index.html">Boost.CMake 1.40.0.cmake5</a> &raquo;</li>
+        <li><a href="index.html">Boost.CMake 1.41.0.cmakebeta5</a> &raquo;</li>
  
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version 8636cf96fb05ae09d21c260dcaa332961bfebcb8, Fri, 30 Oct 2009.
+      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version b3866dd5749c928c9673dc5acd39a15c21d1c52f, Sat, 31 Oct 2009.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

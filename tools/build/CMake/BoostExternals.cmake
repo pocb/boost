@@ -23,15 +23,24 @@ macro(boost_external_report NAME)
 endmacro()
 
 foreach(external
+    BZip2
+    Doxygen
+    Expat
+    ICU
     MPI
     Python
-    BZip2
-    ZLib
-    Expat
-    Doxygen
     Xsltproc
+    ZLib
     )
   message(STATUS "")
   message(STATUS "${external}:")
-  include(${CMAKE_SOURCE_DIR}/tools/build/CMake/externals/${external}.cmake)
+  string(TOUPPER "${external}" EXTERNAL)
+  option(WITH_${EXTERNAL} "Attempt to find and configure ${external}" ON)
+  if(WITH_${EXTERNAL})
+    include(${CMAKE_SOURCE_DIR}/tools/build/CMake/externals/${external}.cmake)
+  else()
+    set(${EXTERNAL}_FOUND FALSE CACHE BOOL "${external} found" FORCE)
+    message(STATUS "Disabled since WITH_${EXTERNAL}=OFF")
+  endif()
 endforeach()
+message(STATUS "")
