@@ -118,11 +118,11 @@ find without setting any particular path::
   add_executable(main main.cpp)
   target_link_libraries(main ${Boost_LIBRARIES})
 
-.. rubric:: Note: 
+.. rubric:: Note 
 
-   the ``NO_MODULE`` is required if your cmake is older than (FIXME,
-   currently required with all versions, modification to the
-   FindBoost.cmake distributed with cmake itself is required).
+the ``NO_MODULE`` is required if your cmake is older than (FIXME,
+currently required with all versions, modification to the
+FindBoost.cmake distributed with cmake itself is required).
 
 Here, having installed to ``/usr/local/boost-1.41.0``, I see::
 
