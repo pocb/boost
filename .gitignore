@@ -2,4 +2,9 @@
 ._*
 *.pyc
 /*.tar.gz
+bin.v2/
+bjam
+dist/
+project-config.jam
+tools/jam/src
 
