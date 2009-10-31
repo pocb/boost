@@ -5,24 +5,20 @@
 # See http://www.boost.org/LICENSE_1_0.txt
 #
 
-#
-# Look for the ICU library. If found, compile support into boost_regex.
-#
-include(FindICU)
-
 set(BOOST_REGEX_ICU_LIBRARIES)
-option(BOOST_REGEX_WITHOUT_ICU OFF "Build regex w/o ICU even if it is available.")
-if (ICU_FOUND AND ICU_I18N_FOUND AND (NOT BOOST_REGEX_WITHOUT_ICU))
+
+if (ICU_FOUND AND ICU_I18N_FOUND)
 
   add_definitions(-DBOOST_HAS_ICU=1)
   include_directories(${ICU_INCLUDE_DIRS})
   set(BOOST_REGEX_ICU_LIBRARIES ${ICU_LIBRARIES} ${ICU_I18N_LIBRARIES})
-  message(STATUS "+-- ICU support added.")
+  message(STATUS "+-- ICU (unicode) available, enabling support.")
   set(NO_STATIC_IF_ICU_FOUND "NO_STATIC")
 
 else()
-  message(STATUS "+-- ICU not found, omitting strictly optional feature.")
-  message(STATUS "    See Boost.Regex documentation for more information.")
+
+  message(STATUS "+-- ICU (unicode) not available, disabling support.")
+
 endif()
  
 boost_add_library(boost_regex
