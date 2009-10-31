@@ -147,7 +147,7 @@ pages and pages of reference doumentation.
     [[`lazy(fp)`]           [Attribute of `P` where `P`
                             is the return type of `fp`] [Invoke `fp` at parse time, returning a parser
                                                         `p` which is then called to parse.]]
-    [[`fp`]                 [see `lazy(fp)` above]      [Equivalent to `lazy[fp]`]]
+    [[`fp`]                 [see `lazy(fp)` above]      [Equivalent to `lazy(fp)`]]
     [[__qi_attr__]          [`Attrib`]                  [Doesn't consume/parse any input, but exposes the 
                                                          argument `attrib` as its attribute.]]
 ]
@@ -180,9 +180,9 @@ pages and pages of reference doumentation.
     [[__qi_raw__`[a]`]              [__boost_iterator_range__`<I>`] [Presents the transduction of `a` as an iterator range]]
 
     [[[qi_repeat `repeat[a]`]]      [`vector<A>`]                   [Repeat `a` zero or more times]]
-    [[[qi_repeat `(N)[a]`]]         [`vector<A>`]                   [Repeat `a` `N` times]]
-    [[[qi_repeat `(N, M)[a]`]]      [`vector<A>`]                   [Repeat `a` `N` to `M` times]]
-    [[[qi_repeat `(N, inf)[a]`]]    [`vector<A>`]                   [Repeat `a` `N` or more times]]
+    [[[qi_repeat `repeat(N)[a]`]]         [`vector<A>`]                   [Repeat `a` `N` times]]
+    [[[qi_repeat `repeat(N, M)[a]`]]      [`vector<A>`]                   [Repeat `a` `N` to `M` times]]
+    [[[qi_repeat `repeat(N, inf)[a]`]]    [`vector<A>`]                   [Repeat `a` `N` or more times]]
 
     [[__qi_skip__`[a]`]             [`A`]                           [Re-establish the skipper that got inhibited by lexeme]]
     [[__qi_skip__`(p)[a]`]          [`A`]                           [Use `p` as a skipper for parsing `a`]]
@@ -211,7 +211,7 @@ pages and pages of reference doumentation.
     [[`a ^ b`]              [`tuple<`
                                 `optional<A>,`
                                 `optional<B> >`
-                            ]                           [Permutation. Parse `a` and `b` in any order]]
+                            ]                           [Permutation. Parse `a` or `b` or `a` followed by `b` or `b` followed by `a`.]]
 ]
 
 [endsect]
@@ -281,8 +281,9 @@ a: vector<A>, b: vector<A> --> (a > b): vector<A>``]]
 
     [[`a | b`]
 [``a: A, b: B --> (a | b): variant<A, B>
-a: A, b: Unused --> (a | b): A
-a: Unused, b: B --> (a | b): B
+a: A, b: Unused --> (a | b): optional<A>
+a: A, b: B, c: Unused --> (a | b | c): optional<variant<A, B> >
+a: Unused, b: B --> (a | b): optional<B>
 a: Unused, b: Unused --> (a | b): Unused
 a: A, b: A --> (a | b): A``]]
 
@@ -328,7 +329,7 @@ a: Unused, b: Unused --> (a ^ b): Unused``]]
 
 [endsect]
 
-[section Non-terminals]
+[section:non_terminals Nonterminals]
 
 [variablelist Notation
     [[`RT`]                     [Synthesized attribute. The rule or grammar's return type.]]
@@ -350,7 +351,7 @@ a: Unused, b: Unused --> (a ^ b): Unused``]]
 
 [variablelist Template Arguments
     [[`Iterator`]               [The iterator type you will use for parsing.]]
-    [[`A1`, `A2`, `A3`]         [Can be one of 1)Signature 2)Locals 3)Skipper.]]
+    [[`A1`, `A2`, `A3`]         [Can be one of 1) Signature 2) Locals 3) Skipper.]]
 ]
 
 [table
@@ -390,7 +391,6 @@ a: Unused, b: Unused --> (a ^ b): Unused``]]
 ``
     ]                                           [Grammar definition. `name` is an optional string that gives the
                                                 grammar its name, useful for debugging and error handling.]]
-    [[my_grammar<Iterator> g]                   [Instantiating a grammar]]
     [[`g.name(name)`]                           [Naming a grammar]]
     [[`g.name()`]                               [Getting the name of a grammar]]
 ]

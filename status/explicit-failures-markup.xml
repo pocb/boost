@@ -3666,7 +3666,12 @@ for more information.
             <test name="test3"/>
             <toolset name="qcc-3.3.5*cpp"/>
             <note author="Jim Douglas" date="14 Feb 06" refid="27"/>
-       </mark-expected-failures>
+        </mark-expected-failures>
+        <mark-expected-failures>
+            <test name="begin_end"/>
+            <toolset name="msvc-7.1"/>
+            <note author="Gunter Winkler" date="07 Oct 09" refid="48"/>
+        </mark-expected-failures>
     </library>
 
     <!-- program_options -->
@@ -4937,6 +4942,38 @@ for more information.
 The Borland compiler and HP-UX aC++ compiler in default mode fail to bind rvalues to the thread move constructor,
 choosing instead to bind them to the private (and unimplemented) copy constructor.
 With aC++, the tests compile cleanly in strict ansi mode and succeed.
+            </note>
+        </mark-expected-failures>
+        <mark-expected-failures>
+            <test name="test_thread_move_return"/>
+            <test name="test_thread_move_return_lib"/>
+            <toolset name="gcc-3.4.3"/>
+            <toolset name="gcc-4.2.4"/>
+            <toolset name="gcc-4.3.3"/>
+            <toolset name="gcc-4.4.1"/>
+            <toolset name="gcc-mingw-4.4.1"/>
+            <toolset name="darwin-*"/>
+            <toolset name="sun-*"/>
+            <toolset name="acc-*"/>
+            <note author="Anthony Williams" date="2009-10-28">
+These tests will fail in most compilers that don't support rvalue references.
+            </note>
+        </mark-expected-failures>
+        <mark-expected-failures>
+            <test name="test_thread_return_local"/>
+            <test name="test_thread_return_local_lib"/>
+            <toolset name="gcc-3.4.3"/>
+            <toolset name="gcc-4.2.4"/>
+            <toolset name="gcc-4.3.3"/>
+            <toolset name="gcc-4.4.1"/>
+            <toolset name="gcc-mingw-4.4.1"/>
+            <toolset name="darwin-*"/>
+            <toolset name="sun-*"/>
+            <toolset name="acc-*"/>
+            <toolset name="msvc-*"/>
+            <toolset name="intel-*"/>
+            <note author="Anthony Williams" date="2009-10-28">
+These tests will fail in most compilers that don't support rvalue references.
             </note>
         </mark-expected-failures>
     </library>
@@ -6322,6 +6359,10 @@ With aC++, the tests compile cleanly in strict ansi mode and succeed.
     <note id="47">
         Depending on system load, the compile time may exceed specified timeout value.
         The test passes when the timeout value is increased.
+    </note>
+
+    <note id="48">
+        This test fails when BOOST_UBLAS_NO_NESTED_CLASS_RELATION is defined.
     </note>
 
 </explicit-failures-markup>

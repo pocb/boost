@@ -13,6 +13,6 @@
 #pragma once
 #endif
 
-#include <boost/spirit/home/qi/skip_over.hpp>
+#include <boost/spirit/home/qi/directive/skip.hpp>
 
 #endif
