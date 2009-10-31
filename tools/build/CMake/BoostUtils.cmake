@@ -254,9 +254,8 @@ endmacro()
 #
 #  assert that ARG is actually a library target
 #
-macro(assert_is_lib_target ARG)
+macro(dependency_check ARG)
   if (NOT ("${ARG}" STREQUAL ""))
-    # message(STATUS ">>> ${ARG}")
     get_target_property(deptype ${ARG} TYPE)
     if(NOT deptype MATCHES ".*_LIBRARY$")
       set(DEPENDENCY_OKAY FALSE)

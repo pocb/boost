@@ -9,13 +9,13 @@ boost_tool_project(bcp
   AUTHORS "John Maddock"
   )
 
-add_definitions(-DBOOST_REGEX_DYN_LINK=1)
+add_definitions(-DBOOST_REGEX_DYN_LINK=1 -DBOOST_TEST_NO_AUTO_LINK=1)
 
 boost_add_executable( bcp
 
   add_path.cpp 
   bcp_imp.cpp 
-  copy_path.cpp 
+  copy_path.cpp
   file_types.cpp
   fileview.cpp 
   main.cpp 
@@ -25,5 +25,8 @@ boost_add_executable( bcp
   scan_licence.cpp 
   output_licence_info.cpp
 
-  DEPENDS boost_system boost_filesystem boost_prg_exec_monitor boost_regex-mt-shared
+  DEPENDS boost_system boost_filesystem boost_prg_exec_monitor boost_regex
+  STATIC_COMPILE_FLAGS -DBOOST_SYSTEM_STATIC_LINK=1
+  RELEASE
+  STATIC
   )

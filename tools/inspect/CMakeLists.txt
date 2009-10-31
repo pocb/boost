@@ -16,8 +16,5 @@ boost_add_executable(inspect
   end_check.cpp unnamed_namespace_check.cpp ascii_check.cpp
   copyright_check.cpp minmax_check.cpp 
 
-  DEPENDS boost_filesystem boost_system 
-  # be specific about the shared boost regex as the
-  # static one wont exist if ICU is found
-  boost_regex-mt-shared
+  DEPENDS boost_filesystem boost_system boost_regex
   )

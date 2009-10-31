@@ -1,10 +1,9 @@
-.. _external_dependencies:
+.. index:: Python
+.. _python_external:
 
-External Dependencies
-=====================
-
-Python
-------
+========
+ Python
+========
 
 By default, Boost.CMake will use the python detection built in to
 cmake.  The relevant variables (command line or environment) are:
@@ -13,7 +12,7 @@ cmake.  The relevant variables (command line or environment) are:
 .. _python_executable:
 
 PYTHON_EXECUTABLE
-~~~~~~~~~~~~~~~~~
+-----------------
 
 The path to the python executable, e.g. ``/usr/local/Python-3.1.1/bin/python3``
 
@@ -21,7 +20,7 @@ The path to the python executable, e.g. ``/usr/local/Python-3.1.1/bin/python3``
 .. _python_debug_libraries:
 
 PYTHON_DEBUG_LIBRARIES
-~~~~~~~~~~~~~~~~~~~~~~
+----------------------
 
 The path to the python debug library,  typically only used by developers.
 
@@ -29,7 +28,7 @@ The path to the python debug library,  typically only used by developers.
 .. _python_libraries:
 
 PYTHON_LIBRARIES
-~~~~~~~~~~~~~~~~
+----------------
 
 The path to the python library,
 e.g. ``/usr/local/Python-3.1.1/lib/libpython3.1.so``
@@ -39,7 +38,7 @@ e.g. ``/usr/local/Python-3.1.1/lib/libpython3.1.so``
 .. _python_include_path:
 
 PYTHON_INCLUDE_PATH
-~~~~~~~~~~~~~~~~~~~
+-------------------
 
 The path to the include directory,
 e.g. ``/usr/local/Python-3.1.1/include/python3.1``.  Note that cmake
@@ -86,6 +85,4 @@ like::
 **NOTE**, once successfully detected, the python configuration will
 not be redetected.  To modify, edit the relevant entries in your
 CMakeCache.txt, or delete it entirely to trigger redetection.
-
-
 

@@ -34,7 +34,7 @@ Users's guide
    build_variants
    exported_targets
    install_customization
-   external_dependencies
+   externals/index
 
 Developer's guide
 =================

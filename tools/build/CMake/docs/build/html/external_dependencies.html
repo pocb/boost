@@ -57,6 +57,7 @@
 <li><a class="reference external" href="#python-include-path">PYTHON_INCLUDE_PATH</a></li>
 </ul>
 </li>
+<li><a class="reference external" href="#icu-international-components-for-unicode">ICU (International Components for Unicode</a></li>
 </ul>
 </li>
 </ul>
@@ -87,20 +88,20 @@
 <p>By default, Boost.CMake will use the python detection built in to
 cmake.  The relevant variables (command line or environment) are:</p>
 <div class="section" id="python-executable">
-<span id="index-1170"></span><span id="id2"></span><h3>PYTHON_EXECUTABLE<a class="headerlink" href="#python-executable" title="Permalink to this headline">¶</a></h3>
+<span id="index-1235"></span><span id="id2"></span><h3>PYTHON_EXECUTABLE<a class="headerlink" href="#python-executable" title="Permalink to this headline">¶</a></h3>
 <p>The path to the python executable, e.g. <tt class="docutils literal"><span class="pre">/usr/local/Python-3.1.1/bin/python3</span></tt></p>
 </div>
 <div class="section" id="python-debug-libraries">
-<span id="index-1171"></span><span id="id3"></span><h3>PYTHON_DEBUG_LIBRARIES<a class="headerlink" href="#python-debug-libraries" title="Permalink to this headline">¶</a></h3>
+<span id="index-1236"></span><span id="id3"></span><h3>PYTHON_DEBUG_LIBRARIES<a class="headerlink" href="#python-debug-libraries" title="Permalink to this headline">¶</a></h3>
 <p>The path to the python debug library,  typically only used by developers.</p>
 </div>
 <div class="section" id="python-libraries">
-<span id="index-1172"></span><span id="id4"></span><h3>PYTHON_LIBRARIES<a class="headerlink" href="#python-libraries" title="Permalink to this headline">¶</a></h3>
+<span id="index-1237"></span><span id="id4"></span><h3>PYTHON_LIBRARIES<a class="headerlink" href="#python-libraries" title="Permalink to this headline">¶</a></h3>
 <p>The path to the python library,
 e.g. <tt class="docutils literal"><span class="pre">/usr/local/Python-3.1.1/lib/libpython3.1.so</span></tt></p>
-<span class="target" id="index-1173"></span></div>
+<span class="target" id="index-1238"></span></div>
 <div class="section" id="python-include-path">
-<span id="index-1174"></span><span id="id5"></span><h3>PYTHON_INCLUDE_PATH<a class="headerlink" href="#python-include-path" title="Permalink to this headline">¶</a></h3>
+<span id="index-1239"></span><span id="id5"></span><h3>PYTHON_INCLUDE_PATH<a class="headerlink" href="#python-include-path" title="Permalink to this headline">¶</a></h3>
 <p>The path to the include directory,
 e.g. <tt class="docutils literal"><span class="pre">/usr/local/Python-3.1.1/include/python3.1</span></tt>.  Note that cmake
 will check for the file <tt class="docutils literal"><span class="pre">Python.h</span></tt> in this directory and complain if
@@ -139,6 +140,35 @@ not be redetected.  To modify, edit the relevant entries in your
 CMakeCache.txt, or delete it entirely to trigger redetection.</p>
 </div>
 </div>
+<div class="section" id="icu-international-components-for-unicode">
+<h2>ICU (International Components for Unicode<a class="headerlink" href="#icu-international-components-for-unicode" title="Permalink to this headline">¶</a></h2>
+<p>If <tt class="docutils literal"><span class="pre">WITH_ICU</span></tt> is <tt class="docutils literal"><span class="pre">ON</span></tt>, ICU is detected via the standard cmake
+<tt class="docutils literal"><span class="pre">find_package(ICU)</span></tt>.  The following variables are set:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="37%" />
+<col width="63%" />
+</colgroup>
+<tbody valign="top">
+<tr><td><tt class="docutils literal"><span class="pre">ICU_FOUND</span></tt></td>
+<td>ON if icu was found</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">ICU_I18N_FOUND</span></tt></td>
+<td>ON if the i18n part (whatever that is)
+of ICU was found.</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">ICU_INCLUDE_DIRS</span></tt></td>
+<td>path to ICU headers</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">ICU_LIBRARIES</span></tt></td>
+<td>full paths to ICU libraries</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">ICU_I18N_LIBRARIES</span></tt></td>
+<td>full paths to the i18n libraries</td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 
 
@@ -166,7 +196,7 @@ CMakeCache.txt, or delete it entirely to trigger redetection.</p>
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version c97ab3b55b19577532872d6f0bf22efb5131c034, Fri, 30 Oct 2009.
+      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version 632d83357f1b22a5214600c895fbe0dff78079f1, Sat, 31 Oct 2009.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

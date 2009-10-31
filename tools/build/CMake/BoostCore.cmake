@@ -653,7 +653,7 @@ macro(boost_library_variant LIBNAME)
 
   set(DEPENDENCY_FAILURES "")
   foreach(dep ${THIS_LIB_DEPENDS})
-    assert_is_lib_target("${dep}${VARIANT_TARGET_NAME}")
+    dependency_check("${dep}${VARIANT_TARGET_NAME}")
   endforeach()
 
   if (DEPENDENCY_FAILURES)
@@ -1351,6 +1351,13 @@ macro(boost_add_executable EXENAME)
   # boost_add_executable and what options the user has set.
   boost_select_variant(${EXENAME} THIS_EXE)
 
+  # Possibly hyphenate exe's name
+  if (THIS_PROJECT_IS_TOOL)
+    set(THIS_EXE_NAME ${EXENAME})
+  else()
+    set(THIS_EXE_NAME ${BOOST_PROJECT_NAME}-${EXENAME})
+  endif()
+
   # Compute the name of the variant targets that we'll be linking
   # against. We'll use this to link against the appropriate
   # dependencies. For IDE targets where we can build both debug and
@@ -1371,7 +1378,7 @@ macro(boost_add_executable EXENAME)
   set(THIS_EXE_ACTUAL_DEPENDS)
   set(THIS_EXE_RELEASE_ACTUAL_DEPENDS)
   set(THIS_EXE_DEBUG_ACTUAL_DEPENDS)
-  set(DEPENDENCIES_OKAY TRUE)
+  set(DEPENDENCY_FAILURES "")
   foreach(LIB ${THIS_EXE_DEPENDS})
     if (LIB MATCHES ".*-.*")
       # The user tried to state exactly which variant to use. Just
@@ -1381,7 +1388,7 @@ macro(boost_add_executable EXENAME)
       list(APPEND THIS_EXE_ACTUAL_DEPENDS ${LIB})
       list(APPEND THIS_EXE_RELEASE_ACTUAL_DEPENDS ${LIB})
       list(APPEND THIS_EXE_DEBUG_ACTUAL_DEPENDS ${LIB})
-      assert_is_lib_target(${LIB})
+      dependency_check(${LIB})
     else ()
       # The user has given the name of just the library target,
       # e.g., "boost_filesystem". We add on the appropriate variant
@@ -1390,10 +1397,10 @@ macro(boost_add_executable EXENAME)
       list(APPEND THIS_EXE_RELEASE_ACTUAL_DEPENDS "${LIB}${RELEASE_VARIANT_TARGET_NAME}")
       list(APPEND THIS_EXE_DEBUG_ACTUAL_DEPENDS "${LIB}${DEBUG_VARIANT_TARGET_NAME}")
       if(THIS_EXE_RELEASE_AND_DEBUG)
-	assert_is_lib_target("${LIB}${RELEASE_VARIANT_TARGET_NAME}")
-	assert_is_lib_target("${LIB}${DEBUG_VARIANT_TARGET_NAME}")
+	dependency_check("${LIB}${RELEASE_VARIANT_TARGET_NAME}")
+	dependency_check("${LIB}${DEBUG_VARIANT_TARGET_NAME}")
       else()
-	assert_is_lib_target("${LIB}${VARIANT_TARGET_NAME}")
+	dependency_check("${LIB}${VARIANT_TARGET_NAME}")
       endif()
     endif ()
   endforeach()
@@ -1402,17 +1409,14 @@ macro(boost_add_executable EXENAME)
 
   if(DEPENDENCY_FAILURES)
     set(THIS_EXE_OKAY FALSE)
+    separate_arguments(DEPENDENCY_FAILURES)
+    message(STATUS "+-- disabled due to dependency failures:")
+    message(STATUS "+-- " ${DEPENDENCY_FAILURES})
   endif()
 
-  if (THIS_EXE_VARIANT)
+  if (THIS_EXE_VARIANT AND (NOT DEPENDENCY_FAILURES))
     # It's okay to build this executable
 
-    # Build the executable
-    if (THIS_PROJECT_IS_TOOL)
-      set(THIS_EXE_NAME ${EXENAME})
-    else()
-      set(THIS_EXE_NAME ${BOOST_PROJECT_NAME}-${EXENAME})
-    endif()
     add_executable(${THIS_EXE_NAME} ${THIS_EXE_SOURCES})
     
     # Set the various compilation and linking flags
@@ -1448,23 +1452,15 @@ macro(boost_add_executable EXENAME)
       # Configuration-agnostic libraries
       target_link_libraries(${THIS_EXE_NAME} ${THIS_EXE_LINK_LIBS})
       
-      # Link against libraries for "release" configuration
-      assert_is_lib_target(${THIS_EXE_RELEASE_ACTUAL_DEPENDS})
       foreach(LIB ${THIS_EXE_RELEASE_ACTUAL_DEPENDS} ${THIS_EXE_RELEASE_LINK_LIBS})     
         target_link_libraries(${THIS_EXE_NAME} optimized ${LIB})
       endforeach(LIB ${THIS_EXE_RELEASE_ACTUAL_DEPENDS} ${THIS_EXE_RELEASE_LINK_LIBS})     
       
-      # Link against libraries for "debug" configuration
-      assert_is_lib_target(${THIS_EXE_DEBUG_ACTUAL_DEPENDS})
       foreach(LIB ${THIS_EXE_DEBUG_ACTUAL_DEPENDS} ${THIS_EXE_DEBUG_LINK_LIBS})     
         target_link_libraries(${THIS_EXE_NAME} debug ${LIB})
       endforeach(LIB ${THIS_EXE_DEBUG_ACTUAL_DEPENDS} ${THIS_EXE_DEBUG_LINK_LIBS})     
 
     else (THIS_EXE_DEBUG_AND_RELEASE)
-      # message(">>>>> ${THIS_EXE_ACTUAL_DEPENDS}")
-      foreach(lib ${THIS_EXE_ACTUAL_DEPENDS})
-	assert_is_lib_target(${lib})
-      endforeach()
       target_link_libraries(${THIS_EXE_NAME} 
         ${THIS_EXE_ACTUAL_DEPENDS} 
         ${THIS_EXE_LINK_LIBS})

@@ -74,7 +74,7 @@ if(BOOST_MAINTAINER)
     COMMAND make -C ${CMAKE_DOCS_DIR} deploy
     )
     
-  message(STATUS "*** MAINTAINER TARGETS ADDED ***")
+ message(STATUS "*** MAINTAINER TARGETS ADDED ***")
 
 endif()
 
