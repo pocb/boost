@@ -33,13 +33,21 @@ Users's guide
    build_configuration
    build_variants
    exported_targets
+   install_customization
+   external_dependencies
+
+Developer's guide
+=================
+
+.. toctree::
+   :maxdepth: 3
+
    testing
    individual_libraries
    add_boost_library
    add_compiled_library
    adding_regression_tests
    build_installer
-   external_dependencies
    notes_by_version
 
 .. modularize_library

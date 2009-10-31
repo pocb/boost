@@ -132,7 +132,7 @@ cd $BOOST/build</pre>
 source directory:</p>
 <div class="highlight-python"><pre>cmake -DCMAKE_INSTALL_PREFIX=/somewhere $BOOST/src</pre>
 </div>
-<p>(<a class="reference external" href="build_configuration.html#cmake-install-prefix"><em>CMAKE_INSTALL_PREFIX</em></a> defaults to <tt class="docutils literal"><span class="pre">/usr/local</span></tt> on unix and
+<p>(<a class="reference external" href="install_customization.html#cmake-install-prefix"><em>CMAKE_INSTALL_PREFIX</em></a> defaults to <tt class="docutils literal"><span class="pre">/usr/local</span></tt> on unix and
 <tt class="docutils literal"><span class="pre">C:\\Program</span> <span class="pre">Files\Boost</span></tt> on windows).  Replace <tt class="docutils literal"><span class="pre">/somewhere</span></tt> above
 with a path you like if the defaults aren&#8217;t okay.  You&#8217;ll see output
 from <tt class="docutils literal"><span class="pre">cmake</span></tt>.  It looks somewhat like this:</p>
@@ -193,7 +193,7 @@ Linking CXX shared library ../../../lib/libboost_date_time-mt.so
 <p>And you&#8217;re done. Once the build completes (which make take a while, if
 you are building all of the Boost libraries), the Boost libraries will
 be in a predictable layout under the directory passed to
-<a class="reference external" href="build_configuration.html#cmake-install-prefix"><em>CMAKE_INSTALL_PREFIX</em></a> (default <tt class="docutils literal"><span class="pre">/usr/local</span></tt>)</p>
+<a class="reference external" href="install_customization.html#cmake-install-prefix"><em>CMAKE_INSTALL_PREFIX</em></a> (default <tt class="docutils literal"><span class="pre">/usr/local</span></tt>)</p>
 </div>
 </div>
 <div class="section" id="windows">
@@ -201,7 +201,7 @@ be in a predictable layout under the directory passed to
 <p>There are two different sets of directions: visual studio, which is
 quite specific, and nmake, which is much like the Unix version, above.</p>
 <div class="section" id="configuration-for-visual-studio">
-<span id="vs-configure"></span><span id="index-842"></span><h3>Configuration for Visual Studio<a class="headerlink" href="#configuration-for-visual-studio" title="Permalink to this headline">¶</a></h3>
+<span id="vs-configure"></span><span id="index-989"></span><h3>Configuration for Visual Studio<a class="headerlink" href="#configuration-for-visual-studio" title="Permalink to this headline">¶</a></h3>
 <p>Run CMake by selecting it from the Start menu.</p>
 <ul>
 <li><p class="first">Use the <em>Browse...</em> button next to <em>Where is the source code</em> to
@@ -259,7 +259,7 @@ binaries</em> directory from the cmake gui.</p>
 </ul>
 </div>
 <div class="section" id="configuration-for-nmake">
-<span id="nmake"></span><span id="index-843"></span><h3>Configuration for NMake<a class="headerlink" href="#configuration-for-nmake" title="Permalink to this headline">¶</a></h3>
+<span id="nmake"></span><span id="index-990"></span><h3>Configuration for NMake<a class="headerlink" href="#configuration-for-nmake" title="Permalink to this headline">¶</a></h3>
 <ul>
 <li><p class="first">Start a <cite>Visual Studio Command Prompt</cite> from the start menu.  This
 will spawn a command prompt window with certain env variables set.
@@ -321,7 +321,7 @@ perform the installation.  With NMake, <tt class="docutils literal"><span class=
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version 31c30425cf29d2ae048ffb07c8284cee1e095b7a, Mon, 26 Oct 2009.
+      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version f71c411913d9f3b5ee84a5678b92600f18f6ef7c, Fri, 30 Oct 2009.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

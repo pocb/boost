@@ -49,6 +49,9 @@
 <li><a class="reference external" href="#users-s-guide">Users&#8217;s guide</a><ul>
 </ul>
 </li>
+<li><a class="reference external" href="#developer-s-guide">Developer&#8217;s guide</a><ul>
+</ul>
+</li>
 <li><a class="reference external" href="#reference">Reference</a><ul>
 </ul>
 </li>
@@ -79,7 +82,7 @@
 build system for boost, under development since boost version 1.35.
 As of Boost version 1.38, boost.cmake can reliably build and
 package boost.</p>
-<dl class="docutils" id="index-841">
+<dl class="docutils" id="index-980">
 <dt><strong>boost-cmake mailing list</strong></dt>
 <dd><a class="reference external" href="http://lists.boost.org/mailman/listinfo.cgi/boost-cmake">http://lists.boost.org/mailman/listinfo.cgi/boost-cmake</a></dd>
 <dt><strong>IRC</strong></dt>
@@ -119,7 +122,7 @@ package boost.</p>
 <li class="toctree-l2"><a class="reference external" href="build_configuration.html#cmake-binary-dir">CMAKE_BINARY_DIR</a></li>
 <li class="toctree-l2"><a class="reference external" href="build_configuration.html#a-few-useful-options">A few useful options</a><ul>
 <li class="toctree-l3"><a class="reference external" href="build_configuration.html#cmake-osx-architectures">CMAKE_OSX_ARCHITECTURES</a></li>
-<li class="toctree-l3"><a class="reference external" href="build_configuration.html#build-versioned">BUILD_VERSIONED</a></li>
+<li class="toctree-l3"><a class="reference external" href="build_configuration.html#winmangle-libnames">WINMANGLE_LIBNAMES</a></li>
 <li class="toctree-l3"><a class="reference external" href="build_configuration.html#build-projects">BUILD_PROJECTS</a></li>
 <li class="toctree-l3"><a class="reference external" href="build_configuration.html#build-examples">BUILD_EXAMPLES</a></li>
 <li class="toctree-l3"><a class="reference external" href="build_configuration.html#build-tools">BUILD_TOOLS</a></li>
@@ -131,17 +134,6 @@ package boost.</p>
 <li class="toctree-l3"><a class="reference external" href="build_configuration.html#build-soversioned">BUILD_SOVERSIONED</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference external" href="build_configuration.html#options-for-customizing-installation">Options for customizing installation</a><ul>
-<li class="toctree-l3"><a class="reference external" href="build_configuration.html#cmake-install-prefix">CMAKE_INSTALL_PREFIX</a></li>
-<li class="toctree-l3"><a class="reference external" href="build_configuration.html#lib-suffix">LIB_SUFFIX</a></li>
-<li class="toctree-l3"><a class="reference external" href="build_configuration.html#install-versioned">INSTALL_VERSIONED</a></li>
-<li class="toctree-l3"><a class="reference external" href="build_configuration.html#boost-cmake-infrastructure-dir">BOOST_CMAKE_INFRASTRUCTURE_DIR</a></li>
-<li class="toctree-l3"><a class="reference external" href="build_configuration.html#boost-install-findboost-cmake-drivers">BOOST_INSTALL_FINDBOOST_CMAKE_DRIVERS</a></li>
-<li class="toctree-l3"><a class="reference external" href="build_configuration.html#boost-exports-file">BOOST_EXPORTS_FILE</a></li>
-<li class="toctree-l3"><a class="reference external" href="build_configuration.html#boost-install-exports-file">BOOST_INSTALL_EXPORTS_FILE</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference external" href="build_configuration.html#system-dependencies">System Dependencies</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="build_variants.html">Build Variants and Features</a><ul>
@@ -166,7 +158,7 @@ package boost.</p>
 <li class="toctree-l2"><a class="reference external" href="build_variants.html#default-variants">Default Variants</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference external" href="exported_targets.html">Developing with Boost.CMake</a><ul>
+<li class="toctree-l1"><a class="reference external" href="exported_targets.html">Tricks for Building against Boost with CMake</a><ul>
 <li class="toctree-l2"><a class="reference external" href="exported_targets.html#with-an-uninstalled-build">With an uninstalled build</a><ul>
 <li class="toctree-l3"><a class="reference external" href="exported_targets.html#example">Example</a></li>
 </ul>
@@ -178,6 +170,34 @@ package boost.</p>
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference external" href="install_customization.html">Customizing the install</a><ul>
+<li class="toctree-l2"><a class="reference external" href="install_customization.html#cmake-install-prefix">CMAKE_INSTALL_PREFIX</a></li>
+<li class="toctree-l2"><a class="reference external" href="install_customization.html#lib-suffix">LIB_SUFFIX</a></li>
+<li class="toctree-l2"><a class="reference external" href="install_customization.html#install-versioned">INSTALL_VERSIONED</a><ul>
+<li class="toctree-l3"><a class="reference external" href="install_customization.html#example">Example</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference external" href="install_customization.html#boost-cmake-infrastructure-dir">BOOST_CMAKE_INFRASTRUCTURE_DIR</a></li>
+<li class="toctree-l2"><a class="reference external" href="install_customization.html#boost-install-findboost-cmake-drivers">BOOST_INSTALL_FINDBOOST_CMAKE_DRIVERS</a></li>
+<li class="toctree-l2"><a class="reference external" href="install_customization.html#boost-exports-file">BOOST_EXPORTS_FILE</a></li>
+<li class="toctree-l2"><a class="reference external" href="install_customization.html#boost-install-exports-file">BOOST_INSTALL_EXPORTS_FILE</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="external_dependencies.html">External Dependencies</a><ul>
+<li class="toctree-l2"><a class="reference external" href="external_dependencies.html#python">Python</a><ul>
+<li class="toctree-l3"><a class="reference external" href="external_dependencies.html#python-executable">PYTHON_EXECUTABLE</a></li>
+<li class="toctree-l3"><a class="reference external" href="external_dependencies.html#python-debug-libraries">PYTHON_DEBUG_LIBRARIES</a></li>
+<li class="toctree-l3"><a class="reference external" href="external_dependencies.html#python-libraries">PYTHON_LIBRARIES</a></li>
+<li class="toctree-l3"><a class="reference external" href="external_dependencies.html#python-include-path">PYTHON_INCLUDE_PATH</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="developer-s-guide">
+<h1>Developer&#8217;s guide<a class="headerlink" href="#developer-s-guide" title="Permalink to this headline">¶</a></h1>
+<ul>
 <li class="toctree-l1"><a class="reference external" href="testing.html">Testing</a><ul>
 <li class="toctree-l2"><a class="reference external" href="testing.html#build-tests">BUILD_TESTS</a></li>
 <li class="toctree-l2"><a class="reference external" href="testing.html#build">Build</a></li>
@@ -212,16 +232,6 @@ package boost.</p>
 </li>
 <li class="toctree-l1"><a class="reference external" href="adding_regression_tests.html">Adding Regression Tests</a></li>
 <li class="toctree-l1"><a class="reference external" href="build_installer.html">Building a Binary Installer</a></li>
-<li class="toctree-l1"><a class="reference external" href="external_dependencies.html">External Dependencies</a><ul>
-<li class="toctree-l2"><a class="reference external" href="external_dependencies.html#python">Python</a><ul>
-<li class="toctree-l3"><a class="reference external" href="external_dependencies.html#python-executable">PYTHON_EXECUTABLE</a></li>
-<li class="toctree-l3"><a class="reference external" href="external_dependencies.html#python-debug-libraries">PYTHON_DEBUG_LIBRARIES</a></li>
-<li class="toctree-l3"><a class="reference external" href="external_dependencies.html#python-libraries">PYTHON_LIBRARIES</a></li>
-<li class="toctree-l3"><a class="reference external" href="external_dependencies.html#python-include-path">PYTHON_INCLUDE_PATH</a></li>
-</ul>
-</li>
-</ul>
-</li>
 <li class="toctree-l1"><a class="reference external" href="notes_by_version.html">Notes by Boost Version</a><ul>
 <li class="toctree-l2"><a class="reference external" href="notes_by_version.html#cmakebeta4">1.41.0.cmakebeta4</a></li>
 <li class="toctree-l2"><a class="reference external" href="notes_by_version.html#cmakebeta3">1.41.0.cmakebeta3</a></li>
@@ -307,7 +317,7 @@ them (or use <tt class="docutils literal"><span class="pre">git</span> <span cla
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version 31c30425cf29d2ae048ffb07c8284cee1e095b7a, Mon, 26 Oct 2009.
+      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version f71c411913d9f3b5ee84a5678b92600f18f6ef7c, Fri, 30 Oct 2009.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

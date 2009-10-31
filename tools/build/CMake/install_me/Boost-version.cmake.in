@@ -49,13 +49,11 @@ endif()
 
 set(Boost_LIBRARIES "")
 foreach(component ${Boost_FIND_COMPONENTS})
-  message("component=${component}")
   #
   # Check that it is really a target
   # 
   set(target boost_${component}${mtflag}${staticflag}${releaseflag})
   get_target_property(p ${target} TYPE)
-  message("TYPE ${target} == ${p}")
   if (NOT (p MATCHES "_LIBRARY$"))
     message(SEND_ERROR "component ${target} is not a library target.")
   endif()
