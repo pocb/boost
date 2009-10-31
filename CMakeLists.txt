@@ -140,16 +140,19 @@ option(BUILD_SOVERSIONED "Create libraries with SONAMES" ${UNIX})
 
 option(INSTALL_VERSIONED "Install to versioned directories" OFF)
 
-# For now, we only actually support static/dynamic run-time variants for 
-# Visual C++. Provide both options for Visual C++ users, but just fix
-# the values of the variables for all other platforms.
-option(ENABLE_STATIC_RUNTIME 
-  "Whether to build libraries linking against the static runtime" 
-  ${MSVC})
+if (MSVC)
+  # For now, we only actually support static/dynamic run-time variants for 
+  # Visual C++. Provide both options for Visual C++ users, but just fix
+  # the values of the variables for all other platforms.
+  option(ENABLE_STATIC_RUNTIME 
+    "Whether to build libraries linking against the static runtime" 
+    ${MSVC})
 
-option(ENABLE_DYNAMIC_RUNTIME 
-  "Whether to build libraries linking against the dynamic runtime" 
-  ${MSVC})
+  option(ENABLE_DYNAMIC_RUNTIME 
+    "Whether to build libraries linking against the dynamic runtime" 
+    ${MSVC})
+
+endif(MSVC)
 
 # The default set of library variants that we will be building
 boost_add_default_variant(RELEASE DEBUG)
@@ -160,7 +163,7 @@ if (MSVC)
 endif()
 
 # Extra features used by some libraries
-set(ENABLE_PYTHON_NODEBUG ON)
+option(ENABLE_PYTHON_NODEBUG "Enable python debug/nondebug support" ON)
 boost_add_extra_variant(PYTHON_NODEBUG PYTHON_DEBUG)
 ##########################################################################
 
@@ -332,7 +335,9 @@ add_subdirectory(libs)
 add_subdirectory(tools)
 ##########################################################################
 
-install(EXPORT Boost DESTINATION ${BOOST_INSTALL_EXPORTS_FILE})
+if(NOT BUILD_PROJECTS STREQUAL "NONE") 
+  install(EXPORT Boost DESTINATION ${BOOST_INSTALL_EXPORTS_FILE})
+endif()
 
 add_subdirectory(tools/build/CMake)
 
