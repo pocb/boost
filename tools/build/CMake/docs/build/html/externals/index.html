@@ -68,14 +68,16 @@
             
   <div class="section" id="external-dependencies">
 <span id="id1"></span><h1>External Dependencies<a class="headerlink" href="#external-dependencies" title="Permalink to this headline">¶</a></h1>
-<p>Each external dependency has an associated option
-<tt class="docutils literal"><span class="pre">WITH_</span></tt><em>dependency</em> that controls whether detection of the dependency will
+<p>Each external dependency has an associated option <tt class="docutils literal"><span class="pre">WITH_</span></tt><em>dependency</em> that controls whether detection of the dependency will
 happen at all.  These options default to <tt class="docutils literal"><span class="pre">ON</span></tt>.</p>
+<p>Each external will set a variable <em>external</em><tt class="docutils literal"><span class="pre">_FOUND</span></tt> if detection
+was successful.  You can</p>
 <ul>
 <li class="toctree-l1"><a class="reference external" href="bzip2.html">BZip2</a></li>
 <li class="toctree-l1"><a class="reference external" href="doxygen.html">Doxygen</a></li>
 <li class="toctree-l1"><a class="reference external" href="expat.html">Expat</a></li>
 <li class="toctree-l1"><a class="reference external" href="icu.html">ICU (International Components for Unicode)</a></li>
+<li class="toctree-l1"><a class="reference external" href="mpi.html">MPI</a></li>
 <li class="toctree-l1"><a class="reference external" href="python.html">Python</a><ul>
 <li class="toctree-l2"><a class="reference external" href="python.html#python-executable">PYTHON_EXECUTABLE</a></li>
 <li class="toctree-l2"><a class="reference external" href="python.html#python-debug-libraries">PYTHON_DEBUG_LIBRARIES</a></li>
@@ -113,7 +115,7 @@ happen at all.  These options default to <tt class="docutils literal"><span clas
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version 632d83357f1b22a5214600c895fbe0dff78079f1, Sat, 31 Oct 2009.
+      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version 225e86f40f22a6fa793f2e5ce6e2829b0d47fe3f, Sat, 31 Oct 2009.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

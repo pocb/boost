@@ -332,7 +332,9 @@ add_subdirectory(libs)
 add_subdirectory(tools)
 ##########################################################################
 
-install(EXPORT Boost DESTINATION ${BOOST_INSTALL_EXPORTS_FILE})
+if(NOT BUILD_PROJECTS STREQUAL "NONE") 
+  install(EXPORT Boost DESTINATION ${BOOST_INSTALL_EXPORTS_FILE})
+endif()
 
 add_subdirectory(tools/build/CMake)
 
