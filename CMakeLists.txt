@@ -132,35 +132,32 @@ option(ENABLE_SINGLE_THREADED "Whether to build single-threaded libraries"
        ${ENABLE_SINGLE_THREADED_DEFAULT})
 option(ENABLE_MULTI_THREADED "Whether to build multi-threaded libraries" ON)
 
-if(UNIX)
-  option(BUILD_VERSIONED 
-    "Mangle compiler and OS versioning information to into library names" 
-    OFF)
+option(WINMANGLE_LIBNAMES
+  "Mangle toolset and boost version tags to into library names" 
+  ${WIN32})
 
-  option(BUILD_SOVERSIONED "Create libraries with soversion set" ON)
+option(BUILD_SOVERSIONED "Create libraries with SONAMES" ${UNIX})
 
-  option(INSTALL_VERSIONED "Install to versioned *directories*" OFF)
-
-else(UNIX)
-  option(BUILD_VERSIONED "Mangle compiler and OS versioning information to into library names" ON)
-endif(UNIX)
+option(INSTALL_VERSIONED "Install to versioned directories" OFF)
 
 # For now, we only actually support static/dynamic run-time variants for 
 # Visual C++. Provide both options for Visual C++ users, but just fix
 # the values of the variables for all other platforms.
-if(MSVC)
-  option(ENABLE_STATIC_RUNTIME "Whether to build libraries linking against the static runtime" ON)
-  option(ENABLE_DYNAMIC_RUNTIME "Whether to build libraries linking against the dynamic runtime" ON)
-else(MSVC)
-  set(ENABLE_STATIC_RUNTIME OFF)
-  set(ENABLE_DYNAMIC_RUNTIME ON)
-endif(MSVC)
+option(ENABLE_STATIC_RUNTIME 
+  "Whether to build libraries linking against the static runtime" 
+  ${MSVC})
+
+option(ENABLE_DYNAMIC_RUNTIME 
+  "Whether to build libraries linking against the dynamic runtime" 
+  ${MSVC})
 
 # The default set of library variants that we will be building
 boost_add_default_variant(RELEASE DEBUG)
 boost_add_default_variant(STATIC SHARED)
 boost_add_default_variant(SINGLE_THREADED MULTI_THREADED)
-boost_add_default_variant(DYNAMIC_RUNTIME STATIC_RUNTIME)
+if (MSVC)
+  boost_add_default_variant(DYNAMIC_RUNTIME STATIC_RUNTIME)
+endif()
 
 # Extra features used by some libraries
 set(ENABLE_PYTHON_NODEBUG ON)
@@ -207,30 +204,14 @@ else()
 
 endif()
 
-# boost_report_pretty("Install include dir:" BOOST_INCLUDE_INSTALL_DIR)
-# boost_report_pretty("Install lib dir:" BOOST_LIB_INSTALL_DIR)
-# boost_report_pretty("Install executable dir:" BOOST_EXE_INSTALL_DIR)
+boost_report_pretty("Install include dir:" BOOST_INCLUDE_INSTALL_DIR)
+boost_report_pretty("Install lib dir:" BOOST_LIB_INSTALL_DIR)
+boost_report_pretty("Install executable dir:" BOOST_EXE_INSTALL_DIR)
 
 install(DIRECTORY boost 
   DESTINATION ${BOOST_INCLUDE_INSTALL_DIR}
   PATTERN "CVS" EXCLUDE
   PATTERN ".svn" EXCLUDE)
-#
-# TDS 20080526:  Getting a segfault here even with the ifs.   At r45780, with these lines 
-# uncommented:
-# 1. cmake the workspace
-# 2. run ccmake and turn OFF ENABLE_MULTI_THREADED and ENABLE_SHARED
-# 3. 'c' to configure
-# 4. 'g' to generate.... segfault.
-# 5. run rebuild_cache at the command line:  no segfault this time.
-#
-# With these lines commented out, step 4 above does not segfault.
-#
-#if (NOT TEST_INSTALLED_TREE)
-  # If I don't have if around this, I get a seg fault
-#  install(EXPORT boost-targets DESTINATION "lib/Boost${BOOST_VERSION}")
-#endif (NOT TEST_INSTALLED_TREE)
-##########################################################################
 
 ##########################################################################
 # Binary packages                                                        #
@@ -294,17 +275,18 @@ if(WIN32 AND NOT UNIX)
 endif(WIN32 AND NOT UNIX)
 include(CPack)
 
-option(BOOST_INSTALLER_ON_THE_FLY
-       "Whether to build installers that download components on-the-fly" OFF)
-
-if (BOOST_INSTALLER_ON_THE_FLY)
-  if(COMMAND cpack_configure_downloads)
-    cpack_configure_downloads(
-    "http://www.osl.iu.edu/~dgregor/Boost-CMake/${BOOST_VERSION}/"
-      ALL ADD_REMOVE)
+if (FALSE)
+  option(BOOST_INSTALLER_ON_THE_FLY
+    "Whether to build installers that download components on-the-fly" OFF)
+ 
+  if (BOOST_INSTALLER_ON_THE_FLY)
+    if(COMMAND cpack_configure_downloads)
+      cpack_configure_downloads(
+	"http://www.osl.iu.edu/~dgregor/Boost-CMake/${BOOST_VERSION}/"
+	ALL ADD_REMOVE)
+    endif()
   endif()
 endif()
-
 ##########################################################################
 
 ##########################################################################
@@ -325,8 +307,6 @@ else()
   include_directories(${CMAKE_SOURCE_DIR})
 endif (TEST_INSTALLED_TREE)
 
-set(BOOST_COMPILED_PROJECTS "" CACHE INTERNAL "Compiled projects list" FORCE)
-
 # Boost.Build version 2 does this due to trouble with autolinking
 # during building and testing.  
 # TODO: See if we can actually use auto-linking in our regression tests.
@@ -338,14 +318,14 @@ set(BOOST_EXPORTS_FILE ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/cmake/Boost.cmake
 file(REMOVE ${BOOST_EXPORTS_FILE})
 
 if(INSTALL_VERSIONED)
-  set(BOOST_INSTALL_EXPORTS_FILE ${BOOST_LIB_INSTALL_DIR}
+  set(BOOST_INSTALL_EXPORTS_FILE ${BOOST_LIB_INSTALL_DIR}/cmake
     CACHE STRING "Install location for cmake exports")
 else()
   set(BOOST_INSTALL_EXPORTS_FILE ${BOOST_LIB_INSTALL_DIR}/boost/cmake
     CACHE STRING "Install location for cmake exports")
 endif()
 
-mark_as_advanced(BOOST_BUILD_EXPORTS_FILE BOOST_INSTALL_EXPORTS_FILE)
+mark_as_advanced(BOOST_EXPORTS_FILE BOOST_INSTALL_EXPORTS_FILE)
 
 # Add build rules for documentation
 add_subdirectory(doc)

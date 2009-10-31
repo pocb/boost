@@ -443,7 +443,7 @@ endmacro(boost_module)
 #   particular version of the library and the toolset used to build
 #   this library. For example, this might be "-gcc41-mt-1_34" for the
 #   multi-threaded, release variant of the library in Boost 1.34.0 as
-#   compiled with GCC 4.1.  If option BUILD_VERSIONED is OFF, this 
+#   compiled with GCC 4.1.  If option MANGLE_LIBNAMES is OFF, this 
 #   variable is set to the empty string.
 #
 #   VARIANT_DISPLAY_NAME: The display name that describes this
@@ -453,11 +453,11 @@ macro(boost_library_variant_target_name)
   set(VARIANT_TARGET_NAME "")
 
   # The versioned name starts with the full Boost toolset
-  if(BUILD_VERSIONED)
+  if(WINMANGLE_LIBNAMES)
     set(VARIANT_VERSIONED_NAME "-${BOOST_TOOLSET}")
-  else(BUILD_VERSIONED)
+  else(WINMANGLE_LIBNAMES)
     set(VARIANT_VERSIONED_NAME "")
-  endif(BUILD_VERSIONED)
+  endif(WINMANGLE_LIBNAMES)
 
   # Add -mt for multi-threaded libraries
   list_contains(VARIANT_IS_MT MULTI_THREADED ${ARGN})
@@ -533,7 +533,7 @@ macro(boost_library_variant_target_name)
     set(VARIANT_VERSIONED_NAME "${VARIANT_VERSIONED_NAME}-${VARIANT_ABI_TAG}")
   endif (VARIANT_ABI_TAG)
 
-  if(BUILD_VERSIONED)
+  if(WINMANGLE_LIBNAMES)
     # Append the Boost version number to the versioned name
     if(BOOST_VERSION_SUBMINOR GREATER 0)
       set(VARIANT_VERSIONED_NAME
@@ -542,7 +542,7 @@ macro(boost_library_variant_target_name)
       set(VARIANT_VERSIONED_NAME 
 	"${VARIANT_VERSIONED_NAME}-${BOOST_VERSION_MAJOR}_${BOOST_VERSION_MINOR}")
     endif(BOOST_VERSION_SUBMINOR GREATER 0)
-  endif(BUILD_VERSIONED)
+  endif(WINMANGLE_LIBNAMES)
 endmacro(boost_library_variant_target_name)
 
 # This macro is an internal utility macro that updates compilation and

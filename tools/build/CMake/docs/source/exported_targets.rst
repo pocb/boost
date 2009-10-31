@@ -2,8 +2,8 @@
 .. index:: uninstalled tree, building against
 .. _exported_targets:
 
-Developing with Boost.CMake
-===========================
+Tricks for Building against Boost with CMake
+============================================
 
 Boost.CMake *exports* its targets, making developing independent
 projects against an installed boost, or simply against a build tree
