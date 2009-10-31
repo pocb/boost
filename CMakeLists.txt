@@ -45,7 +45,7 @@ else()
     "Unable to parse Boost version from ${CMAKE_CURRENT_SOURCE_DIR}/boost/version.hpp")
 endif()
 
-set(BOOST_CMAKE_VERSION "${BOOST_VERSION}.cmakebeta4")
+set(BOOST_CMAKE_VERSION "${BOOST_VERSION}.cmakebeta5")
 
 #
 #  For intermittent deployment of docs

@@ -50,8 +50,6 @@ Developer's guide
    build_installer
    notes_by_version
 
-.. modularize_library
-
 Reference
 =========
 
