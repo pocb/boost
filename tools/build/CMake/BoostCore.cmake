@@ -620,6 +620,7 @@ macro(boost_library_variant LIBNAME)
   set(THIS_VARIANT_LINK_LIBS ${THIS_LIB_LINK_LIBS})
   
   # Determine if it is okay to build this variant
+  # message("boost_library_variant(${LIBNAME} ${ARGN})")
   set(THIS_VARIANT_OKAY TRUE)
   foreach(ARG ${ARGN})
     # If the library itself stated that we cannot build this variant,
@@ -656,7 +657,11 @@ macro(boost_library_variant LIBNAME)
     dependency_check("${dep}${VARIANT_TARGET_NAME}")
   endforeach()
 
-  if(DEPENDENCY_FAILURES)
+  #
+  # Announce dependency failures only if this variant
+  # is otherwise OK
+  #
+  if(THIS_VARIANT_OKAY AND DEPENDENCY_FAILURES)
     set(THIS_VARIANT_OKAY FALSE)
     # separate_arguments(DEPENDENCY_FAILURES)
     message(STATUS "+-- ${LIBNAME}${VARIANT_TARGET_NAME} disabled due to dependency failures:")
@@ -962,6 +967,7 @@ macro(boost_select_variant NAME PREFIX)
         # that request (because the user has turned off the build
         # variants with that feature), then we won't build this
         # executable or module.
+	# message("select variant FEATURE=${FEATURE}")
         if (NOT ENABLE_${FEATURE})
           set(SELECT_VARIANT_OKAY FALSE)
           message(STATUS "* ${NAME} is NOT being built because ENABLE_${FEATURE} is FALSE")
@@ -1175,6 +1181,7 @@ macro(boost_add_library LIBNAME)
   # library, collectively.
   add_custom_target(${LIBNAME})
 
+  # message("def variants: ${BOOST_DEFAULT_VARIANTS}")
   if (THIS_LIB_EXTRA_VARIANTS)
     # Build the set of variants that we will generate for this library
     set(THIS_LIB_VARIANTS)
