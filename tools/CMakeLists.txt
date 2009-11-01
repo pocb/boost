@@ -85,7 +85,7 @@ endmacro(boost_tool_dependencies)
 #
 ###############################################################################
 
-set(BUILD_TOOLS "ALL" CACHE STRING "Semicolon-separated list of tools to build")
+set(BUILD_TOOLS "NONE" CACHE STRING "Semicolon-separated list of tools to build")
 
 message(STATUS "")
 if (BUILD_TOOLS STREQUAL "NONE")
