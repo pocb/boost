@@ -192,7 +192,7 @@ if(INSTALL_VERSIONED)
 else()
 
   set(BOOST_INCLUDE_INSTALL_DIR 
-    "include/"
+    "include"
     CACHE STRING "Destination path under CMAKE_INSTALL_PREFIX for header files")
 
   set(BOOST_LIB_INSTALL_DIR
@@ -203,7 +203,6 @@ endif()
 
 boost_report_pretty("Install include dir:" BOOST_INCLUDE_INSTALL_DIR)
 boost_report_pretty("Install lib dir:" BOOST_LIB_INSTALL_DIR)
-boost_report_pretty("Install executable dir:" BOOST_EXE_INSTALL_DIR)
 
 install(DIRECTORY boost 
   DESTINATION ${BOOST_INCLUDE_INSTALL_DIR}
