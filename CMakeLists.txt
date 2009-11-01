@@ -140,22 +140,24 @@ option(BUILD_SOVERSIONED "Create libraries with SONAMES" ${UNIX})
 
 option(INSTALL_VERSIONED "Install to versioned directories" OFF)
 
-# For now, we only actually support static/dynamic run-time variants for 
-# Visual C++. Provide both options for Visual C++ users, but just fix
-# the values of the variables for all other platforms.
-option(ENABLE_STATIC_RUNTIME 
-  "Whether to build libraries linking against the static runtime" 
-  ${MSVC})
-
-option(ENABLE_DYNAMIC_RUNTIME 
-  "Whether to build libraries linking against the dynamic runtime" 
-  ${MSVC})
 
 # The default set of library variants that we will be building
 boost_add_default_variant(RELEASE DEBUG)
 boost_add_default_variant(STATIC SHARED)
 boost_add_default_variant(SINGLE_THREADED MULTI_THREADED)
+
 if (MSVC)
+  # For now, we only actually support static/dynamic run-time variants for 
+  # Visual C++. Provide both options for Visual C++ users, but just fix
+  # the values of the variables for all other platforms.
+  option(ENABLE_STATIC_RUNTIME 
+    "Whether to build libraries linking against the static runtime" 
+    ON)
+
+  option(ENABLE_DYNAMIC_RUNTIME 
+    "Whether to build libraries linking against the dynamic runtime" 
+    ON)
+
   boost_add_default_variant(DYNAMIC_RUNTIME STATIC_RUNTIME)
 endif()
 
