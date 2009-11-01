@@ -8,6 +8,8 @@
 add_definitions(-DBOOST_MPI_SOURCE=1)
 include_directories(${MPI_INCLUDE_PATH})
 
+if (NOT APPLE)
+
 boost_add_library(
   boost_mpi
   broadcast.cpp
@@ -74,5 +76,7 @@ if(PYTHON_FOUND)
 
 endif()
 
-
+else()
+  message(STATUS "+-- mpi disabled on apple.")
+endif() # not APPLE
 
