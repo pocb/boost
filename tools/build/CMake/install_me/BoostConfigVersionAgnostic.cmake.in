@@ -12,12 +12,11 @@
 # 
 get_filename_component(CWD ${CMAKE_CURRENT_LIST_FILE} PATH)
 
-file(GLOB AVAILABLE_VERSIONFILES RELATIVE ${CWD} "${CWD}/Boost-*.cmake")
+file(GLOB AVAILABLE_VERSIONFILES 
+  RELATIVE ${CWD} 
+  "@CMAKE_INSTALL_PREFIX@/share/boost-*/cmake/BoostConfig.cmake")
 
-#
-#  
-#
-if (EXISTS "${CWD}/Boost-${PACKAGE_MAJOR}.${PACKAGE_MINOR}.${PACKAGE_PATCH}.cmake")
+if (EXISTS "@CMAKE_INSTALL_PREFIX@/share/boost-${PACKAGE_FIND_VERSION_MAJOR}.${PACKAGE_FIND_VERSION_MINOR}.${PACKAGE_FIND_VERSION_PATCH}/cmake/BoostConfig.cmake")
   #
   #  Exact version
   #
@@ -35,7 +34,13 @@ elseif(AVAILABLE_VERSIONFILES)
   list(SORT AVAILABLE_VERSIONFILES)
   list(REVERSE AVAILABLE_VERSIONFILES)
   list(GET AVAILABLE_VERSIONFILES 0 MOSTRECENT)
-  string(REGEX MATCH "[0-9]+\\.[0-9]+\\.[0-9]+" FOUNDVERSION ${MOSTRECENT})
+  #
+  #  Warning bugs: this assumes that there are no other x.yy.zz type
+  #  numbers in your path
+  #
+  string(REGEX MATCH 
+    "[0-9]+\\.[0-9]+\\.[0-9]+" 
+    FOUNDVERSION ${MOSTRECENT})
 
   if(PACKAGE_FIND_VERSION)
     if(${PACKAGE_FIND_VERSION} STRLESS ${FOUNDVERSION})

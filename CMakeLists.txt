@@ -45,6 +45,16 @@ else()
     "Unable to parse Boost version from ${CMAKE_CURRENT_SOURCE_DIR}/boost/version.hpp")
 endif()
 
+#
+#  This for automatic testing of multiple versioned installs
+#
+if(BOOST_VERSION_OVERRIDE)
+  set(BOOST_VERSION ${BOOST_VERSION_OVERRIDE})
+  set(BOOST_VERSION_NUMERIC ${BOOST_VERSION_NUMERIC_OVERRIDE})
+  set(BOOST_VERSION_UNDERSCORES ${BOOST_VERSION_UNDERSCORES_OVERRIDE})
+  configure_file(tools/build/CMake/install_me/version.hpp.override.in ${CMAKE_BINARY_DIR}/version.hpp)
+endif()
+
 set(BOOST_CMAKE_VERSION "${BOOST_VERSION}.cmakebeta5")
 
 #
@@ -90,9 +100,6 @@ configure_file(boost/version.hpp
 # directories. This simplifies manual testing and the use of the build
 # tree rather than installed Boost libraries.
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-# we have to do this to export targets from the build tree
-file(MAKE_DIRECTORY ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/cmake)
-
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
@@ -116,24 +123,24 @@ include(BoostTesting)
 # Build Features and Variants                                            #
 ##########################################################################
 
-# Determine default settings for the variable ENABLE_feature options
-if (MSVC)
-  set(ENABLE_SINGLE_THREADED_DEFAULT OFF)
-else ()
-  set(ENABLE_SINGLE_THREADED_DEFAULT OFF)
-endif ()
 
 # User-level options deciding which variants we will build. 
 option(ENABLE_STATIC "Whether to build static libraries" ON)
 option(ENABLE_SHARED "Whether to build shared libraries" ON)
 option(ENABLE_DEBUG "Whether to build debugging libraries" ON)
 option(ENABLE_RELEASE "Whether to build release libraries" ON)
-option(ENABLE_SINGLE_THREADED "Whether to build single-threaded libraries" 
-       ${ENABLE_SINGLE_THREADED_DEFAULT})
+option(ENABLE_SINGLE_THREADED "Whether to build single-threaded libraries" OFF)
 option(ENABLE_MULTI_THREADED "Whether to build multi-threaded libraries" ON)
 
+if(BUILD_VERSIONED)
+  message(FATAL_ERROR "Option 'BUILD_VERSIONED' has changed, the new name is WINMANGLE_LIBNAMES")
+endif(BUILD_VERSIONED)
+if(BUILD_TESTING)
+  message(FATAL_ERROR "Option 'BUILD_TESTING' is gone, new name is BUILD_TESTS, see the docs")
+endif()
+
 option(WINMANGLE_LIBNAMES
-  "Mangle toolset and boost version tags to into library names" 
+  "mangle toolset and boost version tags to into library names" 
   ${WIN32})
 
 option(BUILD_SOVERSIONED "Create libraries with SONAMES" ${UNIX})
@@ -141,7 +148,7 @@ option(BUILD_SOVERSIONED "Create libraries with SONAMES" ${UNIX})
 option(INSTALL_VERSIONED "Install to versioned directories" OFF)
 
 
-# The default set of library variants that we will be building
+# the default set of library variants that we will be building
 boost_add_default_variant(RELEASE DEBUG)
 boost_add_default_variant(STATIC SHARED)
 boost_add_default_variant(SINGLE_THREADED MULTI_THREADED)
@@ -177,7 +184,12 @@ if(INSTALL_VERSIONED)
     set(sep ".")
   endif()
 
-  set(verstring "${BOOST_VERSION_MAJOR}${sep}${BOOST_VERSION_MINOR}${sep}${BOOST_VERSION_SUBMINOR}")
+  if (BOOST_VERSION_OVERRIDE)
+    set(verstring "${BOOST_VERSION_OVERRIDE}")
+  else()
+    set(verstring "${BOOST_VERSION_MAJOR}${sep}${BOOST_VERSION_MINOR}${sep}${BOOST_VERSION_SUBMINOR}")
+  endif()
+
   set(BOOST_INCLUDE_INSTALL_DIR 
     "include/boost-${verstring}"
     CACHE STRING "Destination path under CMAKE_INSTALL_PREFIX for header files"
@@ -208,6 +220,14 @@ install(DIRECTORY boost
   PATTERN "CVS" EXCLUDE
   PATTERN ".svn" EXCLUDE)
 
+#
+# for testing
+#
+if (BOOST_VERSION_OVERRIDE)
+  install(FILES ${CMAKE_BINARY_DIR}/version.hpp 
+    DESTINATION ${BOOST_INCLUDE_INSTALL_DIR}/boost
+    RENAME version.hpp)
+endif()
 ##########################################################################
 # Binary packages                                                        #
 ##########################################################################
@@ -307,18 +327,20 @@ endif (TEST_INSTALLED_TREE)
 # TODO: See if we can actually use auto-linking in our regression tests.
 add_definitions(-DBOOST_ALL_NO_LIB=1)
 
-set(BOOST_EXPORTS_FILE ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/cmake/Boost.cmake
+#
+# Get build space set up for exports file
+#
+set(BOOST_EXPORTS_FILE ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/Exports.cmake
   CACHE FILEPATH "File to export targets from boost build directory")
 
+file(MAKE_DIRECTORY ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 file(REMOVE ${BOOST_EXPORTS_FILE})
 
-if(INSTALL_VERSIONED)
-  set(BOOST_INSTALL_EXPORTS_FILE ${BOOST_LIB_INSTALL_DIR}/cmake
-    CACHE STRING "Install location for cmake exports")
-else()
-  set(BOOST_INSTALL_EXPORTS_FILE ${BOOST_LIB_INSTALL_DIR}/boost/cmake
-    CACHE STRING "Install location for cmake exports")
+if(NOT INSTALL_VERSIONED)
+  set(pathelem "boost/")
 endif()
+set(BOOST_INSTALL_EXPORTS_FILE ${BOOST_LIB_INSTALL_DIR}
+  CACHE STRING "Install location for cmake exports")
 
 mark_as_advanced(BOOST_EXPORTS_FILE BOOST_INSTALL_EXPORTS_FILE)
 
@@ -338,4 +360,3 @@ if(NOT BUILD_PROJECTS STREQUAL "NONE")
 endif()
 
 add_subdirectory(tools/build/CMake)
-
