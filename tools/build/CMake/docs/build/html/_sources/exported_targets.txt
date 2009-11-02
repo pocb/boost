@@ -10,32 +10,6 @@ projects against an installed boost, or simply against a build tree
 sitting on disk.  There are a variety of ways to use these to ease
 configuration of boost in your external project.
 
-You only need to do three things:
-
-1.  Add the appropriate include directory.  This is either
-    ``${``:ref:`CMAKE_INSTALL_PREFIX`\ ``}/include``, if installed, or the
-    toplevel of the boost source directory if not.
-
-2.  ``include`` the generated ``Boost.cmake`` file containing the
-    exported targets.  In an installation, this file is in directory
-    ``${``:ref:`CMAKE_INSTALL_PREFIX`\ ``}/lib/cmake/Boost.cmake`` [#libsuffix]_, and
-    in a not-installed build tree it is located in
-    ``${``:ref:`CMAKE_BINARY_DIR`\ ``}/lib/cmake/Boost.cmake``
-3.  Tell cmake about your link dependencies with
-    ``target_link_libraries``.  Note that you use the **names of the
-    cmake targets**, not the shorter names that the libraries have on
-    disk.   ``make help`` shows a list::
-
-       % make help | grep signals
-       ... boost_signals
-       ... boost_signals-mt-shared
-       ... boost_signals-mt-shared-debug
-       ... boost_signals-mt-static
-       ... boost_signals-mt-static-debug
-              
-    See also :ref:`fixme` for details on the naming conventions.
-
-
 .. index:: Building against uninstalled boost
 .. _uninstalled:
 
@@ -44,9 +18,9 @@ With an uninstalled build
 
 You only need to do three things:
 
-1.  Add the appropriate include directory.  This is either
-    ``${``:ref:`CMAKE_INSTALL_PREFIX`\ ``}/include``, if installed, or the
-    toplevel of the boost source directory if not.
+1.  Add the appropriate include directory with
+    ``include_directories()``.  This is the toplevel of the boost
+    source tree.
 
 2.  ``include`` the generated ``Boost.cmake`` from the build tree
     containing the exported targets.  I is located in
@@ -120,8 +94,8 @@ find without setting any particular path::
 
 .. rubric:: Note 
 
-the ``NO_MODULE`` is required if your cmake is older than (FIXME,
-currently required with all versions, modification to the
+the ``NO_MODULE`` above is **required** if your cmake is older than
+(FIXME, currently required with all versions, modification to the
 FindBoost.cmake distributed with cmake itself is required).
 
 Here, having installed to ``/usr/local/boost-1.41.0``, I see::
@@ -138,14 +112,19 @@ Here, having installed to ``/usr/local/boost-1.41.0``, I see::
 
 See also the documentation for ``FindBoost.cmake``.
 
+If your :ref:`BOOST_CMAKE_INFRASTRUCTURE_DIR` is no on cmake's
+``CMAKE_PREFIX_PATH``, you will need to add it so that the cmake
+infrastructure files are found by the ``find_package`` path search.
+
+
 The Somewhat harder way
 -----------------------
 
 If your boost installation does *not* come with the file installed
-when :ref:`BOOST_INSTALL_FINDBOOST_CMAKE_DRIVERS`, you will need to
-specify the path to the Boost.cmake file installed in
+when :ref:`BOOST_INSTALL_FINDBOOST_CMAKE_DRIVERS` is on, you will need
+to specify the path to the Boost.cmake file installed in
 :ref:`BOOST_LIB_INSTALL_DIR` (try
-``$CMAKE_INSTALL_PREFIX/lib/boost/cmake/Boost.cmake``
+``${CMAKE_INSTALL_PREFIX}/lib/boost/cmake/Boost.cmake``)
 
 
 .. rubric:: Footnotes

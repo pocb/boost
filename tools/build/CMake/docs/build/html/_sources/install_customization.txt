@@ -103,12 +103,12 @@ when :ref:`INSTALL_VERSIONED` is true.  The default is ``include/``.
 BOOST_CMAKE_INFRASTRUCTURE_DIR
 ------------------------------
 
-This is a directory **outside** the boost install tree, by default
-``/usr/share/boost/cmake``, to which the targets from this boost
-install will be exported: this significanly eases detection of boost
-installations by CMake.  The name of the file is
-Boost-|version|.cmake.  See :ref:`exported_targets` for more
-information about how users employ this file.
+This is a directory to which the targets from this boost install will
+be exported, by default ``${CMAKE_INSTALL_PREFIX}/share/boost/cmake``:
+this significanly eases detection of boost installations by CMake.
+The name of the file is Boost-|version|.cmake.  See
+:ref:`exported_targets` for more information about how users employ
+this file.
 
 .. index:: BOOST_INSTALL_FINDBOOST_CMAKE_DRIVERS
 .. _boost_install_findboost_cmake_drivers:

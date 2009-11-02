@@ -10,7 +10,7 @@
 #
 if (UNIX)
   set(BOOST_CMAKE_INFRASTRUCTURE_DIR
-    "/usr/share/boost/cmake"
+    "${CMAKE_INSTALL_PREFIX}/share/boost/cmake"
     CACHE FILEPATH 
     "Directory to install Boost-${BOOST_VERSION} to")
 endif()
