@@ -8,7 +8,8 @@
 #
 # Determine if we have a version of boost available that works
 #
-#
+# Thanks Tronic for some sharp eyes.
+# 
 get_filename_component(CWD ${CMAKE_CURRENT_LIST_FILE} PATH)
 
 file(GLOB AVAILABLE_VERSIONFILES RELATIVE ${CWD} "${CWD}/Boost-*.cmake")
@@ -16,7 +17,7 @@ file(GLOB AVAILABLE_VERSIONFILES RELATIVE ${CWD} "${CWD}/Boost-*.cmake")
 #
 #  
 #
-if (PACKAGE_FIND_VERSION AND EXISTS "${CWD}/Boost-${PACKAGE_FIND_VERSION}.cmake")
+if (EXISTS "${CWD}/Boost-${PACKAGE_MAJOR}.${PACKAGE_MINOR}.${PACKAGE_PATCH}.cmake")
   #
   #  Exact version
   #
