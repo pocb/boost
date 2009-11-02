@@ -198,7 +198,11 @@ BUILD_EXAMPLES
 This is a semicolon-separated list of projects whose examples should
 be built, e.g.::
 
-  BUILD_EXAMPLES=iostreams;accumulators
+  BUILD_EXAMPLES="iostreams;accumulators"
+
+.. warning:: If you pass this on the commandline in a unix shell,
+   	     don't forget to quote the list of arguments or escape the
+   	     semicolons...
 
 Per-library examples are specified with the :ref:`EXAMPLEDIRS`
 argument to the :ref:`boost_library_project_macro` macro.

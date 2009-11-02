@@ -22,10 +22,14 @@ BUILD_TESTS
 The variable BUILD_TESTS is a comma-separated list of projects for
 which testing will be enabled, e.g.::
 
-  accumulators;iostreams;variant
+  "accumulators;iostreams;variant"
 
 or the string ``"ALL"`` for all projects, or the string
 ``"NONE"`` to disable testing.
+
+.. warning:: if you pass this list from a unix shell, don't forget to
+   	     enclose the whole thing in quotes or escape the
+   	     semicolons.
 
 If you re-run the CMake configuration for Boost with ``BUILD_TESTS``
 set to ``ALL``, you will notice that configuration takes significantly
@@ -54,7 +58,7 @@ If you're using a command-line configuration (nmake files, unix
 makefiles) you can simplify this process by passing the value of
 ``BUILD_TESTS`` on the command line, e.g. ::
 
-   cmake ../src -DBUILD_TESTS=mpi;graph_parallel
+   cmake ../src -DBUILD_TESTS="mpi;graph_parallel"
 
 .. note:: In Visual Studio, you should be prompted by the gui to
    reload the project.  If you're unlucky, you will be prompted a
