@@ -61,7 +61,7 @@ foreach(component ${Boost_FIND_COMPONENTS})
   set(target boost_${component}${mtflag}${staticflag}${releaseflag})
   get_target_property(p ${target} TYPE)
   if (NOT (p MATCHES "_LIBRARY$"))
-    message(SEND_ERROR "Library boost_${component} (${mtdesc}, ${staticdesc}, ${reldesc}) is not available in the installation for Boost @BOOST_VERSION@.  ")
+    message(SEND_ERROR "Library boost_${component} (${mtdesc}, ${staticdesc}, ${reldesc}) is not available in the detected Boost @BOOST_VERSION@ installation under @CMAKE_INSTALL_PREFIX@.")
   endif()
 
   list(APPEND Boost_LIBRARIES ${target})
