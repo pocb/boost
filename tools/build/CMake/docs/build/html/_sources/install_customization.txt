@@ -33,6 +33,8 @@ LIB_SUFFIX
 INSTALL_VERSIONED
 -----------------
 
+**ON** by default on unix, **OFF** on windows.
+
 This variable controls whether boost versions will be mangled into the
 paths into which boost is installed.  This option has effect only when
 CMake is run the first time: they will be set as explained below the
@@ -104,28 +106,45 @@ BOOST_CMAKE_INFRASTRUCTURE_DIR
 ------------------------------
 
 This is a directory to which the targets from this boost install will
-be exported, by default ``${CMAKE_INSTALL_PREFIX}/share/boost/cmake``:
-this significanly eases detection of boost installations by CMake.
-The name of the file is Boost-|version|.cmake.  See
-:ref:`exported_targets` for more information about how users employ
-this file.
+be exported, by default ``${CMAKE_INSTALL_PREFIX}/share/boost-``\
+|version|\ ``/cmake``: this significanly eases detection of boost
+installations by CMake.  The name of the files are
+``BoostConfig.cmake`` and ``BoostConfigVersion.cmake`` [#findpackage]_. 
+See :ref:`exported_targets` for
+more information about how users employ this file.
 
-.. index:: BOOST_INSTALL_FINDBOOST_CMAKE_DRIVERS
+If this is a full path, it will be used directly, otherwise it will be
+interpreted relative to ``${CMAKE_INSTALL_PREFIX}``.
+
+.. index:: BOOST_INSTALL_CMAKE_DRIVERS
 .. _boost_install_findboost_cmake_drivers:
 
-BOOST_INSTALL_FINDBOOST_CMAKE_DRIVERS
--------------------------------------
+BOOST_INSTALL_CMAKE_DRIVERS
+---------------------------
 
-There are two optional driver files that can be installed to
-``BOOST_CMAKE_INFRASTRUCTURE_DIR``, named ``BoostConfig.cmake`` and
-``BoostConfigVersion.cmake``.  These two files coordinate with
-Boost-|version|.cmake to enable cmake developers who use both boost
-and cmake to find local boost installations via the standard cmake
-incantation::
+Specifies whether generic cmake driver files should be installed, 
+see the next option to customize where.  This variable is
+``OFF`` by default.  
+
+BOOST_CMAKE_DRIVERS_INSTALL_DIR
+-------------------------------
+
+There are two optional version-agnostic driver files that can be
+installed to a central location, by default
+``${CMAKE_INSTALL_PREFIX}/share/cmake/boost``.  
+
+named ``BoostConfig.cmake`` and ``BoostConfigVersion.cmake``.  These
+two files coordinate with Boost-|version|.cmake to enable cmake
+developers who use both boost and cmake to find local boost
+installations via the standard cmake incantation::
 
   find_package(Boost 1.41.0 COMPONENTS thread iostreams)
 
 These driver files should be the same from release to release.  
+
+This variable allows modification of this location; If this is a full
+path, it will be used directly, otherwise it will be interpreted
+relative to ``${CMAKE_INSTALL_PREFIX}``.
 
 .. index:: BOOST_EXPORTS_FILE
 .. _BOOST_EXPORTS_FILE:
@@ -133,26 +152,34 @@ These driver files should be the same from release to release.
 BOOST_EXPORTS_FILE
 ------------------
 
-This is the path to the file that will contain CMake exported targets
-in the build tree, by default it is::
+This is the path *in the build tree* to the file that will contain
+CMake exported targets, by default it is::
 
-  ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/cmake/Boost.cmake
+  ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/Exports.cmake
 
 See :ref:`exported_targets` for information on how to use this handy
 file when building against an **uninstalled** boost.  *This variable
-has no effect on installation.*
+has no effect on installation, and is only useful if building separate
+cmake projects against an uninstalled boost.* 
+
+If this is a full path, it will be used directly, otherwise it will be
+interpreted relative to ``${CMAKE_BINARY_DIR}``.
 
 .. index:: BOOST_INSTALL_EXPORTS_FILE
 .. _BOOST_INSTALL_EXPORTS_FILE:
 
-BOOST_INSTALL_EXPORTS_FILE
---------------------------
+BOOST_EXPORTS_INSTALL_DIR
+-------------------------
 
-This is the path to which the exports file (See
-:ref:`BOOST_EXPORTS_FILE` will be installed.  By default it is::
-
-  ${BOOST_LIB_INSTALL_DIR}/cmake
+This is the path to which the exports file(s) (See
+:ref:`BOOST_EXPORTS_FILE`) will be installed. By default it is
+``${BOOST_LIB_INSTALL_DIR}``.  This must be a **relative** path.
 
 See :ref:`exported_targets` for information on how to use this handy
-file to simply building against an **installed** boost.
+file to build against an **installed** boost.   
 
+
+
+.. rubric:: Footnotes
+
+.. [#findpackage] See also the cmake docs for ``find_package()``. 

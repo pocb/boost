@@ -145,7 +145,9 @@ option(WINMANGLE_LIBNAMES
 
 option(BUILD_SOVERSIONED "Create libraries with SONAMES" ${UNIX})
 
-option(INSTALL_VERSIONED "Install to versioned directories" OFF)
+if(UNIX)
+  option(INSTALL_VERSIONED "Install to versioned directories" ON)
+endif()
 
 
 # the default set of library variants that we will be building
@@ -215,10 +217,17 @@ endif()
 boost_report_pretty("Install include dir:" BOOST_INCLUDE_INSTALL_DIR)
 boost_report_pretty("Install lib dir:" BOOST_LIB_INSTALL_DIR)
 
-install(DIRECTORY boost 
-  DESTINATION ${BOOST_INCLUDE_INSTALL_DIR}
-  PATTERN "CVS" EXCLUDE
-  PATTERN ".svn" EXCLUDE)
+
+if (BOOST_VERSION_OVERRIDE)
+  install(FILES ${CMAKE_BINARY_DIR}/version.hpp 
+    DESTINATION ${BOOST_INCLUDE_INSTALL_DIR}/boost
+    RENAME version.hpp)
+else()
+  install(DIRECTORY boost 
+    DESTINATION ${BOOST_INCLUDE_INSTALL_DIR}
+    PATTERN "CVS" EXCLUDE
+    PATTERN ".svn" EXCLUDE)
+endif()
 
 #
 # for testing
@@ -228,6 +237,8 @@ if (BOOST_VERSION_OVERRIDE)
     DESTINATION ${BOOST_INCLUDE_INSTALL_DIR}/boost
     RENAME version.hpp)
 endif()
+
+
 ##########################################################################
 # Binary packages                                                        #
 ##########################################################################
@@ -339,10 +350,13 @@ file(REMOVE ${BOOST_EXPORTS_FILE})
 if(NOT INSTALL_VERSIONED)
   set(pathelem "boost/")
 endif()
-set(BOOST_INSTALL_EXPORTS_FILE ${BOOST_LIB_INSTALL_DIR}
-  CACHE STRING "Install location for cmake exports")
 
-mark_as_advanced(BOOST_EXPORTS_FILE BOOST_INSTALL_EXPORTS_FILE)
+if (NOT BOOST_EXPORTS_INSTALL_DIR)
+  set(BOOST_EXPORTS_INSTALL_DIR ${BOOST_LIB_INSTALL_DIR}
+    CACHE STRING "Install location for cmake exports")
+endif()
+
+mark_as_advanced(BOOST_EXPORTS_FILE BOOST_EXPORTS_INSTALL_DIR)
 
 # Add build rules for documentation
 add_subdirectory(doc)
@@ -356,7 +370,7 @@ add_subdirectory(tools)
 ##########################################################################
 
 if(NOT BUILD_PROJECTS STREQUAL "NONE") 
-  install(EXPORT Boost DESTINATION ${BOOST_INSTALL_EXPORTS_FILE})
+  install(EXPORT Boost DESTINATION ${BOOST_EXPORTS_INSTALL_DIR})
 endif()
 
 add_subdirectory(tools/build/CMake)

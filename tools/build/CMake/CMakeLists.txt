@@ -12,10 +12,12 @@ if (UNIX)
   if(NOT INSTALL_VERSIONED)
     set(pathelem "boost/")
   endif()
-  set(BOOST_CMAKE_INFRASTRUCTURE_DIR
-    "${CMAKE_INSTALL_PREFIX}/share/boost-${BOOST_VERSION}/cmake"
-    CACHE FILEPATH 
-    "Directory to install Boost-${BOOST_VERSION} to")
+  if (NOT BOOST_CMAKE_INFRASTRUCTURE_DIR)
+    set(BOOST_CMAKE_INFRASTRUCTURE_DIR
+      "${CMAKE_INSTALL_PREFIX}/share/boost-${BOOST_VERSION}/cmake"
+      CACHE FILEPATH 
+      "Directory to install Boost-${BOOST_VERSION} to")
+  endif()
 endif()
 
 #
@@ -61,14 +63,17 @@ if(UNIX)
   # The files that go in <prefix>/share/cmake/boost that search for
   # Boost-<version>.cmake files (user specifies <version>)
   #
-  option(BOOST_INSTALL_FINDBOOST_CMAKE_DRIVERS
+  option(BOOST_INSTALL_CMAKE_DRIVERS
     "Install version-agnostic BoostConfig.cmake and BoostConfigVersion.cmake to \\$\\{CMAKE_INSTLL_PREFIX\\}/share/cmake/boost" OFF)
 
-  mark_as_advanced(BOOST_INSTALL_FINDBOOST_CMAKE_DRIVERS)
+  mark_as_advanced(BOOST_INSTALL_CMAKE_DRIVERS)
 
-  if (BOOST_INSTALL_FINDBOOST_CMAKE_DRIVERS)
-    set(agnostic_infra_dir "${CMAKE_INSTALL_PREFIX}/share/cmake/boost")
-
+  if (BOOST_INSTALL_CMAKE_DRIVERS)
+    if (NOT BOOST_CMAKE_DRIVERS_INSTALL_DIR)
+      set(agnostic_infra_dir "share/cmake/boost")
+    else()
+      set(agnostic_infra_dir ${BOOST_CMAKE_DRIVERS_INSTALL_DIR})
+    endif()
     install(FILES
       ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/BoostConfigAgnostic.cmake
       DESTINATION ${agnostic_infra_dir}
