@@ -24,7 +24,7 @@ set(Boost_LIBRARY_DIRS "@CMAKE_INSTALL_PREFIX@/@BOOST_LIB_INSTALL_DIR@")
 #
 #  Include the imported targets
 #
-include("@CMAKE_INSTALL_PREFIX@/@BOOST_LIB_INSTALL_DIR@/cmake/Boost.cmake")
+include("@CMAKE_INSTALL_PREFIX@/@BOOST_LIB_INSTALL_DIR@/boost/cmake/Boost.cmake")
 
 #
 #  Calculate target suffix from user variables
