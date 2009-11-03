@@ -78,7 +78,15 @@ set(DART_TESTING_TIMEOUT 15
 # example usage:
 #  boost_additional_test_dependencies(signals BOOST_DEPENDS test optional)
 #
+#
+#  TDS 20091103:  
+#  For the moment we don't need this, since tests are now traversed
+#  after project directories (so all boost lib dependency targets are
+#  visible to all tests) and modularization has crashed and burned.
+#
 macro(boost_additional_test_dependencies libname)
+  # NOTE DISABLED
+  if (FALSE)
   parse_arguments(BOOST_TEST 
     "BOOST_DEPENDS"
     ""
@@ -135,6 +143,7 @@ macro(boost_additional_test_dependencies libname)
     # include_directories("${Boost_SOURCE_DIR}/libs/${include}/include")
     #
   endforeach (include ${includes})
+endif()
   
 endmacro(boost_additional_test_dependencies libname)
 #-------------------------------------------------------------------------------
