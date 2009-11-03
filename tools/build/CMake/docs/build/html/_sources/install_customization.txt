@@ -14,6 +14,16 @@ CMAKE_INSTALL_PREFIX
   This is a standard cmake option that sets the path to which boost
   will be installed.
 
+.. index:: DESTDIR
+
+  CMake generates makefiles that play nice with ``DESTDIR``.  e.g.
+  if you configure like this::
+
+    cmake ../src -DCMAKE_INSTALL_PREFIX=/tmp/blah
+
+  and install with ``DESTDIR=/foo make install``, you'll get files
+  installed to ``/foo/tmp/blah``.
+
 .. index:: LIB_SUFFIX
 .. _lib_suffix:
 
