@@ -94,9 +94,9 @@ MACRO(PARSE_ARGUMENTS prefix arg_names option_names)
     ELSE (is_arg_name)
       LIST_CONTAINS(is_option ${arg} ${option_names})
       IF (is_option)
-      SET(${prefix}_${arg} TRUE)
+	SET(${prefix}_${arg} TRUE)
       ELSE (is_option)
-      SET(current_arg_list ${current_arg_list} ${arg})
+	SET(current_arg_list ${current_arg_list} ${arg})
       ENDIF (is_option)
     ENDIF (is_arg_name)
   ENDFOREACH(arg)
@@ -232,23 +232,33 @@ endmacro()
 #  equals signs align
 #
 macro(boost_report_value NAME)
-    string(LENGTH "${NAME}" varlen)
-    math(EXPR padding_len 30-${varlen})
-    string(SUBSTRING "                                      " 
-      0 ${padding_len} varpadding)
-    message(STATUS "${NAME}${varpadding} = ${${NAME}}")
+  string(LENGTH "${NAME}" varlen)
+  math(EXPR padding_len 30-${varlen})
+  string(SUBSTRING "                                      " 
+    0 ${padding_len} varpadding)
+  message(STATUS "${NAME}${varpadding} = ${${NAME}}")
 endmacro()
+
+macro(trace NAME)
+  if(BOOST_CMAKE_TRACE)
+    string(LENGTH "${NAME}" varlen)
+    math(EXPR padding_len 40-${varlen})
+    string(SUBSTRING "........................................"
+      0 ${padding_len} varpadding)
+    message(STATUS "${NAME} ${varpadding} ${${NAME}}")
+  endif()
+endmacro()  
 
 #
 #  pretty-prints the value of a variable so that the 
 #  equals signs align
 #
 macro(boost_report_pretty PRETTYNAME VARNAME)
-    string(LENGTH "${PRETTYNAME}" varlen)
-    math(EXPR padding_len 30-${varlen})
-    string(SUBSTRING "                                      " 
-      0 ${padding_len} varpadding)
-    message(STATUS "${PRETTYNAME}${varpadding} = ${${VARNAME}}")
+  string(LENGTH "${PRETTYNAME}" varlen)
+  math(EXPR padding_len 30-${varlen})
+  string(SUBSTRING "                                      " 
+    0 ${padding_len} varpadding)
+  message(STATUS "${PRETTYNAME}${varpadding} = ${${VARNAME}}")
 endmacro()
 
 #

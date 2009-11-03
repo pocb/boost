@@ -193,15 +193,15 @@ macro(boost_test_parse_args testname)
     get_target_property(DEPEND_LOCATION ${ARG} LOCATION)
     # If building static libraries is turned off, don't try to build
     # the test
-    if (NOT ENABLE_STATIC AND ${DEPEND_TYPE} STREQUAL "STATIC_LIBRARY")
-      set(BOOST_TEST_OKAY FALSE)
-    endif (NOT ENABLE_STATIC AND ${DEPEND_TYPE} STREQUAL "STATIC_LIBRARY")
+    #if (NOT ENABLE_STATIC AND ${DEPEND_TYPE} STREQUAL "STATIC_LIBRARY")
+    #set(BOOST_TEST_OKAY FALSE)
+    #endif (NOT ENABLE_STATIC AND ${DEPEND_TYPE} STREQUAL "STATIC_LIBRARY")
 
     # If building shared libraries is turned off, don't try to build
     # the test
-    if (NOT ENABLE_SHARED AND ${DEPEND_TYPE} STREQUAL "SHARED_LIBRARY")
-      set(BOOST_TEST_OKAY FALSE)
-    endif (NOT ENABLE_SHARED AND ${DEPEND_TYPE} STREQUAL "SHARED_LIBRARY")
+    #if (NOT ENABLE_SHARED AND ${DEPEND_TYPE} STREQUAL "SHARED_LIBRARY")
+    #set(BOOST_TEST_OKAY FALSE)
+    #endif (NOT ENABLE_SHARED AND ${DEPEND_TYPE} STREQUAL "SHARED_LIBRARY")
   endforeach(ARG ${BOOST_TEST_DEPENDS})
 
   # Setup the SOURCES variables. If no sources are specified, use the
@@ -289,15 +289,15 @@ macro(boost_test_run testname)
   # DLLs.  
   # 
   if (NOT CMAKE_HOST_WIN32)
-    set(OUTPUT_NAME tests/${BOOST_PROJECT_NAME}/${testname})
+    set(THIS_TEST_OUTPUT_NAME tests/${BOOST_PROJECT_NAME}/${testname})
   else()
-    set(OUTPUT_NAME ${BOOST_PROJECT_NAME}-${testname})
+    set(THIS_TEST_OUTPUT_NAME ${BOOST_PROJECT_NAME}-${testname})
   endif()
-  if (BOOST_TEST_OKAY)  
 
+  if (BOOST_TEST_OKAY)  
     boost_add_executable(${testname} ${BOOST_TEST_SOURCES}
-      OUTPUT_NAME ${OUTPUT_NAME}
       DEPENDS "${BOOST_TEST_DEPENDS}"
+      OUTPUT_NAME ${THIS_TEST_OUTPUT_NAME}
       LINK_LIBS ${BOOST_TEST_LINK_LIBS}
       LINK_FLAGS ${BOOST_TEST_LINK_FLAGS}
       COMPILE_FLAGS ${BOOST_TEST_COMPILE_FLAGS}
@@ -359,10 +359,12 @@ endmacro(boost_test_run_fail)
 macro(boost_test_compile testname)
   boost_test_parse_args(${testname} ${ARGN} COMPILE)
 
-  set (test_pass "PASSED")
   if (BOOST_TEST_FAIL)
     set (test_pass "FAILED")
-  endif(BOOST_TEST_FAIL)
+  else()
+    set (test_pass "PASSED")
+  endif()
+
   if (BOOST_TEST_OKAY)
   
     # Determine the include directories to pass along to the underlying

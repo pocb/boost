@@ -306,11 +306,18 @@ macro(boost_library_project LIBNAME)
 
   list(FIND BUILD_TESTS ${libname} BUILD_TESTS_INDEX)
   if ((BUILD_TESTS_INDEX GREATER -1) OR (BUILD_TESTS STREQUAL "ALL"))
-    # Include the test directories.
-    project(${libname}-tests)
+    # set the tests directories list for later inclusion
+    # project(${libname}-tests)
+    if (THIS_PROJECT_TESTDIRS)
+      set(BOOST_TEST_PROJECTS ${ULIBNAME} ${BOOST_TEST_PROJECTS} PARENT_SCOPE)
+    endif()
     foreach(SUBDIR ${THIS_PROJECT_TESTDIRS})
-      message(STATUS "+-- ${SUBDIR}")
-      add_subdirectory(${SUBDIR})
+      # message(STATUS "+-- ${SUBDIR}")
+      # add_subdirectory(${SUBDIR})
+      set(BOOST_${ULIBNAME}_TESTDIRS
+	${BOOST_${ULIBNAME}_TESTDIRS}
+	${CMAKE_CURRENT_SOURCE_DIR}/${SUBDIR}
+	PARENT_SCOPE)
     endforeach()
   endif()
 
@@ -1400,15 +1407,17 @@ macro(boost_add_executable EXENAME)
     endif ()
   endforeach()
 
-  set(THIS_EXE_OKAY FALSE)
+  set(THIS_EXE_OKAY TRUE)
 
   if(DEPENDENCY_FAILURES)
     set(THIS_EXE_OKAY FALSE)
     # separate_arguments(DEPENDENCY_FAILURES)
-    message(STATUS "+-- disabled due to dependency failures:")
+    message(STATUS "+-- ${THIS_EXE_NAME} disabled due to dependency failures:")
     message(STATUS "+---- ${DEPENDENCY_FAILURES}")
   endif()
 
+  trace(THIS_EXE_VARIANT)
+  trace(THIS_EXE_OUTPUT_NAME)
   if (THIS_EXE_VARIANT AND (NOT DEPENDENCY_FAILURES))
     # It's okay to build this executable
 

@@ -46,6 +46,8 @@ if ((NOT BUILD_PROJECTS STREQUAL "ALL") AND (NOT BUILD_PROJECTS STREQUAL "NONE")
   endforeach()
 endif()
 
+set(BOOST_TEST_PROJECTS "" CACHE INTERNAL "hi" FORCE)
+
 #
 # include only directories of projects in BUILD_PROJECTS
 #
@@ -58,6 +60,19 @@ foreach(subdir ${BOOST_SUBPROJECT_DIRS})
     message(STATUS "+ ${subdir}")
     add_subdirectory(${BOOST_LIBS_PARENT_DIR}/${subdir} ${CMAKE_BINARY_DIR}/libs/${subdir})
   endif()
+endforeach()
+
+message(STATUS "")
+message(STATUS "Reading boost project TEST directories...")
+message(STATUS "")
+foreach(PROJ ${BOOST_TEST_PROJECTS})
+  string(TOLOWER ${PROJ} proj)
+  project(${proj})
+  set(BOOST_PROJECT_NAME ${proj})
+  foreach(dir ${BOOST_${PROJ}_TESTDIRS})
+    message(STATUS "+ ${proj}")
+    add_subdirectory(${dir} ${CMAKE_BINARY_DIR}/libs/${proj}/test)
+  endforeach()
 endforeach()
 
 # Write out a GraphViz file containing inter-library dependencies. 
