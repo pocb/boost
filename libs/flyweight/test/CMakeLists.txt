@@ -7,6 +7,37 @@
 #
 # See http://www.boost.org/libs/flyweight for library home page.
 
+find_package(Threads)
+
+macro(flyweight_test testname)
+  boost_test_run(${testname} 
+    test_${testname}.cpp test_${testname}_main.cpp
+    LINK_LIBS ${CMAKE_THREAD_LIBS_INIT})
+endmacro()
+
+foreach(test
+    basic
+    custom_factory
+    init
+    multictor
+    no_locking
+    no_tracking
+    set_factory)
+
+  flyweight_test(${test})
+
+endforeach()
+
+#
+# test_assoc_cont_fact_main is irregularly named
+#
+boost_test_run(assoc_cont_factory
+  test_assoc_cont_factory.cpp test_assoc_cont_fact_main.cpp
+  LINK_LIBS ${CMAKE_THREAD_LIBS_INIT})
+
+#
+# this one involves a dll
+#
 boost_add_library(intermod_holder_dll 
   intermod_holder_dll.cpp
   COMPILE_FLAGS "-DBOOST_FLYWEIGHT_TEST_INTERMOD_HOLDER_DLL_SOURCE=1"
@@ -15,15 +46,8 @@ boost_add_library(intermod_holder_dll
   NO_INSTALL
   )
 
-boost_test_run(test_assoc_cont_factory test_assoc_cont_factory.cpp test_assoc_cont_fact_main.cpp)
-boost_test_run(test_basic test_basic.cpp              test_basic_main.cpp)
-boost_test_run(test_custom_factory test_custom_factory.cpp     test_custom_factory_main.cpp)
-boost_test_run(test_init test_init.cpp               test_init_main.cpp)
-
-boost_test_run(test_intermod_holder test_intermod_holder.cpp    test_intermod_holder_main.cpp
+boost_test_run(intermod_holder
+  test_intermod_holder.cpp test_intermod_holder_main.cpp
+  LINK_LIBS ${CMAKE_THREAD_LIBS_INIT}
   DEPENDS intermod_holder_dll)
 
-boost_test_run(test_multictor test_multictor.cpp          test_multictor_main.cpp)
-boost_test_run(test_no_locking test_no_locking.cpp         test_no_locking_main.cpp)
-boost_test_run(test_no_tracking test_no_tracking.cpp        test_no_tracking_main.cpp)
-boost_test_run(test_set_factory test_set_factory.cpp        test_set_factory_main.cpp)
