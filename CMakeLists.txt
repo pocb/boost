@@ -245,6 +245,7 @@ endif()
 set(CPACK_PACKAGE_NAME "Boost C++ Libraries")
 set(CPACK_PACKAGE_VENDOR "Boost.org")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Boost ${BOOST_VERSION} prerelease")
+set(CPACK_PACKAGE_FILE_NAME "boost-${BOOST_VERSION}-${BOOST_PLATFORM}-${BOOST_TOOLSET}")
 
 if (EXISTS "${CMAKE_SOURCE_DIR}/README.txt")
   message(STATUS "Using generic cpack package description file.")
