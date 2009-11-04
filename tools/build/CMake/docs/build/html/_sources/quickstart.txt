@@ -24,26 +24,37 @@ self-explanatory. If you need to build your own copy of CMake, please
 see the `CMake installation instructions
 <http://www.cmake.org/HTML/Install.html>`_.  
 
-Check out the code
-------------------
+.. note::
 
-The code associated with these docs is available at
-http://gitorious.org/boost/cmake with tag |release|.  You can clone
-the repository locally and then check out the tag.  Tarballs and
-zipfiles corresponding to these tags are avaiable at
-http://sodium.resophonic.com/boost-cmake.
+  In these instructions, we will do things such that the Boost source
+  tree (with CMake build files) is available in the directory
+  ``$BOOST/src`` and that the build will happen in ``$BOOST/build``::
+  
+    $BOOST/
+      src/     # (source checked out to here)
+      build/   # (build output here) 
+  
+  Note that it is *not* actually necessary to set any environment
+  variable ``BOOST``, this is a convention used in this document.
 
-In these instructions, we will do things such that the Boost source
-tree (with CMake build files) is available in the directory
-``$BOOST/src`` and that the build will happen in ``$BOOST/build``::
+Checkout / download the code
+----------------------------
 
-  $BOOST/
-    src/     # (source checked out to here)
-    build/   # (build output here) 
+Tarballs and zipfiles are avaiable at
+http://sodium.resophonic.com/boost-cmake in subdirectory |release|.
 
-Note that it is *not* actually necessary to set any environment
-variable ``BOOST``, this is a convention used in this document.
- 
+Boost.CMake is distributed *separately* from upstream boost.  Code is
+in a `git <http://git-scm.com>`_ repository at
+http://gitorious.org/boost/cmake.git.  These documents correspond to
+tag |release|.  You can clone the repository locally and then check out
+the tag::
+
+  git clone git://gitorious.org/boost/cmake.git src
+  cd src
+  git checkout <TAG>
+
+where ``<TAG>`` is |release|
+
 On Unix
 -------
 

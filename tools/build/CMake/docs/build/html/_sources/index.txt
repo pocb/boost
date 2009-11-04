@@ -15,13 +15,32 @@ package boost.
 .. index:: Mailing List, IRC
 
 **boost-cmake mailing list**    
+
   http://lists.boost.org/mailman/listinfo.cgi/boost-cmake      
+
 **IRC**             
+
   ``#boost-cmake`` on the `freenode network <http://freenode.net>`_
+
 **CMake/CTest regression testing of boost**
+
   http://www.cdash.org/CDashPublic/index.php?project=Boost
-**CMake home page** 
+
+**CMake home page**
+
   http://www.cmake.org
+
+**Source code**
+
+  Boost.CMake is distributed *separately* from upstream boost.  Code
+  is in a `git <http://git-scm.com>`_ repository at
+  http://gitorious.org/boost/cmake.git.  These documents correspond to
+  tag |release|.  
+
+**Tarballs**
+
+  Tarballs and zipfiles are available at
+  http://sodium.resophonic.com/boost-cmake/ in subdirectory |release|.  
 
 Users's guide
 =============
