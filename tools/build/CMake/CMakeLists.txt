@@ -14,7 +14,7 @@ if (UNIX)
   endif()
   if (NOT BOOST_CMAKE_INFRASTRUCTURE_DIR)
     set(BOOST_CMAKE_INFRASTRUCTURE_DIR
-      "${CMAKE_INSTALL_PREFIX}/share/boost-${BOOST_VERSION}/cmake"
+      "share/boost-${BOOST_VERSION}/cmake"
       CACHE FILEPATH 
       "Directory to install Boost-${BOOST_VERSION} to")
   endif()
@@ -64,7 +64,7 @@ if(UNIX)
   # Boost-<version>.cmake files (user specifies <version>)
   #
   option(BOOST_INSTALL_CMAKE_DRIVERS
-    "Install version-agnostic BoostConfig.cmake and BoostConfigVersion.cmake to \\$\\{CMAKE_INSTLL_PREFIX\\}/share/cmake/boost" OFF)
+    "Install version-agnostic BoostConfig.cmake and BoostConfigVersion.cmake to this subdirectory of CMAKE_INSTALL_PREFIX" OFF)
 
   mark_as_advanced(BOOST_INSTALL_CMAKE_DRIVERS)
 
