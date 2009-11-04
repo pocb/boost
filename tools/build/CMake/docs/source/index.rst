@@ -43,14 +43,14 @@ Developer's guide
 .. toctree::
    :maxdepth: 3
 
-   testing
    individual_libraries
    add_boost_library
    add_compiled_library
+   testing
    adding_regression_tests
    build_installer
    notes_by_version
-
+   
 Reference
 =========
 

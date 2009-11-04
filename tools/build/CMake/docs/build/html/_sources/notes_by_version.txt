@@ -1,6 +1,12 @@
 Notes by Boost Version
 ======================
 
+1.41.0.beta1.cmake1
+-------------------
+
+This is the first cmake beta based on upstream ``Boost_1_41_0_beta1".
+There are *way* too many enhancements to mention.
+
 1.41.0.cmakebeta4
 -----------------
 

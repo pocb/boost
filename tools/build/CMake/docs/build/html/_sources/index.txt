@@ -35,6 +35,7 @@ Users's guide
    exported_targets
    install_customization
    externals/index
+   diff
 
 Developer's guide
 =================
@@ -42,14 +43,14 @@ Developer's guide
 .. toctree::
    :maxdepth: 3
 
-   testing
    individual_libraries
    add_boost_library
    add_compiled_library
+   testing
    adding_regression_tests
    build_installer
    notes_by_version
-
+   
 Reference
 =========
 
@@ -89,9 +90,11 @@ Release checklist
 * Update ``BOOST_CMAKE_VERSION`` in toplevel ``CMakeLists.txt``
 * Update notes by version in ``tools/build/CMake/docs/notes_by_version.rst``
 * Reconfig cmake with ``BOOST_MAINTAINER`` set to ON
+* make make-diff
 * Rebuild docs and commit
 * Tag commit with ``BOOST_CMAKE_VERSION``
 * ``make do-release``
+* push tag
 
 Index
 =====

@@ -5,13 +5,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Configuring the buildspace &mdash; Boost.CMake 1.41.0.cmakebeta5</title>
+    <title>Configuring the buildspace &mdash; Boost.CMake 1.41.0.beta1.cmake1</title>
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '1.41.0.cmakebeta5',
+        VERSION:     '1.41.0.beta1.cmake1',
         COLLAPSE_MODINDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -19,7 +19,7 @@
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Boost.CMake 1.41.0.cmakebeta5" href="index.html" />
+    <link rel="top" title="Boost.CMake 1.41.0.beta1.cmake1" href="index.html" />
     <link rel="next" title="Build Variants and Features" href="build_variants.html" />
     <link rel="prev" title="Quickstart" href="quickstart.html" /> 
   </head>
@@ -38,7 +38,7 @@
              accesskey="P">previous</a> |</li>
     <li><a href="http://www.boost.org/">Boost</a> &raquo;</li>
     
-        <li><a href="index.html">Boost.CMake 1.41.0.cmakebeta5</a> &raquo;</li>
+        <li><a href="index.html">Boost.CMake 1.41.0.beta1.cmake1</a> &raquo;</li>
  
       </ul>
     </div>
@@ -181,7 +181,7 @@ this, <strong>delete the cache file</strong>.  On windows, there is a <em>Delete
 Cache</em> option in the CMake gui&#8217;s <em>File</em> menu.  On unix you can simply
 <tt class="docutils literal"><span class="pre">rm</span> <span class="pre">CMakeCache.txt</span></tt>.</p>
 <div class="section" id="cmake-binary-dir">
-<span id="index-301"></span><span id="id2"></span><h2>CMAKE_BINARY_DIR<a class="headerlink" href="#cmake-binary-dir" title="Permalink to this headline">¶</a></h2>
+<span id="index-491"></span><span id="id2"></span><h2>CMAKE_BINARY_DIR<a class="headerlink" href="#cmake-binary-dir" title="Permalink to this headline">¶</a></h2>
 <p>This variable is set by cmake and corresponds to the toplevel of your
 <tt class="docutils literal"><span class="pre">build/</span></tt> directory.</p>
 </div>
@@ -197,7 +197,7 @@ Cache</em> option in the CMake gui&#8217;s <em>File</em> menu.  On unix you can 
 </blockquote>
 </div>
 <div class="section" id="winmangle-libnames">
-<span id="index-302"></span><span id="id3"></span><h3>WINMANGLE_LIBNAMES<a class="headerlink" href="#winmangle-libnames" title="Permalink to this headline">¶</a></h3>
+<span id="index-492"></span><span id="id3"></span><h3>WINMANGLE_LIBNAMES<a class="headerlink" href="#winmangle-libnames" title="Permalink to this headline">¶</a></h3>
 <p>This option controls whether libraries will be built with mangled-in
 compiler name/version and boost version.  For example, with
 <tt class="docutils literal"><span class="pre">BUILD_VERSIONED</span></tt> set to <tt class="docutils literal"><span class="pre">OFF</span></tt>, the signals library looks like
@@ -224,7 +224,7 @@ version only.</p>
 </div>
 </div>
 <div class="section" id="build-projects">
-<span id="index-303"></span><span id="id4"></span><h3>BUILD_PROJECTS<a class="headerlink" href="#build-projects" title="Permalink to this headline">¶</a></h3>
+<span id="index-493"></span><span id="id4"></span><h3>BUILD_PROJECTS<a class="headerlink" href="#build-projects" title="Permalink to this headline">¶</a></h3>
 <p>This is a semicolon-separated list of projects to be built, or
 <tt class="docutils literal"><span class="pre">&quot;ALL&quot;</span></tt> (the default) for all projects, or <tt class="docutils literal"><span class="pre">&quot;NONE&quot;</span></tt>.  Projects not
 appearing in this list (if list not <tt class="docutils literal"><span class="pre">&quot;ALL&quot;</span></tt>) are ignored; no targets in
@@ -249,7 +249,7 @@ Call Stack (most recent call first):
 </div>
 </div>
 <div class="section" id="build-examples">
-<span id="index-304"></span><span id="id5"></span><h3>BUILD_EXAMPLES<a class="headerlink" href="#build-examples" title="Permalink to this headline">¶</a></h3>
+<span id="index-494"></span><span id="id5"></span><h3>BUILD_EXAMPLES<a class="headerlink" href="#build-examples" title="Permalink to this headline">¶</a></h3>
 <p>This is a semicolon-separated list of projects whose examples should
 be built, e.g.:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">BUILD_EXAMPLES</span><span class="o">=</span><span class="s">&quot;iostreams;accumulators&quot;</span>
@@ -270,7 +270,7 @@ argument to the <a class="reference external" href="reference/boost_library_proj
 filter has no ability to reverse the result.</p>
 </div>
 <div class="section" id="build-tools">
-<span id="index-305"></span><span id="id6"></span><h3>BUILD_TOOLS<a class="headerlink" href="#build-tools" title="Permalink to this headline">¶</a></h3>
+<span id="index-495"></span><span id="id6"></span><h3>BUILD_TOOLS<a class="headerlink" href="#build-tools" title="Permalink to this headline">¶</a></h3>
 <p>Similar to BUILD_EXAMPLES and BUILD_PROJECTS above, this is a
 semicolon-separated list of tools (in subdirectory
 <tt class="docutils literal"><span class="pre">$BOOST_ROOT/tools/</span></tt>) that should be built, e.g.:</p>
@@ -282,7 +282,7 @@ the values here are lowercase (only subdirectories of <tt class="docutils litera
 matching one of the strings in the list will be traversed by cmake).</p>
 </div>
 <div class="section" id="cmake-verbose-makefile">
-<span id="index-306"></span><h3>CMAKE_VERBOSE_MAKEFILE<a class="headerlink" href="#cmake-verbose-makefile" title="Permalink to this headline">¶</a></h3>
+<span id="index-496"></span><h3>CMAKE_VERBOSE_MAKEFILE<a class="headerlink" href="#cmake-verbose-makefile" title="Permalink to this headline">¶</a></h3>
 <blockquote>
 Displays full build commands during build.  Good for debugging.
 This option will generate permanently verbose makefiles; it is
@@ -290,7 +290,7 @@ generally easier to invoke make with the option <tt class="docutils literal"><sp
 instead (this has the same effect, but is not persistent).</blockquote>
 </div>
 <div class="section" id="cmake-cxx-compiler">
-<span id="index-307"></span><span id="id7"></span><h3>CMAKE_CXX_COMPILER<a class="headerlink" href="#cmake-cxx-compiler" title="Permalink to this headline">¶</a></h3>
+<span id="index-497"></span><span id="id7"></span><h3>CMAKE_CXX_COMPILER<a class="headerlink" href="#cmake-cxx-compiler" title="Permalink to this headline">¶</a></h3>
 <blockquote>
 <p>Sets the compiler.  If you have a nonstandard compiler and no
 default compiler, you may have to pass the value of this option on
@@ -301,9 +301,9 @@ the commandline, for example:</p>
 to have cmake generate a set of nmake or project files by choosing
 an appropriate generator.</p>
 </blockquote>
-<span class="target" id="index-308"></span><span class="target" id="index-309"></span></div>
+<span class="target" id="index-498"></span><span class="target" id="index-499"></span></div>
 <div class="section" id="build-soversioned">
-<span id="build-with-soversion"></span><span id="index-310"></span><h3>BUILD_SOVERSIONED<a class="headerlink" href="#build-soversioned" title="Permalink to this headline">¶</a></h3>
+<span id="index-500"></span><span id="id8"></span><h3>BUILD_SOVERSIONED<a class="headerlink" href="#build-soversioned" title="Permalink to this headline">¶</a></h3>
 <p>Enables the setting of SOVERSION in built libraries.  If
 this is on:</p>
 <div class="highlight-python"><pre>% ls -l libboost_thread*.so*
@@ -321,6 +321,8 @@ lrwxrwxrwx 1 troy troy     28 Oct 29 18:37 libboost_thread-mt.so -&gt; libboost_
 -rwxr-xr-x 1 troy troy  121886 Oct 29 15:10 lib/libboost_signals-mt.so*</pre>
 </div>
 <p>(Unix only, <tt class="docutils literal"><span class="pre">ON</span></tt> by default)</p>
+<p>This setting also determines whether libraries are <em>installed</em>
+with/without soversions.  See also <a class="reference external" href="install_customization.html#install-versioned"><em>INSTALL_VERSIONED</em></a>.</p>
 </div>
 </div>
 </div>
@@ -345,12 +347,12 @@ lrwxrwxrwx 1 troy troy     28 Oct 29 18:37 libboost_thread-mt.so -&gt; libboost_
              >previous</a> |</li>
     <li><a href="http://www.boost.org/">Boost</a> &raquo;</li>
     
-        <li><a href="index.html">Boost.CMake 1.41.0.cmakebeta5</a> &raquo;</li>
+        <li><a href="index.html">Boost.CMake 1.41.0.beta1.cmake1</a> &raquo;</li>
  
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version 6544651230b1dc028bdcd3e07a14c58239c16946, Tue, 3 Nov 2009.
+      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version e1ba6c87679375525a8b313a538ba1c31eae8012, Wed, 4 Nov 2009.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

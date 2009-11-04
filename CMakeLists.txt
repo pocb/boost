@@ -55,7 +55,7 @@ if(BOOST_VERSION_OVERRIDE)
   configure_file(tools/build/CMake/install_me/version.hpp.override.in ${CMAKE_BINARY_DIR}/version.hpp)
 endif()
 
-set(BOOST_CMAKE_VERSION "${BOOST_VERSION}.cmakebeta5")
+set(BOOST_CMAKE_VERSION "${BOOST_VERSION}.beta1.cmake1")
 
 #
 #  For intermittent deployment of docs
@@ -79,7 +79,7 @@ if(BOOST_MAINTAINER)
   set(gitdiff "git diff --stat=100,90 ${UPSTREAM_TAG}") 
   add_custom_target(make-diff
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-    COMMAND echo "${gitdiff}\\n\\n" > ${CMAKE_DOCS_DIR}/source/git_diff.txt
+    COMMAND echo "% ${gitdiff}" > ${CMAKE_DOCS_DIR}/source/git_diff.txt
     COMMAND git diff --stat=100,90 ${UPSTREAM_TAG} >> ${CMAKE_DOCS_DIR}/source/git_diff.txt
     COMMAND make -C ${CMAKE_DOCS_DIR} html
     )

@@ -1,4 +1,76 @@
-% git diff --stat=100,90 Boost_1_41_0_beta1
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Differences between this release and upstream &mdash; Boost.CMake 1.41.0.beta1.cmake1</title>
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.41.0.beta1.cmake1',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Boost.CMake 1.41.0.beta1.cmake1" href="index.html" />
+    <link rel="next" title="Building individual libraries with cmake" href="individual_libraries.html" />
+    <link rel="prev" title="Zlib" href="externals/zlib.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="individual_libraries.html" title="Building individual libraries with cmake"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="externals/zlib.html" title="Zlib"
+             accesskey="P">previous</a> |</li>
+    <li><a href="http://www.boost.org/">Boost</a> &raquo;</li>
+    
+        <li><a href="index.html">Boost.CMake 1.41.0.beta1.cmake1</a> &raquo;</li>
+ 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/boost-small.png" alt="Logo"/>
+            </a></p>
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="externals/zlib.html"
+                                  title="previous chapter">Zlib</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="individual_libraries.html"
+                                  title="next chapter">Building individual libraries with cmake</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/diff.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="differences-between-this-release-and-upstream">
+<h1>Differences between this release and upstream<a class="headerlink" href="#differences-between-this-release-and-upstream" title="Permalink to this headline">¶</a></h1>
+<p>The only differences below should be in the build system... but there
+should be a <em>lot</em> of them.  :)</p>
+<div class="highlight-python"><pre>% git diff --stat=100,90 Boost_1_41_0_beta1
  .gitignore                                                                            |    7 +
  CMakeLists.txt                                                                        |  394 ++-
  CTestConfig.cmake                                                                     |   13 +
@@ -279,8 +351,8 @@
  libs/xpressive/test/CMakeLists.txt                                                    |   84 +
  tools/CMakeLists.txt                                                                  |  122 +
  tools/bcp/CMakeLists.txt                                                              |   32 +
- tools/build/CMake/Boost.bmp                                                           |  Bin 0 -> 71674 bytes
- tools/build/CMake/Boost.png                                                           |  Bin 0 -> 6308 bytes
+ tools/build/CMake/Boost.bmp                                                           |  Bin 0 -&gt; 71674 bytes
+ tools/build/CMake/Boost.png                                                           |  Bin 0 -&gt; 6308 bytes
  tools/build/CMake/BoostConfig.cmake                                                   |  249 +
  tools/build/CMake/BoostCore.cmake                                                     | 1494 +++++
  tools/build/CMake/BoostDocs.cmake                                                     |  526 ++
@@ -295,8 +367,8 @@
  tools/build/CMake/docs/.gitignore                                                     |    4 +
  tools/build/CMake/docs/Makefile.in                                                    |  101 +
  tools/build/CMake/docs/build/html/.buildinfo                                          |    4 +
- tools/build/CMake/docs/build/html/_images/MacInstaller.png                            |  Bin 0 -> 185943 bytes
- tools/build/CMake/docs/build/html/_images/WindowsInstaller.png                        |  Bin 0 -> 88166 bytes
+ tools/build/CMake/docs/build/html/_images/MacInstaller.png                            |  Bin 0 -&gt; 185943 bytes
+ tools/build/CMake/docs/build/html/_images/WindowsInstaller.png                        |  Bin 0 -&gt; 88166 bytes
  tools/build/CMake/docs/build/html/_sources/add_boost_library.txt                      |   49 +
  tools/build/CMake/docs/build/html/_sources/add_compiled_library.txt                   |  231 +
  tools/build/CMake/docs/build/html/_sources/adding_regression_tests.txt                |  107 +
@@ -330,15 +402,15 @@
  tools/build/CMake/docs/build/html/_sources/reference/boost_test_run_fail.txt          |    7 +
  tools/build/CMake/docs/build/html/_sources/testing.txt                                |  428 ++
  tools/build/CMake/docs/build/html/_static/basic.css                                   |  405 ++
- tools/build/CMake/docs/build/html/_static/boost-small.png                             |  Bin 0 -> 8899 bytes
+ tools/build/CMake/docs/build/html/_static/boost-small.png                             |  Bin 0 -&gt; 8899 bytes
  tools/build/CMake/docs/build/html/_static/boost.css                                   |  221 +
- tools/build/CMake/docs/build/html/_static/contents.png                                |  Bin 0 -> 202 bytes
+ tools/build/CMake/docs/build/html/_static/contents.png                                |  Bin 0 -&gt; 202 bytes
  tools/build/CMake/docs/build/html/_static/doctools.js                                 |  232 +
- tools/build/CMake/docs/build/html/_static/file.png                                    |  Bin 0 -> 392 bytes
+ tools/build/CMake/docs/build/html/_static/file.png                                    |  Bin 0 -&gt; 392 bytes
  tools/build/CMake/docs/build/html/_static/jquery.js                                   |   32 +
- tools/build/CMake/docs/build/html/_static/minus.png                                   |  Bin 0 -> 199 bytes
- tools/build/CMake/docs/build/html/_static/navigation.png                              |  Bin 0 -> 218 bytes
- tools/build/CMake/docs/build/html/_static/plus.png                                    |  Bin 0 -> 199 bytes
+ tools/build/CMake/docs/build/html/_static/minus.png                                   |  Bin 0 -&gt; 199 bytes
+ tools/build/CMake/docs/build/html/_static/navigation.png                              |  Bin 0 -&gt; 218 bytes
+ tools/build/CMake/docs/build/html/_static/plus.png                                    |  Bin 0 -&gt; 199 bytes
  tools/build/CMake/docs/build/html/_static/pygments.css                                |   59 +
  tools/build/CMake/docs/build/html/_static/searchtools.js                              |  467 ++
  tools/build/CMake/docs/build/html/_static/sphinxdoc.css                               |  349 +
@@ -379,8 +451,8 @@
  tools/build/CMake/docs/build/html/searchindex.js                                      |    1 +
  tools/build/CMake/docs/build/html/testing.html                                        |  516 ++
  tools/build/CMake/docs/source/.gitignore                                              |    1 +
- tools/build/CMake/docs/source/MacInstaller.png                                        |  Bin 0 -> 185943 bytes
- tools/build/CMake/docs/source/WindowsInstaller.png                                    |  Bin 0 -> 88166 bytes
+ tools/build/CMake/docs/source/MacInstaller.png                                        |  Bin 0 -&gt; 185943 bytes
+ tools/build/CMake/docs/source/WindowsInstaller.png                                    |  Bin 0 -&gt; 88166 bytes
  tools/build/CMake/docs/source/_static/boost.css                                       |  221 +
  tools/build/CMake/docs/source/_static/pygments.css                                    |   59 +
  tools/build/CMake/docs/source/_static/sphinxdoc.css                                   |  349 +
@@ -388,9 +460,9 @@
  tools/build/CMake/docs/source/add_boost_library.rst                                   |   49 +
  tools/build/CMake/docs/source/add_compiled_library.rst                                |  231 +
  tools/build/CMake/docs/source/adding_regression_tests.rst                             |  107 +
- tools/build/CMake/docs/source/boost-dark-trans.png                                    |  Bin 0 -> 8312 bytes
- tools/build/CMake/docs/source/boost-small.png                                         |  Bin 0 -> 8899 bytes
- tools/build/CMake/docs/source/boost.png                                               |  Bin 0 -> 6308 bytes
+ tools/build/CMake/docs/source/boost-dark-trans.png                                    |  Bin 0 -&gt; 8312 bytes
+ tools/build/CMake/docs/source/boost-small.png                                         |  Bin 0 -&gt; 8899 bytes
+ tools/build/CMake/docs/source/boost.png                                               |  Bin 0 -&gt; 6308 bytes
  tools/build/CMake/docs/source/boost/theme.conf                                        |    9 +
  tools/build/CMake/docs/source/boost/todo.py                                           |  147 +
  tools/build/CMake/docs/source/boost_cmake_version.py.in                               |    2 +
@@ -474,3 +546,37 @@
  tools/quickbook/CMakeLists.txt                                                        |   33 +
  tools/wave/CMakeLists.txt                                                             |   22 +
  474 files changed, 28189 insertions(+), 13 deletions(-)
+</pre>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="individual_libraries.html" title="Building individual libraries with cmake"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="externals/zlib.html" title="Zlib"
+             >previous</a> |</li>
+    <li><a href="http://www.boost.org/">Boost</a> &raquo;</li>
+    
+        <li><a href="index.html">Boost.CMake 1.41.0.beta1.cmake1</a> &raquo;</li>
+ 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version e1ba6c87679375525a8b313a538ba1c31eae8012, Wed, 4 Nov 2009.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
+    </div>
+  </body>
+</html>

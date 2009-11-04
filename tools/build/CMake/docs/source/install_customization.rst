@@ -11,18 +11,18 @@ Customizing the install
 CMAKE_INSTALL_PREFIX
 --------------------
 
-  This is a standard cmake option that sets the path to which boost
-  will be installed.
+This is a standard cmake option that sets the path to which boost
+will be installed.
 
 .. index:: DESTDIR
 
-  CMake generates makefiles that play nice with ``DESTDIR``.  e.g.
-  if you configure like this::
+CMake generates makefiles that play nice with ``DESTDIR``.  e.g.
+if you configure like this::
 
-    cmake ../src -DCMAKE_INSTALL_PREFIX=/tmp/blah
+  cmake ../src -DCMAKE_INSTALL_PREFIX=/tmp/blah
 
-  and install with ``DESTDIR=/foo make install``, you'll get files
-  installed to ``/foo/tmp/blah``.
+and install with ``DESTDIR=/foo make install``, you'll get files
+installed to ``/foo/tmp/blah``.
 
 .. index:: LIB_SUFFIX
 .. _lib_suffix:
@@ -30,12 +30,12 @@ CMAKE_INSTALL_PREFIX
 LIB_SUFFIX
 ----------
 
-  This defines the subdirectory of ``CMAKE_INSTALL_PREFIX`` to which
-  libraries will be installed.  It is empty by default. For example,
-  if I'm on 64-bit fedora, I want the libs installed to
-  ``/usr/lib64``, I'd use::
+This defines the subdirectory of ``CMAKE_INSTALL_PREFIX`` to which
+libraries will be installed.  It is empty by default. For example,
+if I'm on 64-bit fedora, I want the libs installed to
+``/usr/lib64``, I'd use::
 
-    cmake ../src -DCMAKE_INSTALL_PREFIX=/usr -DLIB_SUFFIX=64
+  cmake ../src -DCMAKE_INSTALL_PREFIX=/usr -DLIB_SUFFIX=64
 
 .. index:: INSTALL_VERSIONED
 .. _install_versioned:
@@ -82,9 +82,10 @@ and without it, ::
    
 **Note:** ``lib/`` above will contain :ref:`LIB_SUFFIX` if set.
 
+See also :ref:`BUILD_SOVERSIONED`
+
 The relative lib and include pathnames can be controlled individually
 with the following two variables:
-
 
 .. index:: BOOST_LIB_INSTALL_DIR
 .. _boost_lib_install_dir:

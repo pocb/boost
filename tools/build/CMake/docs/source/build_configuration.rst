@@ -260,7 +260,7 @@ CMAKE_CXX_COMPILER
 .. index:: BUILD_SOVERSIONED
 .. index:: soversion
 .. index:: soname
-.. _build_with_soversion:
+.. _BUILD_SOVERSIONED:
 
 BUILD_SOVERSIONED
 ^^^^^^^^^^^^^^^^^
@@ -285,3 +285,5 @@ and if off::
   
 (Unix only, ``ON`` by default)
 
+This setting also determines whether libraries are *installed*
+with/without soversions.  See also :ref:`INSTALL_VERSIONED`.
