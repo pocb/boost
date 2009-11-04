@@ -114,6 +114,7 @@ Release checklist
 * Tag commit with ``BOOST_CMAKE_VERSION``
 * ``make do-release``
 * push tag
+* update wiki
 
 Index
 =====
