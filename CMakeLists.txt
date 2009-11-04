@@ -74,6 +74,16 @@ if(BOOST_MAINTAINER)
   #  for use in generated documentation
   #
   set(CMAKE_DOCS_DIR ${CMAKE_SOURCE_DIR}/tools/build/CMake/docs/)
+  set(UPSTREAM_TAG "Boost_1_41_0_beta1")
+  
+  set(gitdiff "git diff --stat=100,90 ${UPSTREAM_TAG}") 
+  add_custom_target(make-diff
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    COMMAND echo "${gitdiff}\\n\\n" > ${CMAKE_DOCS_DIR}/source/git_diff.txt
+    COMMAND git diff --stat=100,90 ${UPSTREAM_TAG} >> ${CMAKE_DOCS_DIR}/source/git_diff.txt
+    COMMAND make -C ${CMAKE_DOCS_DIR} html
+    )
+
   add_custom_target(do-release
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
     COMMAND git archive --format=tar --prefix=boost-${BOOST_CMAKE_VERSION}/ ${BOOST_CMAKE_VERSION} | gzip --best > boost-${BOOST_CMAKE_VERSION}.tar.gz

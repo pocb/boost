@@ -35,6 +35,7 @@ Users's guide
    exported_targets
    install_customization
    externals/index
+   diff
 
 Developer's guide
 =================
@@ -89,9 +90,11 @@ Release checklist
 * Update ``BOOST_CMAKE_VERSION`` in toplevel ``CMakeLists.txt``
 * Update notes by version in ``tools/build/CMake/docs/notes_by_version.rst``
 * Reconfig cmake with ``BOOST_MAINTAINER`` set to ON
+* make make-diff
 * Rebuild docs and commit
 * Tag commit with ``BOOST_CMAKE_VERSION``
 * ``make do-release``
+* push tag
 
 Index
 =====
