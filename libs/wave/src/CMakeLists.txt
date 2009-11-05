@@ -4,7 +4,7 @@
 # Distributed under the Boost Software License, Version 1.0.
 # See http://www.boost.org/LICENSE_1_0.txt
 #
-boost_add_library(boost_wave 
+boost_add_library(wave 
 
   instantiate_cpp_exprgrammar.cpp
   instantiate_cpp_grammar.cpp

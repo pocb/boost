@@ -18,13 +18,13 @@ if (BORLAND)
   add_definitions(-w-8080)
 endif(BORLAND)
 
-boost_add_library(boost_prg_exec_monitor 
+boost_add_library(prg_exec_monitor 
   execution_monitor.cpp 
   debug.cpp 
   cpp_main.cpp 
   SHARED_COMPILE_FLAGS -DBOOST_TEST_DYN_LINK=1 ${BOOST_SHARED_COMPILE_FLAGS})
 
-boost_add_library(boost_test_exec_monitor
+boost_add_library(test_exec_monitor
   compiler_log_formatter.cpp
   debug.cpp
   execution_monitor.cpp
@@ -45,7 +45,7 @@ boost_add_library(boost_test_exec_monitor
   NO_SHARED
   )
 
-boost_add_library(boost_unit_test_framework
+boost_add_library(unit_test_framework
     compiler_log_formatter.cpp
     debug.cpp
     exception_safety.cpp

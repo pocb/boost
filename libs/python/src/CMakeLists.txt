@@ -29,7 +29,7 @@ endif (PYTHON_DEBUG_LIBRARIES AND BUILD_BOOST_PYTHON)
 # Always build the non-debug variants of the boost_python library
 set(BUILD_PYTHON_NODEBUG ON)
 
-boost_add_library(boost_python
+boost_add_library(python
   numeric.cpp 
   list.cpp 
   long.cpp 

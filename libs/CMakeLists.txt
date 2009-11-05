@@ -54,6 +54,8 @@ set(BOOST_TEST_PROJECTS "" CACHE INTERNAL "hi" FORCE)
 message(STATUS "")
 message(STATUS "Reading boost project directories...")
 message(STATUS "")
+set(BOOST_ALL_COMPONENTS "")
+
 foreach(subdir ${BOOST_SUBPROJECT_DIRS})
   list(FIND BUILD_PROJECTS ${subdir} THIS_BUILD_PROJECTS_INDEX)
   if ((THIS_BUILD_PROJECTS_INDEX GREATER -1) OR (BUILD_PROJECTS STREQUAL "ALL"))
@@ -61,6 +63,8 @@ foreach(subdir ${BOOST_SUBPROJECT_DIRS})
     add_subdirectory(${BOOST_LIBS_PARENT_DIR}/${subdir} ${CMAKE_BINARY_DIR}/libs/${subdir})
   endif()
 endforeach()
+
+set(BOOST_ALL_COMPONENTS ${BOOST_ALL_COMPONENTS} PARENT_SCOPE)
 
 message(STATUS "")
 message(STATUS "Reading boost project TEST directories...")

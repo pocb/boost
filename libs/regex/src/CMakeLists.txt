@@ -21,7 +21,7 @@ else()
 
 endif()
  
-boost_add_library(boost_regex
+boost_add_library(regex
 
    c_regex_traits.cpp
    cpp_regex_traits.cpp

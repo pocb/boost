@@ -304,6 +304,12 @@ macro(boost_library_project LIBNAME)
     endforeach(SUBDIR ${THIS_PROJECT_SRCDIRS})
   endif()
 
+  set(BOOST_ALL_COMPONENTS ${BOOST_ALL_COMPONENTS} PARENT_SCOPE)
+
+  #set(BOOST_${LIBNAME}_COMPONENTS ${THIS_PROJECT_COMPONENTS} PARENT_SCOPE)
+  #message("BOOST_${LIBNAME}_COMPONENTS ${THIS_PROJECT_COMPONENTS}")
+  #set(BOOST_ALL_COMPONENTS ${LIBNAME} ${BOOST_ALL_COMPONENTS} PARENT_SCOPE)
+
   list(FIND BUILD_TESTS ${libname} BUILD_TESTS_INDEX)
   if ((BUILD_TESTS_INDEX GREATER -1) OR (BUILD_TESTS STREQUAL "ALL"))
     # set the tests directories list for later inclusion
@@ -1173,15 +1179,23 @@ endmacro(boost_select_variant)
 #     STATIC_COMPILE_FLAGS "-DBOOST_THREAD_BUILD_LIB=1"
 #     NO_SINGLE_THREADED
 #   )
-macro(boost_add_library LIBNAME)
+macro(boost_add_library SHORT_LIBNAME)
+  set(LIBNAME "boost_${SHORT_LIBNAME}")
   parse_arguments(THIS_LIB
     "DEPENDS;COMPILE_FLAGS;LINK_FLAGS;LINK_LIBS;EXTRA_VARIANTS;FORCE_VARIANTS;${BOOST_ADD_ARG_NAMES}"
     "MODULE;NO_INSTALL;${BOOST_ADDLIB_OPTION_NAMES}"
     ${ARGN}
     )
+
   set(THIS_LIB_SOURCES ${THIS_LIB_DEFAULT_ARGS})
 
-  
+  #
+  # cmake BoostConfig.cmake generation needs to know which
+  # libraries are available
+  #
+  set(BOOST_ALL_COMPONENTS ${SHORT_LIBNAME} ${BOOST_ALL_COMPONENTS} 
+    PARENT_SCOPE)
+
   # A top-level target that refers to all of the variants of the
   # library, collectively.
   add_custom_target(${LIBNAME})
@@ -1208,7 +1222,6 @@ macro(boost_add_library LIBNAME)
     set(ENABLE_${THIS_LIB_FORCE_VARIANTS}_PREV ${ENABLE_${THIS_LIB_FORCE_VARIANTS}} )
     set(ENABLE_${THIS_LIB_FORCE_VARIANTS} TRUE)
   endif (THIS_LIB_FORCE_VARIANTS)
-  
   
   # Build each of the library variants
   foreach(VARIANT_STR ${THIS_LIB_VARIANTS})

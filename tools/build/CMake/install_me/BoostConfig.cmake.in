@@ -52,6 +52,10 @@ else()
 endif()
 
 set(Boost_LIBRARIES "")
+if (NOT Boost_FIND_COMPONENTS)
+  set(Boost_FIND_COMPONENTS "@BOOST_ALL_COMPONENTS@")
+endif()
+
 foreach(component ${Boost_FIND_COMPONENTS})
   #
   # Check that it is really a target

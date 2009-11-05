@@ -15,7 +15,7 @@ endif (MSVC)
 include_directories(${MPI_INCLUDE_PATH})
 
 boost_add_library(
-  boost_graph_parallel
+  graph_parallel
   mpi_process_group.cpp tag_allocator.cpp
   DEPENDS boost_mpi
   SHARED_COMPILE_FLAGS "-DBOOST_GRAPH_DYN_LINK=1"

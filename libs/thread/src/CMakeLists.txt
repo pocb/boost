@@ -11,7 +11,7 @@ else (WIN32)
 endif (WIN32)
 
 boost_add_library(
-  boost_thread
+  thread
   ${THREAD_SOURCES}
   SHARED_COMPILE_FLAGS "-DBOOST_THREAD_BUILD_DLL=1"
   STATIC_COMPILE_FLAGS "-DBOOST_THREAD_BUILD_LIB=1"

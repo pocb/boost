@@ -24,7 +24,7 @@ if (BZIP2_FOUND)
   # NOTE: What to do about BZIP2_NEED_PREFIX?
 endif(BZIP2_FOUND)
 
-boost_add_library(boost_iostreams
+boost_add_library(iostreams
 
   file_descriptor.cpp 
   mapped_file.cpp 

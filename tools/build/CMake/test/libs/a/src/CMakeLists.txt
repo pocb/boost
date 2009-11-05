@@ -4,6 +4,8 @@
 # Distributed under the Boost Software License, Version 1.0.
 # See http://www.boost.org/LICENSE_1_0.txt
 #
+add_definitions(-DLIBNAME=\"A\")
+
 boost_add_library(a
 
   lib.cpp
@@ -24,7 +26,7 @@ foreach(shared_or_static SHARED STATIC)
 
 	main.cpp
 	
-	DEPENDS a
+	DEPENDS boost_a
 
 	${shared_or_static}
 	${debug_or_release}

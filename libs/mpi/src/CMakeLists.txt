@@ -11,7 +11,7 @@ include_directories(${MPI_INCLUDE_PATH})
 if (NOT APPLE)
 
   boost_add_library(
-    boost_mpi
+    mpi
     broadcast.cpp
     communicator.cpp
     computation_tree.cpp
@@ -43,7 +43,7 @@ if (NOT APPLE)
     message (STATUS "+-- Python available, enabling boost_mpi_python.")
     include_directories(${PYTHON_INCLUDE_PATH})
 
-    boost_add_library(boost_mpi_python
+    boost_add_library(mpi_python
       
       python/serialize.cpp
 
