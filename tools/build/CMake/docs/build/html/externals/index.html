@@ -67,11 +67,28 @@
           <div class="body">
             
   <div class="section" id="external-dependencies">
-<span id="id1"></span><h1>External Dependencies<a class="headerlink" href="#external-dependencies" title="Permalink to this headline">¶</a></h1>
+<span id="index-531"></span><span id="id1"></span><h1>External Dependencies<a class="headerlink" href="#external-dependencies" title="Permalink to this headline">¶</a></h1>
 <p>Each external dependency has an associated option <tt class="docutils literal"><span class="pre">WITH_</span></tt><em>dependency</em> that controls whether detection of the dependency will
 happen at all.  These options default to <tt class="docutils literal"><span class="pre">ON</span></tt>.</p>
 <p>Each external will set a variable <em>external</em><tt class="docutils literal"><span class="pre">_FOUND</span></tt> if detection
-was successful.  You can</p>
+was successful.  If this variable is empty (or <tt class="docutils literal"><span class="pre">FALSE</span></tt>, 0, or
+<tt class="docutils literal"><span class="pre">NO</span></tt>) detection will be reattempted each time you configure.</p>
+<p>To <strong>disable</strong> the detection of any given external dependency and
+thereby any libraries or features that depend on it, set option
+<tt class="docutils literal"><span class="pre">WITH_</span></tt><em>dependency</em> to <tt class="docutils literal"><span class="pre">NO</span></tt> (or <tt class="docutils literal"><span class="pre">OFF</span></tt>, etc.):</p>
+<div class="highlight-python"><pre>% cmake ../src -DWITH_PYTHON=OFF
+-- The C compiler identification is GNU
+-- The CXX compiler identification is GNU
+... more output ...
+--
+-- Python:
+-- Disabled since WITH_PYTHON=OFF
+--
+... more output ...
+-- + python
+-- +-- disabled since PYTHON_FOUND is false
+--</pre>
+</div>
 <ul>
 <li class="toctree-l1"><a class="reference external" href="bzip2.html">BZip2</a></li>
 <li class="toctree-l1"><a class="reference external" href="doxygen.html">Doxygen</a></li>
@@ -115,7 +132,7 @@ was successful.  You can</p>
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version d7fa654e7c305ea1840e0b8d8e89bf700944b68b, Wed, 4 Nov 2009.
+      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version e573c3a24aaa06659f65f9275b8a273ca2d2c349, Thu, 5 Nov 2009.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

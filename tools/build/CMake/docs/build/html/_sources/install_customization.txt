@@ -128,7 +128,7 @@ If this is a full path, it will be used directly, otherwise it will be
 interpreted relative to ``${CMAKE_INSTALL_PREFIX}``.
 
 .. index:: BOOST_INSTALL_CMAKE_DRIVERS
-.. _boost_install_findboost_cmake_drivers:
+.. _boost_install_cmake_drivers:
 
 BOOST_INSTALL_CMAKE_DRIVERS
 ---------------------------
