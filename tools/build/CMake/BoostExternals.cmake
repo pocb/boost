@@ -22,6 +22,14 @@ macro(boost_external_report NAME)
   endforeach()
 endmacro()
 
+#
+#  Some externals default to OFF
+#
+option(WITH_VALGRIND "Run tests under valgrind" OFF)
+
+#
+#
+#
 foreach(external
     BZip2
     Doxygen
@@ -30,6 +38,7 @@ foreach(external
     MPI
     Python
     Xsltproc
+    Valgrind
     ZLib
     )
   message(STATUS "")

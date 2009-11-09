@@ -323,6 +323,8 @@ macro(boost_test_run testname)
         THIS_TEST_LOCATION "${THIS_TEST_LOCATION}")
 
       add_test (${BOOST_TEST_TESTNAME} 
+	${VALGRIND_EXECUTABLE}
+	${VALGRIND_FLAGS}
         ${THIS_TEST_LOCATION}
         ${BOOST_TEST_ARGS})
 
