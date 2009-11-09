@@ -40,4 +40,5 @@ thereby any libraries or features that depend on it, set option
    mpi
    python
    xsltproc
+   valgrind
    zlib
