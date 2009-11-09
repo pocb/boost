@@ -32,7 +32,7 @@ endif()
 #
 set(ENV_PYTHON_LIBRARIES $ENV{PYTHON_LIBRARIES})
 
-if ((NOT PYTHONLIBS_FOUND) AND ENV_PYTHON_LIBRARIES)
+if ((NOT PYTHON_LIBRARIES) AND ENV_PYTHON_LIBRARIES)
   message(STATUS "Testing PYTHON_LIBRARIES from environment")
   get_filename_component(pythonlib_searchpath ${ENV_PYTHON_LIBRARIES} PATH)
   get_filename_component(pythonlib_filename   ${ENV_PYTHON_LIBRARIES} NAME)
@@ -44,11 +44,13 @@ if ((NOT PYTHONLIBS_FOUND) AND ENV_PYTHON_LIBRARIES)
     message(FATAL_ERROR "Environment supplied PYTHON_LIBRARIES=${ENV_PYTHON_LIBRARIES} but that isn't a library.")
   endif()
   message(STATUS "Ok, using ${PYTHON_LIBRARIES}.")
+endif()
 
+set(ENV_PYTHON_DEBUG_LIBRARIES $ENV{PYTHON_DEBUG_LIBRARIES})
+if ((NOT PYTHON_DEBUG_LIBRARIES) AND ENV_PYTHON_DEBUG_LIBRARIES)
   #
   #  Python debug libraries
   #
-  set(ENV_PYTHON_DEBUG_LIBRARIES $ENV{PYTHON_DEBUG_LIBRARIES})
   if(ENV_PYTHON_DEBUG_LIBRARIES)
     message(STATUS "Testing PYTHON_DEBUG_LIBRARIES from environment")
     get_filename_component(pythonlib_searchpath 
@@ -66,11 +68,19 @@ if ((NOT PYTHONLIBS_FOUND) AND ENV_PYTHON_LIBRARIES)
   else()
     message(STATUS "Skipping optional PYTHON_DEBUG_LIBRARIES:  not set.")
   endif()
+elseif(NOT PYTHON_DEBUG_LIBRARIES)
+  message("WASTING")
+  set(PYTHON_DEBUG_LIBRARIES PYTHON_DEBUG_LIBRARIES-NOTFOUND 
+    CACHE FILEPATH "Python debug library path")
+else()
+  message("DBGLIB=${PYTHON_DEBUG_LIBRARIES}")
+endif()
 
-  #
-  #  Python includes
-  #
-  set(ENV_PYTHON_INCLUDE_PATH $ENV{PYTHON_INCLUDE_PATH})
+#
+#  Python includes
+#
+set(ENV_PYTHON_INCLUDE_PATH $ENV{PYTHON_INCLUDE_PATH})
+if((NOT PYTHON_INCLUDE_PATH) AND ENV_PYTHON_INCLUDE_PATH)
   if(ENV_PYTHON_INCLUDE_PATH)
     message(STATUS "Testing PYTHON_INCLUDE_PATH from environment")
     find_path(PYTHON_INCLUDE_PATH
@@ -85,7 +95,9 @@ if ((NOT PYTHONLIBS_FOUND) AND ENV_PYTHON_LIBRARIES)
       message(FATAL_ERROR "Environment supplied PYTHON_INCLUDE_PATH=${ENV_PYTHON_INCLUDE_PATH} but this directory does not contain file Python.h")
     endif()
   endif()
+endif()
 
+if (PYTHON_INCLUDE_PATH AND PYTHON_LIBRARIES)
   set(PYTHONLIBS_FOUND TRUE CACHE BOOL "Python libraries found, don't redetect at configure time")
 
   # Determine extra libraries we need to link against to build Python
