@@ -1503,5 +1503,7 @@ macro(boost_python_extension MODULE_NAME)
     LINK_LIBS ${PYTHON_LIBRARIES}
     DEPENDS boost_python
     SHARED
+    MULTI_THREADED
+    DEBUG
     )
 endmacro()

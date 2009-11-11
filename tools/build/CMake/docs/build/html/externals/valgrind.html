@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>boost_module &mdash; Boost.CMake 1.41.0.beta1.cmake1</title>
+    <title>Valgrind &mdash; Boost.CMake 1.41.0.beta1.cmake1</title>
     <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
@@ -20,8 +20,9 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <link rel="top" title="Boost.CMake 1.41.0.beta1.cmake1" href="../index.html" />
-    <link rel="next" title="boost_add_library" href="boost_add_library.html" />
-    <link rel="prev" title="boost_library_project" href="boost_library_project.html" /> 
+    <link rel="up" title="External Dependencies" href="index.html" />
+    <link rel="next" title="Zlib" href="zlib.html" />
+    <link rel="prev" title="Xsltproc" href="xsltproc.html" /> 
   </head>
   <body>
     <div class="related">
@@ -31,15 +32,16 @@
           <a href="../genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="boost_add_library.html" title="boost_add_library"
+          <a href="zlib.html" title="Zlib"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="boost_library_project.html" title="boost_library_project"
+          <a href="xsltproc.html" title="Xsltproc"
              accesskey="P">previous</a> |</li>
     <li><a href="http://www.boost.org/">Boost</a> &raquo;</li>
     
         <li><a href="../index.html">Boost.CMake 1.41.0.beta1.cmake1</a> &raquo;</li>
- 
+
+          <li><a href="index.html" accesskey="U">External Dependencies</a> &raquo;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar">
@@ -48,14 +50,14 @@
               <img class="logo" src="../_static/boost-small.png" alt="Logo"/>
             </a></p>
             <h4>Previous topic</h4>
-            <p class="topless"><a href="boost_library_project.html"
-                                  title="previous chapter">boost_library_project</a></p>
+            <p class="topless"><a href="xsltproc.html"
+                                  title="previous chapter">Xsltproc</a></p>
             <h4>Next topic</h4>
-            <p class="topless"><a href="boost_add_library.html"
-                                  title="next chapter">boost_add_library</a></p>
+            <p class="topless"><a href="zlib.html"
+                                  title="next chapter">Zlib</a></p>
             <h3>This Page</h3>
             <ul class="this-page-menu">
-              <li><a href="../_sources/reference/boost_module.txt"
+              <li><a href="../_sources/externals/valgrind.txt"
                      rel="nofollow">Show Source</a></li>
             </ul>
         </div>
@@ -66,9 +68,31 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="boost-module">
-<span id="index-450"></span><span id="id1"></span><h1>boost_module<a class="headerlink" href="#boost-module" title="Permalink to this headline">¶</a></h1>
-<p>FIXME</p>
+  <div class="section" id="valgrind">
+<span id="index-606"></span><span id="id1"></span><h1>Valgrind<a class="headerlink" href="#valgrind" title="Permalink to this headline">¶</a></h1>
+<p>Boost.cmake does a standard path search for <tt class="docutils literal"><span class="pre">valgrind</span></tt>.  If found,
+it sets the following variables</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<tbody valign="top">
+<tr><td><tt class="docutils literal"><span class="pre">VALGRIND_FOUND</span></tt></td>
+<td>Was valgrind found</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">VALGRIND_FLAGS</span></tt></td>
+<td>&#8220;&#8211;tool=memcheck&#8221;</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">VALGRIND_EXECUTABLE</span></tt></td>
+<td>path to the executable</td>
+</tr>
+</tbody>
+</table>
+<p id="index-607">If the setting <tt class="docutils literal"><span class="pre">WITH_VALGRIND</span></tt> is <tt class="docutils literal"><span class="pre">ON</span></tt>, (see
+<a class="reference external" href="index.html#external-dependencies"><em>External Dependencies</em></a>) then tests will be run under valgrind.
+Tip: CTest&#8217;s <tt class="docutils literal"><span class="pre">-V</span></tt> flag will show you the exact commands run and
+output of each test.</p>
 </div>
 
 
@@ -84,15 +108,16 @@
           <a href="../genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="boost_add_library.html" title="boost_add_library"
+          <a href="zlib.html" title="Zlib"
              >next</a> |</li>
         <li class="right" >
-          <a href="boost_library_project.html" title="boost_library_project"
+          <a href="xsltproc.html" title="Xsltproc"
              >previous</a> |</li>
     <li><a href="http://www.boost.org/">Boost</a> &raquo;</li>
     
         <li><a href="../index.html">Boost.CMake 1.41.0.beta1.cmake1</a> &raquo;</li>
- 
+
+          <li><a href="index.html" >External Dependencies</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
