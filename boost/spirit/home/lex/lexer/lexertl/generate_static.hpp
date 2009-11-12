@@ -101,10 +101,10 @@ namespace boost { namespace spirit { namespace lex { namespace lexertl
         os_ << "    enum { static_version = " 
             << boost::lexical_cast<std::string>(SPIRIT_STATIC_LEXER_VERSION) << " };\n\n";
         os_ << "    // return the number of lexer states\n";
-        os_ << "    static std::size_t const state_count()\n";
+        os_ << "    static std::size_t state_count()\n";
         os_ << "    {\n        return lexer_state_count" << suffix << "; \n    }\n\n";
         os_ << "    // return the name of the lexer state as given by 'idx'\n";
-        os_ << "    static char const* const state_name(std::size_t idx)\n";
+        os_ << "    static char const* state_name(std::size_t idx)\n";
         os_ << "    {\n        return lexer_state_names" << suffix << "[idx]; \n    }\n\n";
         os_ << "    // return the next matched token\n";
         os_ << "    template<typename Iterator>\n";
@@ -173,14 +173,22 @@ namespace boost { namespace spirit { namespace lex { namespace lexertl
         os_ << "std::size_t next_token" << (name_suffix[0] ? "_" : "") 
             << name_suffix  << " (";
 
-        if (dfas_ > 1 || !optimize_parameters)
+        if (dfas_ > 1)
         {
-            os_ << "std::size_t &start_state_, ";
+            os_ << "std::size_t& start_state_, ";
+        }
+        else if (!optimize_parameters)
+        {
+            os_ << "std::size_t& /*start_state_*/, ";
         }
 
-        if (sm_.data()._seen_BOL_assertion || !optimize_parameters)
+        if (sm_.data()._seen_BOL_assertion)
         {
             os_ << "Iterator const& start_, ";
+        }
+        else if (!optimize_parameters)
+        {
+            os_ << "Iterator const& /*start_*/, ";
         }
 
         if (dfas_ > 1 || sm_.data()._seen_BOL_assertion || !optimize_parameters)
