@@ -145,9 +145,10 @@ option(ENABLE_MULTI_THREADED "Whether to build multi-threaded libraries" ON)
 if(BUILD_VERSIONED)
   message(FATAL_ERROR "Option 'BUILD_VERSIONED' has changed, the new name is WINMANGLE_LIBNAMES")
 endif(BUILD_VERSIONED)
-if(BUILD_TESTING)
-  message(FATAL_ERROR "Option 'BUILD_TESTING' is gone, new name is BUILD_TESTS, see the docs")
-endif()
+
+#if(BUILD_TESTING)
+#  message(FATAL_ERROR "Option 'BUILD_TESTING' is gone, new name is BUILD_TESTS, see the docs")
+#endif()
 
 option(WINMANGLE_LIBNAMES
   "mangle toolset and boost version tags to into library names" 

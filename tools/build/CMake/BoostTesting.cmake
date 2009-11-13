@@ -46,6 +46,8 @@ endif()
 
 set(BUILD_TESTS ${tests} CACHE STRING "Semicolon-separated list of lowercase librarary names to test, or \"ALL\"")
 enable_testing()
+find_package(Dart)
+include(CTest)
 
 if (BUILD_TESTS STREQUAL "NONE")
   #
