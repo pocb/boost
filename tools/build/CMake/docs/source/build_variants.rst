@@ -187,6 +187,8 @@ ENABLE_DYNAMIC_RUNTIME
   The `DYNAMIC_RUNTIME` feature identifies builds that link against
   the dynamic C and C++ run-time libraries.
 
+.. _per_feature_flags:
+
 Per-feature Compilation and Linker Options
 ------------------------------------------
 

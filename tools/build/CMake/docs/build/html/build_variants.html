@@ -92,8 +92,8 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <span class="target" id="index-395"></span><div class="section" id="build-variants-and-features">
-<span id="features"></span><span id="variants"></span><span id="index-396"></span><h1>Build Variants and Features<a class="headerlink" href="#build-variants-and-features" title="Permalink to this headline">¶</a></h1>
+  <span class="target" id="index-694"></span><div class="section" id="build-variants-and-features">
+<span id="features"></span><span id="variants"></span><span id="index-695"></span><h1>Build Variants and Features<a class="headerlink" href="#build-variants-and-features" title="Permalink to this headline">¶</a></h1>
 <p>Different compilation and linking flags affect how source code and
 libraries are compiled. Boost&#8217;s build system abstracts some of these
 properties into specific <em>features</em> of the build, which indicate (at
@@ -187,14 +187,14 @@ contain version numbers and are symbolic links to one another).</p>
 <p>You can globally (en|dis)able the build of these various features
 through the following cmake variables:</p>
 <div class="section" id="enable-static">
-<span id="index-397"></span><span id="id1"></span><h3>ENABLE_STATIC<a class="headerlink" href="#enable-static" title="Permalink to this headline">¶</a></h3>
+<span id="index-696"></span><span id="id1"></span><h3>ENABLE_STATIC<a class="headerlink" href="#enable-static" title="Permalink to this headline">¶</a></h3>
 <blockquote>
 The <cite>STATIC</cite> feature identifies static builds of libraries, i.e., a
 <cite>.lib</cite> (library) file on Microsoft Windows or a <cite>.a</cite> (archive) file
 on Unix systems.</blockquote>
 </div>
 <div class="section" id="enable-shared">
-<span id="index-398"></span><h3>ENABLE_SHARED<a class="headerlink" href="#enable-shared" title="Permalink to this headline">¶</a></h3>
+<span id="index-697"></span><h3>ENABLE_SHARED<a class="headerlink" href="#enable-shared" title="Permalink to this headline">¶</a></h3>
 <blockquote>
 The <cite>SHARED</cite> feature identifies shared builds of libraries, i.e.,
 a <cite>.dll</cite> (dynamically linked library) file on Microsoft Windows or
@@ -204,14 +204,14 @@ systems. In some cases, <cite>SHARED</cite> variants actually refer to
 systems (e.g., Mac OS X).</blockquote>
 </div>
 <div class="section" id="enable-debug">
-<span id="index-399"></span><h3>ENABLE_DEBUG<a class="headerlink" href="#enable-debug" title="Permalink to this headline">¶</a></h3>
+<span id="index-698"></span><h3>ENABLE_DEBUG<a class="headerlink" href="#enable-debug" title="Permalink to this headline">¶</a></h3>
 <blockquote>
 The <cite>DEBUG</cite> feature identifies builds of libraries that retain
 complete debugging information and prohibit optimization, making
 these builds far easier to use for debugging programs.</blockquote>
 </div>
 <div class="section" id="enable-release">
-<span id="index-400"></span><h3>ENABLE_RELEASE<a class="headerlink" href="#enable-release" title="Permalink to this headline">¶</a></h3>
+<span id="index-699"></span><h3>ENABLE_RELEASE<a class="headerlink" href="#enable-release" title="Permalink to this headline">¶</a></h3>
 <blockquote>
 The <cite>RELEASE</cite> feature identifies builds of libraries that use full
 optimization and eliminate extraneous information such as debug
@@ -220,7 +220,7 @@ smaller than (and execute faster than) their debug library
 counterparts.</blockquote>
 </div>
 <div class="section" id="enable-single-threaded">
-<span id="index-401"></span><h3>ENABLE_SINGLE_THREADED<a class="headerlink" href="#enable-single-threaded" title="Permalink to this headline">¶</a></h3>
+<span id="index-700"></span><h3>ENABLE_SINGLE_THREADED<a class="headerlink" href="#enable-single-threaded" title="Permalink to this headline">¶</a></h3>
 <blockquote>
 The <cite>SINGLE_THREADED</cite> feature identifies builds of libraries that
 assume that the program using them is single-threaded. These
@@ -228,7 +228,7 @@ libraries typically avoid costly atomic operations or locks, and
 make use of no multi-threaded features.</blockquote>
 </div>
 <div class="section" id="enable-multi-threaded">
-<span id="index-402"></span><h3>ENABLE_MULTI_THREADED<a class="headerlink" href="#enable-multi-threaded" title="Permalink to this headline">¶</a></h3>
+<span id="index-701"></span><h3>ENABLE_MULTI_THREADED<a class="headerlink" href="#enable-multi-threaded" title="Permalink to this headline">¶</a></h3>
 <blockquote>
 The <cite>MULTI_THREADED</cite> feature identifies builds of libraries that
 assume that the program using them is multi-threaded. These
@@ -238,7 +238,7 @@ library in a multi-threade context, often at the cost of
 single-thread performance.</blockquote>
 </div>
 <div class="section" id="enable-static-runtime">
-<span id="index-403"></span><h3>ENABLE_STATIC_RUNTIME<a class="headerlink" href="#enable-static-runtime" title="Permalink to this headline">¶</a></h3>
+<span id="index-702"></span><h3>ENABLE_STATIC_RUNTIME<a class="headerlink" href="#enable-static-runtime" title="Permalink to this headline">¶</a></h3>
 <blockquote>
 The <cite>STATIC_RUNTIME</cite> feature identifies builds that link against
 the C and C++ run-time libraries statically, which directly
@@ -246,14 +246,14 @@ includes the code from those run-time libraries into the Boost
 library or executable.</blockquote>
 </div>
 <div class="section" id="enable-dynamic-runtime">
-<span id="index-404"></span><h3>ENABLE_DYNAMIC_RUNTIME<a class="headerlink" href="#enable-dynamic-runtime" title="Permalink to this headline">¶</a></h3>
+<span id="index-703"></span><h3>ENABLE_DYNAMIC_RUNTIME<a class="headerlink" href="#enable-dynamic-runtime" title="Permalink to this headline">¶</a></h3>
 <blockquote>
 The <cite>DYNAMIC_RUNTIME</cite> feature identifies builds that link against
 the dynamic C and C++ run-time libraries.</blockquote>
 </div>
 </div>
 <div class="section" id="per-feature-compilation-and-linker-options">
-<h2>Per-feature Compilation and Linker Options<a class="headerlink" href="#per-feature-compilation-and-linker-options" title="Permalink to this headline">¶</a></h2>
+<span id="per-feature-flags"></span><h2>Per-feature Compilation and Linker Options<a class="headerlink" href="#per-feature-compilation-and-linker-options" title="Permalink to this headline">¶</a></h2>
 <p>For each feature above, the Boost build system defines three variables
 used to provide compilation flags, linking flags, and extra libraries
 to link against when using that feature.  These flags are automatically
@@ -360,7 +360,7 @@ of the <em>boost_thread</em> project is disabled.</td></tr>
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version fa8a5ffebdc2c68f3bd4205c29e2cf98689cadc4, Mon, 9 Nov 2009.
+      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version 3dfc264ce050ce2e304ced96031eb5d2986fd1a4, Sat, 14 Nov 2009.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

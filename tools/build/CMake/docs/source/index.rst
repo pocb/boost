@@ -53,6 +53,7 @@ Users's guide
    build_variants
    exported_targets
    install_customization
+   faq
    externals/index
    diff
 
