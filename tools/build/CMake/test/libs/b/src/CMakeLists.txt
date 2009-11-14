@@ -4,7 +4,7 @@
 # Distributed under the Boost Software License, Version 1.0.
 # See http://www.boost.org/LICENSE_1_0.txt
 #
-add_definitions(-DLIBNAME=\"B\")
+add_definitions(-DLIBNAME=b)
 
 boost_add_library(b
 
@@ -18,13 +18,13 @@ boost_add_library(b
   MULTI_THREADED_COMPILE_FLAGS   "-DSINGLE_OR_MULTI=MULTI_THREADED"
   )
 
-boost_add_executable(SHARED-RELEASE-MULTI_THREADED main.cpp  DEPENDS boost_b-mt-shared) 
-boost_add_executable(SHARED-RELEASE-SINGLE_THREADED main.cpp DEPENDS boost_b-shared)
-boost_add_executable(STATIC-RELEASE-MULTI_THREADED main.cpp  DEPENDS boost_b-mt-static)
-boost_add_executable(STATIC-RELEASE-SINGLE_THREADED main.cpp DEPENDS boost_b-static)
-boost_add_executable(SHARED-DEBUG-MULTI_THREADED main.cpp    DEPENDS boost_b-mt-shared-debug)
-boost_add_executable(SHARED-DEBUG-SINGLE_THREADED main.cpp   DEPENDS boost_b-shared-debug)
-boost_add_executable(STATIC-DEBUG-MULTI_THREADED main.cpp    DEPENDS boost_b-mt-static-debug)
-boost_add_executable(STATIC-DEBUG-SINGLE_THREADED main.cpp   DEPENDS boost_b-static-debug)
+boost_add_executable(SHARED_RELEASE_MULTI_THREADED main.cpp  DEPENDS boost_b-mt-shared) 
+boost_add_executable(SHARED_RELEASE_SINGLE_THREADED main.cpp DEPENDS boost_b-shared)
+boost_add_executable(STATIC_RELEASE_MULTI_THREADED main.cpp  DEPENDS boost_b-mt-static)
+boost_add_executable(STATIC_RELEASE_SINGLE_THREADED main.cpp DEPENDS boost_b-static)
+boost_add_executable(SHARED_DEBUG_MULTI_THREADED main.cpp    DEPENDS boost_b-mt-shared-debug)
+boost_add_executable(SHARED_DEBUG_SINGLE_THREADED main.cpp   DEPENDS boost_b-shared-debug)
+boost_add_executable(STATIC_DEBUG_MULTI_THREADED main.cpp    DEPENDS boost_b-mt-static-debug)
+boost_add_executable(STATIC_DEBUG_SINGLE_THREADED main.cpp   DEPENDS boost_b-static-debug)
 
 
