@@ -386,8 +386,12 @@ add_subdirectory(libs)
 add_subdirectory(tools)
 ##########################################################################
 
-if(NOT BUILD_PROJECTS STREQUAL "NONE") 
+if(BOOST_ALL_COMPONENTS) 
   install(EXPORT Boost DESTINATION ${BOOST_EXPORTS_INSTALL_DIR})
+else()
+  message(STATUS "No library targets built, therefore no exported targets")
+  message(STATUS "marked for installation.")
+  message(STATUS "")
 endif()
 
 add_subdirectory(tools/build/CMake)
