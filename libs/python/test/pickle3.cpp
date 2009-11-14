@@ -53,7 +53,8 @@ namespace boost_python_test {
     boost::python::tuple
     getinitargs(const world& w)
     {
-      return boost::python::make_tuple(w.get_country());
+        using namespace boost::python;
+        return make_tuple(w.get_country());
     }
 
     static
@@ -63,7 +64,7 @@ namespace boost_python_test {
         using namespace boost::python;
         world const& w = extract<world const&>(w_obj)();
 
-        return boost::python::make_tuple(w_obj.attr("__dict__"), w.get_secret_number());
+        return make_tuple(w_obj.attr("__dict__"), w.get_secret_number());
     }
 
     static
