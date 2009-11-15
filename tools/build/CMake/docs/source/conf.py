@@ -24,7 +24,7 @@ import boost_cmake_version
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.ifconfig', 'sphinx.ext.todo', 'cmake']
+extensions = ['sphinx.ext.ifconfig', 'sphinx.ext.todo', 'cmake', 'GitLexer']
 todo_include_todos = True
 
 # Add any paths that contain templates here, relative to this directory.
@@ -122,7 +122,7 @@ html_title = 'Boost.CMake ' + release
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
-html_logo = 'boost-small.png'
+html_logo = 'alt.boost.png'
 
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
