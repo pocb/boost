@@ -1,0 +1,15 @@
+.. _testing:
+
+Hacking Alt.Boost.CMake with Git
+================================
+
+Boost-cmake, in addition to using an alternative build system, uses
+alternate version control.  This makes boost.cmake feasable: without
+distributed version control it would be very difficult to maintain a
+build system against upstream boost.
+
+This document will review some common version-control procedures for
+those who are unfamiliar with git.  More documentation is available at
+`Hacking Boost via Git
+<http://gitorious.org/boost/git-docs/blobs/raw/master/build/html/index.html>`_.
+

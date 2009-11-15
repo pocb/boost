@@ -55,6 +55,7 @@ Users's guide
    install_customization
    faq
    externals/index
+   git
    diff
 
 Developer's guide

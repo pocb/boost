@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>FAQ &mdash; Boost.CMake 1.41.0.beta1.cmake1</title>
+    <title>Hacking Alt.Boost.CMake with Git &mdash; Boost.CMake 1.41.0.beta1.cmake1</title>
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
@@ -20,8 +20,8 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Boost.CMake 1.41.0.beta1.cmake1" href="index.html" />
-    <link rel="next" title="External Dependencies" href="externals/index.html" />
-    <link rel="prev" title="Customizing the install" href="install_customization.html" /> 
+    <link rel="next" title="Differences between this release and upstream" href="diff.html" />
+    <link rel="prev" title="Zlib" href="externals/zlib.html" /> 
   </head>
   <body>
     <div class="related">
@@ -31,10 +31,10 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="externals/index.html" title="External Dependencies"
+          <a href="diff.html" title="Differences between this release and upstream"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="install_customization.html" title="Customizing the install"
+          <a href="externals/zlib.html" title="Zlib"
              accesskey="P">previous</a> |</li>
     <li><a href="http://www.boost.org/">Boost</a> &raquo;</li>
     
@@ -47,23 +47,15 @@
             <p class="logo"><a href="index.html">
               <img class="logo" src="_static/boost-small.png" alt="Logo"/>
             </a></p>
-            <h3><a href="index.html">Table Of Contents</a></h3>
-            <ul>
-<li><a class="reference external" href="">FAQ</a><ul>
-<li><a class="reference external" href="#how-do-i-set-d-secure-scl-0-on-the-commandline-for-release-builds">How do I set <tt class="docutils literal"><span class="pre">/D</span> <span class="pre">_SECURE_SCL=0</span></tt> on the commandline for release builds?</a></li>
-</ul>
-</li>
-</ul>
-
             <h4>Previous topic</h4>
-            <p class="topless"><a href="install_customization.html"
-                                  title="previous chapter">Customizing the install</a></p>
+            <p class="topless"><a href="externals/zlib.html"
+                                  title="previous chapter">Zlib</a></p>
             <h4>Next topic</h4>
-            <p class="topless"><a href="externals/index.html"
-                                  title="next chapter">External Dependencies</a></p>
+            <p class="topless"><a href="diff.html"
+                                  title="next chapter">Differences between this release and upstream</a></p>
             <h3>This Page</h3>
             <ul class="this-page-menu">
-              <li><a href="_sources/faq.txt"
+              <li><a href="_sources/git.txt"
                      rel="nofollow">Show Source</a></li>
             </ul>
         </div>
@@ -74,28 +66,15 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="faq">
-<span id="id1"></span><h1>FAQ<a class="headerlink" href="#faq" title="Permalink to this headline">¶</a></h1>
-<p>A collection of asked questions.</p>
-<div class="section" id="how-do-i-set-d-secure-scl-0-on-the-commandline-for-release-builds">
-<h2>How do I set <tt class="docutils literal"><span class="pre">/D</span> <span class="pre">_SECURE_SCL=0</span></tt> on the commandline for release builds?<a class="headerlink" href="#how-do-i-set-d-secure-scl-0-on-the-commandline-for-release-builds" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li>Run the cmake gui, pick the source and build directories, click
-<em>Configure</em></li>
-<li>Find the entry called <tt class="docutils literal"><span class="pre">RELEASE_COMPILE_FLAGS</span></tt> and modify to taste.
-(See also <a class="reference external" href="build_variants.html#per-feature-flags"><em>Per-feature Compilation and Linker Options</em></a>)</li>
-<li>Click <em>Configure</em> again, settings will be regenerated with your
-flags intact.</li>
-<li>Click <em>Generate</em></li>
-<li>Run Visual Studio, navigate to the build directory, open
-<tt class="docutils literal"><span class="pre">Boost.sln</span></tt>, build, profit.</li>
-</ul>
-<p>Note:   I couldn&#8217;t find the magic checkbox to tell visual studio show me
-what commands it executes while building.   I switched the cmake gui to
-&#8216;advanced mode&#8217; and change CMAKE_VERBOSE_MAKEFILES to TRUE.  Is there a
-more &#8216;visualstudioesque&#8217; way to do this?</p>
-<p>-t</p>
-</div>
+  <div class="section" id="hacking-alt-boost-cmake-with-git">
+<span id="testing"></span><h1>Hacking Alt.Boost.CMake with Git<a class="headerlink" href="#hacking-alt-boost-cmake-with-git" title="Permalink to this headline">¶</a></h1>
+<p>Boost-cmake, in addition to using an alternative build system, uses
+alternate version control.  This makes boost.cmake feasable: without
+distributed version control it would be very difficult to maintain a
+build system against upstream boost.</p>
+<p>This document will review some common version-control procedures for
+those who are unfamiliar with git.  More documentation is available at
+<a class="reference external" href="http://gitorious.org/boost/git-docs/blobs/raw/master/build/html/index.html">Hacking Boost via Git</a>.</p>
 </div>
 
 
@@ -111,10 +90,10 @@ more &#8216;visualstudioesque&#8217; way to do this?</p>
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="externals/index.html" title="External Dependencies"
+          <a href="diff.html" title="Differences between this release and upstream"
              >next</a> |</li>
         <li class="right" >
-          <a href="install_customization.html" title="Customizing the install"
+          <a href="externals/zlib.html" title="Zlib"
              >previous</a> |</li>
     <li><a href="http://www.boost.org/">Boost</a> &raquo;</li>
     
