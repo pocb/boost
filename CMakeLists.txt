@@ -386,8 +386,21 @@ add_subdirectory(libs)
 add_subdirectory(tools)
 ##########################################################################
 
-if(NOT BUILD_PROJECTS STREQUAL "NONE") 
-  install(EXPORT Boost DESTINATION ${BOOST_EXPORTS_INSTALL_DIR})
+if(NOT BOOST_ALL_COMPONENTS)
+  #
+  # This is a dummy target to suppress the warning from
+  # install(EXPORT,....) below.
+  # 
+  add_executable(this_is_a_dummy_no_libs_were_built
+    ${CMAKE_SOURCE_DIR}/tools/build/CMake/main.cpp)
+  
+  install(TARGETS this_is_a_dummy_no_libs_were_built
+    EXPORT Boost
+    DESTINATION ${BOOST_LIB_INSTALL_DIR}
+    COMPONENT Boost)
+
 endif()
+
+install(EXPORT Boost DESTINATION ${BOOST_EXPORTS_INSTALL_DIR})
 
 add_subdirectory(tools/build/CMake)
