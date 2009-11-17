@@ -12,11 +12,11 @@ set(CTEST_DROP_METHOD "http")
 set(CTEST_DROP_SITE "my.cdash.org")
 set(CTEST_DROP_LOCATION "/submit.php?project=Boost")
 set(CTEST_DROP_SITE_CDASH TRUE)
-
+set(UPDATE_COMMAND "git")
 #
 #  You're welcome to set this to 
 #
 #set(BUILD_PROJECTS "crc")
-set(BUILD_TESTS "ALL")
+#set(BUILD_TESTS "ALL")
 
 
