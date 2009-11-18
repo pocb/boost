@@ -1,8 +1,17 @@
-.. highlight:: git_shell
-.. _testing:
+..
+.. Copyright (C) 2009 Troy Straszheim <troy@resophonic.com>
+..
+.. Distributed under the Boost Software License, Version 1.0. 
+.. See accompanying file LICENSE_1_0.txt or copy at 
+..   http://www.boost.org/LICENSE_1_0.txt 
+..
 
-Hacking Alt.Boost.CMake with Git
-================================
+.. highlight:: git_shell
+
+.. _hacking_cmake_with_git:
+
+Hacking Boost.CMake with Git
+============================
 
 Boost-cmake, in addition to using an alternative build system, uses
 alternate version control.  This makes boost.cmake feasable: without

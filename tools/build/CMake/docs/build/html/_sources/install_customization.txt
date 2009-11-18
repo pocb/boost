@@ -1,3 +1,11 @@
+..
+.. Copyright (C) 2009 Troy Straszheim <troy@resophonic.com>
+..
+.. Distributed under the Boost Software License, Version 1.0. 
+.. See accompanying file LICENSE_1_0.txt or copy at 
+..   http://www.boost.org/LICENSE_1_0.txt 
+..
+
 .. _install_customization:
 
 Customizing the install
@@ -45,7 +53,8 @@ INSTALL_VERSIONED
 
 **ON** by default on unix, **OFF** on windows.
 
-This variable controls whether boost versions will be mangled into the
+This is a different mangling than :ref:`WINMANGLE_LIBNAMES`: this
+variable controls whether boost versions will be mangled into the
 paths into which boost is installed.  This option has effect only when
 CMake is run the first time: they will be set as explained below the
 first time thereafter not modified, so that the paths are customizable

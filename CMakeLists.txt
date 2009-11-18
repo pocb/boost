@@ -55,7 +55,7 @@ if(BOOST_VERSION_OVERRIDE)
   configure_file(tools/build/CMake/install_me/version.hpp.override.in ${CMAKE_BINARY_DIR}/version.hpp)
 endif()
 
-set(BOOST_CMAKE_VERSION "${BOOST_VERSION}.beta1.cmake1")
+set(BOOST_CMAKE_VERSION "${BOOST_VERSION}.cmake0")
 
 #
 #  For intermittent deployment of docs
@@ -74,7 +74,7 @@ if(BOOST_MAINTAINER)
   #  for use in generated documentation
   #
   set(CMAKE_DOCS_DIR ${CMAKE_SOURCE_DIR}/tools/build/CMake/docs/)
-  set(UPSTREAM_TAG "Boost_1_41_0_beta1")
+  set(UPSTREAM_TAG "Boost_1_41_0")
   
   set(gitdiff "git diff --stat=100,90 ${UPSTREAM_TAG}") 
   add_custom_target(make-diff

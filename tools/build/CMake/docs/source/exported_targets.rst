@@ -1,3 +1,11 @@
+..
+.. Copyright (C) 2009 Troy Straszheim <troy@resophonic.com>
+..
+.. Distributed under the Boost Software License, Version 1.0. 
+.. See accompanying file LICENSE_1_0.txt or copy at 
+..   http://www.boost.org/LICENSE_1_0.txt 
+..
+
 .. _find_package: http://www.cmake.org/cmake/help/cmake-2-8-docs.html#command:find_package
 .. _FindBoost.cmake: http://www.cmake.org/cmake/help/cmake-2-8-docs.html#module:FindBoost
 
@@ -46,7 +54,8 @@ You only need to do three things:
        ... boost_signals-mt-static
        ... boost_signals-mt-static-debug
               
-    See also :ref:`fixme` for details on the naming conventions.
+    See also :ref:`name_mangling` for details on the naming
+    conventions.
 
 Since these are exported targets, CMake will add appropriate *rpaths*
 as necessary; fiddling with ``LD_LIBRARY_PATH`` should not be

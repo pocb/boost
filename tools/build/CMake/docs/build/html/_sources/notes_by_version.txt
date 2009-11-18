@@ -1,10 +1,23 @@
+..
+.. Copyright (C) 2009 Troy Straszheim <troy@resophonic.com>
+..
+.. Distributed under the Boost Software License, Version 1.0. 
+.. See accompanying file LICENSE_1_0.txt or copy at 
+..   http://www.boost.org/LICENSE_1_0.txt 
+..
+
 Notes by Boost Version
 ======================
+
+1.41.0.cmake1
+-------------------
+
+Again, innumerable tiny tweaks.   
 
 1.41.0.beta1.cmake1
 -------------------
 
-This is the first cmake beta based on upstream ``Boost_1_41_0_beta1".
+This is the first cmake beta based on upstream ``Boost_1_41_0_beta1``.
 There are *way* too many enhancements to mention.
 
 1.41.0.cmakebeta4

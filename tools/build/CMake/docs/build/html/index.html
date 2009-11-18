@@ -5,13 +5,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Boost-CMake 1.41.0.beta1.cmake1 &mdash; Boost.CMake 1.41.0.beta1.cmake1</title>
+    <title>Boost-CMake 1.41.0.cmake0 &mdash; Boost.CMake 1.41.0.cmake0</title>
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '1.41.0.beta1.cmake1',
+        VERSION:     '1.41.0.cmake0',
         COLLAPSE_MODINDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -19,7 +19,7 @@
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Boost.CMake 1.41.0.beta1.cmake1" href="" />
+    <link rel="top" title="Boost.CMake 1.41.0.cmake0" href="" />
     <link rel="next" title="Quickstart" href="quickstart.html" /> 
   </head>
   <body>
@@ -34,7 +34,7 @@
              accesskey="N">next</a> |</li>
     <li><a href="http://www.boost.org/">Boost</a> &raquo;</li>
     
-        <li><a href="">Boost.CMake 1.41.0.beta1.cmake1</a> &raquo;</li>
+        <li><a href="">Boost.CMake 1.41.0.cmake0</a> &raquo;</li>
  
       </ul>
     </div>
@@ -45,7 +45,7 @@
             </a></p>
             <h3><a href="">Table Of Contents</a></h3>
             <ul>
-<li><a class="reference external" href="">Boost-CMake 1.41.0.beta1.cmake1</a></li>
+<li><a class="reference external" href="">Boost-CMake 1.41.0.cmake0</a></li>
 <li><a class="reference external" href="#users-s-guide">Users&#8217;s guide</a><ul>
 </ul>
 </li>
@@ -55,9 +55,11 @@
 <li><a class="reference external" href="#reference">Reference</a><ul>
 </ul>
 </li>
-<li><a class="reference external" href="#about-this-documentation">About this documentation</a></li>
+<li><a class="reference external" href="#about-this-documentation">About this documentation</a><ul>
 <li><a class="reference external" href="#release-checklist">Release checklist</a></li>
-<li><a class="reference external" href="#index">Index</a></li>
+<li><a class="reference external" href="#why-alt-boost">Why &#8220;alt.boost&#8221;?</a></li>
+</ul>
+</li>
 </ul>
 
             <h4>Next topic</h4>
@@ -77,20 +79,19 @@
           <div class="body">
             
   <div class="section" id="boost-cmake-release">
-<h1>Boost-CMake 1.41.0.beta1.cmake1<a class="headerlink" href="#boost-cmake-release" title="Permalink to this headline">¶</a></h1>
-<p>Boost.<a class="reference external" href="http://www.cmake.org">CMake</a> is an alternate
-build system for boost, under development since boost version 1.35.
-As of Boost version 1.38, boost.cmake can reliably build and
-package boost.</p>
-<p id="index-750"><strong>boost-cmake mailing list</strong></p>
+<h1>Boost-CMake 1.41.0.cmake0<a class="headerlink" href="#boost-cmake-release" title="Permalink to this headline">¶</a></h1>
+<p>Boost.<a class="reference external" href="http://www.cmake.org">CMake</a> (or <a class="reference internal" href="#alt-boost"><em>alt.boost</em></a>) is the boost distribution that all the cool kids are
+using.  The effort started in earnest at <a class="reference external" href="http://www.boostcon.com">BoostCon &#8216;07</a>; by the end of which it was possible to do
+a basic build of boost with cmake.  In 2009, the project moved out to
+git version control.  Today, <tt class="docutils literal"><span class="pre">Boost.CMake</span></tt> is stable, mature, and
+supported by the developers, a large base of expert users, and
+occasionally by the authors of CMake itself.</p>
+<p id="index-147"><strong>boost-cmake mailing list</strong></p>
 <blockquote>
 <a class="reference external" href="http://lists.boost.org/mailman/listinfo.cgi/boost-cmake">http://lists.boost.org/mailman/listinfo.cgi/boost-cmake</a></blockquote>
 <p><strong>IRC</strong></p>
 <blockquote>
 <tt class="docutils literal"><span class="pre">#boost-cmake</span></tt> on the <a class="reference external" href="http://freenode.net">freenode network</a></blockquote>
-<p><strong>CMake/CTest regression testing of boost</strong></p>
-<blockquote>
-<a class="reference external" href="http://www.cdash.org/CDashPublic/index.php?project=Boost">http://www.cdash.org/CDashPublic/index.php?project=Boost</a></blockquote>
 <p><strong>CMake home page</strong></p>
 <blockquote>
 <a class="reference external" href="http://www.cmake.org">http://www.cmake.org</a></blockquote>
@@ -99,11 +100,11 @@ package boost.</p>
 Boost.CMake is distributed <em>separately</em> from upstream boost.  Code
 is in a <a class="reference external" href="http://git-scm.com">git</a> repository at
 <a class="reference external" href="http://gitorious.org/boost/cmake.git">http://gitorious.org/boost/cmake.git</a>.  These documents correspond to
-tag 1.41.0.beta1.cmake1.</blockquote>
+tag 1.41.0.cmake0.  See also <a class="reference external" href="git.html#hacking-cmake-with-git"><em>Hacking Boost.CMake with Git</em></a>.</blockquote>
 <p><strong>Tarballs</strong></p>
 <blockquote>
 Tarballs and zipfiles are available at
-<a class="reference external" href="http://sodium.resophonic.com/boost-cmake/">http://sodium.resophonic.com/boost-cmake/</a> in subdirectory 1.41.0.beta1.cmake1.</blockquote>
+<a class="reference external" href="http://sodium.resophonic.com/boost-cmake/">http://sodium.resophonic.com/boost-cmake/</a> in subdirectory 1.41.0.cmake0.</blockquote>
 </div>
 <div class="section" id="users-s-guide">
 <h1>Users&#8217;s guide<a class="headerlink" href="#users-s-guide" title="Permalink to this headline">¶</a></h1>
@@ -215,7 +216,7 @@ Tarballs and zipfiles are available at
 <li class="toctree-l2"><a class="reference external" href="externals/zlib.html">Zlib</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference external" href="git.html">Hacking Alt.Boost.CMake with Git</a><ul>
+<li class="toctree-l1"><a class="reference external" href="git.html">Hacking Boost.CMake with Git</a><ul>
 <li class="toctree-l2"><a class="reference external" href="git.html#i-just-want-to-try-the-head-of-the-whatever-branch">I just want to try the HEAD of the &lt;whatever&gt; branch</a></li>
 <li class="toctree-l2"><a class="reference external" href="git.html#i-want-to-svn-update">I want to svn update</a></li>
 <li class="toctree-l2"><a class="reference external" href="git.html#but-i-want-a-different-branch-than-that">But I want a different branch than that</a></li>
@@ -265,6 +266,7 @@ Tarballs and zipfiles are available at
 <li class="toctree-l1"><a class="reference external" href="adding_regression_tests.html">Adding Regression Tests</a></li>
 <li class="toctree-l1"><a class="reference external" href="build_installer.html">Building a Binary Installer</a></li>
 <li class="toctree-l1"><a class="reference external" href="notes_by_version.html">Notes by Boost Version</a><ul>
+<li class="toctree-l2"><a class="reference external" href="notes_by_version.html#cmake1">1.41.0.cmake1</a></li>
 <li class="toctree-l2"><a class="reference external" href="notes_by_version.html#beta1-cmake1">1.41.0.beta1.cmake1</a></li>
 <li class="toctree-l2"><a class="reference external" href="notes_by_version.html#cmakebeta4">1.41.0.cmakebeta4</a></li>
 <li class="toctree-l2"><a class="reference external" href="notes_by_version.html#cmakebeta3">1.41.0.cmakebeta3</a></li>
@@ -272,14 +274,14 @@ Tarballs and zipfiles are available at
 <li class="toctree-l2"><a class="reference external" href="notes_by_version.html#cmake4">1.40.0.cmake4</a></li>
 <li class="toctree-l2"><a class="reference external" href="notes_by_version.html#cmake3">1.40.0.cmake3</a></li>
 <li class="toctree-l2"><a class="reference external" href="notes_by_version.html#cmake2">1.40.0.cmake2</a></li>
-<li class="toctree-l2"><a class="reference external" href="notes_by_version.html#cmake1">1.40.0.cmake1</a></li>
+<li class="toctree-l2"><a class="reference external" href="notes_by_version.html#id1">1.40.0.cmake1</a></li>
 <li class="toctree-l2"><a class="reference external" href="notes_by_version.html#cmake0">1.40.0.cmake0</a></li>
-<li class="toctree-l2"><a class="reference external" href="notes_by_version.html#id3">1.40.0</a></li>
+<li class="toctree-l2"><a class="reference external" href="notes_by_version.html#id2">1.40.0</a></li>
 <li class="toctree-l2"><a class="reference external" href="notes_by_version.html#and-1-39-0">1.38.0 and 1.39.0</a><ul>
 <li class="toctree-l3"><a class="reference external" href="notes_by_version.html#known-issues">Known Issues</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference external" href="notes_by_version.html#id4">1.35.0 - 1.37</a></li>
+<li class="toctree-l2"><a class="reference external" href="notes_by_version.html#id3">1.35.0 - 1.37</a></li>
 </ul>
 </li>
 </ul>
@@ -310,13 +312,13 @@ When you&#8217;re ready to see the html:</p>
 </div>
 <p>Once you&#8217;ve written a ton of docs, push them someplace where I can see
 them (or use <tt class="docutils literal"><span class="pre">git</span> <span class="pre">diff</span></tt> to send a patch).</p>
-</div>
 <div class="section" id="release-checklist">
-<h1>Release checklist<a class="headerlink" href="#release-checklist" title="Permalink to this headline">¶</a></h1>
+<h2>Release checklist<a class="headerlink" href="#release-checklist" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li>Update <tt class="docutils literal"><span class="pre">BOOST_CMAKE_VERSION</span></tt> in toplevel <tt class="docutils literal"><span class="pre">CMakeLists.txt</span></tt></li>
 <li>Update notes by version in <tt class="docutils literal"><span class="pre">tools/build/CMake/docs/notes_by_version.rst</span></tt></li>
 <li>Reconfig cmake with <tt class="docutils literal"><span class="pre">BOOST_MAINTAINER</span></tt> set to ON</li>
+<li>set UPSTREAM_TAG in root <tt class="docutils literal"><span class="pre">CMakeLists.txt</span></tt></li>
 <li>make make-diff</li>
 <li>Rebuild docs and commit</li>
 <li>Tag commit with <tt class="docutils literal"><span class="pre">BOOST_CMAKE_VERSION</span></tt></li>
@@ -325,9 +327,14 @@ them (or use <tt class="docutils literal"><span class="pre">git</span> <span cla
 <li>update wiki</li>
 </ul>
 </div>
-<div class="section" id="index">
-<h1>Index<a class="headerlink" href="#index" title="Permalink to this headline">¶</a></h1>
-<p><a class="reference external" href="genindex.html"><em>Index</em></a></p>
+<div class="section" id="why-alt-boost">
+<span id="alt-boost"></span><span id="index-148"></span><h2>Why &#8220;alt.boost&#8221;?<a class="headerlink" href="#why-alt-boost" title="Permalink to this headline">¶</a></h2>
+<p>The &#8216;alt&#8217; is a reference to the <tt class="docutils literal"><span class="pre">alt.*</span></tt> Usenet hierarchy.  Here, as
+in Usenet, <em>alt</em> stands for <a class="reference external" href="http://nylon.net/alt/index.htm">Anarchists, Lunatics and Terrorists</a>.  This independent effort explores
+and applies alternate techniques/technologies in the areas of build,
+version control, testing, packaging, documentation and release
+management.</p>
+</div>
 </div>
 
 
@@ -347,12 +354,12 @@ them (or use <tt class="docutils literal"><span class="pre">git</span> <span cla
              >next</a> |</li>
     <li><a href="http://www.boost.org/">Boost</a> &raquo;</li>
     
-        <li><a href="">Boost.CMake 1.41.0.beta1.cmake1</a> &raquo;</li>
+        <li><a href="">Boost.CMake 1.41.0.cmake0</a> &raquo;</li>
  
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version b945719a2871360bd2a92c25b624d7aeb4c6cdc0, Sun, 15 Nov 2009.
+      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version c79a84871040a6b971bbad8851ca5077e3f7db6d, Wed, 18 Nov 2009.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

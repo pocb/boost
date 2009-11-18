@@ -5,13 +5,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Build Variants and Features &mdash; Boost.CMake 1.41.0.beta1.cmake1</title>
+    <title>Build Variants and Features &mdash; Boost.CMake 1.41.0.cmake0</title>
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '1.41.0.beta1.cmake1',
+        VERSION:     '1.41.0.cmake0',
         COLLAPSE_MODINDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -19,7 +19,7 @@
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Boost.CMake 1.41.0.beta1.cmake1" href="index.html" />
+    <link rel="top" title="Boost.CMake 1.41.0.cmake0" href="index.html" />
     <link rel="next" title="Tricks for Building against Boost with CMake" href="exported_targets.html" />
     <link rel="prev" title="Configuring the buildspace" href="build_configuration.html" /> 
   </head>
@@ -38,7 +38,7 @@
              accesskey="P">previous</a> |</li>
     <li><a href="http://www.boost.org/">Boost</a> &raquo;</li>
     
-        <li><a href="index.html">Boost.CMake 1.41.0.beta1.cmake1</a> &raquo;</li>
+        <li><a href="index.html">Boost.CMake 1.41.0.cmake0</a> &raquo;</li>
  
       </ul>
     </div>
@@ -92,8 +92,8 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <span class="target" id="index-717"></span><div class="section" id="build-variants-and-features">
-<span id="features"></span><span id="variants"></span><span id="index-718"></span><h1>Build Variants and Features<a class="headerlink" href="#build-variants-and-features" title="Permalink to this headline">¶</a></h1>
+  <span class="target" id="index-130"></span><div class="section" id="build-variants-and-features">
+<span id="features"></span><span id="variants"></span><span id="index-131"></span><h1>Build Variants and Features<a class="headerlink" href="#build-variants-and-features" title="Permalink to this headline">¶</a></h1>
 <p>Different compilation and linking flags affect how source code and
 libraries are compiled. Boost&#8217;s build system abstracts some of these
 properties into specific <em>features</em> of the build, which indicate (at
@@ -120,7 +120,7 @@ describes the library naming conventions used for the variants.</p>
 (dis|en)abled with a boolean option <tt class="docutils literal"><span class="pre">ENABLE_</span></tt><em>feature</em>, which set
 in <a class="reference external" href="build_configuration.html#cmakecache-txt"><em>CMakeCache.txt</em></a>.  The available features are:</p>
 <div class="section" id="name-mangling">
-<h2>Name Mangling<a class="headerlink" href="#name-mangling" title="Permalink to this headline">¶</a></h2>
+<span id="id1"></span><h2>Name Mangling<a class="headerlink" href="#name-mangling" title="Permalink to this headline">¶</a></h2>
 <p>Libraries have their features mangled in to distinguish the variants
 from one another.  CMake&#8217;s symbolic target names correspond:</p>
 <table border="1" class="docutils">
@@ -156,6 +156,10 @@ from one another.  CMake&#8217;s symbolic target names correspond:</p>
 <td>-debug</td>
 <td>-d</td>
 </tr>
+<tr><td>pydebug</td>
+<td>-pydebug</td>
+<td>-yd</td>
+</tr>
 </tbody>
 </table>
 <p>The make target <tt class="docutils literal"><span class="pre">help</span></tt> will show the available options:</p>
@@ -187,14 +191,14 @@ contain version numbers and are symbolic links to one another).</p>
 <p>You can globally (en|dis)able the build of these various features
 through the following cmake variables:</p>
 <div class="section" id="enable-static">
-<span id="index-719"></span><span id="id1"></span><h3>ENABLE_STATIC<a class="headerlink" href="#enable-static" title="Permalink to this headline">¶</a></h3>
+<span id="index-132"></span><span id="id2"></span><h3>ENABLE_STATIC<a class="headerlink" href="#enable-static" title="Permalink to this headline">¶</a></h3>
 <blockquote>
 The <cite>STATIC</cite> feature identifies static builds of libraries, i.e., a
 <cite>.lib</cite> (library) file on Microsoft Windows or a <cite>.a</cite> (archive) file
 on Unix systems.</blockquote>
 </div>
 <div class="section" id="enable-shared">
-<span id="index-720"></span><h3>ENABLE_SHARED<a class="headerlink" href="#enable-shared" title="Permalink to this headline">¶</a></h3>
+<span id="index-133"></span><h3>ENABLE_SHARED<a class="headerlink" href="#enable-shared" title="Permalink to this headline">¶</a></h3>
 <blockquote>
 The <cite>SHARED</cite> feature identifies shared builds of libraries, i.e.,
 a <cite>.dll</cite> (dynamically linked library) file on Microsoft Windows or
@@ -204,14 +208,14 @@ systems. In some cases, <cite>SHARED</cite> variants actually refer to
 systems (e.g., Mac OS X).</blockquote>
 </div>
 <div class="section" id="enable-debug">
-<span id="index-721"></span><h3>ENABLE_DEBUG<a class="headerlink" href="#enable-debug" title="Permalink to this headline">¶</a></h3>
+<span id="index-134"></span><h3>ENABLE_DEBUG<a class="headerlink" href="#enable-debug" title="Permalink to this headline">¶</a></h3>
 <blockquote>
 The <cite>DEBUG</cite> feature identifies builds of libraries that retain
 complete debugging information and prohibit optimization, making
 these builds far easier to use for debugging programs.</blockquote>
 </div>
 <div class="section" id="enable-release">
-<span id="index-722"></span><h3>ENABLE_RELEASE<a class="headerlink" href="#enable-release" title="Permalink to this headline">¶</a></h3>
+<span id="index-135"></span><h3>ENABLE_RELEASE<a class="headerlink" href="#enable-release" title="Permalink to this headline">¶</a></h3>
 <blockquote>
 The <cite>RELEASE</cite> feature identifies builds of libraries that use full
 optimization and eliminate extraneous information such as debug
@@ -220,7 +224,7 @@ smaller than (and execute faster than) their debug library
 counterparts.</blockquote>
 </div>
 <div class="section" id="enable-single-threaded">
-<span id="index-723"></span><h3>ENABLE_SINGLE_THREADED<a class="headerlink" href="#enable-single-threaded" title="Permalink to this headline">¶</a></h3>
+<span id="index-136"></span><h3>ENABLE_SINGLE_THREADED<a class="headerlink" href="#enable-single-threaded" title="Permalink to this headline">¶</a></h3>
 <blockquote>
 The <cite>SINGLE_THREADED</cite> feature identifies builds of libraries that
 assume that the program using them is single-threaded. These
@@ -228,7 +232,7 @@ libraries typically avoid costly atomic operations or locks, and
 make use of no multi-threaded features.</blockquote>
 </div>
 <div class="section" id="enable-multi-threaded">
-<span id="index-724"></span><h3>ENABLE_MULTI_THREADED<a class="headerlink" href="#enable-multi-threaded" title="Permalink to this headline">¶</a></h3>
+<span id="index-137"></span><h3>ENABLE_MULTI_THREADED<a class="headerlink" href="#enable-multi-threaded" title="Permalink to this headline">¶</a></h3>
 <blockquote>
 The <cite>MULTI_THREADED</cite> feature identifies builds of libraries that
 assume that the program using them is multi-threaded. These
@@ -238,7 +242,7 @@ library in a multi-threade context, often at the cost of
 single-thread performance.</blockquote>
 </div>
 <div class="section" id="enable-static-runtime">
-<span id="index-725"></span><h3>ENABLE_STATIC_RUNTIME<a class="headerlink" href="#enable-static-runtime" title="Permalink to this headline">¶</a></h3>
+<span id="index-138"></span><h3>ENABLE_STATIC_RUNTIME<a class="headerlink" href="#enable-static-runtime" title="Permalink to this headline">¶</a></h3>
 <blockquote>
 The <cite>STATIC_RUNTIME</cite> feature identifies builds that link against
 the C and C++ run-time libraries statically, which directly
@@ -246,7 +250,7 @@ includes the code from those run-time libraries into the Boost
 library or executable.</blockquote>
 </div>
 <div class="section" id="enable-dynamic-runtime">
-<span id="index-726"></span><h3>ENABLE_DYNAMIC_RUNTIME<a class="headerlink" href="#enable-dynamic-runtime" title="Permalink to this headline">¶</a></h3>
+<span id="index-139"></span><h3>ENABLE_DYNAMIC_RUNTIME<a class="headerlink" href="#enable-dynamic-runtime" title="Permalink to this headline">¶</a></h3>
 <blockquote>
 The <cite>DYNAMIC_RUNTIME</cite> feature identifies builds that link against
 the dynamic C and C++ run-time libraries.</blockquote>
@@ -307,7 +311,7 @@ libraries in the feature space</p>
 (<cite>STATIC</cite> or <cite>SHARED</cite>) x (<cite>DEBUG</cite> or <cite>RELEASE</cite>) x
 (<cite>SINGLE_THREADED</cite> or <cite>MULTI_THREADED</cite>)</blockquote>
 <p>resulting in 8 different copies of each library, modulo certain cases
-where variants are disabled <a class="footnote-reference" href="#disabled-variants" id="id2">[1]</a>. On Windows, where
+where variants are disabled <a class="footnote-reference" href="#disabled-variants" id="id3">[1]</a>. On Windows, where
 the distinction between static and dynamic run-time libraries is very
 important, the default build also creates permutations with
 (<cite>STATIC_RUNTIME</cite> or <cite>DYNAMIC_RUNTIME</cite>). Certain non-sensical
@@ -328,7 +332,7 @@ the debug variants, drastically improving overall build times.</p>
 <table class="docutils footnote" frame="void" id="disabled-variants" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id2">[1]</a></td><td>For instance, the <strong>SINGLE_THREADED</strong> variant
+<tr><td class="label"><a class="fn-backref" href="#id3">[1]</a></td><td>For instance, the <strong>SINGLE_THREADED</strong> variant
 of the <em>boost_thread</em> project is disabled.</td></tr>
 </tbody>
 </table>
@@ -355,12 +359,12 @@ of the <em>boost_thread</em> project is disabled.</td></tr>
              >previous</a> |</li>
     <li><a href="http://www.boost.org/">Boost</a> &raquo;</li>
     
-        <li><a href="index.html">Boost.CMake 1.41.0.beta1.cmake1</a> &raquo;</li>
+        <li><a href="index.html">Boost.CMake 1.41.0.cmake0</a> &raquo;</li>
  
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version b945719a2871360bd2a92c25b624d7aeb4c6cdc0, Sun, 15 Nov 2009.
+      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version c79a84871040a6b971bbad8851ca5077e3f7db6d, Wed, 18 Nov 2009.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

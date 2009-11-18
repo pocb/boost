@@ -1,10 +1,10 @@
-% git diff --stat=100,90 Boost_1_41_0_beta1
- .gitignore                                                                            |    7 +
- CMakeLists.txt                                                                        |  394 ++-
- CTestConfig.cmake                                                                     |   13 +
+% git diff --stat=100,90 Boost_1_41_0
+ .gitignore                                                                            |    8 +
+ CMakeLists.txt                                                                        |  413 ++-
+ CTestConfig.cmake                                                                     |   21 +
  doc/CMakeLists.txt                                                                    |    9 +
  doc/src/CMakeLists.txt                                                                |   19 +
- libs/CMakeLists.txt                                                                   |   95 +
+ libs/CMakeLists.txt                                                                   |   99 +
  libs/accumulators/CMakeLists.txt                                                      |   21 +
  libs/accumulators/doc/CMakeLists.txt                                                  |    8 +
  libs/accumulators/example/CMakeLists.txt                                              |    8 +
@@ -138,7 +138,7 @@
  libs/mpi/CMakeLists.txt                                                               |   31 +
  libs/mpi/doc/CMakeLists.txt                                                           |   36 +
  libs/mpi/module.cmake                                                                 |    1 +
- libs/mpi/src/CMakeLists.txt                                                           |   82 +
+ libs/mpi/src/CMakeLists.txt                                                           |   84 +
  libs/mpi/test/CMakeLists.txt                                                          |   77 +
  libs/mpl/CMakeLists.txt                                                               |   28 +
  libs/mpl/module.cmake                                                                 |    1 +
@@ -179,10 +179,10 @@
  libs/ptr_container/CMakeLists.txt                                                     |   27 +
  libs/ptr_container/module.cmake                                                       |    1 +
  libs/ptr_container/test/CMakeLists.txt                                                |   28 +
- libs/python/CMakeLists.txt                                                            |   19 +
+ libs/python/CMakeLists.txt                                                            |   21 +
  libs/python/module.cmake                                                              |    3 +
  libs/python/src/CMakeLists.txt                                                        |   70 +
- libs/python/test/CMakeLists.txt                                                       |  229 +
+ libs/python/test/CMakeLists.txt                                                       |  231 +
  libs/random/CMakeLists.txt                                                            |   28 +
  libs/random/module.cmake                                                              |    3 +
  libs/random/test/CMakeLists.txt                                                       |   34 +
@@ -282,12 +282,13 @@
  tools/build/CMake/Boost.bmp                                                           |  Bin 0 -> 71674 bytes
  tools/build/CMake/Boost.png                                                           |  Bin 0 -> 6308 bytes
  tools/build/CMake/BoostConfig.cmake                                                   |  249 +
- tools/build/CMake/BoostCore.cmake                                                     | 1494 +++++
+ tools/build/CMake/BoostCore.cmake                                                     | 1509 +++++
  tools/build/CMake/BoostDocs.cmake                                                     |  526 ++
- tools/build/CMake/BoostExternals.cmake                                                |   46 +
- tools/build/CMake/BoostTesting.cmake                                                  |  483 ++
+ tools/build/CMake/BoostExternals.cmake                                                |   55 +
+ tools/build/CMake/BoostTesting.cmake                                                  |  494 ++
  tools/build/CMake/BoostUtils.cmake                                                    |  275 +
  tools/build/CMake/CMakeLists.txt                                                      |   91 +
+ tools/build/CMake/CTestCustom.cmake.in                                                |    5 +
  tools/build/CMake/CompileTest/CMakeLists.txt                                          |   12 +
  tools/build/CMake/FindICU.cmake                                                       |   51 +
  tools/build/CMake/LinkTest/CMakeLists.txt                                             |   26 +
@@ -300,24 +301,28 @@
  tools/build/CMake/docs/build/html/_sources/add_boost_library.txt                      |   49 +
  tools/build/CMake/docs/build/html/_sources/add_compiled_library.txt                   |  231 +
  tools/build/CMake/docs/build/html/_sources/adding_regression_tests.txt                |  107 +
- tools/build/CMake/docs/build/html/_sources/build_configuration.txt                    |  287 +
+ tools/build/CMake/docs/build/html/_sources/build_configuration.txt                    |  289 +
  tools/build/CMake/docs/build/html/_sources/build_installer.txt                        |   49 +
- tools/build/CMake/docs/build/html/_sources/build_variants.txt                         |  270 +
- tools/build/CMake/docs/build/html/_sources/exported_targets.txt                       |  137 +
+ tools/build/CMake/docs/build/html/_sources/build_variants.txt                         |  275 +
+ tools/build/CMake/docs/build/html/_sources/diff.txt                                   |    9 +
+ tools/build/CMake/docs/build/html/_sources/exported_targets.txt                       |  247 +
  tools/build/CMake/docs/build/html/_sources/externals/bzip2.txt                        |   19 +
  tools/build/CMake/docs/build/html/_sources/externals/doxygen.txt                      |   10 +
  tools/build/CMake/docs/build/html/_sources/externals/expat.txt                        |   10 +
  tools/build/CMake/docs/build/html/_sources/externals/icu.txt                          |   22 +
- tools/build/CMake/docs/build/html/_sources/externals/index.txt                        |   23 +
+ tools/build/CMake/docs/build/html/_sources/externals/index.txt                        |   44 +
  tools/build/CMake/docs/build/html/_sources/externals/mpi.txt                          |   10 +
  tools/build/CMake/docs/build/html/_sources/externals/python.txt                       |   88 +
+ tools/build/CMake/docs/build/html/_sources/externals/valgrind.txt                     |   27 +
  tools/build/CMake/docs/build/html/_sources/externals/xsltproc.txt                     |   18 +
  tools/build/CMake/docs/build/html/_sources/externals/zlib.txt                         |   17 +
- tools/build/CMake/docs/build/html/_sources/index.txt                                  |  104 +
+ tools/build/CMake/docs/build/html/_sources/faq.txt                                    |   39 +
+ tools/build/CMake/docs/build/html/_sources/git.txt                                    |  182 +
+ tools/build/CMake/docs/build/html/_sources/index.txt                                  |  137 +
  tools/build/CMake/docs/build/html/_sources/individual_libraries.txt                   |  152 +
- tools/build/CMake/docs/build/html/_sources/install_customization.txt                  |  195 +
- tools/build/CMake/docs/build/html/_sources/notes_by_version.txt                       |  213 +
- tools/build/CMake/docs/build/html/_sources/quickstart.txt                             |  233 +
+ tools/build/CMake/docs/build/html/_sources/install_customization.txt                  |  197 +
+ tools/build/CMake/docs/build/html/_sources/notes_by_version.txt                       |  218 +
+ tools/build/CMake/docs/build/html/_sources/quickstart.txt                             |  244 +
  tools/build/CMake/docs/build/html/_sources/reference/boost_add_executable.txt         |  132 +
  tools/build/CMake/docs/build/html/_sources/reference/boost_add_library.txt            |  192 +
  .../CMake/docs/build/html/_sources/reference/boost_additional_test_dependencies.txt   |   36 +
@@ -329,8 +334,8 @@
  tools/build/CMake/docs/build/html/_sources/reference/boost_test_run.txt               |    7 +
  tools/build/CMake/docs/build/html/_sources/reference/boost_test_run_fail.txt          |    7 +
  tools/build/CMake/docs/build/html/_sources/testing.txt                                |  428 ++
+ tools/build/CMake/docs/build/html/_static/alt.boost.png                               |  Bin 0 -> 8906 bytes
  tools/build/CMake/docs/build/html/_static/basic.css                                   |  405 ++
- tools/build/CMake/docs/build/html/_static/boost-small.png                             |  Bin 0 -> 8899 bytes
  tools/build/CMake/docs/build/html/_static/boost.css                                   |  221 +
  tools/build/CMake/docs/build/html/_static/contents.png                                |  Bin 0 -> 202 bytes
  tools/build/CMake/docs/build/html/_static/doctools.js                                 |  232 +
@@ -345,26 +350,30 @@
  tools/build/CMake/docs/build/html/add_boost_library.html                              |  146 +
  tools/build/CMake/docs/build/html/add_compiled_library.html                           |  319 +
  tools/build/CMake/docs/build/html/adding_regression_tests.html                        |  201 +
- tools/build/CMake/docs/build/html/build_configuration.html                            |  357 +
+ tools/build/CMake/docs/build/html/build_configuration.html                            |  359 +
  tools/build/CMake/docs/build/html/build_installer.html                                |  139 +
- tools/build/CMake/docs/build/html/build_variants.html                                 |  367 +
- tools/build/CMake/docs/build/html/exported_targets.html                               |  235 +
+ tools/build/CMake/docs/build/html/build_variants.html                                 |  371 +
+ tools/build/CMake/docs/build/html/diff.html                                           | 1102 +++
+ tools/build/CMake/docs/build/html/exported_targets.html                               |  320 +
  tools/build/CMake/docs/build/html/externals/bzip2.html                                |  127 +
  tools/build/CMake/docs/build/html/externals/doxygen.html                              |  108 +
  tools/build/CMake/docs/build/html/externals/expat.html                                |  108 +
  tools/build/CMake/docs/build/html/externals/icu.html                                  |  131 +
- tools/build/CMake/docs/build/html/externals/index.html                                |  122 +
+ tools/build/CMake/docs/build/html/externals/index.html                                |  140 +
  tools/build/CMake/docs/build/html/externals/mpi.html                                  |  108 +
  tools/build/CMake/docs/build/html/externals/python.html                               |  170 +
+ tools/build/CMake/docs/build/html/externals/valgrind.html                             |  128 +
  tools/build/CMake/docs/build/html/externals/xsltproc.html                             |  124 +
  tools/build/CMake/docs/build/html/externals/zlib.html                                 |  124 +
- tools/build/CMake/docs/build/html/genindex.html                                       |  332 +
- tools/build/CMake/docs/build/html/index.html                                          |  331 +
+ tools/build/CMake/docs/build/html/faq.html                                            |  130 +
+ tools/build/CMake/docs/build/html/genindex.html                                       |  360 +
+ tools/build/CMake/docs/build/html/git.html                                            |  278 +
+ tools/build/CMake/docs/build/html/index.html                                          |  365 +
  tools/build/CMake/docs/build/html/individual_libraries.html                           |  241 +
- tools/build/CMake/docs/build/html/install_customization.html                          |  247 +
- tools/build/CMake/docs/build/html/notes_by_version.html                               |  313 +
+ tools/build/CMake/docs/build/html/install_customization.html                          |  252 +
+ tools/build/CMake/docs/build/html/notes_by_version.html                               |  318 +
  tools/build/CMake/docs/build/html/objects.inv                                         |    6 +
- tools/build/CMake/docs/build/html/quickstart.html                                     |  328 +
+ tools/build/CMake/docs/build/html/quickstart.html                                     |  338 +
  tools/build/CMake/docs/build/html/reference/boost_add_executable.html                 |  210 +
  tools/build/CMake/docs/build/html/reference/boost_add_library.html                    |  295 +
  tools/build/CMake/docs/build/html/reference/boost_additional_test_dependencies.html   |  142 +
@@ -379,6 +388,7 @@
  tools/build/CMake/docs/build/html/searchindex.js                                      |    1 +
  tools/build/CMake/docs/build/html/testing.html                                        |  516 ++
  tools/build/CMake/docs/source/.gitignore                                              |    1 +
+ tools/build/CMake/docs/source/GitLexer.py                                             |   49 +
  tools/build/CMake/docs/source/MacInstaller.png                                        |  Bin 0 -> 185943 bytes
  tools/build/CMake/docs/source/WindowsInstaller.png                                    |  Bin 0 -> 88166 bytes
  tools/build/CMake/docs/source/_static/boost.css                                       |  221 +
@@ -388,35 +398,39 @@
  tools/build/CMake/docs/source/add_boost_library.rst                                   |   49 +
  tools/build/CMake/docs/source/add_compiled_library.rst                                |  231 +
  tools/build/CMake/docs/source/adding_regression_tests.rst                             |  107 +
+ tools/build/CMake/docs/source/alt.boost.png                                           |  Bin 0 -> 8906 bytes
  tools/build/CMake/docs/source/boost-dark-trans.png                                    |  Bin 0 -> 8312 bytes
  tools/build/CMake/docs/source/boost-small.png                                         |  Bin 0 -> 8899 bytes
  tools/build/CMake/docs/source/boost.png                                               |  Bin 0 -> 6308 bytes
  tools/build/CMake/docs/source/boost/theme.conf                                        |    9 +
  tools/build/CMake/docs/source/boost/todo.py                                           |  147 +
  tools/build/CMake/docs/source/boost_cmake_version.py.in                               |    2 +
- tools/build/CMake/docs/source/build_configuration.rst                                 |  287 +
+ tools/build/CMake/docs/source/build_configuration.rst                                 |  289 +
  tools/build/CMake/docs/source/build_installer.rst                                     |   49 +
- tools/build/CMake/docs/source/build_variants.rst                                      |  270 +
+ tools/build/CMake/docs/source/build_variants.rst                                      |  275 +
  tools/build/CMake/docs/source/cmake.py                                                |   36 +
  tools/build/CMake/docs/source/conf.py                                                 |  214 +
  tools/build/CMake/docs/source/diff.rst                                                |    9 +
- tools/build/CMake/docs/source/exported_targets.rst                                    |  137 +
+ tools/build/CMake/docs/source/exported_targets.rst                                    |  247 +
  tools/build/CMake/docs/source/externals/bzip2.rst                                     |   19 +
  tools/build/CMake/docs/source/externals/doxygen.rst                                   |   10 +
  tools/build/CMake/docs/source/externals/expat.rst                                     |   10 +
  tools/build/CMake/docs/source/externals/icu.rst                                       |   22 +
- tools/build/CMake/docs/source/externals/index.rst                                     |   23 +
+ tools/build/CMake/docs/source/externals/index.rst                                     |   44 +
  tools/build/CMake/docs/source/externals/mpi.rst                                       |   10 +
  tools/build/CMake/docs/source/externals/python.rst                                    |   88 +
+ tools/build/CMake/docs/source/externals/valgrind.rst                                  |   27 +
  tools/build/CMake/docs/source/externals/xsltproc.rst                                  |   18 +
  tools/build/CMake/docs/source/externals/zlib.rst                                      |   17 +
+ tools/build/CMake/docs/source/faq.rst                                                 |   39 +
+ tools/build/CMake/docs/source/git.rst                                                 |  182 +
  tools/build/CMake/docs/source/git_diff.txt                                            |    1 +
- tools/build/CMake/docs/source/index.rst                                               |  104 +
+ tools/build/CMake/docs/source/index.rst                                               |  138 +
  tools/build/CMake/docs/source/individual_libraries.rst                                |  152 +
- tools/build/CMake/docs/source/install_customization.rst                               |  195 +
+ tools/build/CMake/docs/source/install_customization.rst                               |  197 +
  tools/build/CMake/docs/source/modularize_library.rst.set_aside                        |  183 +
- tools/build/CMake/docs/source/notes_by_version.rst                                    |  213 +
- tools/build/CMake/docs/source/quickstart.rst                                          |  233 +
+ tools/build/CMake/docs/source/notes_by_version.rst                                    |  218 +
+ tools/build/CMake/docs/source/quickstart.rst                                          |  244 +
  tools/build/CMake/docs/source/reference/boost_add_executable.rst                      |  132 +
  tools/build/CMake/docs/source/reference/boost_add_library.rst                         |  192 +
  tools/build/CMake/docs/source/reference/boost_additional_test_dependencies.rst        |   36 +
@@ -433,28 +447,40 @@
  tools/build/CMake/externals/Expat.cmake                                               |   13 +
  tools/build/CMake/externals/ICU.cmake                                                 |   12 +
  tools/build/CMake/externals/MPI.cmake                                                 |   11 +
- tools/build/CMake/externals/Python.cmake                                              |  148 +
+ tools/build/CMake/externals/Python.cmake                                              |  161 +
+ tools/build/CMake/externals/Python/valgrind-python-2.4.6.supp                         |  228 +
+ tools/build/CMake/externals/Python/valgrind-python-2.6.4.supp                         |  403 ++
+ tools/build/CMake/externals/Python/valgrind-python-3.1.1.supp                         |  391 ++
+ tools/build/CMake/externals/Valgrind.cmake                                            |   18 +
  tools/build/CMake/externals/Xsltproc.cmake                                            |   18 +
  tools/build/CMake/externals/ZLib.cmake                                                |   13 +
  tools/build/CMake/install_me/Boost-thisversion.cmake.in                               |   75 +
- tools/build/CMake/install_me/BoostConfig.cmake.in                                     |   76 +
+ tools/build/CMake/install_me/BoostConfig.cmake.in                                     |   80 +
  tools/build/CMake/install_me/BoostConfigAgnostic.cmake.in                             |   19 +
  tools/build/CMake/install_me/BoostConfigVersion.cmake.in                              |   22 +
  tools/build/CMake/install_me/BoostConfigVersionAgnostic.cmake.in                      |   69 +
  tools/build/CMake/install_me/version.hpp.override.in                                  |   35 +
- tools/build/CMake/test/include/selftest_report.hpp                                    |    5 +
+ tools/build/CMake/main.cpp                                                            |    7 +
+ tools/build/CMake/test/include/selftest_lib.ipp                                       |   22 +
+ tools/build/CMake/test/include/selftest_main.ipp                                      |   11 +
+ tools/build/CMake/test/include/selftest_report.hpp                                    |    6 +
  tools/build/CMake/test/libs/a/CMakeLists.txt                                          |   27 +
  tools/build/CMake/test/libs/a/module.cmake                                            |    1 +
- tools/build/CMake/test/libs/a/src/CMakeLists.txt                                      |   36 +
- tools/build/CMake/test/libs/a/src/lib.cpp                                             |   17 +
- tools/build/CMake/test/libs/a/src/main.cpp                                            |   10 +
+ tools/build/CMake/test/libs/a/src/CMakeLists.txt                                      |   38 +
+ tools/build/CMake/test/libs/a/src/lib.cpp                                             |   22 +
+ tools/build/CMake/test/libs/a/src/main.cpp                                            |    1 +
  tools/build/CMake/test/libs/a/test/CMakeLists.txt                                     |   21 +
  tools/build/CMake/test/libs/b/CMakeLists.txt                                          |   27 +
  tools/build/CMake/test/libs/b/module.cmake                                            |    1 +
- tools/build/CMake/test/libs/b/src/CMakeLists.txt                                      |   28 +
- tools/build/CMake/test/libs/b/src/lib.cpp                                             |   17 +
- tools/build/CMake/test/libs/b/src/main.cpp                                            |   10 +
+ tools/build/CMake/test/libs/b/src/CMakeLists.txt                                      |   30 +
+ tools/build/CMake/test/libs/b/src/lib.cpp                                             |    1 +
+ tools/build/CMake/test/libs/b/src/main.cpp                                            |    1 +
  tools/build/CMake/test/libs/b/test/CMakeLists.txt                                     |   21 +
+ tools/build/CMake/test/libs/c/CMakeLists.txt                                          |   27 +
+ tools/build/CMake/test/libs/c/src/CMakeLists.txt                                      |   30 +
+ tools/build/CMake/test/libs/c/src/lib.cpp                                             |   22 +
+ tools/build/CMake/test/libs/c/src/main.cpp                                            |   12 +
+ tools/build/CMake/test/libs/c/test/CMakeLists.txt                                     |   21 +
  tools/build/CMake/test/tools/tool-a/CMakeLists.txt                                    |   36 +
  tools/build/CMake/test/tools/tool-a/main.cpp                                          |   11 +
  tools/build/CMake/test/tools/tool-a/module.cmake                                      |    1 +
@@ -473,4 +499,4 @@
  tools/jam/src/.gitignore                                                              |    3 +
  tools/quickbook/CMakeLists.txt                                                        |   33 +
  tools/wave/CMakeLists.txt                                                             |   22 +
- 474 files changed, 28189 insertions(+), 13 deletions(-)
+ 500 files changed, 32214 insertions(+), 13 deletions(-)

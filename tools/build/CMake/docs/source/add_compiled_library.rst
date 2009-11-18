@@ -1,3 +1,11 @@
+..
+.. Copyright (C) 2009 Troy Straszheim <troy@resophonic.com>
+..
+.. Distributed under the Boost Software License, Version 1.0. 
+.. See accompanying file LICENSE_1_0.txt or copy at 
+..   http://www.boost.org/LICENSE_1_0.txt 
+..
+
 .. _add_compiled_library:
 
 Adding a Compiled Library to CMake
@@ -31,7 +39,7 @@ directories listed after ``SRCDIRS``, follow these steps for each one.
    help build the library. Let's start by adding a simple library with
    a few source files::
 
-     boost_add_library(boost_libname
+     boost_add_library(libname
         mysrc1.cpp mysrc2.cpp
         )
 
@@ -66,7 +74,7 @@ are included by the user). For example, we want to define the macro
 ``BUILDING_BOOST_LIBNAME`` when building the library. We can do so by
 passing the ``COMPILE_FLAGS`` option to ``boost_add_library``::
 
-  boost_add_library(boost_libname
+  boost_add_library(libname
       mysrc1.cpp mysrc2.cpp
       COMPILE_FLAGS "-DBUILDING_BOOST_LIBNAME=1"
       )
@@ -84,7 +92,7 @@ shared library. This macro instructs the library headers to
 ``dllexport`` everything that needs to be exported. We can do this with
 variant-specific compile flags, e.g., ::
 
-  boost_add_library(boost_libname
+  boost_add_library(libname
       mysrc1.cpp mysrc2.cpp
       COMPILE_FLAGS "-DBUILDING_BOOST_LIBNAME=1"
       SHARED_COMPILE_FLAGS "-DBOOST_LIBNAME_DYN_LINK=1"
@@ -95,7 +103,7 @@ will be combined with the ``COMPILE_FLAGS`` options. When building a
 static library, the ``SHARED_COMPILE_FLAGS`` options will be
 ignored. There are other options that can be specified per-feature,
 such as ``LINK_FLAGS`` and ``LINK_LIBS``; refer to the
-[wiki:CMakeAddLibrary boost_add_library macro reference] for more
+:ref:`boost_add_library_macro` reference for more
 information.
 
 Linking to Other Boost Libraries
@@ -103,12 +111,12 @@ Linking to Other Boost Libraries
 
 Some Boost libraries depends on other Boost libraries. For example,
 perhaps our library uses the Boost.Filesystem library under the
-hood. We can use the ``DEPENDS`` feature of the [wiki:CMakeAddLibrary
-boost_add_library macro] to state which libraries our library depends
-on. In this example, we'll link against ``boost_filesystem``::
+hood. We can use the ``DEPENDS`` feature of the
+:ref:`boost_add_library_macro` to state which libraries our library
+depends on. In this example, we'll link against ``boost_filesystem``::
 
   
-  boost_add_library(boost_libname
+  boost_add_library(libname
       mysrc1.cpp mysrc2.cpp
       COMPILE_FLAGS "-DBUILDING_BOOST_LIBNAME=1"
       SHARED_COMPILE_FLAGS "-DBOOST_LIBNAME_DYN_LINK=1"
@@ -169,9 +177,9 @@ The include directory should be added via the CMake
 
 The ``PNG_DEFINITIONS`` value should be added to the ``COMPILE_FLAGS``
 and the ``PNG_LIBRARIES`` value to the ``LINK_LIBS`` option to the
-[wiki:CMakeAddLibrary boost_add_library macro]. Using these features
-together, we can search for the ``PNG`` library on the system and
-optionally include PNG support into our library::
+:ref:`boost_add_library_macro`. Using these features together, we can
+search for the ``PNG`` library on the system and optionally include
+PNG support into our library::
 
   include(FindPNG)
   set(EXTRA_SOURCES)
@@ -180,7 +188,7 @@ optionally include PNG support into our library::
     list(APPEND EXTRA_SOURCES png.cpp)
   endif (PNG_FOUND)
   
-  boost_add_library(boost_libname
+  boost_add_library(libname
     mysrc1.cpp mysrc2.cpp
     ${EXTRA_SOURCES}
     COMPILE_FLAGS "-DBUILDING_BOOST_LIBNAME=1 ${PNG_DEFINITIONS}"
@@ -221,7 +229,7 @@ built as a multi-threaded library, because it uses thread-unsafe
 routines from the underlying C library. To disable multi-threaded
 variants of the library, pass the option ``NOT_MULTI_THREADED``::
 
-  boost_add_library(boost_libname
+  boost_add_library(libname
       mysrc1.cpp mysrc2.cpp
       COMPILE_FLAGS "-DBUILDING_BOOST_LIBNAME=1"
       SHARED_COMPILE_FLAGS "-DBOOST_LIBNAME_DYN_LINK=1"

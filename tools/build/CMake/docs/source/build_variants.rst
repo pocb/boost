@@ -1,3 +1,11 @@
+..
+.. Copyright (C) 2009 Troy Straszheim <troy@resophonic.com>
+..
+.. Distributed under the Boost Software License, Version 1.0. 
+.. See accompanying file LICENSE_1_0.txt or copy at 
+..   http://www.boost.org/LICENSE_1_0.txt 
+..
+
 .. index:: variants
 .. index:: features
 
@@ -36,6 +44,8 @@ The configuration and build of the library for each *feature* is
 (dis|en)abled with a boolean option ``ENABLE_``\ *feature*, which set
 in :ref:`cmakecache.txt`.  The available features are:
 
+.. _name_mangling:
+
 Name Mangling
 -------------
 
@@ -50,6 +60,7 @@ static         -static       (none)
 multithreaded  -mt           -mt
 release        (none)        (none)
 debug          -debug        -d
+pydebug        -pydebug      -yd
 ============== ===========   ======================
 
 The make target ``help`` will show the available options::

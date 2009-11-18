@@ -1,3 +1,11 @@
+..
+.. Copyright (C) 2009 Troy Straszheim <troy@resophonic.com>
+..
+.. Distributed under the Boost Software License, Version 1.0. 
+.. See accompanying file LICENSE_1_0.txt or copy at 
+..   http://www.boost.org/LICENSE_1_0.txt 
+..
+
 .. _add_boost_library_project:
 
 Adding a Library Project
@@ -14,7 +22,7 @@ To introduce a new library, which resides in the subdirectory
 
 1. Create a new file ``libs/libname/CMakeLists.txt`` with your
    favorite text editor. This file will contain an invocation of the
-   [wiki:CMakeLibraryProject boost_library_project macro], which
+   :ref:`boost_library_project_macro`, which
    identifies each Boost library to the build system. The invocation
    of the ``boost_library_project`` will look like this::
 

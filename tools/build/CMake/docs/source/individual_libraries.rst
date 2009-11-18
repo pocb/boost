@@ -1,3 +1,11 @@
+..
+.. Copyright (C) 2009 Troy Straszheim <troy@resophonic.com>
+..
+.. Distributed under the Boost Software License, Version 1.0. 
+.. See accompanying file LICENSE_1_0.txt or copy at 
+..   http://www.boost.org/LICENSE_1_0.txt 
+..
+
 Building individual libraries with cmake
 ========================================
 
@@ -53,7 +61,7 @@ Preprocessing
 -------------
 
 In build directories corresponding to a source library containing a
-``CMakeLists.txt`` containing a ``boost_add_library`` invocation
+``CMakeLists.txt`` containing a :ref:`boost_add_library_macro` invocation
 (e.g. ``build/libs/signals/src, build/libs/filesystem/src``), more
 detailed targets are available::
 

@@ -1,16 +1,22 @@
-.. boost-cmake documentation master file, created by
-   sphinx-quickstart on Mon May 11 08:53:19 2009.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
+..
+.. Copyright (C) 2009 Troy Straszheim <troy@resophonic.com>
+..
+.. Distributed under the Boost Software License, Version 1.0. 
+.. See accompanying file LICENSE_1_0.txt or copy at 
+..   http://www.boost.org/LICENSE_1_0.txt 
+..
 
 Boost-CMake |release|
 =====================
 
-Boost.\ `CMake <http://www.cmake.org>`_ is an alternate
-build system for boost, under development since boost version 1.35.
-As of Boost version 1.38, boost.cmake can reliably build and
-package boost.  
+Boost.\ `CMake <http://www.cmake.org>`_ (or :ref:`alt.boost
+<alt_boost>`) is the boost distribution that all the cool kids are
+using.  The effort started in earnest at `BoostCon '07
+<http://www.boostcon.com>`_; by the end of which it was possible to do
+a basic build of boost with cmake.  In 2009, the project moved out to
+git version control.  Today, ``Boost.CMake`` is stable, mature, and
+supported by the developers, a large base of expert users, and
+occasionally by the authors of CMake itself.
 
 .. index:: Mailing List, IRC
 
@@ -22,10 +28,6 @@ package boost.
 
   ``#boost-cmake`` on the `freenode network <http://freenode.net>`_
 
-**CMake/CTest regression testing of boost**
-
-  http://www.cdash.org/CDashPublic/index.php?project=Boost
-
 **CMake home page**
 
   http://www.cmake.org
@@ -35,7 +37,7 @@ package boost.
   Boost.CMake is distributed *separately* from upstream boost.  Code
   is in a `git <http://git-scm.com>`_ repository at
   http://gitorious.org/boost/cmake.git.  These documents correspond to
-  tag |release|.  
+  tag |release|.  See also :ref:`hacking_cmake_with_git`.
 
 **Tarballs**
 
@@ -106,11 +108,12 @@ Once you've written a ton of docs, push them someplace where I can see
 them (or use ``git diff`` to send a patch).
 
 Release checklist
-=================
+-----------------
 
 * Update ``BOOST_CMAKE_VERSION`` in toplevel ``CMakeLists.txt``
 * Update notes by version in ``tools/build/CMake/docs/notes_by_version.rst``
 * Reconfig cmake with ``BOOST_MAINTAINER`` set to ON
+* set UPSTREAM_TAG in root ``CMakeLists.txt``
 * make make-diff
 * Rebuild docs and commit
 * Tag commit with ``BOOST_CMAKE_VERSION``
@@ -118,9 +121,20 @@ Release checklist
 * push tag
 * update wiki
 
-Index
-=====
+.. index:: alt.boost
+   single: Anarchists; Lunatics, Terrorists and
+   single: Lunatics; Anarchists Terrorists and
+   single: Terrorists; Anarchists Lunatics and
 
-:ref:`genindex`
+.. _alt_boost:
 
+Why "alt.boost"?
+----------------
+
+The 'alt' is a reference to the ``alt.*`` Usenet hierarchy.  Here, as
+in Usenet, *alt* stands for `Anarchists, Lunatics and Terrorists
+<http://nylon.net/alt/index.htm>`_.  This independent effort explores
+and applies alternate techniques/technologies in the areas of build,
+version control, testing, packaging, documentation and release
+management.  
 

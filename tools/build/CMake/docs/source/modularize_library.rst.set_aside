@@ -10,9 +10,9 @@ self-contained, it is easier to bring in libraries of different
 versions and select specific subsets of libraries. Additionally,
 modular libraries explicitly declare their dependencies on other
 libraries (or "modules"), making it possible to build and install
-coherent subsets of Boost. For example, the [wiki:CMakeBinaryInstaller
-binary installer] for Windows allows one to turn on or off
-installation of each modular library.
+coherent subsets of Boost. For example, the binary installer for
+Windows allows one to turn on or off installation of each modular
+library.
 
 Eventually, we hope that most of Boost's libraries will be modular, to
 make it easier for users to install the subset of Boost that they are
