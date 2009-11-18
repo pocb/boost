@@ -52,14 +52,16 @@ namespace boost_python_test {
     boost::python::tuple
     getinitargs(const world& w)
     {
-      return boost::python::make_tuple(w.get_country());
+        using namespace boost::python;
+        return make_tuple(w.get_country());
     }
 
     static
     boost::python::tuple
     getstate(const world& w)
     {
-      return boost::python::make_tuple(w.get_secret_number());
+        using namespace boost::python;
+        return make_tuple(w.get_secret_number());
     }
 
     static

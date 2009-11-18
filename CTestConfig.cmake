@@ -14,9 +14,8 @@ set(CTEST_DROP_LOCATION "/submit.php?project=Boost")
 set(CTEST_DROP_SITE_CDASH TRUE)
 set(UPDATE_COMMAND "git")
 #
-#  You're welcome to set this to 
+#  You're welcome to set these
 #
 #set(BUILD_PROJECTS "crc")
 #set(BUILD_TESTS "ALL")
-
 

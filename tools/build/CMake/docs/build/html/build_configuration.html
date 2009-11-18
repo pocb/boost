@@ -45,7 +45,7 @@
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
             <p class="logo"><a href="index.html">
-              <img class="logo" src="_static/boost-small.png" alt="Logo"/>
+              <img class="logo" src="_static/alt.boost.png" alt="Logo"/>
             </a></p>
             <h3><a href="index.html">Table Of Contents</a></h3>
             <ul>
@@ -181,7 +181,7 @@ this, <strong>delete the cache file</strong>.  On windows, there is a <em>Delete
 Cache</em> option in the CMake gui&#8217;s <em>File</em> menu.  On unix you can simply
 <tt class="docutils literal"><span class="pre">rm</span> <span class="pre">CMakeCache.txt</span></tt>.</p>
 <div class="section" id="cmake-binary-dir">
-<span id="index-491"></span><span id="id2"></span><h2>CMAKE_BINARY_DIR<a class="headerlink" href="#cmake-binary-dir" title="Permalink to this headline">¶</a></h2>
+<span id="index-707"></span><span id="id2"></span><h2>CMAKE_BINARY_DIR<a class="headerlink" href="#cmake-binary-dir" title="Permalink to this headline">¶</a></h2>
 <p>This variable is set by cmake and corresponds to the toplevel of your
 <tt class="docutils literal"><span class="pre">build/</span></tt> directory.</p>
 </div>
@@ -197,7 +197,7 @@ Cache</em> option in the CMake gui&#8217;s <em>File</em> menu.  On unix you can 
 </blockquote>
 </div>
 <div class="section" id="winmangle-libnames">
-<span id="index-492"></span><span id="id3"></span><h3>WINMANGLE_LIBNAMES<a class="headerlink" href="#winmangle-libnames" title="Permalink to this headline">¶</a></h3>
+<span id="index-708"></span><span id="id3"></span><h3>WINMANGLE_LIBNAMES<a class="headerlink" href="#winmangle-libnames" title="Permalink to this headline">¶</a></h3>
 <p>This option controls whether libraries will be built with mangled-in
 compiler name/version and boost version.  For example, with
 <tt class="docutils literal"><span class="pre">BUILD_VERSIONED</span></tt> set to <tt class="docutils literal"><span class="pre">OFF</span></tt>, the signals library looks like
@@ -224,7 +224,7 @@ version only.</p>
 </div>
 </div>
 <div class="section" id="build-projects">
-<span id="index-493"></span><span id="id4"></span><h3>BUILD_PROJECTS<a class="headerlink" href="#build-projects" title="Permalink to this headline">¶</a></h3>
+<span id="index-709"></span><span id="id4"></span><h3>BUILD_PROJECTS<a class="headerlink" href="#build-projects" title="Permalink to this headline">¶</a></h3>
 <p>This is a semicolon-separated list of projects to be built, or
 <tt class="docutils literal"><span class="pre">&quot;ALL&quot;</span></tt> (the default) for all projects, or <tt class="docutils literal"><span class="pre">&quot;NONE&quot;</span></tt>.  Projects not
 appearing in this list (if list not <tt class="docutils literal"><span class="pre">&quot;ALL&quot;</span></tt>) are ignored; no targets in
@@ -249,7 +249,7 @@ Call Stack (most recent call first):
 </div>
 </div>
 <div class="section" id="build-examples">
-<span id="index-494"></span><span id="id5"></span><h3>BUILD_EXAMPLES<a class="headerlink" href="#build-examples" title="Permalink to this headline">¶</a></h3>
+<span id="index-710"></span><span id="id5"></span><h3>BUILD_EXAMPLES<a class="headerlink" href="#build-examples" title="Permalink to this headline">¶</a></h3>
 <p>This is a semicolon-separated list of projects whose examples should
 be built, e.g.:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">BUILD_EXAMPLES</span><span class="o">=</span><span class="s">&quot;iostreams;accumulators&quot;</span>
@@ -270,7 +270,7 @@ argument to the <a class="reference external" href="reference/boost_library_proj
 filter has no ability to reverse the result.</p>
 </div>
 <div class="section" id="build-tools">
-<span id="index-495"></span><span id="id6"></span><h3>BUILD_TOOLS<a class="headerlink" href="#build-tools" title="Permalink to this headline">¶</a></h3>
+<span id="index-711"></span><span id="id6"></span><h3>BUILD_TOOLS<a class="headerlink" href="#build-tools" title="Permalink to this headline">¶</a></h3>
 <p>Similar to BUILD_EXAMPLES and BUILD_PROJECTS above, this is a
 semicolon-separated list of tools (in subdirectory
 <tt class="docutils literal"><span class="pre">$BOOST_ROOT/tools/</span></tt>) that should be built, e.g.:</p>
@@ -282,7 +282,7 @@ the values here are lowercase (only subdirectories of <tt class="docutils litera
 matching one of the strings in the list will be traversed by cmake).</p>
 </div>
 <div class="section" id="cmake-verbose-makefile">
-<span id="index-496"></span><h3>CMAKE_VERBOSE_MAKEFILE<a class="headerlink" href="#cmake-verbose-makefile" title="Permalink to this headline">¶</a></h3>
+<span id="index-712"></span><h3>CMAKE_VERBOSE_MAKEFILE<a class="headerlink" href="#cmake-verbose-makefile" title="Permalink to this headline">¶</a></h3>
 <blockquote>
 Displays full build commands during build.  Good for debugging.
 This option will generate permanently verbose makefiles; it is
@@ -290,7 +290,7 @@ generally easier to invoke make with the option <tt class="docutils literal"><sp
 instead (this has the same effect, but is not persistent).</blockquote>
 </div>
 <div class="section" id="cmake-cxx-compiler">
-<span id="index-497"></span><span id="id7"></span><h3>CMAKE_CXX_COMPILER<a class="headerlink" href="#cmake-cxx-compiler" title="Permalink to this headline">¶</a></h3>
+<span id="index-713"></span><span id="id7"></span><h3>CMAKE_CXX_COMPILER<a class="headerlink" href="#cmake-cxx-compiler" title="Permalink to this headline">¶</a></h3>
 <blockquote>
 <p>Sets the compiler.  If you have a nonstandard compiler and no
 default compiler, you may have to pass the value of this option on
@@ -301,9 +301,9 @@ the commandline, for example:</p>
 to have cmake generate a set of nmake or project files by choosing
 an appropriate generator.</p>
 </blockquote>
-<span class="target" id="index-498"></span><span class="target" id="index-499"></span></div>
+<span class="target" id="index-714"></span><span class="target" id="index-715"></span></div>
 <div class="section" id="build-soversioned">
-<span id="index-500"></span><span id="id8"></span><h3>BUILD_SOVERSIONED<a class="headerlink" href="#build-soversioned" title="Permalink to this headline">¶</a></h3>
+<span id="index-716"></span><span id="id8"></span><h3>BUILD_SOVERSIONED<a class="headerlink" href="#build-soversioned" title="Permalink to this headline">¶</a></h3>
 <p>Enables the setting of SOVERSION in built libraries.  If
 this is on:</p>
 <div class="highlight-python"><pre>% ls -l libboost_thread*.so*
@@ -352,7 +352,7 @@ with/without soversions.  See also <a class="reference external" href="install_c
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version fa8a5ffebdc2c68f3bd4205c29e2cf98689cadc4, Mon, 9 Nov 2009.
+      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version b945719a2871360bd2a92c25b624d7aeb4c6cdc0, Sun, 15 Nov 2009.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

@@ -9,9 +9,9 @@ foreach(shared_or_static SHARED STATIC)
   foreach(debug_or_release DEBUG RELEASE)
     foreach(single_or_multi SINGLE_THREADED MULTI_THREADED)
   
-      set(testname ${shared_or_static}-${debug_or_release}-${single_or_multi})
-      add_test(a-${testname} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/a-${testname})
-      set_tests_properties(a-${testname}
+      set(testname a-${shared_or_static}_${debug_or_release}_${single_or_multi})
+      add_test(${testname} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${testname})
+      set_tests_properties(${testname}
 	PROPERTIES
 	PASS_REGULAR_EXPRESSION "${testname}")
 

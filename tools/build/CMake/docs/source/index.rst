@@ -53,7 +53,9 @@ Users's guide
    build_variants
    exported_targets
    install_customization
+   faq
    externals/index
+   git
    diff
 
 Developer's guide
