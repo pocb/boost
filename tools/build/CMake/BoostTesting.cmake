@@ -46,8 +46,15 @@ endif()
 
 set(BUILD_TESTS ${tests} CACHE STRING "Semicolon-separated list of lowercase librarary names to test, or \"ALL\"")
 enable_testing()
-find_package(Dart)
-include(CTest)
+
+if (BUILD_TESTING)
+  if (NOT EXISTS ${CMAKE_BINARY_DIR}/CTestCustom.cmake)
+    configure_file(${CMAKE_SOURCE_DIR}/tools/build/CMake/CTestCustom.cmake.in
+      ${CMAKE_BINARY_DIR}/CTestCustom.cmake
+      COPYONLY)
+  endif()
+  include(CTest)
+endif()
 
 if (BUILD_TESTS STREQUAL "NONE")
   #
