@@ -91,7 +91,7 @@ if(BOOST_MAINTAINER)
     # COMMAND git log --quiet ${BOOST_CMAKE_VERSION} > /dev/null
     COMMAND ssh ${BOOST_CMAKE_HOST} mkdir -p ${BOOST_CMAKE_VERSIONED_DOCROOT}
     COMMAND scp boost-${BOOST_CMAKE_VERSION}.tar.gz boost-${BOOST_CMAKE_VERSION}.zip ${BOOST_CMAKE_URL}
-    COMMAND make -C ${CMAKE_DOCS_DIR} deploy-current-docs
+    COMMAND make -C ${CMAKE_DOCS_DIR} deploy
     )
     
  message(STATUS "*** MAINTAINER TARGETS ADDED ***")
