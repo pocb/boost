@@ -981,7 +981,7 @@ macro(boost_select_variant NAME PREFIX)
         # executable or module.
         if (NOT ENABLE_${FEATURE})
           set(SELECT_VARIANT_OKAY FALSE)
-          message(STATUS "* ${NAME} is NOT being built because ENABLE_${FEATURE} is FALSE")
+          message(STATUS "* ${NAME} disabled because ENABLE_${FEATURE} is FALSE")
         endif (NOT ENABLE_${FEATURE})
       endif (${PREFIX}_${FEATURE})
     endforeach (FEATURE ${FEATURESET})
@@ -1504,6 +1504,5 @@ macro(boost_python_extension MODULE_NAME)
     DEPENDS boost_python
     SHARED
     MULTI_THREADED
-    DEBUG
     )
 endmacro()

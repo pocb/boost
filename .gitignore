@@ -6,3 +6,5 @@ project-config.jam
 bin.v2/
 dist/
 .\#*
+*.tar.gz
+*.zip

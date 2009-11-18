@@ -64,6 +64,17 @@ foreach(subdir ${BOOST_SUBPROJECT_DIRS})
   endif()
 endforeach()
 
+#
+#  If we're doing selftests, add those selftest dirs
+#
+foreach(project 
+    ${BOOST_CMAKE_SELFTEST_PROJECTS})
+  message(STATUS "* ${project}")
+  add_subdirectory(${CMAKE_SOURCE_DIR}/tools/build/CMake/selftest_projects/${project}
+    ${CMAKE_BINARY_DIR}/libs/${project})
+endforeach()
+
+
 set(BOOST_ALL_COMPONENTS ${BOOST_ALL_COMPONENTS} PARENT_SCOPE)
 
 message(STATUS "")
