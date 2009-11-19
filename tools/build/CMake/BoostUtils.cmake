@@ -269,16 +269,16 @@ function (colormsg)
   message(STATUS ${str})
 endfunction()
 
-colormsg("Colors:"  
-  WHITE "white" GRAY "gray" GREEN "green" 
-  RED "red" YELLOW "yellow" BLUE "blue" MAG "mag" CYAN "cyan" 
-  _WHITE_ "white" _GRAY_ "gray" _GREEN_ "green" 
-  _RED_ "red" _YELLOW_ "yellow" _BLUE_ "blue" _MAG_ "mag" _CYAN_ "cyan" 
-  _HIWHITE_ "white" _HIGRAY_ "gray" _HIGREEN_ "green" 
-  _HIRED_ "red" _HIYELLOW_ "yellow" _HIBLUE_ "blue" _HIMAG_ "mag" _HICYAN_ "cyan" 
-  HIWHITE "white" HIGRAY "gray" HIGREEN "green" 
-  HIRED "red" HIYELLOW "yellow" HIBLUE "blue" HIMAG "mag" HICYAN "cyan" 
-  "right?")
+# colormsg("Colors:"  
+#   WHITE "white" GRAY "gray" GREEN "green" 
+#   RED "red" YELLOW "yellow" BLUE "blue" MAG "mag" CYAN "cyan" 
+#   _WHITE_ "white" _GRAY_ "gray" _GREEN_ "green" 
+#   _RED_ "red" _YELLOW_ "yellow" _BLUE_ "blue" _MAG_ "mag" _CYAN_ "cyan" 
+#   _HIWHITE_ "white" _HIGRAY_ "gray" _HIGREEN_ "green" 
+#   _HIRED_ "red" _HIYELLOW_ "yellow" _HIBLUE_ "blue" _HIMAG_ "mag" _HICYAN_ "cyan" 
+#   HIWHITE "white" HIGRAY "gray" HIGREEN "green" 
+#   HIRED "red" HIYELLOW "yellow" HIBLUE "blue" HIMAG "mag" HICYAN "cyan" 
+#   "right?")
 
 #
 #  pretty-prints the value of a variable so that the 

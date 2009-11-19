@@ -52,7 +52,7 @@ set(BOOST_TEST_PROJECTS "" CACHE INTERNAL "hi" FORCE)
 # include only directories of projects in BUILD_PROJECTS
 #
 message(STATUS "")
-colormsg(_HIBLUE_ "Reading boost project directories...")
+colormsg(_HIBLUE_ "Reading boost project directories (per BUILD_PROJECTS)")
 message(STATUS "")
 set(BOOST_ALL_COMPONENTS "")
 
@@ -79,7 +79,7 @@ set(BOOST_ALL_COMPONENTS ${BOOST_ALL_COMPONENTS} PARENT_SCOPE)
 
 if(BUILD_TESTS AND NOT BUILD_TESTS STREQUAL "NONE")
   message(STATUS "")
-  colormsg(_HIBLUE_ "Reading boost project TEST directories...")
+  colormsg(_HIBLUE_ "Traversing project test directories (per BUILD_TESTS)")
   message(STATUS "")
 else()
   message(STATUS "")

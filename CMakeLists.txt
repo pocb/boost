@@ -33,6 +33,9 @@ project(Boost)
 list(APPEND CMAKE_MODULE_PATH ${Boost_SOURCE_DIR}/tools/build/CMake)
 include(BoostUtils)
 
+message(STATUS "")
+colormsg(_HIBLUE_ "Boost.CMake starting")
+
 ##########################################################################
 # Version information                                                    #
 ##########################################################################
@@ -225,9 +228,9 @@ else()
     
 endif()
 
-boost_report_pretty("Install prefix:" CMAKE_INSTALL_PREFIX)
-boost_report_pretty("Install include dir:" BOOST_INCLUDE_INSTALL_DIR)
-boost_report_pretty("Install lib dir:" BOOST_LIB_INSTALL_DIR)
+boost_report_pretty("Install prefix" CMAKE_INSTALL_PREFIX)
+boost_report_pretty("Install include dir" BOOST_INCLUDE_INSTALL_DIR)
+boost_report_pretty("Install lib dir" BOOST_LIB_INSTALL_DIR)
 
 include(BoostExternals)
 
