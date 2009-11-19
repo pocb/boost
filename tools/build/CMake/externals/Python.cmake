@@ -12,7 +12,7 @@
 set(ENV_PYTHON_EXECUTABLE $ENV{PYTHON_EXECUTABLE})
 
 if ((NOT PYTHONINTERP_FOUND) AND ENV_PYTHON_EXECUTABLE)
-  message(STATUS "Testing PYTHON_EXECUTABLE from environment")
+  colormsg(YELLOW "Testing PYTHON_EXECUTABLE from environment")
   find_program(PYTHON_EXECUTABLE ${ENV_PYTHON_EXECUTABLE})
   if (NOT PYTHON_EXECUTABLE)
     message(FATAL_ERROR "Environment supplied PYTHON_EXECUTABLE=${ENV_PYTHON_EXECUTABLE} but this file does not exist or is not a program.")
@@ -33,7 +33,7 @@ endif()
 set(ENV_PYTHON_LIBRARIES $ENV{PYTHON_LIBRARIES})
 
 if ((NOT PYTHON_LIBRARIES) AND ENV_PYTHON_LIBRARIES)
-  message(STATUS "Testing PYTHON_LIBRARIES from environment")
+  colormsg(YELLOW "Testing PYTHON_LIBRARIES from environment")
   get_filename_component(pythonlib_searchpath ${ENV_PYTHON_LIBRARIES} PATH)
   get_filename_component(pythonlib_filename   ${ENV_PYTHON_LIBRARIES} NAME)
   find_library(PYTHON_LIBRARIES ${pythonlib_filename} 
@@ -52,7 +52,7 @@ if ((NOT PYTHON_DEBUG_LIBRARIES) AND ENV_PYTHON_DEBUG_LIBRARIES)
   #  Python debug libraries
   #
   if(ENV_PYTHON_DEBUG_LIBRARIES)
-    message(STATUS "Testing PYTHON_DEBUG_LIBRARIES from environment")
+    colormsg("Testing" MAG "PYTHON_DEBUG_LIBRARIES" "from environment")
     get_filename_component(pythonlib_searchpath 
       ${ENV_PYTHON_DEBUG_LIBRARIES} PATH)
     get_filename_component(pythonlib_filename   
@@ -79,7 +79,7 @@ endif()
 set(ENV_PYTHON_INCLUDE_PATH $ENV{PYTHON_INCLUDE_PATH})
 if((NOT PYTHON_INCLUDE_PATH) AND ENV_PYTHON_INCLUDE_PATH)
   if(ENV_PYTHON_INCLUDE_PATH)
-    message(STATUS "Testing PYTHON_INCLUDE_PATH from environment")
+    colormsg(YELLOW "Testing PYTHON_INCLUDE_PATH from environment")
     find_path(PYTHON_INCLUDE_PATH
       Python.h
       PATHS ${ENV_PYTHON_INCLUDE_PATH}
