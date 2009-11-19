@@ -38,7 +38,7 @@ boost_add_library(
 
 if(PYTHON_FOUND)
 
-  message (STATUS "+-- Python available, enabling boost_mpi_python.")
+  colormsg (GREEN "+-- Python available, enabling boost_mpi_python.")
   include_directories(${PYTHON_INCLUDE_PATH})
 
   boost_add_library(mpi_python
@@ -72,6 +72,6 @@ if(PYTHON_FOUND)
     LINK_LIBS ${MPI_LIBRARIES} ${PYTHON_LIBRARIES})
 
 else()
-  message(STATUS "+-- optional python bindings disabled since PYTHON_FOUND is false.")
+  colormsg(RED "+-- optional python bindings disabled since PYTHON_FOUND is false.")
 endif()
 

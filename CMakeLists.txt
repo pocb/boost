@@ -28,6 +28,12 @@ cmake_minimum_required(VERSION 2.6.4 FATAL_ERROR)
 project(Boost)
 
 ##########################################################################
+# Boost CMake modules                                                    #
+##########################################################################
+list(APPEND CMAKE_MODULE_PATH ${Boost_SOURCE_DIR}/tools/build/CMake)
+include(BoostUtils)
+
+##########################################################################
 # Version information                                                    #
 ##########################################################################
 
@@ -94,7 +100,7 @@ if(BOOST_MAINTAINER)
     COMMAND make -C ${CMAKE_DOCS_DIR} deploy
     )
     
- message(STATUS "*** MAINTAINER TARGETS ADDED ***")
+  colormsg(HIRED "*** MAINTAINER TARGETS ADDED ***")
 
 endif()
 
@@ -113,17 +119,11 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-##########################################################################
-# Boost CMake modules                                                    #
-##########################################################################
-list(APPEND CMAKE_MODULE_PATH ${Boost_SOURCE_DIR}/tools/build/CMake)
-include(BoostUtils)
 
 message(STATUS "")
 boost_report_pretty("Boost.CMake version" BOOST_CMAKE_VERSION)
 
 include(BoostConfig)
-include(BoostExternals)
 include(BoostCore)
 include(BoostDocs)
 include(BoostTesting)
@@ -225,9 +225,11 @@ else()
     
 endif()
 
+boost_report_pretty("Install prefix:" CMAKE_INSTALL_PREFIX)
 boost_report_pretty("Install include dir:" BOOST_INCLUDE_INSTALL_DIR)
 boost_report_pretty("Install lib dir:" BOOST_LIB_INSTALL_DIR)
 
+include(BoostExternals)
 
 if (BOOST_VERSION_OVERRIDE)
   install(FILES ${CMAKE_BINARY_DIR}/version.hpp 

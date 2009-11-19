@@ -13,7 +13,7 @@ set (lib_headers
 )
 
 if (NOT MPI_FOUND)
-  message(STATUS "+-- MPI not found, disabling.")
+  colormsg(RED "+-- MPI not found, disabling.")
 else()
 
   boost_library_project(

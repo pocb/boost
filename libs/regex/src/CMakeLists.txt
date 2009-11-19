@@ -12,12 +12,12 @@ if (ICU_FOUND AND ICU_I18N_FOUND)
   add_definitions(-DBOOST_HAS_ICU=1)
   include_directories(${ICU_INCLUDE_DIRS})
   set(BOOST_REGEX_ICU_LIBRARIES ${ICU_LIBRARIES} ${ICU_I18N_LIBRARIES})
-  message(STATUS "+-- ICU (unicode) available, enabling support.")
+  colormsg(GREEN "+-- ICU (unicode) available, enabling support.")
   set(NO_STATIC_IF_ICU_FOUND "NO_STATIC")
 
 else()
 
-  message(STATUS "+-- ICU (unicode) not available, disabling support.")
+  colormsg(CYAN "+-- ICU (unicode) not available, disabling support.")
 
 endif()
  

@@ -17,5 +17,5 @@ if (PYTHON_FOUND)
     AUTHORS "David Abrahams <dave -at- boostpro.com>"
     )
 else ()
-  message(STATUS "+-- disabled since PYTHON_FOUND is false")
+  colormsg(RED "+-- disabled since PYTHON_FOUND is false")
 endif ()

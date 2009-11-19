@@ -90,11 +90,11 @@ set(BUILD_TOOLS "NONE" CACHE STRING "Semicolon-separated list of tools to build"
 message(STATUS "")
 if (BUILD_TOOLS STREQUAL "NONE")
 
-  message(STATUS "Skipping config of tools since BUILD_TOOLS is \"NONE\"")
+  colormsg(RED "BUILD_TOOLS is NONE: skipping tools.")
 
 else()
 
-  message(STATUS "Reading tools...")
+  colormsg(_HIBLUE_ "Reading tools...")
   message(STATUS "")
 
   file(GLOB BOOST_TOOL_CMAKE_FILES 

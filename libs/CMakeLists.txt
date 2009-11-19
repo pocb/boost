@@ -52,7 +52,7 @@ set(BOOST_TEST_PROJECTS "" CACHE INTERNAL "hi" FORCE)
 # include only directories of projects in BUILD_PROJECTS
 #
 message(STATUS "")
-message(STATUS "Reading boost project directories...")
+colormsg(_HIBLUE_ "Reading boost project directories...")
 message(STATUS "")
 set(BOOST_ALL_COMPONENTS "")
 
@@ -69,7 +69,7 @@ endforeach()
 #
 foreach(project 
     ${BOOST_CMAKE_SELFTEST_PROJECTS})
-  message(STATUS "* ${project}")
+  colormsg(RED "* ${project}")
   add_subdirectory(${CMAKE_SOURCE_DIR}/tools/build/CMake/selftest_projects/${project}
     ${CMAKE_BINARY_DIR}/libs/${project})
 endforeach()
@@ -77,9 +77,16 @@ endforeach()
 
 set(BOOST_ALL_COMPONENTS ${BOOST_ALL_COMPONENTS} PARENT_SCOPE)
 
-message(STATUS "")
-message(STATUS "Reading boost project TEST directories...")
-message(STATUS "")
+if(BUILD_TESTS AND NOT BUILD_TESTS STREQUAL "NONE")
+  message(STATUS "")
+  colormsg(_HIBLUE_ "Reading boost project TEST directories...")
+  message(STATUS "")
+else()
+  message(STATUS "")
+  colormsg(RED "BUILD_TESTS is NONE: skipping test directories.")
+  message(STATUS "")
+endif()
+
 foreach(PROJ ${BOOST_TEST_PROJECTS})
   string(TOLOWER ${PROJ} proj)
   project(${proj})

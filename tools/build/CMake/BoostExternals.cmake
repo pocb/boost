@@ -6,7 +6,7 @@
 #
 
 message(STATUS "")
-message(STATUS "Looking for (optional) dependencies on the system")
+colormsg(_HIBLUE_ "Looking for (optional) dependencies on the system")
 
 macro(boost_external_report NAME)
   string(TOUPPER ${NAME} VARNAME)
@@ -42,14 +42,14 @@ foreach(external
     ZLib
     )
   message(STATUS "")
-  message(STATUS "${external}:")
+  colormsg(HICYAN "${external}:")
   string(TOUPPER "${external}" EXTERNAL)
   option(WITH_${EXTERNAL} "Attempt to find and configure ${external}" ON)
   if(WITH_${EXTERNAL})
     include(${CMAKE_SOURCE_DIR}/tools/build/CMake/externals/${external}.cmake)
   else()
     set(${EXTERNAL}_FOUND FALSE CACHE BOOL "${external} found" FORCE)
-    message(STATUS "Disabled since WITH_${EXTERNAL}=OFF")
+    colormsg(RED "Disabled since WITH_${EXTERNAL}=OFF")
   endif()
 endforeach()
 message(STATUS "")

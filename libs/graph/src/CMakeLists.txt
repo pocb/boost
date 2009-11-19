@@ -15,7 +15,7 @@ set(BOOST_GRAPH_OPTIONAL_SOURCES "")
 set(BOOST_GRAPH_OPTIONAL_LIBRARIES "")
 
 if (EXPAT_FOUND)
-  message(STATUS "+-- expat available, enabling the GraphML parser.")
+  colormsg(GREEN "+-- expat available, enabling the GraphML parser.")
   # We have Expat, so build the GraphML parser
   set(BOOST_GRAPH_OPTIONAL_SOURCES 
     ${BOOST_GRAPH_OPTIONAL_SOURCES} "graphml.cpp")
