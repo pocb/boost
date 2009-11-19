@@ -52,7 +52,7 @@ if ((NOT PYTHON_DEBUG_LIBRARIES) AND ENV_PYTHON_DEBUG_LIBRARIES)
   #  Python debug libraries
   #
   if(ENV_PYTHON_DEBUG_LIBRARIES)
-    colormsg("Testing" MAG "PYTHON_DEBUG_LIBRARIES" "from environment")
+    colormsg(YELLOW "Testing PYTHON_DEBUG_LIBRARIES from environment")
     get_filename_component(pythonlib_searchpath 
       ${ENV_PYTHON_DEBUG_LIBRARIES} PATH)
     get_filename_component(pythonlib_filename   
