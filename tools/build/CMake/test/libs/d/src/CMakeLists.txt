@@ -48,4 +48,12 @@ boost_add_library(no_single
   NO_MULTI_THREADED
   DEPENDS boost_d_no_SINGLE_THREADED)
 
+#
+# Problem:  You can pass NO_MULTI_THREADED to this
+# and get something that never builds
+#
+boost_python_extension(doesntbuild
+  lib.cpp
+  NO_MULTI_THREADED
+  DEPENDS boost_d_no_SINGLE_THREADED)
 

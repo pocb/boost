@@ -641,6 +641,7 @@ macro(boost_library_variant LIBNAME)
     # the library.
     if (THIS_LIB_NO_${ARG})
       set(THIS_VARIANT_OKAY FALSE)
+      set(SELECT_VARIANT_FAILURE_REASONS "NO_${ARG}")
     endif (THIS_LIB_NO_${ARG})
 
     # If the user specified that we should not build any variants of
@@ -648,6 +649,7 @@ macro(boost_library_variant LIBNAME)
     # off, don't build shared libraries.
     if(NOT ENABLE_${ARG})
       set(THIS_VARIANT_OKAY FALSE)
+      set(SELECT_VARIANT_FAILURE_REASONS "ENABLE_${ARG} is OFF")
     endif(NOT ENABLE_${ARG})
 
     # Accumulate compile and link flags
@@ -1042,6 +1044,7 @@ macro(boost_select_variant NAME PREFIX)
         # All of the features in this set were turned off. 
         # Just don't build anything.
         set(SELECT_VARIANT_OKAY FALSE)
+	message("NOT ${PREFIX}_FOUND_FEATURE")
       endif (NOT ${PREFIX}_FOUND_FEATURE)
     endif (NOT ${PREFIX}_REQUESTED_FROM_SET)
   endforeach(FEATURESET_STR ${BOOST_FEATURES})

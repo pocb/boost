@@ -8,17 +8,10 @@
 #
 # On unix this is '/usr/share/cmake/boost'
 #
-if (UNIX)
-  if(NOT INSTALL_VERSIONED)
-    set(pathelem "boost/")
-  endif()
-  if (NOT BOOST_CMAKE_INFRASTRUCTURE_DIR)
-    set(BOOST_CMAKE_INFRASTRUCTURE_DIR
-      "share/boost-${BOOST_VERSION}/cmake"
-      CACHE FILEPATH 
-      "Directory to install Boost-${BOOST_VERSION} to")
-  endif()
-endif()
+set(BOOST_CMAKE_INFRASTRUCTURE_INSTALL_DIR
+  "share/boost-${BOOST_VERSION}/cmake"
+  CACHE STRING 
+  "Directory to install Boost-${BOOST_VERSION} to")
 
 #
 # Provides version number to sphinx build
@@ -36,27 +29,24 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/docs/Makefile.in
 # File used by BoostConfigVersion to import targets/libs/etc 
 # into users's cmake build
 #
-configure_file(install_me/BoostConfig.cmake.in
-  ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/BoostConfig.cmake
-  @ONLY)
-configure_file(install_me/BoostConfigVersion.cmake.in
-  ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/BoostConfigVersion.cmake
-    @ONLY)
-configure_file(install_me/BoostConfigAgnostic.cmake.in
-  ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/BoostConfigAgnostic.cmake
-  @ONLY)
-configure_file(install_me/BoostConfigVersionAgnostic.cmake.in
-  ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/BoostConfigVersionAgnostic.cmake
-    @ONLY)
+foreach (file 
+    BoostConfig
+    BoostConfigVersion
+    BoostConfigAgnostic
+    BoostConfigVersionAgnostic)
+  configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/install_me/${file}.cmake.in 
+    ${CMAKE_CURRENT_SOURCE_DIR}/install_me/${file}.cmake @ONLY)
+endforeach()
 
 if(UNIX)
   #
   #  These are generated, version-specific
   #
   install(FILES
-    ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/BoostConfigVersion.cmake
-    ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/BoostConfig.cmake
-    DESTINATION ${BOOST_CMAKE_INFRASTRUCTURE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/install_me/BoostConfigVersion.cmake
+    ${CMAKE_CURRENT_SOURCE_DIR}/install_me/BoostConfig.cmake
+    DESTINATION ${BOOST_CMAKE_INFRASTRUCTURE_INSTALL_DIR}
     )
 
   #
@@ -75,12 +65,12 @@ if(UNIX)
       set(agnostic_infra_dir ${BOOST_CMAKE_DRIVERS_INSTALL_DIR})
     endif()
     install(FILES
-      ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/BoostConfigAgnostic.cmake
+      ${CMAKE_CURRENT_SOURCE_DIR}/install_me/BoostConfigAgnostic.cmake
       DESTINATION ${agnostic_infra_dir}
       RENAME BoostConfig.cmake
     )
     install(FILES
-      ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/BoostConfigVersionAgnostic.cmake
+      ${CMAKE_CURRENT_SOURCE_DIR}/install_me/BoostConfigVersionAgnostic.cmake
       DESTINATION ${agnostic_infra_dir}
       RENAME BoostConfigVersion.cmake
     )

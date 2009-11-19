@@ -209,7 +209,7 @@ Alternative: via Boost_DIR
 
 If the above didn't work, you can help cmake find your boost
 installation by setting ``Boost_DIR`` (in your ``CMakeLists.txt`` to
-the :ref:`BOOST_CMAKE_INFRASTRUCTURE_DIR` that was set when you
+the :ref:`BOOST_CMAKE_INFRASTRUCTURE_INSTALL_DIR` that was set when you
 compiled.  ``Boost_DIR`` will override any other settings.
 
 Given a (versioned) boost installation in ``/net/someplace``, 

@@ -192,41 +192,29 @@ boost_add_extra_variant(PYTHON_NODEBUG PYTHON_DEBUG)
 ##########################################################################
 # Installation                                                           #
 ##########################################################################
-if(INSTALL_VERSIONED)
-
-  if (WIN32)
-    set(sep "_")
-  else()
-    set(sep ".")
-  endif()
-
-  if (BOOST_VERSION_OVERRIDE)
-    set(verstring "${BOOST_VERSION_OVERRIDE}")
-  else()
-    set(verstring "${BOOST_VERSION_MAJOR}${sep}${BOOST_VERSION_MINOR}${sep}${BOOST_VERSION_SUBMINOR}")
-  endif()
-
-  set(BOOST_INCLUDE_INSTALL_DIR 
-    "include/boost-${verstring}"
-    CACHE STRING "Destination path under CMAKE_INSTALL_PREFIX for header files"
-    FORCE)
-
-  set(BOOST_LIB_INSTALL_DIR
-    "lib${LIB_SUFFIX}/boost-${verstring}"
-    CACHE STRING "Destination path under CMAKE_INSTALL_PREFIX for libraries"
-    FORCE)
-
+if (WIN32)
+  set(sep "_")
 else()
-
-  set(BOOST_INCLUDE_INSTALL_DIR 
-    "include"
-    CACHE STRING "Destination path under CMAKE_INSTALL_PREFIX for header files")
-
-  set(BOOST_LIB_INSTALL_DIR
-    "lib${LIB_SUFFIX}"
-    CACHE STRING "Destination path under CMAKE_INSTALL_PREFIX for libraries")
-    
+  set(sep ".")
 endif()
+
+if (BOOST_VERSION_OVERRIDE)
+  set(verdir "boost-${BOOST_VERSION_OVERRIDE}")
+elseif(INSTALL_VERSIONED)
+  set(verdir "boost-${BOOST_VERSION_MAJOR}${sep}${BOOST_VERSION_MINOR}${sep}${BOOST_VERSION_SUBMINOR}")
+else()
+  set(verstring "")
+endif()
+
+set(BOOST_INCLUDE_INSTALL_DIR 
+  "include/${verdir}"
+  CACHE STRING "Destination path under CMAKE_INSTALL_PREFIX for header files"
+  )
+
+set(BOOST_LIB_INSTALL_DIR
+  "lib${LIB_SUFFIX}/${verdir}"
+  CACHE STRING "Destination path under CMAKE_INSTALL_PREFIX for libraries"
+  )
 
 boost_report_pretty("Install prefix" CMAKE_INSTALL_PREFIX)
 boost_report_pretty("Install include dir" BOOST_INCLUDE_INSTALL_DIR)

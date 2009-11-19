@@ -55,11 +55,11 @@ INSTALL_VERSIONED
 
 This is a different mangling than :ref:`WINMANGLE_LIBNAMES`: this
 variable controls whether boost versions will be mangled into the
-paths into which boost is installed.  This option has effect only when
-CMake is run the first time: they will be set as explained below the
-first time thereafter not modified, so that the paths are customizable
-by users.  (ie If you have configured a build and change this option,
-it will have no effect, you must start "from scratch")
+paths into which boost is installed.  This option **has effect only
+when CMake is run the first time**: they will be set as explained
+below the first time thereafter not modified, so that the paths are
+customizable by users.  (ie If you have configured a build and change
+this option, it will have no effect, you must start "from scratch")
 
 .. rubric:: Example
 
@@ -103,10 +103,7 @@ BOOST_LIB_INSTALL_DIR
 ---------------------
 
 The directory to which libs will be installed under
-:ref:`CMAKE_INSTALL_PREFIX`.  This variable will be forcibly modified
-when :ref:`INSTALL_VERSIONED` is true.  The default is ``lib/``.
-
-
+:ref:`CMAKE_INSTALL_PREFIX`.
 
 .. index:: BOOST_INCLUDE_INSTALL_DIR
 .. _boost_include_install_dir:
@@ -115,15 +112,13 @@ BOOST_INCLUDE_INSTALL_DIR
 -------------------------
 
 The directory to which boost header files will be installed under
-:ref:`CMAKE_INSTALL_PREFIX`.  This variable will be forcibly modified
-when :ref:`INSTALL_VERSIONED` is true.  The default is ``include/``.
+:ref:`CMAKE_INSTALL_PREFIX`.
 
+.. index:: BOOST_CMAKE_INFRASTRUCTURE_INSTALL_DIR
+.. _boost_cmake_infrastructure_install_dir:
 
-.. index:: BOOST_CMAKE_INFRASTRUCTURE_DIR
-.. _boost_cmake_infrastructure_dir:
-
-BOOST_CMAKE_INFRASTRUCTURE_DIR
-------------------------------
+BOOST_CMAKE_INFRASTRUCTURE_INSTALL_DIR
+--------------------------------------
 
 This is a directory to which the targets from this boost install will
 be exported, by default ``${CMAKE_INSTALL_PREFIX}/share/boost-``\
