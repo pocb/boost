@@ -96,10 +96,10 @@ pageTracker._trackPageview();
   <div class="section" id="customizing-the-install">
 <span id="install-customization"></span><h1>Customizing the install<a class="headerlink" href="#customizing-the-install" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="cmake-install-prefix">
-<span id="index-47"></span><span id="id1"></span><h2>CMAKE_INSTALL_PREFIX<a class="headerlink" href="#cmake-install-prefix" title="Permalink to this headline">¶</a></h2>
+<span id="index-87"></span><span id="id1"></span><h2>CMAKE_INSTALL_PREFIX<a class="headerlink" href="#cmake-install-prefix" title="Permalink to this headline">¶</a></h2>
 <p>This is a standard cmake option that sets the path to which boost
 will be installed.</p>
-<p id="index-48">CMake generates makefiles that play nice with <tt class="docutils literal"><span class="pre">DESTDIR</span></tt>.  e.g.
+<p id="index-88">CMake generates makefiles that play nice with <tt class="docutils literal"><span class="pre">DESTDIR</span></tt>.  e.g.
 if you configure like this:</p>
 <div class="highlight-python"><pre>cmake ../src -DCMAKE_INSTALL_PREFIX=/tmp/blah</pre>
 </div>
@@ -107,7 +107,7 @@ if you configure like this:</p>
 installed to <tt class="docutils literal"><span class="pre">/foo/tmp/blah</span></tt>.</p>
 </div>
 <div class="section" id="lib-suffix">
-<span id="index-49"></span><span id="id2"></span><h2>LIB_SUFFIX<a class="headerlink" href="#lib-suffix" title="Permalink to this headline">¶</a></h2>
+<span id="index-89"></span><span id="id2"></span><h2>LIB_SUFFIX<a class="headerlink" href="#lib-suffix" title="Permalink to this headline">¶</a></h2>
 <p>This defines the subdirectory of <tt class="docutils literal"><span class="pre">CMAKE_INSTALL_PREFIX</span></tt> to which
 libraries will be installed.  It is empty by default. For example,
 if I&#8217;m on 64-bit fedora, I want the libs installed to
@@ -116,7 +116,7 @@ if I&#8217;m on 64-bit fedora, I want the libs installed to
 </div>
 </div>
 <div class="section" id="install-versioned">
-<span id="index-50"></span><span id="id3"></span><h2>INSTALL_VERSIONED<a class="headerlink" href="#install-versioned" title="Permalink to this headline">¶</a></h2>
+<span id="index-90"></span><span id="id3"></span><h2>INSTALL_VERSIONED<a class="headerlink" href="#install-versioned" title="Permalink to this headline">¶</a></h2>
 <p><strong>ON</strong> by default on unix, <strong>OFF</strong> on windows.</p>
 <p>This is a different mangling than <a class="reference external" href="build_configuration.html#winmangle-libnames"><em>WINMANGLE_LIBNAMES</em></a>: this
 variable controls whether boost versions will be mangled into the
@@ -156,17 +156,17 @@ is:</p>
 with the following two variables:</p>
 </div>
 <div class="section" id="boost-lib-install-dir">
-<span id="index-51"></span><span id="id4"></span><h2>BOOST_LIB_INSTALL_DIR<a class="headerlink" href="#boost-lib-install-dir" title="Permalink to this headline">¶</a></h2>
+<span id="index-91"></span><span id="id4"></span><h2>BOOST_LIB_INSTALL_DIR<a class="headerlink" href="#boost-lib-install-dir" title="Permalink to this headline">¶</a></h2>
 <p>The directory to which libs will be installed under
 <a class="reference internal" href="#cmake-install-prefix"><em>CMAKE_INSTALL_PREFIX</em></a>.</p>
 </div>
 <div class="section" id="boost-include-install-dir">
-<span id="index-52"></span><span id="id5"></span><h2>BOOST_INCLUDE_INSTALL_DIR<a class="headerlink" href="#boost-include-install-dir" title="Permalink to this headline">¶</a></h2>
+<span id="index-92"></span><span id="id5"></span><h2>BOOST_INCLUDE_INSTALL_DIR<a class="headerlink" href="#boost-include-install-dir" title="Permalink to this headline">¶</a></h2>
 <p>The directory to which boost header files will be installed under
 <a class="reference internal" href="#cmake-install-prefix"><em>CMAKE_INSTALL_PREFIX</em></a>.</p>
 </div>
 <div class="section" id="boost-cmake-infrastructure-install-dir">
-<span id="index-53"></span><span id="id6"></span><h2>BOOST_CMAKE_INFRASTRUCTURE_INSTALL_DIR<a class="headerlink" href="#boost-cmake-infrastructure-install-dir" title="Permalink to this headline">¶</a></h2>
+<span id="index-93"></span><span id="id6"></span><h2>BOOST_CMAKE_INFRASTRUCTURE_INSTALL_DIR<a class="headerlink" href="#boost-cmake-infrastructure-install-dir" title="Permalink to this headline">¶</a></h2>
 <p>This is a directory to which the targets from this boost install will
 be exported, by default <tt class="docutils literal"><span class="pre">${CMAKE_INSTALL_PREFIX}/share/boost-</span></tt>1.41.0<tt class="docutils literal"><span class="pre">/cmake</span></tt>: this significanly eases detection of boost
 installations by CMake.  The name of the files are
@@ -177,16 +177,16 @@ more information about how users employ this file.</p>
 interpreted relative to <tt class="docutils literal"><span class="pre">${CMAKE_INSTALL_PREFIX}</span></tt>.</p>
 </div>
 <div class="section" id="boost-install-cmake-drivers">
-<span id="index-54"></span><span id="id8"></span><h2>BOOST_INSTALL_CMAKE_DRIVERS<a class="headerlink" href="#boost-install-cmake-drivers" title="Permalink to this headline">¶</a></h2>
+<span id="index-94"></span><span id="id8"></span><h2>BOOST_INSTALL_CMAKE_DRIVERS<a class="headerlink" href="#boost-install-cmake-drivers" title="Permalink to this headline">¶</a></h2>
 <p>Specifies whether generic cmake driver files should be installed,
 see the next option to customize where.  This variable is
-<tt class="docutils literal"><span class="pre">OFF</span></tt> by default.</p>
+<tt class="docutils literal"><span class="pre">ON</span></tt> by default.</p>
 </div>
 <div class="section" id="boost-cmake-drivers-install-dir">
 <h2>BOOST_CMAKE_DRIVERS_INSTALL_DIR<a class="headerlink" href="#boost-cmake-drivers-install-dir" title="Permalink to this headline">¶</a></h2>
 <p>There are two optional version-agnostic driver files that can be
 installed to a central location, by default
-<tt class="docutils literal"><span class="pre">${CMAKE_INSTALL_PREFIX}/share/cmake/boost</span></tt>.</p>
+<tt class="docutils literal"><span class="pre">${CMAKE_INSTALL_PREFIX}/share/boost-&lt;VERSION&gt;/cmake</span></tt>.</p>
 <p>named <tt class="docutils literal"><span class="pre">BoostConfig.cmake</span></tt> and <tt class="docutils literal"><span class="pre">BoostConfigVersion.cmake</span></tt>.  These
 two files coordinate with Boost-1.41.0.cmake to enable cmake
 developers who use both boost and cmake to find local boost
@@ -199,7 +199,7 @@ path, it will be used directly, otherwise it will be interpreted
 relative to <tt class="docutils literal"><span class="pre">${CMAKE_INSTALL_PREFIX}</span></tt>.</p>
 </div>
 <div class="section" id="boost-exports-file">
-<span id="index-55"></span><span id="id9"></span><h2>BOOST_EXPORTS_FILE<a class="headerlink" href="#boost-exports-file" title="Permalink to this headline">¶</a></h2>
+<span id="index-95"></span><span id="id9"></span><h2>BOOST_EXPORTS_FILE<a class="headerlink" href="#boost-exports-file" title="Permalink to this headline">¶</a></h2>
 <p>This is the path <em>in the build tree</em> to the file that will contain
 CMake exported targets, by default it is:</p>
 <div class="highlight-python"><pre>${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/Exports.cmake</pre>
@@ -212,10 +212,10 @@ cmake projects against an uninstalled boost.</em></p>
 interpreted relative to <tt class="docutils literal"><span class="pre">${CMAKE_BINARY_DIR}</span></tt>.</p>
 </div>
 <div class="section" id="boost-exports-install-dir">
-<span id="boost-install-exports-file"></span><span id="index-56"></span><h2>BOOST_EXPORTS_INSTALL_DIR<a class="headerlink" href="#boost-exports-install-dir" title="Permalink to this headline">¶</a></h2>
-<p>This is the path to which the exports file(s) (See
-<a class="reference internal" href="#boost-exports-file"><em>BOOST_EXPORTS_FILE</em></a>) will be installed. By default it is
-<tt class="docutils literal"><span class="pre">${BOOST_LIB_INSTALL_DIR}</span></tt>.  This must be a <strong>relative</strong> path.</p>
+<span id="boost-install-exports-file"></span><span id="index-96"></span><h2>BOOST_EXPORTS_INSTALL_DIR<a class="headerlink" href="#boost-exports-install-dir" title="Permalink to this headline">¶</a></h2>
+<p>This is the path to which exported targest will be installed. By
+default it is <tt class="docutils literal"><span class="pre">${BOOST_LIB_INSTALL_DIR}</span></tt>.  This must be a
+<strong>relative</strong> path.</p>
 <p>See <a class="reference external" href="exported_targets.html#exported-targets"><em>Tricks for Building against Boost with CMake</em></a> for information on how to use this handy
 file to build against an <strong>installed</strong> boost.</p>
 <p class="rubric">Footnotes</p>
@@ -253,7 +253,7 @@ file to build against an <strong>installed</strong> boost.</p>
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version 6e7c06ffb7c69b6fdb30c2d9de02951b466e0970, Thu, 19 Nov 2009.
+      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version 881d5410dd498959fc2a133d9bd26b4ae5bf80c1, Fri, 20 Nov 2009.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>

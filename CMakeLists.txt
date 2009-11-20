@@ -366,7 +366,7 @@ if (NOT BOOST_EXPORTS_INSTALL_DIR)
     CACHE STRING "Install location for cmake exports")
 endif()
 
-mark_as_advanced(BOOST_EXPORTS_FILE BOOST_EXPORTS_INSTALL_DIR)
+mark_as_advanced(BOOST_EXPORTS_FILE) 
 
 # Add build rules for documentation
 add_subdirectory(doc)

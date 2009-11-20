@@ -139,14 +139,14 @@ BOOST_INSTALL_CMAKE_DRIVERS
 
 Specifies whether generic cmake driver files should be installed, 
 see the next option to customize where.  This variable is
-``OFF`` by default.  
+``ON`` by default.  
 
 BOOST_CMAKE_DRIVERS_INSTALL_DIR
 -------------------------------
 
 There are two optional version-agnostic driver files that can be
 installed to a central location, by default
-``${CMAKE_INSTALL_PREFIX}/share/cmake/boost``.  
+``${CMAKE_INSTALL_PREFIX}/share/boost-<VERSION>/cmake``.  
 
 named ``BoostConfig.cmake`` and ``BoostConfigVersion.cmake``.  These
 two files coordinate with Boost-|version|.cmake to enable cmake
@@ -186,9 +186,9 @@ interpreted relative to ``${CMAKE_BINARY_DIR}``.
 BOOST_EXPORTS_INSTALL_DIR
 -------------------------
 
-This is the path to which the exports file(s) (See
-:ref:`BOOST_EXPORTS_FILE`) will be installed. By default it is
-``${BOOST_LIB_INSTALL_DIR}``.  This must be a **relative** path.
+This is the path to which exported targest will be installed. By
+default it is ``${BOOST_LIB_INSTALL_DIR}``.  This must be a
+**relative** path.
 
 See :ref:`exported_targets` for information on how to use this handy
 file to build against an **installed** boost.   

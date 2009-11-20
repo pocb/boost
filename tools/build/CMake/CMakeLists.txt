@@ -54,9 +54,7 @@ install(FILES
 # Boost-<version>.cmake files (user specifies <version>)
 #
 option(BOOST_INSTALL_CMAKE_DRIVERS
-  "Install version-agnostic BoostConfig.cmake and BoostConfigVersion.cmake to this subdirectory of CMAKE_INSTALL_PREFIX" OFF)
-
-mark_as_advanced(BOOST_INSTALL_CMAKE_DRIVERS)
+  "Install version-agnostic BoostConfig.cmake and BoostConfigVersion.cmake to this subdirectory of CMAKE_INSTALL_PREFIX" ON)
 
 if (BOOST_INSTALL_CMAKE_DRIVERS)
   if (NOT BOOST_CMAKE_DRIVERS_INSTALL_DIR)
