@@ -446,11 +446,15 @@ set(WANT_DOCBOOK_XSL_VERSION 1.73.2)
 # Find the DocBook DTD (version 4.2)
 find_path(DOCBOOK_DTD_DIR docbookx.dtd
   PATHS "${CMAKE_BINARY_DIR}/docbook-dtd-${WANT_DOCBOOK_DTD_VERSION}"
+  # ubuntu puts 'em here
+  /usr/share/xml/docbook/schema/dtd/${WANT_DOCBOOK_DTD_VERSION}
   DOC "Path to the DocBook DTD")
 
 # Find the DocBook XSL stylesheets
 find_path(DOCBOOK_XSL_DIR html/html.xsl
   PATHS "${CMAKE_BINARY_DIR}/docbook-xsl-${WANT_DOCBOOK_XSL_VERSION}"
+  # ubuntu puts 'em here
+  /usr/share/xml/docbook/stylesheet/nwalsh 
   DOC "Path to the DocBook XSL stylesheets")
 
 # Find the BoostBook DTD (it should be in the distribution!)
