@@ -232,9 +232,9 @@ endif()
 #  Only modify these if you're testing the cmake build itself
 #
 if(BOOST_CMAKE_SELFTEST)
-  message(STATUS "***")
-  message(STATUS "*** SELFTEST ENABLED")
-  message(STATUS "***")
+  colormsg(HIMAG "***")
+  colormsg(HIMAG "*** SELFTEST ENABLED")
+  colormsg(HIMAG "***")
   set(root "${CMAKE_SOURCE_DIR}/tools/build/CMake/test")
   set(BOOST_CMAKE_SELFTEST_ROOT ${root})
 else()
