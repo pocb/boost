@@ -692,17 +692,18 @@ macro(boost_library_variant LIBNAME)
       # On Windows, we need static and shared libraries to have
       # different names, so we follow the Boost.Build version 2 style
       # and prepend "lib" to the name.
-      if(WIN32 AND NOT CYGWIN)
-        set(LIBPREFIX "lib")
-      else(WIN32 AND NOT CYGWIN)
-        set(LIBPREFIX "")
-      endif(WIN32 AND NOT CYGWIN)
+      if(WIN32 AND NOT (CYGWIN OR MINGW))
+	set_target_properties(${VARIANT_LIBNAME}
+	  PROPERTIES
+	  PREFIX "${LIBPREFIX}"
+	  )
+      endif()
       
       add_library(${VARIANT_LIBNAME} STATIC ${THIS_LIB_SOURCES})
 
       set_target_properties(${VARIANT_LIBNAME}
         PROPERTIES
-        OUTPUT_NAME "${LIBPREFIX}${LIBNAME}${VARIANT_VERSIONED_NAME}"
+        OUTPUT_NAME "${LIBNAME}${VARIANT_VERSIONED_NAME}"
         CLEAN_DIRECT_OUTPUT 1
         COMPILE_FLAGS "${THIS_VARIANT_COMPILE_FLAGS}"
         LINK_FLAGS "${THIS_VARIANT_LINK_FLAGS}"
@@ -729,6 +730,13 @@ macro(boost_library_variant LIBNAME)
     else ()  # shared
 
       add_library(${VARIANT_LIBNAME} SHARED ${THIS_LIB_SOURCES})
+
+      if(MINGW)
+	set_target_properties(${VARIANT_LIBNAME}
+	  PROPERTIES
+	  PREFIX ""
+	  )
+      endif()
 
       set_target_properties(${VARIANT_LIBNAME}
         PROPERTIES
