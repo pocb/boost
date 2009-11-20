@@ -146,7 +146,7 @@ BOOST_CMAKE_DRIVERS_INSTALL_DIR
 
 There are two optional version-agnostic driver files that can be
 installed to a central location, by default
-``${CMAKE_INSTALL_PREFIX}/share/boost-<VERSION>/cmake``.  
+``${CMAKE_INSTALL_PREFIX}/share/boost-``\ |version|\ ``/cmake``.  
 
 named ``BoostConfig.cmake`` and ``BoostConfigVersion.cmake``.  These
 two files coordinate with Boost-|version|.cmake to enable cmake

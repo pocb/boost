@@ -182,8 +182,7 @@ following::
 The ``NO_MODULE`` above is currently **required**, pending updates to
 FindBoost.cmake_ in a cmake release. 
 
-Then run ``cmake .`` in that directory (note the dot).
-
+Then run ``cmake .`` in that directory (note the dot).  Then run make.
 If all is well you will see::
 
   % make VERBOSE=1

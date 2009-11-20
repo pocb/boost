@@ -93,14 +93,14 @@ pageTracker._trackPageview();
         <div class="bodywrapper">
           <div class="body">
             
-  <span class="target" id="index-22"></span><div class="section" id="tricks-for-building-against-boost-with-cmake">
-<span id="exported-targets"></span><span id="index-23"></span><h1>Tricks for Building against Boost with CMake<a class="headerlink" href="#tricks-for-building-against-boost-with-cmake" title="Permalink to this headline">¶</a></h1>
+  <span class="target" id="index-97"></span><div class="section" id="tricks-for-building-against-boost-with-cmake">
+<span id="exported-targets"></span><span id="index-98"></span><h1>Tricks for Building against Boost with CMake<a class="headerlink" href="#tricks-for-building-against-boost-with-cmake" title="Permalink to this headline">¶</a></h1>
 <p>Boost.CMake <em>exports</em> its targets, making developing independent
 projects against an installed boost, or simply against a build tree
 sitting on disk.  There are a variety of ways to use these to ease
 configuration of boost in your external project.</p>
 <div class="section" id="with-an-uninstalled-build">
-<span id="uninstalled"></span><span id="index-24"></span><h2>With an uninstalled build<a class="headerlink" href="#with-an-uninstalled-build" title="Permalink to this headline">¶</a></h2>
+<span id="uninstalled"></span><span id="index-99"></span><h2>With an uninstalled build<a class="headerlink" href="#with-an-uninstalled-build" title="Permalink to this headline">¶</a></h2>
 <p>You only need to do three things:</p>
 <ol class="arabic">
 <li><p class="first">Add the appropriate include directory with
@@ -192,7 +192,7 @@ linking CXX executable main
 topic, outside the scope of this document.  Boost.CMake makes every
 effort to install things cleanly and behave in a backwards-compatible
 manner.</p>
-<span class="target" id="index-25"></span><span class="target" id="index-26"></span><p id="index-27">The variable <a class="reference external" href="install_customization.html#boost-install-cmake-drivers"><em>BOOST_INSTALL_CMAKE_DRIVERS</em></a> controls whether
+<span class="target" id="index-100"></span><span class="target" id="index-101"></span><p id="index-102">The variable <a class="reference external" href="install_customization.html#boost-install-cmake-drivers"><em>BOOST_INSTALL_CMAKE_DRIVERS</em></a> controls whether
 Boost.CMake installs two files which help out in case multiple
 versions of boost are installed.  If there is only one version
 present, the situation is simpler: typically this is simply a
@@ -219,7 +219,7 @@ int main()
     thrd.join();
 }</pre>
 </div>
-<p id="index-28">Create a <tt class="docutils literal"><span class="pre">CMakeLists.txt</span></tt> in the same directory containing the
+<p id="index-103">Create a <tt class="docutils literal"><span class="pre">CMakeLists.txt</span></tt> in the same directory containing the
 following:</p>
 <div class="highlight-python"><pre>find_package(Boost 1.41.0 COMPONENTS thread NO_MODULE)
                                             ^^^^^^^^^--- NOTE THIS
@@ -229,8 +229,8 @@ target_link_libraries(main ${Boost_LIBRARIES})</pre>
 </div>
 <p>The <tt class="docutils literal"><span class="pre">NO_MODULE</span></tt> above is currently <strong>required</strong>, pending updates to
 <a class="reference external" href="http://www.cmake.org/cmake/help/cmake-2-8-docs.html#module:FindBoost">FindBoost.cmake</a> in a cmake release.</p>
-<p>Then run <tt class="docutils literal"><span class="pre">cmake</span> <span class="pre">.</span></tt> in that directory (note the dot).</p>
-<p>If all is well you will see:</p>
+<p>Then run <tt class="docutils literal"><span class="pre">cmake</span> <span class="pre">.</span></tt> in that directory (note the dot).  Then run make.
+If all is well you will see:</p>
 <div class="highlight-python"><pre>% make VERBOSE=1
 ...
 [100%] Building CXX object CMakeFiles/main.dir/main.cpp.o
@@ -323,7 +323,7 @@ versioned subdirectory of lib, e.g. <tt class="docutils literal"><span class="pr
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version 881d5410dd498959fc2a133d9bd26b4ae5bf80c1, Fri, 20 Nov 2009.
+      &copy; Copyright 2008-2009, Troy D. Straszheim, 2008 Douglas Gregor --  Version 302e56f90fd26da5c5fca8c76bcb46a48e9cbba6, Fri, 20 Nov 2009.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
     </div>
   </body>
