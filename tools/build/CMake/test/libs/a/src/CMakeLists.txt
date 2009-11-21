@@ -22,6 +22,8 @@ foreach(shared_or_static SHARED STATIC)
   foreach(debug_or_release DEBUG RELEASE)
     foreach(single_or_multi SINGLE_THREADED MULTI_THREADED)
   
+      message("---------------------------------------------------")
+
       boost_add_executable(${shared_or_static}_${debug_or_release}_${single_or_multi}
 
 	main.cpp

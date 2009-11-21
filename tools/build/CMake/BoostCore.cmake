@@ -983,29 +983,35 @@ macro(boost_select_variant NAME PREFIX)
     string(REPLACE ":" ";" FEATURESET ${FEATURESET_STR})
     separate_arguments(FEATURESET)
     set(${PREFIX}_REQUESTED_FROM_SET FALSE)
-    set(unselected TRUE)
     foreach (FEATURE ${FEATURESET})
       # message("FEATURE ${FEATURE}")
-      if (unselected AND (${PREFIX}_${FEATURE} OR ENABLE_${FEATURE}))
-	# message("YES ${PREFIX}_${FEATURE}")
-        # Make this feature part of the variant
-        list(APPEND ${PREFIX}_VARIANT ${FEATURE})
-        set(${PREFIX}_REQUESTED_FROM_SET TRUE)
 
-        # The caller has requested this particular feature be used
-        # when building the executable or module. If we can't satisfy
-        # that request (because the user has turned off the build
-        # variants with that feature), then we won't build this
-        # executable or module.
-        if (NOT ENABLE_${FEATURE})
-	  # message("NOT ENABLE_${FEATURE}")
-          set(SELECT_VARIANT_OKAY FALSE)
-	  list(APPEND SELECT_VARIANT_FAILURE_REASONS 
-	    "ENABLE_${FEATURE} iz FALSE")
-        else()
-	  set(unselected FALSE)
-        endif()
+      if (${PREFIX}_${FEATURE} AND ENABLE_${FEATURE})
+	# message("YES>>>>${FEATURE}")
+	set(${PREFIX}_REQUESTED_FROM_SET TRUE)
+	list(APPEND ${PREFIX}_VARIANT ${FEATURE})
       endif()
+
+      #       if ((NOT userpref_selected) AND ENABLE_${FEATURE})
+      # 	# message("YES ${PREFIX}_${FEATURE}")
+      #         # Make this feature part of the variant
+      #         list(APPEND ${PREFIX}_VARIANT ${FEATURE})
+      #         set(${PREFIX}_REQUESTED_FROM_SET TRUE)
+      # 
+      #         # The caller has requested this particular feature be used
+      #         # when building the executable or module. If we can't satisfy
+      #         # that request (because the user has turned off the build
+      #         # variants with that feature), then we won't build this
+      #         # executable or module.
+      #         if (NOT ENABLE_${FEATURE})
+      # 	  message("NOT ENABLE_${FEATURE}")
+      #           set(SELECT_VARIANT_OKAY FALSE)
+      # 	  list(APPEND SELECT_VARIANT_FAILURE_REASONS 
+      # 	    "ENABLE_${FEATURE} iz FALSE")
+      #         else()
+      # 	  set(unselected FALSE)
+      #         endif()
+      #       endif()
     endforeach()
 
     if (NOT ${PREFIX}_REQUESTED_FROM_SET)
@@ -1060,7 +1066,7 @@ macro(boost_select_variant NAME PREFIX)
         # All of the features in this set were turned off. 
         # Just don't build anything.
         set(SELECT_VARIANT_OKAY FALSE)
-	message("NOT ${PREFIX}_FOUND_FEATURE")
+	# message("NOT ${PREFIX}_FOUND_FEATURE")
       endif (NOT ${PREFIX}_FOUND_FEATURE)
     endif (NOT ${PREFIX}_REQUESTED_FROM_SET)
   endforeach(FEATURESET_STR ${BOOST_FEATURES})
@@ -1372,6 +1378,7 @@ macro(boost_add_executable EXENAME)
   # boost_add_executable and what options the user has set.
   boost_select_variant(${EXENAME} THIS_EXE)
 
+  # message("THIS_EXE_VARIANT=${THIS_EXE_VARIANT}")
   # Possibly hyphenate exe's name
   if (THIS_PROJECT_IS_TOOL)
     set(THIS_EXE_NAME ${EXENAME})
