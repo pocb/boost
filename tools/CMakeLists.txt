@@ -90,7 +90,7 @@ set(BUILD_TOOLS "NONE" CACHE STRING "Semicolon-separated list of tools to build"
 message(STATUS "")
 if (BUILD_TOOLS STREQUAL "NONE")
 
-  colormsg(RED "BUILD_TOOLS is NONE: skipping tools.")
+  colormsg(HIGRAY "BUILD_TOOLS is NONE: skipping tools.")
 
 else()
 

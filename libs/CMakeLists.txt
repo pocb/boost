@@ -83,7 +83,7 @@ if(BUILD_TESTS AND NOT BUILD_TESTS STREQUAL "NONE")
   message(STATUS "")
 else()
   message(STATUS "")
-  colormsg(RED "BUILD_TESTS is NONE: skipping test directories.")
+  colormsg(HIGRAY "BUILD_TESTS is NONE: skipping test directories.")
   message(STATUS "")
 endif()
 

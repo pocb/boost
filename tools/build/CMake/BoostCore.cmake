@@ -648,7 +648,7 @@ macro(boost_library_variant LIBNAME)
     # off, don't build shared libraries.
     if(NOT ENABLE_${ARG})
       set(THIS_VARIANT_OKAY FALSE)
-      set(SELECT_VARIANT_FAILURE_REASONS "ENABLE_${ARG} i OFF")
+      set(SELECT_VARIANT_FAILURE_REASONS "variant disabled because ENABLE_${ARG} is OFF")
     endif(NOT ENABLE_${ARG})
 
     # Accumulate compile and link flags
@@ -664,11 +664,15 @@ macro(boost_library_variant LIBNAME)
   boost_library_variant_target_name(${ARGN})
   # Determine the suffix for this library target
   set(VARIANT_LIBNAME "${LIBNAME}${VARIANT_TARGET_NAME}")
+  trace(VARIANT_LIBNAME)
 
   set(DEPENDENCY_FAILURES "")
   foreach(dep ${THIS_LIB_DEPENDS})
+    trace(dep)
     dependency_check("${dep}${VARIANT_TARGET_NAME}")
   endforeach()
+  trace(THIS_VARIANT_OKAY)
+  trace(DEPENDENCY_FAILURES)
 
   #
   # Announce dependency failures only if this variant
@@ -794,6 +798,7 @@ macro(boost_library_variant LIBNAME)
       
       # Make the library installation component dependent on the library
       # installation components of dependent libraries.
+      trace(THIS_LIB_DEPENDS)
       set(THIS_LIB_COMPONENT_DEPENDS)
       foreach(DEP ${THIS_LIB_DEPENDS})
         # We ask the library variant that this library depends on to tell us
@@ -979,15 +984,16 @@ macro(boost_select_variant NAME PREFIX)
   set(${PREFIX}_VARIANT)
 
   foreach(FEATURESET_STR ${BOOST_FEATURES})
-    # message("FEATURESET_STR ${FEATURESET_STR}")
+    trace(FEATURESET_STR)
+
     string(REPLACE ":" ";" FEATURESET ${FEATURESET_STR})
     separate_arguments(FEATURESET)
     set(${PREFIX}_REQUESTED_FROM_SET FALSE)
     foreach (FEATURE ${FEATURESET})
-      # message("FEATURE ${FEATURE}")
+      trace(FEATURE)
 
       if (${PREFIX}_${FEATURE} AND ENABLE_${FEATURE})
-	# message("YES>>>>${FEATURE}")
+	trace(${PREFIX}_${FEATURE})
 	set(${PREFIX}_REQUESTED_FROM_SET TRUE)
 	list(APPEND ${PREFIX}_VARIANT ${FEATURE})
       endif()
@@ -1019,11 +1025,13 @@ macro(boost_select_variant NAME PREFIX)
       # this set, so find the first feature value that actually works.
       set(${PREFIX}_FOUND_FEATURE FALSE)
 
+      trace(${PREFIX}_FOUND_FEATURE)
       # If this feature set decides between Release and Debug, we
       # either query CMAKE_BUILD_TYPE to determine which to use (for
       # makefile targets) or handle both variants separately (for IDE
       # targets). We only build both variants separately for executable targets.
       if (FEATURESET_STR STREQUAL "RELEASE:DEBUG")
+	trace(CMAKE_CONFIGURATION_TYPES)
         if (CMAKE_CONFIGURATION_TYPES)
           # IDE target: can we build both debug and release?
           if (ENABLE_DEBUG AND ENABLE_RELEASE)
@@ -1035,19 +1043,20 @@ macro(boost_select_variant NAME PREFIX)
               set(${PREFIX}_FOUND_FEATURE TRUE)
             endif ()
           endif ()
-        else (CMAKE_CONFIGURATION_TYPES)
+        else ()
           # Makefile target: CMAKE_BUILD_TYPE tells us which variant to build
-          if (CMAKE_BUILD_TYPE STREQUAL "Release")
+	  trace(CMAKE_BUILD_TYPE)
+          if (CMAKE_BUILD_TYPE STREQUAL "Release" AND ENABLE_RELEASE)
             # Okay, build the release variant
             list(APPEND ${PREFIX}_VARIANT RELEASE)
             set(${PREFIX}_FOUND_FEATURE TRUE)
-          elseif (CMAKE_BUILD_TYPE STREQUAL "Debug")
+          elseif (CMAKE_BUILD_TYPE STREQUAL "Debug" AND ENABLE_DEBUG)
             # Okay, build the debug variant
             list(APPEND ${PREFIX}_VARIANT DEBUG)
             set(${PREFIX}_FOUND_FEATURE TRUE)
-          endif (CMAKE_BUILD_TYPE STREQUAL "Release")
-        endif (CMAKE_CONFIGURATION_TYPES)
-      endif (FEATURESET_STR STREQUAL "RELEASE:DEBUG")
+          endif ()
+        endif ()
+      endif ()
 
       # Search through all of the features in the set to find one that works
       foreach (FEATURE ${FEATURESET})
@@ -1511,7 +1520,7 @@ macro(boost_add_single_library LIBNAME)
   set(THIS_LIB_SOURCES ${THIS_LIB_DEFAULT_ARGS})
 
   boost_select_variant(${LIBNAME} THIS_LIB)
-  # message("boost_select_variant selected ${THIS_LIB_VARIANT}")
+  trace(THIS_LIB_VARIANT)
   if (THIS_LIB_VARIANT)
     add_custom_target(${LIBNAME})
     separate_arguments(THIS_LIB_VARIANT)
@@ -1538,6 +1547,7 @@ macro(boost_python_extension MODULE_NAME)
     SHARED
     MULTI_THREADED
     )
+
   if (NOT THIS_VARIANT_OKAY)
     colormsg(HIRED "    ${MODULE_NAME}" RED "(python extension) disabled because:")
     foreach(msg ${SELECT_VARIANT_FAILURE_REASONS})

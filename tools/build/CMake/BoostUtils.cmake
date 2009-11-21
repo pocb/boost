@@ -284,44 +284,45 @@ endfunction()
 #  pretty-prints the value of a variable so that the 
 #  equals signs align
 #
-macro(boost_report_value NAME)
+function(boost_report_value NAME)
   string(LENGTH "${NAME}" varlen)
   math(EXPR padding_len 30-${varlen})
   string(SUBSTRING "                                      " 
     0 ${padding_len} varpadding)
   colormsg("${NAME}${varpadding} = ${${NAME}}")
-endmacro()
+endfunction()
 
-macro(trace NAME)
+function(trace NAME)
   if(BOOST_CMAKE_TRACE)
     string(LENGTH "${NAME}" varlen)
     math(EXPR padding_len 40-${varlen})
     string(SUBSTRING "........................................"
       0 ${padding_len} varpadding)
-    message(STATUS "${NAME} ${varpadding} ${${NAME}}")
+    message("${NAME} ${varpadding} ${${NAME}}")
   endif()
-endmacro()  
+endfunction()  
 
 #
 #  pretty-prints the value of a variable so that the 
 #  equals signs align
 #
-macro(boost_report_pretty PRETTYNAME VARNAME)
+function(boost_report_pretty PRETTYNAME VARNAME)
   string(LENGTH "${PRETTYNAME}" varlen)
   math(EXPR padding_len 30-${varlen})
   string(SUBSTRING "                                      " 
     0 ${padding_len} varpadding)
   message(STATUS "${PRETTYNAME}${varpadding} = ${${VARNAME}}")
-endmacro()
+endfunction()
 
 #
 #  assert that ARG is actually a library target
 #
 macro(dependency_check ARG)
+  trace(ARG)
   if (NOT ("${ARG}" STREQUAL ""))
     get_target_property(deptype ${ARG} TYPE)
     if(NOT deptype MATCHES ".*_LIBRARY$")
-      set(DEPENDENCY_OKAY FALSE)
+      set(DEPENDENCY_OKAY FALSE PARENT_SCOPE)
       list(APPEND DEPENDENCY_FAILURES ${ARG})
     endif()
   endif()
