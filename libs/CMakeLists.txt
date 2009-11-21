@@ -70,7 +70,7 @@ endforeach()
 foreach(project 
     ${BOOST_CMAKE_SELFTEST_PROJECTS})
   colormsg(RED "* ${project}")
-  add_subdirectory(${CMAKE_SOURCE_DIR}/tools/build/CMake/selftest_projects/${project}
+  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../tools/build/CMake/selftest_projects/${project}
     ${CMAKE_BINARY_DIR}/libs/${project})
 endforeach()
 

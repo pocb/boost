@@ -46,7 +46,7 @@ foreach(external
   option(WITH_${EXTERNAL} "Attempt to find and configure ${external}" ON)
   if(WITH_${EXTERNAL})
     colormsg(HICYAN "${external}:")
-    include(${CMAKE_SOURCE_DIR}/tools/build/CMake/externals/${external}.cmake)
+    include(${CMAKE_CURRENT_SOURCE_DIR}/tools/build/CMake/externals/${external}.cmake)
   else()
     set(${EXTERNAL}_FOUND FALSE CACHE BOOL "${external} found" FORCE)
     colormsg(HIRED "${external}:" RED "disabled, since WITH_${EXTERNAL}=OFF")

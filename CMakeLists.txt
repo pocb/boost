@@ -82,19 +82,19 @@ if(BOOST_MAINTAINER)
   #  Put the boost.cmake version someplace sphinx can get it
   #  for use in generated documentation
   #
-  set(CMAKE_DOCS_DIR ${CMAKE_SOURCE_DIR}/tools/build/CMake/docs/)
+  set(CMAKE_DOCS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tools/build/CMake/docs/)
   set(UPSTREAM_TAG "Boost_1_41_0")
   
   set(gitdiff "git diff --stat=100,90 ${UPSTREAM_TAG}") 
   add_custom_target(make-diff
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     COMMAND echo "% ${gitdiff}" > ${CMAKE_DOCS_DIR}/source/git_diff.txt
     COMMAND git diff --stat=100,90 ${UPSTREAM_TAG} >> ${CMAKE_DOCS_DIR}/source/git_diff.txt
     COMMAND make -C ${CMAKE_DOCS_DIR} html
     )
 
   add_custom_target(do-release
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     COMMAND git archive --format=tar --prefix=boost-${BOOST_CMAKE_VERSION}/ ${BOOST_CMAKE_VERSION} | gzip --best > boost-${BOOST_CMAKE_VERSION}.tar.gz
     COMMAND git archive --format=zip -9 --prefix=boost-${BOOST_CMAKE_VERSION}/ ${BOOST_CMAKE_VERSION} > boost-${BOOST_CMAKE_VERSION}.zip
     # COMMAND git log --quiet ${BOOST_CMAKE_VERSION} > /dev/null
@@ -256,16 +256,16 @@ set(CPACK_PACKAGE_VENDOR "Boost.org")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Boost ${BOOST_VERSION} prerelease")
 set(CPACK_PACKAGE_FILE_NAME "boost-${BOOST_VERSION}-${BOOST_PLATFORM}-${BOOST_TOOLSET}")
 
-if (EXISTS "${CMAKE_SOURCE_DIR}/README.txt")
+if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/README.txt")
   message(STATUS "Using generic cpack package description file.")
-  set(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_SOURCE_DIR}/README.txt")
-  set(CPACK_RESOURCE_FILE_README "${CMAKE_SOURCE_DIR}/README.txt")
+  set(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/README.txt")
+  set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/README.txt")
 endif ()
 
-set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE_1_0.txt")
-if (EXISTS "${CMAKE_SOURCE_DIR}/Welcome.txt")
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE_1_0.txt")
+if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/Welcome.txt")
   message(STATUS "Using generic cpack welcome file.")
-  set(CPACK_RESOURCE_FILE_WELCOME "${CMAKE_SOURCE_DIR}/Welcome.txt")
+  set(CPACK_RESOURCE_FILE_WELCOME "${CMAKE_CURRENT_SOURCE_DIR}/Welcome.txt")
 endif()
 
 set(CPACK_PACKAGE_VERSION "${BOOST_VERSION}")
@@ -279,7 +279,7 @@ if(WIN32 AND NOT UNIX)
   # sure there is at least one set of four (4) backlasshes.
   # NOTE: No Boost icon yet
   set(CPACK_MONOLITHIC_INSTALL ON) # don't be modular for now
-  set(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/tools/build/CMake\\\\Boost.bmp")
+  set(CPACK_PACKAGE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/tools/build/CMake\\\\Boost.bmp")
 #  set(CPACK_NSIS_INSTALLED_ICON_NAME "bin\\\\MyExecutable.exe")
   set(CPACK_NSIS_DISPLAY_NAME "Boost ${BOOST_VERSION_MAJOR}.${BOOST_VERSION_MINOR}.${BOOST_VERSION_SUBMINOR} prerelease")
   set(CPACK_NSIS_HELP_LINK "http:\\\\\\\\www.boost.org")
@@ -336,11 +336,11 @@ elseif (BOOST_CMAKE_SELFTEST)
   # Use selftest headers
   include_directories("${BOOST_CMAKE_SELFTEST_ROOT}/include")
   # and regular boost headers
-  include_directories(${CMAKE_SOURCE_DIR})
+  include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 else()
   # Use the headers directly from the Boost source tree (in boost/)
-  include_directories(${CMAKE_SOURCE_DIR})
+  include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 endif (TEST_INSTALLED_TREE)
 
 # Boost.Build version 2 does this due to trouble with autolinking
@@ -366,7 +366,7 @@ if (NOT BOOST_EXPORTS_INSTALL_DIR)
     CACHE STRING "Install location for cmake exports")
 endif()
 
-mark_as_advanced(BOOST_EXPORTS_FILE) 
+mark_as_advanced(BOOST_EXPORTS_FILE)
 
 # Add build rules for documentation
 add_subdirectory(doc)
@@ -385,7 +385,7 @@ if(NOT BOOST_ALL_COMPONENTS)
   # install(EXPORT,....) below.
   # 
   add_executable(this_is_a_dummy_no_libs_were_built
-    ${CMAKE_SOURCE_DIR}/tools/build/CMake/main.cpp)
+    ${CMAKE_CURRENT_SOURCE_DIR}/tools/build/CMake/main.cpp)
   
   install(TARGETS this_is_a_dummy_no_libs_were_built
     EXPORT Boost

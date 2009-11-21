@@ -235,10 +235,10 @@ if(BOOST_CMAKE_SELFTEST)
   colormsg(HIMAG "***")
   colormsg(HIMAG "*** SELFTEST ENABLED")
   colormsg(HIMAG "***")
-  set(root "${CMAKE_SOURCE_DIR}/tools/build/CMake/test")
+  set(root "${CMAKE_CURRENT_SOURCE_DIR}/tools/build/CMake/test")
   set(BOOST_CMAKE_SELFTEST_ROOT ${root})
 else()
-  set(root "${CMAKE_SOURCE_DIR}")
+  set(root "${CMAKE_CURRENT_SOURCE_DIR}")
 endif()
 
 set(BOOST_LIBS_PARENT_DIR "${root}/libs" CACHE INTERNAL
