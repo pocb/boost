@@ -166,8 +166,8 @@ endif()
 
 # the default set of library variants that we will be building
 boost_add_default_variant(RELEASE DEBUG)
-boost_add_default_variant(STATIC SHARED)
-boost_add_default_variant(SINGLE_THREADED MULTI_THREADED)
+boost_add_default_variant(SHARED STATIC)
+boost_add_default_variant(MULTI_THREADED SINGLE_THREADED)
 
 if (MSVC)
   # For now, we only actually support static/dynamic run-time variants for 

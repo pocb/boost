@@ -529,11 +529,10 @@ macro(boost_library_variant_target_name)
 
   # Add -debug for debug libraries
   list_contains(VARIANT_IS_DEBUG DEBUG ${ARGN})
+  # message("ARGN=${ARGN}")
   if (VARIANT_IS_DEBUG)
-    # Only add the actual "-debug" if we're also building release libraries
-    if (ENABLE_RELEASE)
-      set(VARIANT_TARGET_NAME "${VARIANT_TARGET_NAME}-debug")
-    endif (ENABLE_RELEASE)
+    set(VARIANT_TARGET_NAME "${VARIANT_TARGET_NAME}-debug")
+
     set(VARIANT_ABI_TAG "${VARIANT_ABI_TAG}d")
 
     set(VARIANT_DISPLAY_NAME "${VARIANT_DISPLAY_NAME}, debug")
@@ -649,7 +648,7 @@ macro(boost_library_variant LIBNAME)
     # off, don't build shared libraries.
     if(NOT ENABLE_${ARG})
       set(THIS_VARIANT_OKAY FALSE)
-      set(SELECT_VARIANT_FAILURE_REASONS "ENABLE_${ARG} is OFF")
+      set(SELECT_VARIANT_FAILURE_REASONS "ENABLE_${ARG} i OFF")
     endif(NOT ENABLE_${ARG})
 
     # Accumulate compile and link flags
@@ -980,11 +979,15 @@ macro(boost_select_variant NAME PREFIX)
   set(${PREFIX}_VARIANT)
 
   foreach(FEATURESET_STR ${BOOST_FEATURES})
+    # message("FEATURESET_STR ${FEATURESET_STR}")
     string(REPLACE ":" ";" FEATURESET ${FEATURESET_STR})
     separate_arguments(FEATURESET)
     set(${PREFIX}_REQUESTED_FROM_SET FALSE)
+    set(unselected TRUE)
     foreach (FEATURE ${FEATURESET})
-      if (${PREFIX}_${FEATURE})
+      # message("FEATURE ${FEATURE}")
+      if (unselected AND (${PREFIX}_${FEATURE} OR ENABLE_${FEATURE}))
+	# message("YES ${PREFIX}_${FEATURE}")
         # Make this feature part of the variant
         list(APPEND ${PREFIX}_VARIANT ${FEATURE})
         set(${PREFIX}_REQUESTED_FROM_SET TRUE)
@@ -995,12 +998,15 @@ macro(boost_select_variant NAME PREFIX)
         # variants with that feature), then we won't build this
         # executable or module.
         if (NOT ENABLE_${FEATURE})
+	  # message("NOT ENABLE_${FEATURE}")
           set(SELECT_VARIANT_OKAY FALSE)
 	  list(APPEND SELECT_VARIANT_FAILURE_REASONS 
-	    "ENABLE_${FEATURE} is FALSE")
-        endif (NOT ENABLE_${FEATURE})
-      endif (${PREFIX}_${FEATURE})
-    endforeach (FEATURE ${FEATURESET})
+	    "ENABLE_${FEATURE} iz FALSE")
+        else()
+	  set(unselected FALSE)
+        endif()
+      endif()
+    endforeach()
 
     if (NOT ${PREFIX}_REQUESTED_FROM_SET)
       # The caller did not specify which feature value to use from
@@ -1244,6 +1250,7 @@ macro(boost_add_library SHORT_LIBNAME)
   foreach(VARIANT_STR ${THIS_LIB_VARIANTS})
     string(REPLACE ":" ";" VARIANT ${VARIANT_STR})
     separate_arguments(VARIANT)
+    # message("VARIANT=${VARIANT}")
     boost_library_variant(${LIBNAME} ${VARIANT})
   endforeach(VARIANT_STR ${THIS_LIB_VARIANTS})
   
@@ -1252,24 +1259,6 @@ macro(boost_add_library SHORT_LIBNAME)
     # message(STATUS "* ^^ ENABLE_${THIS_LIB_FORCE_VARIANTS}  ${ENABLE_${THIS_LIB_FORCE_VARIANTS}}")
   endif (THIS_LIB_FORCE_VARIANTS)  
 endmacro(boost_add_library)
-
-# Like boost_add_library, but builds a single library variant
-# FIXME: I'm not sure if I like this or not. Document it if it survives.
-macro(boost_add_single_library LIBNAME)
-  parse_arguments(THIS_LIB
-    "DEPENDS;COMPILE_FLAGS;LINK_FLAGS;LINK_LIBS;${BOOST_ADD_ARG_NAMES}"
-    "NO_INSTALL;MODULE;${BOOST_ADDEXE_OPTION_NAMES}"
-    ${ARGN}
-    )
-  set(THIS_LIB_SOURCES ${THIS_LIB_DEFAULT_ARGS})
-
-  boost_select_variant(${LIBNAME} THIS_LIB)
-  if (THIS_LIB_VARIANT)
-    add_custom_target(${LIBNAME})
-    separate_arguments(THIS_LIB_VARIANT)
-    boost_library_variant(${LIBNAME} ${THIS_LIB_VARIANT})
-  endif ()
-endmacro(boost_add_single_library)
 
 # Creates a new executable from source files.
 #
@@ -1502,6 +1491,26 @@ macro(boost_add_executable EXENAME)
 
   endif ()
 endmacro(boost_add_executable)
+
+
+# Like boost_add_library, but builds a single library variant
+# FIXME: I'm not sure if I like this or not. Document it if it survives.
+macro(boost_add_single_library LIBNAME)
+  parse_arguments(THIS_LIB
+    "DEPENDS;COMPILE_FLAGS;LINK_FLAGS;LINK_LIBS;${BOOST_ADD_ARG_NAMES}"
+    "NO_INSTALL;MODULE;${BOOST_ADDEXE_OPTION_NAMES}"
+    ${ARGN}
+    )
+  set(THIS_LIB_SOURCES ${THIS_LIB_DEFAULT_ARGS})
+
+  boost_select_variant(${LIBNAME} THIS_LIB)
+  # message("boost_select_variant selected ${THIS_LIB_VARIANT}")
+  if (THIS_LIB_VARIANT)
+    add_custom_target(${LIBNAME})
+    separate_arguments(THIS_LIB_VARIANT)
+    boost_library_variant(${LIBNAME} ${THIS_LIB_VARIANT})
+  endif ()
+endmacro(boost_add_single_library)
 
 
 #
