@@ -688,7 +688,11 @@ macro(boost_library_variant LIBNAME)
 
     # We handle static vs. dynamic libraries differently
     list_contains(THIS_LIB_IS_STATIC "STATIC" ${ARGN})
+
     if (THIS_LIB_IS_STATIC)
+
+      add_library(${VARIANT_LIBNAME} STATIC ${THIS_LIB_SOURCES})
+
       # On Windows, we need static and shared libraries to have
       # different names, so we follow the Boost.Build version 2 style
       # and prepend "lib" to the name.
@@ -699,8 +703,6 @@ macro(boost_library_variant LIBNAME)
 	  )
       endif()
       
-      add_library(${VARIANT_LIBNAME} STATIC ${THIS_LIB_SOURCES})
-
       set_target_properties(${VARIANT_LIBNAME}
         PROPERTIES
         OUTPUT_NAME "${LIBNAME}${VARIANT_VERSIONED_NAME}"
