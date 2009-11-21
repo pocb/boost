@@ -28,82 +28,86 @@ boost_test_compile_fail(duplicates)
 boost_test_compile_fail(deduced_unmatched_arg)
 boost_test_compile(compose)
 
-include_directories(${PYTHON_INCLUDE_PATH})
+if (PYTHON_FOUND)
 
-#
-# This came from libs/python/test/CMakeLists.txt
-# 
-# copy-pasting this kind of code is of course an awful idea.
-#
-macro(bpl_test TESTNAME)
-  parse_arguments(BPL_TEST
-    "ARGS"
-    ""
-    ${ARGN})
+  include_directories(${PYTHON_INCLUDE_PATH})
 
-  # Determine the Python and C++ source files for this test
-  if (BPL_TEST_DEFAULT_ARGS)
-    # First argument is the Python source we will run, the rest are
-    # either extra Python sources we're dependent on or C++ files from
-    # which we will build extension modules.
-    car(BPL_TEST_PYSOURCE ${BPL_TEST_DEFAULT_ARGS})
-    cdr(BPL_TEST_DEFAULT_ARGS ${BPL_TEST_DEFAULT_ARGS})
+  #
+  # This came from libs/python/test/CMakeLists.txt
+  # 
+  # copy-pasting this kind of code is of course an awful idea.
+  #
+  macro(bpl_test TESTNAME)
+    parse_arguments(BPL_TEST
+      "ARGS"
+      ""
+      ${ARGN})
 
-    get_filename_component(BPL_TEST_PYBASE ${BPL_TEST_PYSOURCE} NAME_WE)
+    # Determine the Python and C++ source files for this test
+    if (BPL_TEST_DEFAULT_ARGS)
+      # First argument is the Python source we will run, the rest are
+      # either extra Python sources we're dependent on or C++ files from
+      # which we will build extension modules.
+      car(BPL_TEST_PYSOURCE ${BPL_TEST_DEFAULT_ARGS})
+      cdr(BPL_TEST_DEFAULT_ARGS ${BPL_TEST_DEFAULT_ARGS})
 
-    # Process all the .cpp file and extension module names
-    foreach(SRC ${BPL_TEST_DEFAULT_ARGS})
-      get_filename_component(BPL_SRC_EXT ${SRC} EXT)
-      if (BPL_SRC_EXT STREQUAL ".cpp")
+      get_filename_component(BPL_TEST_PYBASE ${BPL_TEST_PYSOURCE} NAME_WE)
 
-        # Build a Python extension module from this source file
-        get_filename_component(BPL_SRC_NAME ${SRC} NAME_WE)
-        
-        if(BPL_TEST_PYBASE STREQUAL "${BPL_SRC_NAME}")
-          set(BPL_EXTENSION_MODULE ${BPL_SRC_NAME}_ext)
-        else(BPL_TEST_PYBASE STREQUAL "${BPL_SRC_NAME}")
-          set(BPL_EXTENSION_MODULE ${BPL_SRC_NAME})
-        endif(BPL_TEST_PYBASE STREQUAL "${BPL_SRC_NAME}")
+      # Process all the .cpp file and extension module names
+      foreach(SRC ${BPL_TEST_DEFAULT_ARGS})
+	get_filename_component(BPL_SRC_EXT ${SRC} EXT)
+	if (BPL_SRC_EXT STREQUAL ".cpp")
 
-        boost_python_extension(${BPL_EXTENSION_MODULE} ${SRC})
+          # Build a Python extension module from this source file
+          get_filename_component(BPL_SRC_NAME ${SRC} NAME_WE)
+          
+          if(BPL_TEST_PYBASE STREQUAL "${BPL_SRC_NAME}")
+            set(BPL_EXTENSION_MODULE ${BPL_SRC_NAME}_ext)
+          else(BPL_TEST_PYBASE STREQUAL "${BPL_SRC_NAME}")
+            set(BPL_EXTENSION_MODULE ${BPL_SRC_NAME})
+          endif(BPL_TEST_PYBASE STREQUAL "${BPL_SRC_NAME}")
 
-      else (BPL_SRC_EXT STREQUAL ".cpp")
-        set(BPL_EXTENSION_MODULE ${SRC})
+          boost_python_extension(${BPL_EXTENSION_MODULE} ${SRC})
 
-      endif (BPL_SRC_EXT STREQUAL ".cpp")
+	else (BPL_SRC_EXT STREQUAL ".cpp")
+          set(BPL_EXTENSION_MODULE ${SRC})
 
-    endforeach(SRC ${BPL_TEST_DEFAULT_ARGS})
+	endif (BPL_SRC_EXT STREQUAL ".cpp")
 
-  else (BPL_TEST_DEFAULT_ARGS)
+      endforeach(SRC ${BPL_TEST_DEFAULT_ARGS})
 
-    set(BPL_TEST_PYSOURCE "${TESTNAME}.py")
+    else (BPL_TEST_DEFAULT_ARGS)
 
-    # Build a Python extension module from this source file
-    boost_python_extension(${TESTNAME}_ext "${TESTNAME}.cpp")
+      set(BPL_TEST_PYSOURCE "${TESTNAME}.py")
 
-  endif(BPL_TEST_DEFAULT_ARGS)
+      # Build a Python extension module from this source file
+      boost_python_extension(${TESTNAME}_ext "${TESTNAME}.cpp")
 
-  # We'll need the full patch to run the Python test
-  set(BPL_TEST_PYSOURCE ${CMAKE_CURRENT_SOURCE_DIR}/${BPL_TEST_PYSOURCE})
+    endif(BPL_TEST_DEFAULT_ARGS)
+
+    # We'll need the full patch to run the Python test
+    set(BPL_TEST_PYSOURCE ${CMAKE_CURRENT_SOURCE_DIR}/${BPL_TEST_PYSOURCE})
     
-  # Run the test itself
-  file(TO_NATIVE_PATH "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}" PYTHONPATH)
-  if(WIN32 AND NOT UNIX)
-    string(REPLACE "\\" "\\\\" PYTHONPATH "${PYTHONPATH}")
-  endif(WIN32 AND NOT UNIX)
-  set(FULL_TESTNAME ${PROJECT_NAME}-${TESTNAME})
-  add_test(${FULL_TESTNAME}
-    ${VALGRIND_EXECUTABLE}
-    ${VALGRIND_FLAGS}
-    ${PYTHON_EXECUTABLE} 
-    "${CMAKE_CURRENT_SOURCE_DIR}/pyrun.py" 
-    "${PYTHONPATH}"
-    ${BPL_TEST_PYSOURCE} ${BPL_TEST_ARGS})
+    # Run the test itself
+    file(TO_NATIVE_PATH "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}" PYTHONPATH)
+    if(WIN32 AND NOT UNIX)
+      string(REPLACE "\\" "\\\\" PYTHONPATH "${PYTHONPATH}")
+    endif(WIN32 AND NOT UNIX)
+    set(FULL_TESTNAME ${PROJECT_NAME}-${TESTNAME})
+    add_test(${FULL_TESTNAME}
+      ${VALGRIND_EXECUTABLE}
+      ${VALGRIND_FLAGS}
+      ${PYTHON_EXECUTABLE} 
+      "${CMAKE_CURRENT_SOURCE_DIR}/pyrun.py" 
+      "${PYTHONPATH}"
+      ${BPL_TEST_PYSOURCE} ${BPL_TEST_ARGS})
 
-  set_tests_properties(${FULL_TESTNAME}
-    PROPERTIES
-    LABELS "${PROJECT_NAME}"
-    )
-endmacro(bpl_test)
+    set_tests_properties(${FULL_TESTNAME}
+      PROPERTIES
+      LABELS "${PROJECT_NAME}"
+      )
+  endmacro(bpl_test)
 
-bpl_test(python_test)
+  bpl_test(python_test)
+
+endif()
