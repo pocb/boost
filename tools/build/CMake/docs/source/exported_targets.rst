@@ -107,10 +107,13 @@ built boost in directory ``/home/troy/boost/1.41.0/build``. I have a
 program that builds from one file, ``main.cpp`` and uses boost
 threads.  My ``CMakeLists.txt`` looks like this::
 
-   include_directories("/home/troy/boost-1.41.0/src")
-   include("/home/troy/boost-1.41.0/build/lib/Exports.cmake")
+   include_directories(
+     /home/troy/boost-1.41.0/src
+     /home/troy/boost-1.41.0/build/lib/Exports.cmake
+     )
 
    add_executable(my_program main.cpp)
+
    target_link_libraries(my_program boost_thread-mt-shared-debug)
 
 When I build, I see
