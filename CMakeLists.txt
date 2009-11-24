@@ -251,7 +251,10 @@ endif()
 ##########################################################################
 # Binary packages                                                        #
 ##########################################################################
-set(CPACK_PACKAGE_NAME "Boost C++ Libraries")
+#
+#  CPACK_PACKAGE_NAME may not contain spaces when generating rpms
+#
+set(CPACK_PACKAGE_NAME "Boost")
 set(CPACK_PACKAGE_VENDOR "Boost.org")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Boost ${BOOST_VERSION} prerelease")
 set(CPACK_PACKAGE_FILE_NAME "boost-${BOOST_VERSION}-${BOOST_PLATFORM}-${BOOST_TOOLSET}")
