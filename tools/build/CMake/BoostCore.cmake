@@ -1538,16 +1538,31 @@ macro(boost_python_extension MODULE_NAME)
     "" 
     ${ARGN})
   
+  if (WIN32)
+    set(extlibtype SHARED)
+  else()
+    set(extlibtype MODULE)
+  endif()
+
   boost_add_single_library(
     ${MODULE_NAME}
     ${BPL_EXT_DEFAULT_ARGS}
-    MODULE
+    ${extlibtype}
     LINK_LIBS ${PYTHON_LIBRARIES}
     DEPENDS boost_python
     SHARED
     MULTI_THREADED
     )
 
+  if(WIN32)
+    set_target_properties(${VARIANT_LIBNAME}
+      PROPERTIES
+      OUTPUT_NAME "${MODULE_NAME}"
+      PREFIX ""
+      SUFFIX .pyd
+      IMPORT_SUFFIX .pyd
+      )
+  endif()
   if (NOT THIS_VARIANT_OKAY)
     colormsg(HIRED "    ${MODULE_NAME}" RED "(python extension) disabled because:")
     foreach(msg ${SELECT_VARIANT_FAILURE_REASONS})
