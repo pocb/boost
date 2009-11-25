@@ -58,7 +58,21 @@ macro(bpl_test TESTNAME)
   set(BPL_TEST_PYSOURCE ${CMAKE_CURRENT_SOURCE_DIR}/${BPL_TEST_PYSOURCE})
     
   # Run the test itself
-  file(TO_NATIVE_PATH "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}" PYTHONPATH)
+
+  if(WIN32)
+
+    get_target_property(THIS_TEST_LOCATION ${TESTNAME}_ext-mt-shared
+      LOCATION)
+    get_filename_component(THIS_TEST_LOCATION ${THIS_TEST_LOCATION} PATH)
+
+    string(REGEX REPLACE "\\$\\(.*\\)" "\${CTEST_CONFIGURATION_TYPE}"
+      THIS_TEST_LOCATION "${THIS_TEST_LOCATION}")
+
+    set(PYTHONPATH ${THIS_TEST_LOCATION})
+  else()
+    file(TO_NATIVE_PATH "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}" PYTHONPATH)
+  endif()
+  
   if(WIN32 AND NOT UNIX)
     string(REPLACE "\\" "\\\\" PYTHONPATH "${PYTHONPATH}")
   endif(WIN32 AND NOT UNIX)
@@ -141,7 +155,6 @@ bpl_test(object)
 bpl_test(list)
 bpl_test(long)
 bpl_test(dict)
-bpl_test(tuple)
 bpl_test(str)
 bpl_test(slice)
 
@@ -229,3 +242,5 @@ boost_test_compile_fail(raw_pyobject_fail1)
 boost_test_compile_fail(raw_pyobject_fail2)
 boost_test_compile_fail(as_to_python_function)
 boost_test_compile_fail(object_fail1)
+
+bpl_test(tuple)
