@@ -1562,6 +1562,12 @@ macro(boost_python_extension MODULE_NAME)
       SUFFIX .pyd
       IMPORT_SUFFIX .pyd
       )
+  else()
+    set_target_properties(${VARIANT_LIBNAME}
+      PROPERTIES
+      OUTPUT_NAME "${MODULE_NAME}"
+      PREFIX ""
+      )
   endif()
   if (NOT THIS_VARIANT_OKAY)
     colormsg(HIRED "    ${MODULE_NAME}" RED "(python extension) disabled because:")
