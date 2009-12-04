@@ -55,6 +55,7 @@ Users's guide
    build_variants
    exported_targets
    install_customization
+   find_package_boost
    faq
    externals/index
    git

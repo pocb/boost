@@ -11,6 +11,10 @@
 Customizing the install
 =======================
 
+Here you'll find ways to customize your installation.  If you're
+trying to make the install play nice with cmake's ``find_package``,
+see :ref:`find_package_boost`.
+
 .. index:: CMAKE_INSTALL_PREFIX
    single:  installation
 

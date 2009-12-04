@@ -159,7 +159,9 @@ Visual Studio
 ^^^^^^^^^^^^^
 
 You will see a solution named ``RUN_TESTS``.  Build this to run the
-tests.
+tests.  If you want to run them from the commandline, for some
+projects you will have to use the ``-C`` flag to ctest to specify the
+ctest configuration type (Debug or Release, typically).
 
 
 Targets
