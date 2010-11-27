@@ -4,8 +4,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <boost/detail/lightweight_test.hpp>
+// #define BOOST_SPIRIT_LEXERTL_DEBUG
+
 #include <boost/config/warning_disable.hpp>
+#include <boost/detail/lightweight_test.hpp>
 
 #include <boost/spirit/include/support_multi_pass.hpp>
 #include <boost/spirit/include/classic_position_iterator.hpp>
@@ -27,14 +29,14 @@ typedef spirit::classic::position_iterator2<
 
 typedef boost::iterator_range<file_iterator> file_range;
 
-inline file_iterator make_file_iterator(std::istream& input, const std::string& filename)
+inline file_iterator 
+make_file_iterator(std::istream& input, const std::string& filename)
 {
     return file_iterator(
         spirit::make_default_multi_pass(
             std::istreambuf_iterator<char>(input)),
         spirit::multi_pass<std::istreambuf_iterator<char>>(),
-        filename
-    );
+        filename);
 }
 
 struct identifier
@@ -93,11 +95,13 @@ int main()
     int test_data[] = { 1, 3, 2 };
     std::size_t const test_data_size = sizeof(test_data)/sizeof(test_data[0]);
 
+    token_iterator it = begin2;
     int i = 0;
-    for (token_iterator it = begin2; it != end2 && i < test_data_size; ++it, ++i)
+    for (/**/; it != end2 && i < test_data_size; ++it, ++i)
     {
         BOOST_TEST(it->id() == test_data[i]);
     }
+    BOOST_TEST(it == end2);
     BOOST_TEST(i == test_data_size);
 
     return boost::report_errors();
