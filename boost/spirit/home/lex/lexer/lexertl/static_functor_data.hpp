@@ -117,7 +117,9 @@ namespace boost { namespace spirit { namespace lex { namespace lexertl
                 // The following assertion fires most likely because you are 
                 // using lexer semantic actions without using the actor_lexer
                 // as the base class for your token definition class.
-                BOOST_ASSERT(false);
+                BOOST_ASSERT(false && 
+                    "Are you using lexer semantic actions without using the "
+                    "actor_lexer base?");
                 return it; 
             }
 
@@ -134,7 +136,9 @@ namespace boost { namespace spirit { namespace lex { namespace lexertl
                 // The following assertion fires most likely because you are 
                 // using lexer semantic actions without using the actor_lexer
                 // as the base class for your token definition class.
-                BOOST_ASSERT(false); 
+                BOOST_ASSERT(false && 
+                    "Are you using lexer semantic actions without using the "
+                    "actor_lexer base?"); 
             }
             bool adjust_start() { return false; }
             void revert_adjust_start() {}
@@ -151,7 +155,9 @@ namespace boost { namespace spirit { namespace lex { namespace lexertl
                 // The following assertion fires most likely because you are 
                 // using lexer semantic actions without using the actor_lexer
                 // as the base class for your token definition class.
-                BOOST_ASSERT(false);
+                BOOST_ASSERT(false && 
+                    "Are you using lexer semantic actions without using the "
+                    "actor_lexer base?");
                 return false; 
             }
 
@@ -206,7 +212,7 @@ namespace boost { namespace spirit { namespace lex { namespace lexertl
         };
 
         ///////////////////////////////////////////////////////////////////////
-        //  doesn't support no actors
+        //  doesn't support no actors, but does support states
         template <typename Iterator, typename TokenValue>
         struct static_data<Iterator, mpl::false_, mpl::true_, TokenValue>
           : static_data<Iterator, mpl::false_, mpl::false_, TokenValue>

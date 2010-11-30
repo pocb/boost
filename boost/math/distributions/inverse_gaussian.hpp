@@ -53,7 +53,7 @@
 #include <boost/math/distributions/gamma.hpp> // for gamma function
 // using boost::math::gamma_p;
 
-#include <boost/math/tr1.hpp>
+#include <boost/math/tools/tuple.hpp>
 //using std::tr1::tuple;
 //using std::tr1::make_tuple;
 #include <boost/math/tools/roots.hpp>
@@ -217,7 +217,7 @@ struct inverse_gaussian_quantile_functor
     RealType fx = c - prob;  // Difference cdf - value - to minimize.
     RealType dx = pdf(distribution, x); // pdf is 1st derivative.
     // return both function evaluation difference f(x) and 1st derivative f'(x).
-    return std::tr1::make_tuple(fx, dx);
+    return boost::math::make_tuple(fx, dx);
   }
   private:
   const boost::math::inverse_gaussian_distribution<RealType> distribution;
@@ -237,7 +237,8 @@ struct inverse_gaussian_quantile_complement_functor
     RealType fx = c - prob;  // Difference cdf - value - to minimize.
     RealType dx = -pdf(distribution, x); // pdf is 1st derivative.
     // return both function evaluation difference f(x) and 1st derivative f'(x).
-    return std::tr1::make_tuple(fx, dx);
+    //return std::tr1::make_tuple(fx, dx); if available.
+    return boost::math::make_tuple(fx, dx);
   }
   private:
   const boost::math::inverse_gaussian_distribution<RealType> distribution;
@@ -324,7 +325,7 @@ inline RealType quantile(const inverse_gaussian_distribution<RealType, Policy>& 
    }
    if (p == 1)
    { // Might not return infinity?
-     return numeric_limits<RealType>::infinity();
+     return std::numeric_limits<RealType>::infinity();
    }
   //RealType guess_ig(RealType p, RealType mu = 1, RealType lambda = 1);
 
@@ -387,7 +388,7 @@ inline RealType cdf(const complemented2_type<inverse_gaussian_distribution<RealT
 
    //RealType n5 = +sqrt(scale/x) * ((x /mean) + 1); // note now positive sign.
    RealType n6 = cdf(complement(n01, +sqrt(scale/x) * ((x /mean) + 1)));
-   RealType n4 = cdf(n01, n3); // = 
+   // RealType n4 = cdf(n01, n3); // = 
    result = cdf_1 - expfactor * n6; 
    return result;
 } // cdf complement

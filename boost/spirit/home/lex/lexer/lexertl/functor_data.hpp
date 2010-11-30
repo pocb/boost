@@ -98,7 +98,9 @@ namespace boost { namespace spirit { namespace lex { namespace lexertl
                 // The following assertion fires most likely because you are 
                 // using lexer semantic actions without using the actor_lexer
                 // as the base class for your token definition class.
-                BOOST_ASSERT(false);
+                BOOST_ASSERT(false && 
+                    "Are you using lexer semantic actions without using the "
+                    "actor_lexer base?");
                 return it; 
             }
 
@@ -115,7 +117,9 @@ namespace boost { namespace spirit { namespace lex { namespace lexertl
                 // The following assertion fires most likely because you are 
                 // using lexer semantic actions without using the actor_lexer
                 // as the base class for your token definition class.
-                BOOST_ASSERT(false); 
+                BOOST_ASSERT(false && 
+                    "Are you using lexer semantic actions without using the "
+                    "actor_lexer base?"); 
             }
             bool adjust_start() { return false; }
             void revert_adjust_start() {}
@@ -132,7 +136,9 @@ namespace boost { namespace spirit { namespace lex { namespace lexertl
                 // The following assertion fires most likely because you are 
                 // using lexer semantic actions without using the actor_lexer
                 // as the base class for your token definition class.
-                BOOST_ASSERT(false);
+                BOOST_ASSERT(false && 
+                    "Are you using lexer semantic actions without using the "
+                    "actor_lexer base?");
                 return false; 
             }
 
@@ -188,7 +194,7 @@ namespace boost { namespace spirit { namespace lex { namespace lexertl
         };
 
         ///////////////////////////////////////////////////////////////////////
-        //  doesn't support lexer semantic actions
+        //  doesn't support lexer semantic actions, but supports state
         template <typename Iterator, typename TokenValue>
         struct data<Iterator, mpl::false_, mpl::true_, TokenValue>
           : data<Iterator, mpl::false_, mpl::false_, TokenValue>
@@ -291,7 +297,7 @@ namespace boost { namespace spirit { namespace lex { namespace lexertl
               : base_type(data_, first, last)
               , actions_(data_.actions_), hold_()
               , value_(iterator_range<Iterator>(first, last))
-              , has_hold_(false), has_value_(false) {}
+              , has_value_(false), has_hold_(false) {}
 
             // invoke attached semantic actions, if defined
             BOOST_SCOPED_ENUM(pass_flags) invoke_actions(std::size_t state

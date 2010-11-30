@@ -62,9 +62,8 @@ int main()
 {
   cout <<"Geometric distribution example" << endl;
   cout << endl;
-  cout.precision(std::numeric_limits<double>::max_digits10);
-  // gives all potentially significant digits for the type, here double.
-  cout.precision(4); 
+
+  cout.precision(4); // But only show a few for this example.
   try
   {
 //[geometric_eg1_2
@@ -156,7 +155,18 @@ __spaces R> formatC(pgeom(0.0001,0.5, FALSE), digits=17) "               0.5"
 So in Boost.Math the equivalent is
 */
     geometric g05(0.5);  // Probability of success = 0.5 or 50%
-    cout.precision(numeric_limits<double>::max_digits10); // Display all potentially significant digits.
+    // Output all potentially significant digits for the type, here double.
+
+#ifdef BOOST_NO_NUMERIC_LIMITS_LOWEST
+  int max_digits10 = 2 + (boost::math::policies::digits<double, boost::math::policies::policy<> >() * 30103UL) / 100000UL;
+  cout << "BOOST_NO_NUMERIC_LIMITS_LOWEST is defined" << endl; 
+#else 
+  int max_digits10 = std::numeric_limits<double>::max_digits10;
+#endif
+  cout << "Show all potentially significant decimal digits std::numeric_limits<double>::max_digits10 = "
+    << max_digits10 << endl; 
+  cout.precision(max_digits10); // 
+
     cout << cdf(g05, 0.0001) << endl; // returns 0.5000346561579232, not exact 0.5.
 /*`To get the R discrete behaviour, you simply need to round with,
 for example, the `floor` function.

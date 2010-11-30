@@ -83,7 +83,8 @@ template <class RealType>
 void test_spots(RealType)
 {
   // Basic sanity checks
-  RealType tolerance = 1e-4f; // 
+  RealType tolerance = static_cast<RealType>(1e-4L); // 
+  cout << "Tolerance for type " << typeid(RealType).name()  << " is " << tolerance << endl;
 
   // Check some bad parameters to the distribution,
   BOOST_CHECK_THROW(boost::math::inverse_gaussian_distribution<RealType> nbad1(0, 0), std::domain_error); // zero scale
@@ -115,10 +116,7 @@ void test_spots(RealType)
     BOOST_CHECK_THROW(quantile(w11, +std::numeric_limits<RealType>::quiet_NaN()), std::domain_error); // p = + infinity
     BOOST_CHECK_THROW(quantile(complement(w11, +std::numeric_limits<RealType>::quiet_NaN())), std::domain_error); // p = + infinity
   }
-
-  // cout << "Tolerance for type " << typeid(RealType).name()  << " is " << tolerance << endl;
-
-  // Check complements.
+    // Check complements.
 
     BOOST_CHECK_CLOSE_FRACTION(
      cdf(complement(w11, 1.)), static_cast<RealType>(1) - cdf(w11, 1.), tolerance); // cdf complement
@@ -154,7 +152,7 @@ void test_spots(RealType)
     static_cast<RealType>(2.6666666666666666666666666666666666666666666666666666666667L), tolfeweps);
   // std deviation:
   BOOST_CHECK_CLOSE_FRACTION(standard_deviation(dist), 
-    static_cast<RealType>(1.632993L), tolerance);
+    static_cast<RealType>(1.632993L), 1000 * tolerance);
   //// hazard:
   //BOOST_CHECK_CLOSE_FRACTION(hazard(dist, x),
   //  pdf(dist, x) / cdf(complement(dist, x)), tolerance);
@@ -332,13 +330,13 @@ int test_main(int, char* [])
   BOOST_CHECK_CLOSE_FRACTION(
     cdf(w0110, 1.), static_cast<double>(1), tolfeweps ); // cdf
   BOOST_CHECK_CLOSE_FRACTION(
-     cdf(complement(w0110, 1.)), static_cast<double>(3.2787685715328683e-179), tolfeweps ); // cdf complement
+     cdf(complement(w0110, 1.)), static_cast<double>(3.2787685715328683e-179), 100* tolfeweps ); // cdf complement
   // Differs because of loss of accuracy
 
   BOOST_CHECK_CLOSE_FRACTION(
     pdf(w0110, 0.1), static_cast<double>(39.894228040143268), tolfeweps ); // pdf
   BOOST_CHECK_CLOSE_FRACTION(
-    cdf(w0110, 0.1), static_cast<double>(0.51989761564832704), tolfeweps ); // cdf
+    cdf(w0110, 0.1), static_cast<double>(0.51989761564832704), 10 * tolfeweps ); // cdf
 
     // Basic sanity-check spot values for all floating-point types..
   // (Parameter value, arbitrarily zero, only communicates the floating point type).

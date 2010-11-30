@@ -5,6 +5,7 @@
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #define BOOST_SPIRIT_DEBUG 1    // required for token streaming
+#define BOOST_SPIRIT_LEXERTL_DEBUG 1
 
 #include <boost/config/warning_disable.hpp>
 #include <boost/detail/lightweight_test.hpp>
@@ -17,7 +18,6 @@
 #include <boost/spirit/home/phoenix/operator.hpp>
 #include <boost/spirit/home/phoenix/statement.hpp>
 #include <boost/spirit/home/phoenix/object.hpp>
-#include <boost/spirit/home/phoenix/stl.hpp>
 
 #include <sstream>
 
@@ -89,7 +89,7 @@ int main()
     std::size_t const test_data_size = sizeof(test_data)/sizeof(test_data[0]);
 
     token_iterator it = begin2;
-    int i = 0;
+    std::size_t i = 0;
     for (/**/; it != end2 && i < test_data_size; ++it, ++i)
     {
         std::stringstream ss;
