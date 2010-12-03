@@ -8,6 +8,10 @@
 #ifndef BOOST_STATS_INVERSE_GAUSSIAN_HPP
 #define BOOST_STATS_INVERSE_GAUSSIAN_HPP
 
+#ifdef _MSC_VER
+#pragma warning(disable: 4512) // assignment operator could not be generated
+#endif
+
 // http://en.wikipedia.org/wiki/Normal-inverse_Gaussian_distribution
 // http://mathworld.wolfram.com/InverseGaussianDistribution.html
 
@@ -250,6 +254,7 @@ namespace detail
   template <class RealType>
   inline RealType guess_ig(RealType p, RealType mu = 1, RealType lambda = 1)
   { // guess at random variate value x for inverse gaussian quantile.
+      BOOST_MATH_STD_USING
       using boost::math::policies::policy;
       // Error type.
       using boost::math::policies::overflow_error;
@@ -447,6 +452,7 @@ inline RealType shape(const inverse_gaussian_distribution<RealType, Policy>& dis
 template <class RealType, class Policy>
 inline RealType standard_deviation(const inverse_gaussian_distribution<RealType, Policy>& dist)
 {
+  BOOST_MATH_STD_USING
   RealType scale = dist.scale();
   RealType mean = dist.mean();
   RealType result = sqrt(mean * mean * mean / scale);
@@ -456,6 +462,7 @@ inline RealType standard_deviation(const inverse_gaussian_distribution<RealType,
 template <class RealType, class Policy>
 inline RealType mode(const inverse_gaussian_distribution<RealType, Policy>& dist)
 {
+  BOOST_MATH_STD_USING
   RealType scale = dist.scale();
   RealType  mean = dist.mean();
   RealType result = mean * (sqrt(1 + (9 * mean * mean)/(4 * scale * scale)) 
@@ -466,6 +473,7 @@ inline RealType mode(const inverse_gaussian_distribution<RealType, Policy>& dist
 template <class RealType, class Policy>
 inline RealType skewness(const inverse_gaussian_distribution<RealType, Policy>& dist)
 {
+  BOOST_MATH_STD_USING
   RealType scale = dist.scale();
   RealType  mean = dist.mean();
   RealType result = 3 * sqrt(mean/scale);
