@@ -37,11 +37,35 @@
     {
         namespace detail
         {
-            template<BOOST_PP_ENUM_PARAMS_WITH_A_DEFAULT(BOOST_PROTO_MAX_ARITY, typename A, void)>
-            struct typelist
+            enum callable_type
             {
-                typedef void type;
+                CT_not_callable
+              , CT_callable
+              , CT_transform
             };
+
+            template<typename T, bool IsTransform = is_transform<T>::value>
+            struct get_callable_type2
+            {
+                static callable_type const value = CT_callable;
+            };
+
+            template<typename T>
+            struct get_callable_type2<T, true>
+            {
+                static callable_type const value = CT_transform;
+            };
+
+            template<typename T, bool IsCallable = is_callable<T>::value>
+            struct get_callable_type
+            {
+                static callable_type const value = CT_not_callable;
+            };
+
+            template<typename T>
+            struct get_callable_type<T, true>
+              : get_callable_type2<T>
+            {};
 
             template<typename T, bool HasType = mpl::aux::has_type<T>::value>
             struct nested_type
@@ -55,55 +79,76 @@
                 typedef T type;
             };
 
-            template<typename T, typename Args, typename Void = void>
-            struct nested_type_if
-              : nested_type<T>
-            {};
-
-            template<typename R, typename Expr, typename State, typename Data
-                // BUGBUG this should be is_transform, but if R is a template instantiation
-                // it will cause the template to be instantiated, whereas is_callable will not.
-              , bool IsTransform = is_callable<R>::value
+            template<
+                typename T
+              , typename Expr, typename State, typename Data
+              , bool Applied
             >
-            struct make_if_;
+            struct nested_type_if
+            {
+                typedef T type;
+                static bool const applied = false;
+            };
 
-            template<typename R, typename Expr, typename State, typename Data
+            template<typename T, typename Expr, typename State, typename Data>
+            struct nested_type_if<T, Expr, State, Data, true>
+              : nested_type<T>
+            {
+                static bool const applied = true;
+            };
+
+            template<
+                typename R
+              , typename Expr, typename State, typename Data
                 BOOST_MPL_AUX_LAMBDA_ARITY_PARAM(long Arity = mpl::aux::template_arity<R>::value)
             >
             struct make_
             {
                 typedef R type;
-                typedef void not_applied_;
+                static bool const applied = false;
+            };
+
+            template<
+                typename R
+              , typename Expr, typename State, typename Data
+              , callable_type CallableType = get_callable_type<R>::value
+            >
+            struct make_if_;
+
+            template<typename R, typename Expr, typename State, typename Data>
+            struct make_if_<R, Expr, State, Data, CT_callable>
+              : make_<R, Expr, State, Data>
+            {};
+
+            template<typename R, typename Expr, typename State, typename Data>
+            struct make_if_<R, Expr, State, Data, CT_transform>
+              : uncvref<typename R::template impl<Expr, State, Data>::result_type>
+            {
+                static bool const applied = true;
             };
 
             template<typename R, typename Expr, typename State, typename Data>
-            struct make_if_<R, Expr, State, Data, false>
+            struct make_if_<R, Expr, State, Data, CT_not_callable>
               : make_<R, Expr, State, Data>
             {};
 
             #if BOOST_WORKAROUND(__GNUC__, == 3) || (__GNUC__ == 4 && __GNUC_MINOR__ == 0)
             // work around GCC bug
             template<typename Tag, typename Args, long N, typename Expr, typename State, typename Data>
-            struct make_if_<proto::expr<Tag, Args, N>, Expr, State, Data, false>
+            struct make_if_<proto::expr<Tag, Args, N>, Expr, State, Data, CT_not_callable>
             {
                 typedef proto::expr<Tag, Args, N> type;
-                typedef void not_applied_;
+                static bool const applied = false;
             };
 
             // work around GCC bug
             template<typename Tag, typename Args, long N, typename Expr, typename State, typename Data>
-            struct make_if_<proto::basic_expr<Tag, Args, N>, Expr, State, Data, false>
+            struct make_if_<proto::basic_expr<Tag, Args, N>, Expr, State, Data, CT_not_callable>
             {
                 typedef proto::basic_expr<Tag, Args, N> type;
-                typedef void not_applied_;
+                static bool const applied = false;
             };
             #endif
-
-            // TODO could optimize this if R is a transform
-            template<typename R, typename Expr, typename State, typename Data>
-            struct make_if_<R, Expr, State, Data, true>
-              : uncvref<typename R::template impl<Expr, State, Data>::result_type>
-            {};
 
             template<typename Type, bool IsAggregate = is_aggregate<Type>::value>
             struct construct_
@@ -272,6 +317,7 @@
         struct is_callable<protect<PrimitiveTransform> >
           : mpl::true_
         {};
+
     }}
 
     #endif
@@ -283,33 +329,24 @@
         namespace detail
         {
             #if N > 0
-            template<typename T BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)>
-            struct nested_type_if<
-                T
-              , typelist<BOOST_PP_ENUM_PARAMS(N, A)>
-              , typename typelist<
-                    BOOST_PP_ENUM_BINARY_PARAMS(N, typename A, ::not_applied_ BOOST_PP_INTERCEPT)
-                >::type
-            >
-            {
-                typedef T type;
-                typedef void not_applied_;
-            };
-
             #define TMP0(Z, M, DATA) make_if_<BOOST_PP_CAT(A, M), Expr, State, Data>
             #define TMP1(Z, M, DATA) typename TMP0(Z, M, DATA) ::type
+            #define TMP2(Z, M, DATA) TMP0(Z, M, DATA) ::applied ||
 
             template<
                 template<BOOST_PP_ENUM_PARAMS(N, typename BOOST_PP_INTERCEPT)> class R
                 BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
               , typename Expr, typename State, typename Data
             >
-            struct make_<R<BOOST_PP_ENUM_PARAMS(N, A)>, Expr, State, Data
+            struct make_<
+                R<BOOST_PP_ENUM_PARAMS(N, A)>
+              , Expr, State, Data
                 BOOST_MPL_AUX_LAMBDA_ARITY_PARAM(N)
             >
               : nested_type_if<
                     R<BOOST_PP_ENUM(N, TMP1, ~)>
-                  , typelist<BOOST_PP_ENUM(N, TMP0, ~) >
+                  , Expr, State, Data
+                  , (BOOST_PP_REPEAT(N, TMP2, ~) false)
                 >
             {};
 
@@ -318,15 +355,19 @@
                 BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
               , typename Expr, typename State, typename Data
             >
-            struct make_<noinvoke<R<BOOST_PP_ENUM_PARAMS(N, A)> >, Expr, State, Data
-                BOOST_MPL_AUX_LAMBDA_ARITY_PARAM(N)
+            struct make_<
+                noinvoke<R<BOOST_PP_ENUM_PARAMS(N, A)> >
+              , Expr, State, Data
+                BOOST_MPL_AUX_LAMBDA_ARITY_PARAM(1)
             >
             {
                 typedef R<BOOST_PP_ENUM(N, TMP1, ~)> type;
+                static bool const applied = true;
             };
 
             #undef TMP0
             #undef TMP1
+            #undef TMP2
             #endif
 
             template<
@@ -334,14 +375,17 @@
                 BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
               , typename Expr, typename State, typename Data
             >
-            struct make_if_<R(BOOST_PP_ENUM_PARAMS(N, A)), Expr, State, Data, false>
+            struct make_if_<
+                R(BOOST_PP_ENUM_PARAMS(N, A))
+              , Expr, State, Data
+              , CT_not_callable
+            >
+              : uncvref<
+                    typename when<_, R(BOOST_PP_ENUM_PARAMS(N, A))>
+                        ::template impl<Expr, State, Data>::result_type
+                >
             {
-                typedef
-                    typename uncvref<
-                        typename when<_, R(BOOST_PP_ENUM_PARAMS(N, A))>
-                            ::template impl<Expr, State, Data>::result_type
-                    >::type
-                type;
+                static bool const applied = true;
             };
 
             template<
@@ -349,14 +393,17 @@
                 BOOST_PP_ENUM_TRAILING_PARAMS(N, typename A)
               , typename Expr, typename State, typename Data
             >
-            struct make_if_<R(*)(BOOST_PP_ENUM_PARAMS(N, A)), Expr, State, Data, false>
+            struct make_if_<
+                R(*)(BOOST_PP_ENUM_PARAMS(N, A))
+              , Expr, State, Data
+              , CT_not_callable
+            >
+              : uncvref<
+                    typename when<_, R(BOOST_PP_ENUM_PARAMS(N, A))>
+                        ::template impl<Expr, State, Data>::result_type
+                >
             {
-                typedef
-                    typename uncvref<
-                        typename when<_, R(BOOST_PP_ENUM_PARAMS(N, A))>
-                            ::template impl<Expr, State, Data>::result_type
-                    >::type
-                type;
+                static bool const applied = true;
             };
 
             template<typename T, typename A>
@@ -397,7 +444,6 @@
             {
                 /// \brief <tt>boost::result_of\<make\<Object\>(Expr, State, Data)\>::type</tt>
                 typedef typename detail::make_if_<Object, Expr, State, Data>::type result_type;
-                //typedef typename detail::make_<Object, Expr, State, Data>::type result_type;
 
                 /// Let \c ax be <tt>when\<_, Ax\>()(e, s, d)</tt>
                 /// for each \c x in <tt>[0,N]</tt>.
@@ -419,7 +465,7 @@
                         #define TMP(Z, M, DATA)                                                     \
                             detail::as_lvalue(                                                      \
                                 typename when<_, BOOST_PP_CAT(A, M)>                                \
-                                    ::template impl<Expr, State, Data>()(e, s, d)         \
+                                    ::template impl<Expr, State, Data>()(e, s, d)                   \
                             )
                         BOOST_PP_ENUM(N, TMP, DATA)
                         #undef TMP
@@ -449,7 +495,7 @@
                         #define TMP(Z, M, DATA)                                                     \
                             detail::as_lvalue(                                                      \
                                 typename when<_, BOOST_PP_CAT(A, M)>                                \
-                                    ::template impl<Expr, State, Data>()(e, s, d)         \
+                                    ::template impl<Expr, State, Data>()(e, s, d)                   \
                             )
                         BOOST_PP_ENUM(N, TMP, DATA)
                         #undef TMP
