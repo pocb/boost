@@ -17,17 +17,26 @@ Copyright (c) 2008-2009: Joachim Faulhaber
 
 #if(_MSC_VER < 1500 && defined(_DEBUG) ) // 1500 = MSVC-9.0
 typedef int boost_posix_time_ptime;
+typedef int boost_posix_time_duration;
+typedef int boost_gregorian_date; 
+typedef int boost_gregorian_date_duration;
 #else
-typedef boost::posix_time::ptime boost_posix_time_ptime;
+typedef boost::posix_time::ptime         boost_posix_time_ptime;
+typedef boost::posix_time::time_duration boost_posix_time_duration;
+typedef boost::gregorian::date           boost_gregorian_date; 
+typedef boost::gregorian::date_duration  boost_gregorian_date_duration;
 #endif
 
 typedef ::boost::mpl::list<
-    unsigned short, unsigned int, unsigned long  
+     unsigned short, unsigned int, unsigned long  
     ,short, int, long, long long
     ,float, double, long double
     ,boost::rational<int>
     ,boost_posix_time_ptime
-//    ,boost::gregorian::date
+    ,boost_posix_time_duration
+    ,boost_gregorian_date
+    ,boost_gregorian_date_duration
+    ,int*
 > bicremental_types;
 
 typedef unsigned int             bicremental_type_1;
@@ -35,9 +44,10 @@ typedef          int             bicremental_type_2;
 typedef          double          bicremental_type_3;
 typedef boost::rational<int>     bicremental_type_4;
 typedef boost_posix_time_ptime   bicremental_type_5;
-typedef unsigned short           bicremental_type_6;
-typedef          short           bicremental_type_7;
-typedef          float           bicremental_type_8;
+typedef          short           bicremental_type_6;
+typedef          float           bicremental_type_7;
+typedef          int*            bicremental_type_8;
+
 
 typedef ::boost::mpl::list<
      short, int, long, long long
@@ -82,7 +92,11 @@ typedef ::boost::mpl::list<
     ,unsigned long, unsigned long long  
     ,short, int, long
     ,boost_posix_time_ptime
-//    ,boost::gregorian::date
+    ,boost_posix_time_ptime
+    ,boost_posix_time_duration
+    ,boost_gregorian_date
+    ,boost_gregorian_date_duration
+    ,int*
 > discrete_types;
 
 typedef int                      discrete_type_1;
@@ -128,7 +142,10 @@ typedef ::boost::mpl::list<
     ,boost::rational<int>
     ,std::string
     ,boost_posix_time_ptime
-//    ,boost::gregorian::date
+    ,boost_posix_time_duration
+    ,boost_gregorian_date
+    ,boost_gregorian_date_duration
+    ,int*
 > ordered_types;
 
 typedef int                      ordered_type_1;

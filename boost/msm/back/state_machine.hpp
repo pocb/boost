@@ -13,7 +13,6 @@
 
 #include <exception>
 #include <vector>
-#include <queue>
 #include <functional>
 #include <numeric>
 #include <utility>
@@ -63,6 +62,7 @@
 #include <boost/msm/back/default_compile_policy.hpp>
 #include <boost/msm/back/dispatch_table.hpp>
 #include <boost/msm/back/no_fsm_check.hpp>
+#include <boost/msm/back/queue_container_deque.hpp>
 
 BOOST_MPL_HAS_XXX_TRAIT_DEF(accept_sig)
 BOOST_MPL_HAS_XXX_TRAIT_DEF(no_automatic_create)
@@ -73,6 +73,7 @@ BOOST_MPL_HAS_XXX_TRAIT_DEF(do_serialize)
 BOOST_MPL_HAS_XXX_TRAIT_DEF(history_policy)
 BOOST_MPL_HAS_XXX_TRAIT_DEF(fsm_check)
 BOOST_MPL_HAS_XXX_TRAIT_DEF(compile_policy)
+BOOST_MPL_HAS_XXX_TRAIT_DEF(queue_container_policy)
 
 #ifndef BOOST_MSM_CONSTRUCTOR_ARG_SIZE
 #define BOOST_MSM_CONSTRUCTOR_ARG_SIZE 5 // default max number of arguments for constructors
@@ -100,6 +101,7 @@ BOOST_PARAMETER_TEMPLATE_KEYWORD(front_end)
 BOOST_PARAMETER_TEMPLATE_KEYWORD(history_policy)
 BOOST_PARAMETER_TEMPLATE_KEYWORD(compile_policy)
 BOOST_PARAMETER_TEMPLATE_KEYWORD(fsm_check_policy)
+BOOST_PARAMETER_TEMPLATE_KEYWORD(queue_container_policy)
 
 typedef ::boost::parameter::parameters<
     ::boost::parameter::required< ::boost::msm::back::tag::front_end >
@@ -111,6 +113,10 @@ typedef ::boost::parameter::parameters<
     >
   , ::boost::parameter::optional< 
         ::boost::parameter::deduced< ::boost::msm::back::tag::fsm_check_policy>, has_fsm_check< ::boost::mpl::_ > 
+    >
+  , ::boost::parameter::optional< 
+        ::boost::parameter::deduced< ::boost::msm::back::tag::queue_container_policy>, 
+        has_queue_container_policy< ::boost::mpl::_ > 
     >
 > state_machine_signature;
 
@@ -124,16 +130,17 @@ template <
     , class A1 = parameter::void_
     , class A2 = parameter::void_
     , class A3 = parameter::void_
+    , class A4 = parameter::void_
 >
 class state_machine : //public Derived
     public ::boost::parameter::binding<
-            typename state_machine_signature::bind<A0,A1,A2,A3>::type, ::boost::msm::back::tag::front_end
+            typename state_machine_signature::bind<A0,A1,A2,A3,A4>::type, ::boost::msm::back::tag::front_end
     >::type
 {
 public:
     // Create ArgumentPack
     typedef typename
-        state_machine_signature::bind<A0,A1,A2,A3>::type
+        state_machine_signature::bind<A0,A1,A2,A3,A4>::type
         state_machine_args;
 
     // Extract first logical parameter.
@@ -141,30 +148,36 @@ public:
         state_machine_args, ::boost::msm::back::tag::front_end>::type Derived;
 
     typedef typename ::boost::parameter::binding<
-        state_machine_args, ::boost::msm::back::tag::history_policy, NoHistory >::type HistoryPolicy;
+        state_machine_args, ::boost::msm::back::tag::history_policy, NoHistory >::type              HistoryPolicy;
 
     typedef typename ::boost::parameter::binding<
-        state_machine_args, ::boost::msm::back::tag::compile_policy, favor_runtime_speed >::type CompilePolicy;
+        state_machine_args, ::boost::msm::back::tag::compile_policy, favor_runtime_speed >::type    CompilePolicy;
 
     typedef typename ::boost::parameter::binding<
-        state_machine_args, ::boost::msm::back::tag::fsm_check_policy, no_fsm_check >::type FsmCheckPolicy;
+        state_machine_args, ::boost::msm::back::tag::fsm_check_policy, no_fsm_check >::type         FsmCheckPolicy;
 
+    typedef typename ::boost::parameter::binding<
+        state_machine_args, ::boost::msm::back::tag::queue_container_policy, 
+        queue_container_deque >::type                                                               QueueContainerPolicy;
 
 private: 
 
     typedef boost::msm::back::state_machine<
-        A0,A1,A2,A3>                                library_sm;
+        A0,A1,A2,A3,A4>                             library_sm;
 
     typedef ::boost::function<
         execute_return ()>                          transition_fct;
     typedef ::boost::function<
         execute_return () >                         deferred_fct;
-    typedef std::deque<deferred_fct >               deferred_events_queue_t;
-    typedef std::queue<transition_fct >             events_queue_t;
-    typedef bool (*flag_handler)(library_sm&);
+    typedef typename QueueContainerPolicy::
+        template In<deferred_fct>::type             deferred_events_queue_t;
+    typedef typename QueueContainerPolicy::
+        template In<transition_fct>::type           events_queue_t;
+
+    typedef bool (*flag_handler)(library_sm const&);
 
     // all state machines are friend with each other to allow embedding any of them in another fsm
-    template <class ,class , class, class
+    template <class ,class , class, class, class
     > friend class boost::msm::back::state_machine;
 
     // helper to add, if needed, visitors to all states
@@ -224,14 +237,14 @@ private:
         visitors                                                      m_state_visitors;
     };
 
-    template <class StateType,class Enable=void>
+    template <class StateType,class Enable=int>
     struct deferred_msg_queue_helper 
     {
     };
     template <class StateType>
     struct deferred_msg_queue_helper<StateType,
         typename ::boost::enable_if< 
-            typename ::boost::msm::back::has_fsm_deferred_events<StateType>::type >::type> 
+            typename ::boost::msm::back::has_fsm_deferred_events<StateType>::type,int >::type> 
     {
     public:
         deferred_msg_queue_helper():m_deferred_events_queue(){}
@@ -1079,7 +1092,7 @@ private:
             &library_sm::process_event; 
 
         transition_fct f = ::boost::bind(pf,this,evt);
-        m_events_queue.m_events_queue.push(f);
+        m_events_queue.m_events_queue.push_back(f);
     }
     template <class EventType>
     void enqueue_event_helper(EventType const& evt, ::boost::mpl::true_ const &)
@@ -1090,7 +1103,7 @@ private:
     void execute_queued_events_helper(::boost::mpl::false_ const &)
     {
         transition_fct to_call = m_events_queue.m_events_queue.front();
-        m_events_queue.m_events_queue.pop();
+        m_events_queue.m_events_queue.pop_front();
         to_call();
     }
     void execute_queued_events_helper(::boost::mpl::true_ const &)
@@ -1117,6 +1130,26 @@ private:
     typename events_queue_t::size_type get_message_queue_size() const
     {
         return m_events_queue.m_events_queue.size();
+    }
+
+    events_queue_t& get_message_queue()
+    {
+        return m_events_queue.m_events_queue;
+    }
+
+    const events_queue_t& get_message_queue() const
+    {
+        return m_events_queue.m_events_queue;
+    }
+
+    deferred_events_queue_t& get_deferred_queue()
+    {
+        return m_deferred_events_queue;
+    }
+
+    const deferred_events_queue_t& get_deferred_queue() const
+    {
+        return m_deferred_events_queue;
     }
 
     // Getter that returns the current state of the FSM
@@ -1233,7 +1266,7 @@ private:
 
     // checks if a flag is active using the BinaryOp as folding function
     template <class Flag,class BinaryOp>
-    bool is_flag_active()
+    bool is_flag_active() const
     {
         flag_handler* flags_entries = get_entries_for_flag<Flag>();
 
@@ -1244,11 +1277,11 @@ private:
                     ::boost::bind(::boost::msm::back::deref<flag_handler>(),
                         ::boost::bind(::boost::msm::back::plus2<flag_handler*,int>(),
                         flags_entries, _2)),
-                        ::boost::ref(*this)), _1));
+                        ::boost::cref(*this)), _1));
     }
     // checks if a flag is active using no binary op if 1 region, or OR if > 1 regions
     template <class Flag>
-    bool is_flag_active()
+    bool is_flag_active() const
     {
         return FlagHelper<Flag,(nr_regions::value>1)>::helper(*this,get_entries_for_flag<Flag>());
     }
@@ -1323,7 +1356,7 @@ private:
      }
 
      // Construct with the default initial states
-     state_machine<A0,A1,A2,A3 >()
+     state_machine<A0,A1,A2,A3,A4 >()
          :Derived()
          ,m_events_queue() 
          ,m_deferred_events_queue()
@@ -1341,7 +1374,7 @@ private:
          fill_states(this);
      }
      template <class Expr>
-     state_machine<A0,A1,A2,A3 >
+     state_machine<A0,A1,A2,A3,A4 >
          (Expr const& expr,typename ::boost::enable_if<typename ::boost::proto::is_expr<Expr>::type >::type* =0)
          :Derived()
          ,m_events_queue() 
@@ -1369,7 +1402,7 @@ private:
 #define MSM_CONSTRUCTOR_HELPER_EXECUTE_SUB(z, n, unused) ARG ## n t ## n
 #define MSM_CONSTRUCTOR_HELPER_EXECUTE(z, n, unused)                                \
         template <BOOST_PP_ENUM_PARAMS(n, class ARG)>                               \
-        state_machine<A0,A1,A2,A3                                                   \
+        state_machine<A0,A1,A2,A3,A4                                                \
         >(BOOST_PP_ENUM(n, MSM_CONSTRUCTOR_HELPER_EXECUTE_SUB, ~ ),                 \
         typename ::boost::disable_if<typename ::boost::proto::is_expr<ARG0>::type >::type* =0 )                \
         :Derived(BOOST_PP_ENUM_PARAMS(n,t))                                         \
@@ -1387,7 +1420,7 @@ private:
          fill_states(this);                                                         \
      }                                                                              \
         template <class Expr,BOOST_PP_ENUM_PARAMS(n, class ARG)>                    \
-        state_machine<A0,A1,A2,A3                                                   \
+        state_machine<A0,A1,A2,A3,A4                                                \
         >(Expr const& expr,BOOST_PP_ENUM(n, MSM_CONSTRUCTOR_HELPER_EXECUTE_SUB, ~ ), \
         typename ::boost::enable_if<typename ::boost::proto::is_expr<Expr>::type >::type* =0 ) \
         :Derived(BOOST_PP_ENUM_PARAMS(n,t))                                         \
@@ -1428,7 +1461,7 @@ private:
          }
         return *this;
      }
-     state_machine<A0,A1,A2,A3> 
+     state_machine<A0,A1,A2,A3,A4> 
          (library_sm const& rhs)
          : Derived(rhs)
      {
@@ -1479,7 +1512,7 @@ private:
         {
             // event has to be put into the queue
             transition_fct f = ::boost::bind(pf,this,evt);
-            m_events_queue.m_events_queue.push(f);
+            m_events_queue.m_events_queue.push_back(f);
             return false;
         }
         // event can be handled, processing
@@ -1517,7 +1550,7 @@ private:
     }
     // handling of deferred events
     // if none is found in the SM, take the following empty main version
-    template <class StateType, class Enable = void> 
+    template <class StateType, class Enable = int> 
     struct handle_defer_helper
     {
         handle_defer_helper(deferred_msg_queue_helper<library_sm>& ){}
@@ -1532,7 +1565,7 @@ private:
     // otherwise the standard version handling the deferred events
     template <class StateType>
     struct handle_defer_helper
-        <StateType, typename enable_if< typename ::boost::msm::back::has_fsm_deferred_events<StateType>::type >::type>
+        <StateType, typename enable_if< typename ::boost::msm::back::has_fsm_deferred_events<StateType>::type,int >::type>
     {
         handle_defer_helper(deferred_msg_queue_helper<library_sm>& a_queue):
             events_queue(a_queue),next_deferred_event(){}
@@ -1732,7 +1765,7 @@ private:
     template <class Flag,bool orthogonalStates>
     struct FlagHelper 
     {
-        static bool helper(library_sm& sm,flag_handler* )
+        static bool helper(library_sm const& sm,flag_handler* )
         {
             // by default we use OR to accumulate the flags
             return sm.is_flag_active<Flag,Flag_OR>();
@@ -1741,7 +1774,7 @@ private:
     template <class Flag>
     struct FlagHelper<Flag,false>
     {
-        static bool helper(library_sm& sm,flag_handler* flags_entries)
+        static bool helper(library_sm const& sm,flag_handler* flags_entries)
         {
             // just one active state, so we can call operator[] with 0
             return flags_entries[sm.current_state()[0]](sm);
@@ -1752,15 +1785,15 @@ private:
     template <class StateType,class Flag>
     struct FlagHandler
     {
-        static bool flag_true(library_sm& )
+        static bool flag_true(library_sm const& )
         {
             return true;
         }
-        static bool flag_false(library_sm& )
+        static bool flag_false(library_sm const& )
         {
             return false;
         }
-        static bool forward(library_sm& fsm)
+        static bool forward(library_sm const& fsm)
         {
             return ::boost::fusion::at_key<StateType>(fsm.m_substate_list).template is_flag_active<Flag>();
         }
@@ -1818,7 +1851,7 @@ private:
     };
     // maintains for every flag a static array containing the flag value for every state
     template <class Flag>
-    flag_handler* get_entries_for_flag()
+    flag_handler* get_entries_for_flag() const
     {
         BOOST_STATIC_CONSTANT(int, max_state = (mpl::size<state_list>::value));
 
@@ -2100,6 +2133,9 @@ BOOST_PP_REPEAT(BOOST_PP_ADD(BOOST_MSM_VISITOR_ARG_SIZE,1), MSM_VISITOR_ARGS_EXE
      void start(Event const& incomingEvent)
      {
          region_start_helper< ::boost::mpl::int_<0> >::do_start(this,incomingEvent);
+         // give a chance to handle an anonymous (eventless) transition
+         handle_eventless_transitions_helper<library_sm> eventless_helper(this,true);
+         eventless_helper.process_completion_event();
      }
 
      template <class StateType>
@@ -2115,7 +2151,7 @@ BOOST_PP_REPEAT(BOOST_PP_ADD(BOOST_MSM_VISITOR_ARG_SIZE,1), MSM_VISITOR_ARGS_EXE
          struct In<-1,Dummy>
          {
              typedef typename build_orthogonal_regions<
-                 stt,
+                 library_sm,
                  typename Derived::initial_state 
              >::type all_regions;
              enum {region_index= find_region_index<all_regions,StateType>::value };
@@ -2313,7 +2349,7 @@ BOOST_PP_REPEAT(BOOST_PP_ADD(BOOST_MSM_VISITOR_ARG_SIZE,1), MSM_VISITOR_ARGS_EXE
         if (!m_events_queue.m_events_queue.empty())
         {
             transition_fct to_call = m_events_queue.m_events_queue.front();
-            m_events_queue.m_events_queue.pop();
+            m_events_queue.m_events_queue.pop_front();
             to_call();
         }
     }
@@ -2400,6 +2436,8 @@ BOOST_PP_REPEAT(BOOST_PP_ADD(BOOST_MSM_VISITOR_ARG_SIZE,1), MSM_VISITOR_ARGS_EXE
     {
         // checks that regions are truly orthogonal
         FsmCheckPolicy::template check_orthogonality<library_sm>();
+        // checks that all states are reachable
+        FsmCheckPolicy::template check_unreachable_states<library_sm>();
 
         BOOST_STATIC_CONSTANT(int, max_state = (mpl::size<state_list>::value));
         // allocate the place without reallocation

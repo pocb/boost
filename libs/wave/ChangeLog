@@ -20,6 +20,19 @@ TODO (known issues):
 
 CHANGELOG
 
+Boost V1.46.0
+- V2.2.0
+- Added recognition of C++0x keywords to Re2C lexers.
+- Added --c++0x command line option to Wave to enabling the recognition of 
+  C++0x keywords, converting those to C++0x tokens.
+- Adapted all of the library to play well with Boost.Filesystem V3 (which is 
+  the default from now on).
+- Added support for extended character and string literals, added test case
+  (which required to add C++0x support to the test application).
+- Fixed a problem with object like macros, which when being adjacent to a 
+  parenthesis, caused the parenthesis to disappear when the macro expansion
+  was suppressed by the expanding_object_like_macro() hook function.
+
 Boost V1.45.0
 - V2.1.0
 - Token pasting is well formed only as long as the formed token(s) are 

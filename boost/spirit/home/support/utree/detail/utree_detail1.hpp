@@ -1,6 +1,6 @@
 /*=============================================================================
-    Copyright (c) 2001-2010 Joel de Guzman
-    Copyright (c) 2001-2010 Hartmut Kaiser
+    Copyright (c) 2001-2011 Joel de Guzman
+    Copyright (c) 2001-2011 Hartmut Kaiser
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -16,6 +16,7 @@ namespace boost { namespace spirit { namespace detail
     struct visit_impl;
 
     struct index_impl;
+    struct assign_impl;
 
     template <typename T>
     struct get_impl;
@@ -37,11 +38,8 @@ namespace boost { namespace spirit { namespace detail
         void copy(list const& other);
         void default_construct();
 
-        template <typename T>
-        void insert_before(T const& val, node* node);
-
-        template <typename T>
-        void insert_after(T const& val, node* node);
+        template <typename T, typename Iterator>
+        void insert(T const& val, Iterator pos);
 
         template <typename T>
         void push_front(T const& val);
@@ -121,6 +119,7 @@ namespace boost { namespace spirit { namespace detail
         union
         {
             char buff[buff_size];
+            long lbuff[buff_size / (sizeof(long)/sizeof(char))];   // for initialize 
             heap_store heap;
         };
 
@@ -137,6 +136,7 @@ namespace boost { namespace spirit { namespace detail
         void swap(fast_string& other);
         void free();
         void copy(fast_string const& other);
+        void initialize();
 
         char& info();
         char info() const;

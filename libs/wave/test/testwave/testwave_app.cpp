@@ -192,7 +192,7 @@ testwave_app::got_expected_result(std::string const& filename,
             case 'B':       // same as 'P', but forward slashes on Windows
                 {
                     fs::path fullpath (
-                        fs::complete(
+                        boost::wave::util::complete_path(
                             boost::wave::util::create_path(filename), 
                             boost::wave::util::current_path())
                         );
@@ -211,13 +211,27 @@ testwave_app::got_expected_result(std::string const& filename,
                             boost::wave::util::create_path(base);
                         full_result += expected.substr(pos, pos1-pos);
                         if ('P' == expected[pos1+1]) {
-                            full_result += escape_lit(
+#if defined(BOOST_WINDOWS)
+                            std::string p = replace_slashes(
+                                boost::wave::util::native_file_string(
+                                    boost::wave::util::normalize(fullpath)),
+                                "/", '\\');
+#else
+                            std::string p (
                                 boost::wave::util::native_file_string(
                                     boost::wave::util::normalize(fullpath)));
+#endif
+                            full_result += escape_lit(p);
                         }
                         else {
-                            full_result += escape_lit(
+#if defined(BOOST_WINDOWS)
+                            std::string p = replace_slashes(
                                 boost::wave::util::normalize(fullpath).string());
+#else
+                            std::string p (
+                                boost::wave::util::normalize(fullpath).string());
+#endif
+                            full_result += escape_lit(p);
                         }
                         pos1 = expected.find_first_of ("$", 
                             pos = pos1 + 4 + base.size());
@@ -230,6 +244,11 @@ testwave_app::got_expected_result(std::string const& filename,
                                 boost::wave::util::native_file_string(fullpath));
                         }
                         else {
+#if defined(BOOST_WINDOWS)
+                            std::string p = replace_slashes(fullpath.string());
+#else
+                            std::string p (fullpath.string());
+#endif
                             full_result += escape_lit(fullpath.string());
                         }
                         pos1 = expected.find_first_of ("$", pos = pos1 + 2);
@@ -265,8 +284,14 @@ testwave_app::got_expected_result(std::string const& filename,
                                     boost::wave::util::normalize(relpath)));
                         }
                         else {
-                            full_result += escape_lit(
+#if defined(BOOST_WINDOWS)
+                            std::string p = replace_slashes(
                                 boost::wave::util::normalize(relpath).string());
+#else
+                            std::string p (
+                                boost::wave::util::normalize(relpath).string());
+#endif
+                            full_result += escape_lit(p);
                         }
                         pos1 = expected.find_first_of ("$", 
                             pos = pos1 + 4 + base.size());
@@ -279,7 +304,12 @@ testwave_app::got_expected_result(std::string const& filename,
                                 boost::wave::util::native_file_string(relpath));
                         }
                         else {
-                            full_result += escape_lit(relpath.string());
+#if defined(BOOST_WINDOWS)
+                            std::string p = replace_slashes(relpath.string());
+#else
+                            std::string p (relpath.string());
+#endif
+                            full_result += escape_lit(p);
                         }
                         pos1 = expected.find_first_of ("$", pos = pos1 + 2);
                     }
@@ -338,6 +368,9 @@ testwave_app::testwave_app(po::variables_map const& vm)
         ("noguard,G", "disable include guard detection")
 #endif
         ("skipped_token_hooks", "record skipped_token hook calls")
+#if BOOST_WAVE_SUPPORT_CPP0X != 0
+        ("c++0x", "enable C99 mode (implies --variadics and --long_long)")
+#endif
     ;
 }
 
@@ -877,6 +910,28 @@ testwave_app::initialise_options(Context& ctx, po::variables_map const& vm,
         ctx.set_language(boost::wave::enable_variadics(ctx.get_language()));
     }
 #endif // BOOST_WAVE_SUPPORT_VARIADICS_PLACEMARKERS != 0
+
+#if BOOST_WAVE_SUPPORT_CPP0X
+    if (vm.count("c++0x")) {
+        if (9 == debuglevel) {
+            std::cerr << "initialise_options: option: c++0x" << std::endl;
+        }
+        ctx.set_language(
+            boost::wave::language_support(
+                boost::wave::support_cpp0x
+              |  boost::wave::support_option_convert_trigraphs 
+              |  boost::wave::support_option_long_long 
+              |  boost::wave::support_option_emit_line_directives 
+#if BOOST_WAVE_SUPPORT_PRAGMA_ONCE != 0
+              |  boost::wave::support_option_include_guard_detection
+#endif
+#if BOOST_WAVE_EMIT_PRAGMA_DIRECTIVES != 0
+              |  boost::wave::support_option_emit_pragma_directives
+#endif
+              |  boost::wave::support_option_insert_whitespace
+            ));
+    }
+#endif
 
 // enable long_long mode, if appropriate
     if (vm.count("long_long")) {

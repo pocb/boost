@@ -183,8 +183,8 @@ struct Foo :
                 <itemizedlist>
                   <listitem>
                     <para>
-                      If <computeroutput>O</computeroutput> is a <conceptname>Transform</conceptname>, then let
-                      the result type be
+                      If <computeroutput><classname>proto::is_transform</classname>&lt;O&gt;::value</computeroutput> is
+                      <computeroutput>true</computeroutput>, then let the result type be
                       <computeroutput>
                         boost::result_of&lt;<classname>proto::when</classname>&lt;<classname>_</classname>, O&gt;(Expr, State, Data)&gt;::type
                       </computeroutput>.

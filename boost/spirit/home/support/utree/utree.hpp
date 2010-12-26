@@ -1,6 +1,7 @@
 /*=============================================================================
-    Copyright (c) 2001-2010 Joel de Guzman
-    Copyright (c) 2001-2010 Hartmut Kaiser
+    Copyright (c) 2001-2011 Joel de Guzman
+    Copyright (c) 2001-2011 Hartmut Kaiser
+    Copyright (c) 2011      Bryce Lelbach
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -21,6 +22,7 @@
 #include <boost/type_traits/remove_pointer.hpp>
 #include <boost/type_traits/is_polymorphic.hpp>
 #include <boost/utility/enable_if.hpp>
+#include <boost/utility/result_of.hpp>
 #include <boost/ref.hpp>
 
 #include <boost/spirit/home/support/utree/detail/utree_detail1.hpp>
@@ -32,52 +34,71 @@
 # pragma warning(disable: 4244)
 #endif
 
-namespace boost { namespace spirit 
+namespace boost { namespace spirit
 {
-    ///////////////////////////////////////////////////////////////////////////
-    // all exceptions throw by utree are derived from utree_exception
+    //[utree_exceptions
+    /*` All exceptions thrown by utree are derived from utree_exception. */
     struct utree_exception : std::exception {};
 
-    ///////////////////////////////////////////////////////////////////////////
-    // bad_type_exception is thrown whenever somebody calls a member function 
-    // which applies to certain stored utree_type's only, but this precondition
-    // is violated as the utree instance holds some other type.
-    struct bad_type_exception : utree_exception 
+    /*`The `bad_type_exception` is thrown whenever somebody calls a member 
+       function, which applies to certain stored utree_type's only, but this 
+       precondition is violated as the `utree` instance holds some other type.
+    */
+    struct bad_type_exception : utree_exception
     {
         virtual const char* what() const throw()
         {
             return "utree: Illegal operation for currently stored data.";
         }
     };
+    //]
 
-    ///////////////////////////////////////////////////////////////////////////
-    // Our utree can store these types. This enum tells us what type
-    // of data is stored in utree's discriminated union.
-    ///////////////////////////////////////////////////////////////////////////
+    //[utree_types
+    /*`Each instance of an `utree` data structure can store exactly one of the 
+       following data types at a time: 
+    */
     struct utree_type
     {
         enum info
         {
-            nil_type,
-            bool_type,
-            int_type,
-            double_type,
-            string_type,
-            string_range_type,
-            symbol_type,
-            binary_type,
-            list_type,
-            range_type,
-            reference_type,
-            any_type,
-            function_type
+            uninitialized_type, // the utree has not been initialized (it's 
+                                // default constructed)
+            nil_type,           // nil is the sentinel (empty) utree type.
+            list_type,          // A doubly linked list of utrees.
+            range_type,         // A range of list::iterators. 
+            reference_type,     // A reference to another utree.
+            any_type,           // A pointer or reference to any C++ type. 
+            function_type,      // A utree holding a stored_function<F> object,
+                                // where F is an unary function object taking a 
+                                // scope as it's parameter and returning a
+                                // utree.
+
+            // numeric atoms
+            bool_type,          // An utree holding a boolean value
+            int_type,           // An utree holding a integer (int) value
+            double_type,        // An utree holding a floating point (double) value
+
+            // text atoms (utf8)
+            string_type,        // An UTF-8 string 
+            string_range_type,  // A pair of iterators into an UTF-8 string
+            symbol_type,        // An UTF-8 symbol name
+
+            binary_type         // Arbitrary binary data
         };
     };
+    //]
+
+    ///////////////////////////////////////////////////////////////////////////
+    // The uninitialized type
+    ///////////////////////////////////////////////////////////////////////////
+    struct uninitialized_type {};
+    uninitialized_type const uninitialized = uninitialized_type();
 
     ///////////////////////////////////////////////////////////////////////////
     // The nil type
     ///////////////////////////////////////////////////////////////////////////
-    struct nil {};
+    struct nil_type {};
+    nil_type const nil = nil_type();
 
     ///////////////////////////////////////////////////////////////////////////
     // A typed string with parametric Base storage. The storage can be any
@@ -115,44 +136,46 @@ namespace boost { namespace spirit
         }
     };
 
-    ///////////////////////////////////////////////////////////////////////////
-    // Binary string
-    ///////////////////////////////////////////////////////////////////////////
+    //[utree_strings
+    /*`The `utree` string types described below are used by the `utree` API 
+       only. These are not used to store information in the `utree` itself.
+       Their purpose is to refer to different internal `utree` node types
+       only. For instance, creating a `utree` from a binary data type will 
+       create a `binary_type` utree node (see above).
+    */
+    /*`The binary data type can be represented either verbatim as a sequence 
+       of bytes or as a pair of iterators into some other stored binary data 
+       sequence. Use this string type to access/create a `binary_type` `utree`.
+    */
     typedef basic_string<
-        boost::iterator_range<char const*>,
-        utree_type::binary_type>
-    binary_range;
+        boost::iterator_range<char const*>, utree_type::binary_type
+    > binary_range_type;
+    typedef basic_string<
+        std::string, utree_type::binary_type
+    > binary_string_type;
 
+    /*`The UTF-8 string can be represented either verbatim as a sequence of 
+       characters or as a pair of iterators into some other stored binary data 
+       sequence. Use this string type to access/create a `string_type` `utree`.
+    */
     typedef basic_string<
-        std::string,
-        utree_type::binary_type>
-    binary_string;
+        boost::iterator_range<char const*>, utree_type::string_type
+    > utf8_string_range_type;
+    typedef basic_string<
+        std::string, utree_type::string_type
+    > utf8_string_type;
 
-    ///////////////////////////////////////////////////////////////////////////
-    // Our UTF-8 string
-    ///////////////////////////////////////////////////////////////////////////
+    /*`The UTF-8 symbol can be represented either verbatim as a sequence of 
+       characters or as a pair of iterators into some other stored binary data 
+       sequence. Use this string type to access/create a `symbol_type` `utree`.
+    */
     typedef basic_string<
-        boost::iterator_range<char const*>,
-        utree_type::string_type>
-    utf8_string_range;
-
+        boost::iterator_range<char const*>, utree_type::symbol_type
+    > utf8_symbol_range_type;
     typedef basic_string<
-        std::string,
-        utree_type::string_type>
-    utf8_string_type;
-
-    ///////////////////////////////////////////////////////////////////////////
-    // Our UTF-8 symbol (for identifiers)
-    ///////////////////////////////////////////////////////////////////////////
-    typedef basic_string<
-        boost::iterator_range<char const*>,
-        utree_type::symbol_type>
-    utf8_symbol_range;
-
-    typedef basic_string<
-        std::string,
-        utree_type::symbol_type>
-    utf8_symbol;
+        std::string, utree_type::symbol_type
+    > utf8_symbol_type;
+    //]
 
     ///////////////////////////////////////////////////////////////////////////
     // Our function type
@@ -160,11 +183,15 @@ namespace boost { namespace spirit
     class utree;
     class scope;
 
+    //[utree_function_object_interface
     struct function_base
     {
         virtual ~function_base() {};
         virtual utree operator()(scope const& env) const = 0;
-        virtual function_base* clone() const = 0;
+
+        // Calling f.clone() must return a newly allocated function_base 
+        // instance that is equal to f.
+        virtual function_base* clone() const = 0; 
     };
 
     template <typename F>
@@ -176,6 +203,7 @@ namespace boost { namespace spirit
         virtual utree operator()(scope const& env) const;
         virtual function_base* clone() const;
     };
+    //]
 
     ///////////////////////////////////////////////////////////////////////////
     // Shallow tag. Instructs utree to hold an iterator_range
@@ -190,7 +218,6 @@ namespace boost { namespace spirit
     class any_ptr
     {
     public:
-
         template <typename Ptr>
         typename boost::disable_if<
             boost::is_polymorphic<
@@ -202,7 +229,7 @@ namespace boost { namespace spirit
             {
                 return static_cast<Ptr>(p);
             }
-            throw std::bad_cast();
+            boost::throw_exception(std::bad_cast());
         }
 
         template <typename T>
@@ -216,7 +243,6 @@ namespace boost { namespace spirit
         }
 
     private:
-
         // constructor is private
         any_ptr(void* p, std::type_info const* i)
           : p(p), i(i) {}
@@ -230,191 +256,254 @@ namespace boost { namespace spirit
         std::type_info const* i;
     };
 
-    ///////////////////////////////////////////////////////////////////////////
-    // The main utree (Universal Tree) class
-    // The utree is a hierarchical, dynamic type that can store:
-    //  - a nil
-    //  - a bool
-    //  - an integer
-    //  - a double
-    //  - a string
-    //  - a string range
-    //  - a symbol (identifier)
-    //  - binary data
-    //  - a (doubly linked) list of utree
-    //  - an iterator_range of list::iterator
-    //  - a reference to a utree
-    //  - a pointer or reference to any type
-    //  - a function
-    //
-    // The utree has minimal memory footprint. The data structure size is
-    // 16 bytes on a 32-bit platform. Being a container of itself, it can
-    // represent tree structures.
-    ///////////////////////////////////////////////////////////////////////////
-    class utree
-    {
+    //[utree
+    class utree {
     public:
-
+        //[utree_container_types
         typedef utree value_type;
-        typedef detail::list::node_iterator<utree> iterator;
-        typedef detail::list::node_iterator<utree const> const_iterator;
-        typedef detail::list::node_iterator<boost::reference_wrapper<utree> >
-            ref_iterator;
         typedef utree& reference;
         typedef utree const& const_reference;
         typedef std::ptrdiff_t difference_type;
         typedef std::size_t size_type;
 
+        typedef detail::list::node_iterator<utree> iterator;
+        typedef detail::list::node_iterator<utree const> const_iterator;
+        //]
+
+        typedef detail::list::node_iterator<boost::reference_wrapper<utree> >
+          ref_iterator;
+
         typedef boost::iterator_range<iterator> range;
         typedef boost::iterator_range<const_iterator> const_range;
 
-        utree();
-        utree(bool b);
-        utree(char c);
-        utree(unsigned int i);
-        utree(int i);
-        utree(double d);
-        utree(char const* str);
-        utree(char const* str, std::size_t len);
-        utree(std::string const& str);
-        utree(boost::reference_wrapper<utree> ref);
-        utree(any_ptr const& p);
-
-        template <typename Iter>
-        utree(boost::iterator_range<Iter> r);
-        utree(range r, shallow_tag);
-        utree(const_range r, shallow_tag);
-        utree(utf8_string_range const& str, shallow_tag);
-
-        template <typename F>
-        utree(stored_function<F> const& pf);
-
-        template <typename Base, utree_type::info type_>
-        utree(basic_string<Base, type_> const& str);
-
-        utree(utree const& other);
+        // dtor
         ~utree();
 
-        utree& operator=(utree const& other);
-        utree& operator=(bool b);
-        utree& operator=(char c);
-        utree& operator=(unsigned int i);
-        utree& operator=(int i);
-        utree& operator=(double d);
-        utree& operator=(char const* s);
-        utree& operator=(std::string const& s);
-        utree& operator=(boost::reference_wrapper<utree> ref);
+        ////////////////////////////////////////////////////////////////////////
+        //[utree_initialization
+        /*`A `utree` can be constructed or initialized from a wide range of 
+           data types, allowing to create `utree` instances for every 
+           possible node type (see the description of `utree_type::info` above). 
+           For this reason it exposes a constructor and an assignment operator 
+           for each of the allowed node types as shown below. All constructors
+           are non-explicit on purpose, allowing to use an utree instance as
+           the attribute to almost any Qi parser.
+        */
+        // This constructs an `uninitialized_type` node. When used in places
+        // where a boost::optional is expected (i.e. as an attribute for the 
+        // optional component), this represents the 'empty' state.
+        utree(uninitialized_type = uninitialized);
 
-        template <typename F>
-        utree& operator=(stored_function<F> const& pf);
+        // This initializes a `nil_type` node, which represents a valid,
+        // 'initialized empty' utree (different from uninitialized_type!).
+        utree(nil_type);
+        reference operator=(nil_type);
 
-        template <typename Iter>
-        utree& operator=(boost::iterator_range<Iter> r);
+        // This initializes a `boolean_type` node, which can hold 'true' or
+        // 'false' only.
+        utree(bool);
+        reference operator=(bool);
 
-        template <typename Base, utree_type::info type_>
-        utree& operator=(basic_string<Base, type_> const& bin);
+        // This initializes an `integer_type` node, which can hold arbitrary 
+        // integers. For convenience these functions are overloaded for signed
+        // and unsigned integer types.
+        utree(unsigned int);
+        utree(int);
+        reference operator=(unsigned int);
+        reference operator=(int);
 
-        template <typename F>
-        typename F::result_type
-        static visit(utree const& x, F f);
+        // This initializes a `double_type` node, which can hold arbitrary 
+        // floating point (double) values.
+        utree(double);
+        reference operator=(double);
 
-        template <typename F>
-        typename F::result_type
-        static visit(utree& x, F f);
+        // This initializes a `string_type` node, which can hold a narrow 
+        // character sequence (usually an UTF-8 string).
+        utree(char);
+        utree(char const*);
+        utree(char const*, std::size_t);
+        utree(std::string const&);
+        reference operator=(char);
+        reference operator=(char const*);
+        reference operator=(std::string const&);
 
-        template <typename F>
-        typename F::result_type
-        static visit(utree const& x, utree const& y, F f);
+        // This constructs a `string_range_type` node, which does not copy the 
+        // data but stores the iterator range to the character sequence the 
+        // range has been initialized from.
+        utree(utf8_string_range_type const&, shallow_tag);
 
-        template <typename F>
-        typename F::result_type
-        static visit(utree& x, utree const& y, F f);
+        // This initializes a `reference_type` node, which holds a reference to 
+        // another utree node. All operations on such a node are automatically
+        // forwarded to the referenced utree instance.
+        utree(boost::reference_wrapper<utree>);
+        reference operator=(boost::reference_wrapper<utree>);
 
-        template <typename F>
-        typename F::result_type
-        static visit(utree const& x, utree& y, F f);
+        // This initializes an `any_type` node, which can hold a pointer to an
+        // instance of any type together with the typeid of that type. When 
+        // accessing that pointer the typeid will be checked, causing a 
+        // std::bad_cast to be thrown if the typeids do not match.
+        utree(any_ptr const&);
+        reference operator=(any_ptr const&);
 
-        template <typename F>
-        typename F::result_type
-        static visit(utree& x, utree& y, F f);
+        // This initializes a `range_type` node, which holds an utree list node
+        // the elements of which are copy constructed (assigned) from the 
+        // elements referenced by the given range of iterators.
+        template <class Iterator>
+        utree(boost::iterator_range<Iterator>);
+        template <class Iterator>
+        reference operator=(boost::iterator_range<Iterator>);
 
-        template <typename T>
-        void push_back(T const& val);
+        // This initializes a `function_type` node, which can store an 
+        // arbitrary function or function object.
+        template <class F>
+        utree(stored_function<F> const&);
+        template <class F>
+        reference operator=(stored_function<F> const&);
 
-        template <typename T>
-        void push_front(T const& val);
+        // This initializes either a `string_type`, a `symbol_type`, or a 
+        // `binary_type` node (depending on the template parameter `type_`), 
+        // which will hold the corresponding narrow character sequence (usually 
+        // an UTF-8 string).
+        template <class Base, utree_type::info type_>
+        utree(basic_string<Base, type_> const&);
+        template <class Base, utree_type::info type_>
+        reference operator=(basic_string<Base, type_> const&);
+        //]
 
-        template <typename T>
-        iterator insert(iterator pos, T const& x);
+        // copy 
+        utree(const_reference);
+        reference operator=(const_reference);
 
-        template <typename T>
-        void insert(iterator pos, std::size_t, T const& x);
+        // range
+        utree(range, shallow_tag);
+        utree(const_range, shallow_tag);
 
-        template <typename Iter>
-        void insert(iterator pos, Iter first, Iter last);
+        // assign dispatch
+        template <class Iterator>
+        void assign(Iterator, Iterator);
 
-        template <typename Iter>
-        void assign(Iter first, Iter last);
+        ////////////////////////////////////////////////////////////////////////
 
-        void clear();
+        ////////////////////////////////////////////////////////////////////////
+        // function object visitation interface
+
+        // single dispatch
+        template <class F>
+        typename boost::result_of<F(utree const&)>::type
+        static visit(utree const&, F);
+
+        template <class F>
+        typename boost::result_of<F(utree&)>::type
+        static visit(utree&, F);
+
+        // double dispatch
+        template <class F>
+        typename boost::result_of<F(utree const&, utree const&)>::type
+        static visit(utree const&, utree const&, F);
+
+        template <class F>
+        typename boost::result_of<F(utree&, utree const&)>::type
+        static visit(utree&, utree const&, F);
+
+        template <class F>
+        typename boost::result_of<F(utree const&, utree&)>::type
+        static visit(utree const&, utree&, F);
+
+        template <class F>
+        typename boost::result_of<F(utree&, utree&)>::type
+        static visit(utree&, utree&, F);
+
+        ////////////////////////////////////////////////////////////////////////
+
+        ///////////////////////////////////////////////////////////////////////
+        //[utree_container_functions
+        // STL Container interface
+
+        // insertion 
+        template <class T>
+        void push_back(T const&);
+        template <class T>
+        void push_front(T const&);
+        template <class T>
+        iterator insert(iterator, T const&);
+        template <class T>
+        void insert(iterator, std::size_t, T const&);
+        template <class Iterator>
+        void insert(iterator, Iterator, Iterator);
+
+        // erasure
         void pop_front();
         void pop_back();
-        iterator erase(iterator pos);
-        iterator erase(iterator first, iterator last);
+        iterator erase(iterator);
+        iterator erase(iterator, iterator);
 
-        utree& front();
-        utree& back();
-        utree const& front() const;
-        utree const& back() const;
-
-        utree& operator[](std::size_t i);
-        utree const& operator[](std::size_t i) const;
-
-        void swap(utree& other);
-
+        // front access
+        reference front();
+        const_reference front() const;
         iterator begin();
-        iterator end();
         const_iterator begin() const;
-        const_iterator end() const;
-
         ref_iterator ref_begin();
+
+        // back access
+        reference back();
+        const_reference back() const;
+        iterator end();
+        const_iterator end() const;
         ref_iterator ref_end();
+        //]
+
+        // random access
+        reference operator[](size_type);
+        const_reference operator[](size_type) const;
+
+        void clear();
+
+        void swap(utree&);
 
         bool empty() const;
-        std::size_t size() const;
+        size_type size() const;
 
+        ////////////////////////////////////////////////////////////////////////
+
+        //[utree_variant_functions
+        // return the data type (`utree_type::info`) of the currently stored 
+        // data item
         utree_type::info which() const;
 
-        template <typename T>
+        // access the currently stored data in a type safe manner, this will 
+        // throw a `std::bad_cast()` if the currently stored data item is not 
+        // default convertible to `T`.
+        template <class T>
         T get() const;
+        //]
 
-        utree& deref();
-        utree const& deref() const;
+        reference deref();
+        const_reference deref() const;
 
         short tag() const;
-        void tag(short tag);
+        void tag(short);
 
-        utree eval(scope const& env) const;
+        utree eval(scope const&) const;
 
+    //<-
     private:
-
         typedef utree_type type;
 
-        template <typename UTreeX, typename UTreeY>
+        template <class UTreeX, class UTreeY>
         friend struct detail::visit_impl;
         friend struct detail::index_impl;
+        friend struct detail::assign_impl;
 
-        template <typename T>
+        template <class T>
         friend struct detail::get_impl;
 
         type::info get_type() const;
-        void set_type(type::info t);
+        void set_type(type::info);
         void ensure_list_type();
         void free();
-        void copy(utree const& other);
+        void copy(const_reference);
 
-        union
-        {
+        union {
             detail::fast_string s;
             detail::list l;
             detail::range r;
@@ -426,35 +515,48 @@ namespace boost { namespace spirit
             utree* p;
             function_base* pf;
         };
+    //->
     };
+    //]
 
-    ///////////////////////////////////////////////////////////////////////////
-    // The scope
-    ///////////////////////////////////////////////////////////////////////////
-    class scope : public boost::iterator_range<utree*>
-    {
-    public:
-
+    //[utree_scope
+    class scope : public boost::iterator_range<utree*> {
+      public:
         scope(utree* first = 0,
-            utree* last = 0,
-            scope const* parent = 0)
-          : boost::iterator_range<utree*>(first, last),
-            parent(parent),
-            depth(parent? parent->depth + 1 : 0)
-        {}
+              utree* last = 0,
+              scope const* parent = 0) 
+              //<-
+              : boost::iterator_range<utree*>(first, last)
+              , parent(parent)
+              , depth(parent? parent->depth + 1 : 0) {}
+              //->
 
-        scope const* outer() const { return parent; }
-        int level() const { return depth; }
+        scope const* outer() const 
+        //<-
+        {
+            return parent;
+        }
+        //->
 
-    private:
+        std::size_t level() const 
+        //<-
+        {
+            return depth;
+        }
+        //->
 
+      //<-  
+      private:
         scope const* parent;
-        int depth;
+        std::size_t depth;
+      //->
     };
+    //]
 }}
 
 #if defined(BOOST_MSVC)
-# pragma warning(pop)
+  #pragma warning(pop)
 #endif
 
 #endif
+

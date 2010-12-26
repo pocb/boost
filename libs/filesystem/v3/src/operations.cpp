@@ -427,8 +427,9 @@ namespace
     if (::stat(from_p.c_str(), &from_stat)!= 0)
       { return false; }
 
-    int oflag = O_CREAT | O_WRONLY;
-    if (fail_if_exists)oflag |= O_EXCL;
+    int oflag = O_CREAT | O_WRONLY | O_TRUNC;
+    if (fail_if_exists)
+      oflag |= O_EXCL;
     if ((outfile = ::open(to_p.c_str(), oflag, from_stat.st_mode))< 0)
     {
       int open_errno = errno;

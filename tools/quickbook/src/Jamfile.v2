@@ -30,8 +30,10 @@ exe quickbook
     code_snippet.cpp
     markups.cpp
     syntax_highlight.cpp
-    block_grammar.cpp
-    phrase_grammar.cpp
+    grammar.cpp
+    main_grammar.cpp
+    block_markup_grammar.cpp
+    phrase_markup_grammar.cpp
     doc_info_grammar.cpp
     /boost//program_options
     /boost//filesystem

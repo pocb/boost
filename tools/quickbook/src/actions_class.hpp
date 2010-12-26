@@ -51,6 +51,7 @@ namespace quickbook
         docinfo_string          doc_license;
         docinfo_string          doc_last_revision;
         biblioid_list           doc_biblioid_items;
+        docinfo_string          doc_lang;
         std::string             include_doc_id;
         //temporary state
         biblioid_item           doc_biblioid;
@@ -114,6 +115,8 @@ namespace quickbook
         std::string             image_fileref;
         std::string             attribute_name;
         attribute_map           attributes;
+        string_list             anchors;
+        string_list             saved_anchors;
 
     // push/pop the states and the streams
         void copy_macros_for_write();
@@ -136,6 +139,7 @@ namespace quickbook
         phrase_to_docinfo_action extract_doc_last_revision;
         phrase_to_docinfo_action extract_doc_category;
         phrase_to_docinfo_action extract_doc_biblioid;
+        phrase_to_docinfo_action extract_doc_lang;
 
         code_action             code;
         code_action             code_block;
@@ -147,6 +151,7 @@ namespace quickbook
         tagged_action           blurb, blockquote;
         phrase_action           preformatted;
         tagged_action           warning, caution, important, note, tip;
+        space                   space_char;
         plain_char_action       plain_char;
         raw_char_action         raw_char;
         escape_unicode_action   escape_unicode;
@@ -232,6 +237,10 @@ namespace quickbook
 
         markup_action           escape_pre;
         markup_action           escape_post;
+
+        inner_phrase_action_pre inner_phrase_pre;
+        inner_phrase_action_post inner_phrase_post;
+        pre_output_action       output_pre;
     };
 }
 

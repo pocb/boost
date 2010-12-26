@@ -11,13 +11,12 @@
 #include <boost/cstdint.hpp>
 #include <boost/detail/iterator.hpp>
 #include <boost/spirit/include/qi.hpp>
+#include <boost/spirit/include/support_utree.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>
 #include <boost/spirit/include/phoenix_stl.hpp>
 #include <boost/spirit/include/phoenix_statement.hpp>
 #include <boost/spirit/include/phoenix_operator.hpp>
 
-#include <utree/utree.hpp>
-#include <utree/operators.hpp>
 #include <input/string.hpp>
 #include <qi/component_names.hpp>
 
@@ -25,7 +24,7 @@
 namespace boost { namespace spirit { namespace traits
 {
     template <typename Out>
-    void print_attribute(Out& out, scheme::utree const& val);
+    void print_attribute(Out& out, utree const& val);
 }}}
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -42,6 +41,20 @@ namespace scheme { namespace qi
     using boost::spirit::qi::_2;
     using boost::spirit::qi::lexeme;
     using boost::phoenix::push_back;
+    
+    using boost::spirit::utree;
+    using boost::spirit::utree_type;
+    using boost::spirit::scope;
+    using boost::spirit::shallow;
+    using boost::spirit::stored_function;
+    using boost::spirit::function_base;
+    using boost::spirit::binary_string;
+    using boost::spirit::utf8_symbol;
+    using boost::spirit::utf8_string;
+    using boost::spirit::binary_range;
+    using boost::spirit::utf8_symbol_range;
+    using boost::spirit::utf8_string_range;
+    using boost::spirit::nil_type;
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Iterator>
@@ -85,7 +98,7 @@ namespace scheme { namespace qi
         // element is the symbol this function object has been constructed from
         struct make_list_node
         {
-            template <typename T1, typename T2 = nil>
+            template <typename T1, typename T2 = nil_type>
             struct result { typedef void type; };
 
             explicit make_list_node(char const* symbol_)

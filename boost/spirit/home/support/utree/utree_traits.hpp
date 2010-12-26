@@ -1,8 +1,11 @@
-//  Copyright (c) 2001-2010 Hartmut Kaiser
-//
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying
-//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+/*=============================================================================
+    Copyright (c) 2001-2011 Joel de Guzman
+    Copyright (c) 2001-2011 Hartmut Kaiser
+    Copyright (c) 2011 Bryce Lelbach
 
+    Distributed under the Boost Software License, Version 1.0. (See accompanying
+    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+=============================================================================*/
 #if !defined(BOOST_SPIRIT_OUTPUT_UTREE_TRAITS_APR_16_2010_0655AM)
 #define BOOST_SPIRIT_OUTPUT_UTREE_TRAITS_APR_16_2010_0655AM
 
@@ -10,6 +13,7 @@
 #include <boost/spirit/home/support/container.hpp>
 #include <boost/spirit/home/support/utree.hpp>
 #include <boost/spirit/home/karma/domain.hpp>
+#include <boost/spirit/home/karma/nonterminal/nonterminal_fwd.hpp>
 
 #include <string>
 
@@ -33,7 +37,7 @@ namespace boost
 namespace boost { namespace spirit { namespace traits
 {
     ///////////////////////////////////////////////////////////////////////////
-    // this specialization tells Spirit.Qi to allow assignment to an utree from 
+    // this specialization tells Spirit.Qi to allow assignment to an utree from
     // a variant
     namespace detail
     {
@@ -52,9 +56,10 @@ namespace boost { namespace spirit { namespace traits
     }
 
     template <BOOST_VARIANT_ENUM_PARAMS(typename T)>
-    struct assign_to_attribute_from_value<utree, variant<BOOST_VARIANT_ENUM_PARAMS(T)> >
+    struct assign_to_attribute_from_value<
+        utree, variant<BOOST_VARIANT_ENUM_PARAMS(T)> >
     {
-        static void 
+        static void
         call(variant<BOOST_VARIANT_ENUM_PARAMS(T)> const& val, utree& attr)
         {
             apply_visitor(detail::assign_to_utree_visitor(attr), val);
@@ -62,24 +67,24 @@ namespace boost { namespace spirit { namespace traits
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    // this specialization tells Spirit.Qi to allow assignment to an utree from 
+    // this specialization tells Spirit.Qi to allow assignment to an utree from
     // a STL container
     template <typename Attribute>
     struct assign_to_attribute_from_value<utree, Attribute>
     {
         static void call(Attribute const& val, utree& attr, mpl::false_)
         {
-          if (attr.empty())
-              attr = val;
-          else
-              attr.push_back(val);    // implicitly converts utree to a list
+            if (attr.empty())
+                attr = val;
+            else
+                push_back(attr, val);
         }
 
         static void call(Attribute const& val, utree& attr, mpl::true_)
         {
             attr = make_iterator_range(traits::begin(val), traits::end(val));
         }
-
+        
         static void call(Attribute const& val, utree& attr)
         {
             call(val, attr, is_container<Attribute>());
@@ -87,14 +92,89 @@ namespace boost { namespace spirit { namespace traits
     };
 
     ///////////////////////////////////////////////////////////////////////////
-    // this specialization is required to disambiguate the specialization 
+    // this specialization is required to disambiguate the specializations
+    // related to utree
     template <>
     struct assign_to_attribute_from_value<utree, utree>
     {
-        static void 
-        call(utree const& val, utree& attr)
+        static void call(utree const& val, utree& attr)
         {
             attr = val;
+        }
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    // this specialization tells Spirit.Qi to allow assignment to an utree from
+    // generic iterators
+    template <typename Iterator>
+    struct assign_to_attribute_from_iterators<utree, Iterator>
+    {
+        static void
+        call(Iterator const& first, Iterator const& last, utree& attr)
+        {
+            attr.assign(first, last);
+        }
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    // this specialization keeps symbols from being transformed into strings  
+    template<>
+    struct assign_to_attribute_from_value<utree, utf8_symbol_type> 
+    {
+        static void call (utf8_symbol_type const& val, utree& attr) 
+        {
+            attr = val;
+        }
+    };
+
+    template<>
+    struct assign_to_attribute_from_value<utree, utf8_symbol_range_type> 
+    {
+        static void call (utf8_symbol_range_type const& val, utree& attr) 
+        {
+            attr = val;
+        }
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Karma only: convert utree node to string
+    template <>
+    struct attribute_as_string<utree>
+    {
+        typedef utf8_string_range_type type; 
+
+        static type call(utree const& attr)
+        {
+            return boost::get<utf8_string_range_type>(attr);
+        }
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    // push_back support for utree allows concatenation of strings
+    // (utree strings are immutable)
+    template <typename T>
+    struct push_back_container<utree, T>
+    {
+        static bool call(utree& c, T const& val)
+        {
+            switch (c.which())
+            {
+                case utree_type::uninitialized_type:
+                case utree_type::nil_type:
+                case utree_type::list_type:
+                    {
+                        c.push_back(val);
+                        break;
+                    }
+                default:
+                    {
+                        utree ut;
+                        ut.push_back(c);
+                        ut.push_back(val);
+                        c.swap(ut);
+                    }
+            }
+            return true;
         }
     };
 
@@ -110,14 +190,51 @@ namespace boost { namespace spirit { namespace traits
     };
 
     ///////////////////////////////////////////////////////////////////////////
+    // force utree list attribute in a sequence to be dereferenced if a rule
+    // or a grammar takes an utree
+    template <
+        typename OutputIterator, typename T1, typename T2, typename T3
+      , typename T4>
+    struct handles_container<
+            karma::rule<OutputIterator, T1, T2, T3, T4>, utree>
+      : mpl::false_
+    {};
+
+    template <
+        typename OutputIterator, typename T1, typename T2, typename T3
+      , typename T4>
+    struct handles_container<
+            karma::grammar<OutputIterator, T1, T2, T3, T4>, utree>
+      : mpl::false_
+    {};
+
+    ///////////////////////////////////////////////////////////////////////////
+    // the specialization below tells Spirit how to handle utree if it is used
+    // with an optional component
+    template <>
+    struct optional_attribute<utree>
+    {
+        typedef utree const& type;
+
+        static type call(utree const& val)
+        {
+            return val;
+        }
+
+        static bool is_valid(utree const& val)
+        {
+            return val.which() != utree_type::uninitialized_type;
+        }
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
     // the specialization below tells Spirit to handle utree as if it
     // where a 'real' variant (in the context of karma)
     template <>
     struct not_is_variant<utree, karma::domain>
       : mpl::false_ {};
 
-    ///////////////////////////////////////////////////////////////////////////
-    // this specialization tells Spirit how to extract the type of the value 
+    // this specialization tells Spirit how to extract the type of the value
     // stored in the given utree node
     template <>
     struct variant_which<utree>
@@ -125,7 +242,6 @@ namespace boost { namespace spirit { namespace traits
         static int call(utree const& u) { return u.which(); }
     };
 
-    ///////////////////////////////////////////////////////////////////////////
     // The specializations below tell Spirit to verify whether an attribute
     // type is compatible with a given variant type
     template <>
@@ -135,9 +251,9 @@ namespace boost { namespace spirit { namespace traits
     {
         typedef iterator_range<utree::iterator> compatible_type;
 
-        static bool is_compatible(int d) 
-        { 
-            return d == utree_type::list_type; 
+        static bool is_compatible(int d)
+        {
+            return d == utree_type::list_type;
         }
     };
 
@@ -148,21 +264,33 @@ namespace boost { namespace spirit { namespace traits
     {
         typedef iterator_range<utree::const_iterator> compatible_type;
 
-        static bool is_compatible(int d) 
-        { 
-            return d == utree_type::list_type; 
+        static bool is_compatible(int d)
+        {
+            return d == utree_type::list_type;
         }
     };
 
     template <>
-    struct compute_compatible_component_variant<utree, nil>
+    struct compute_compatible_component_variant<utree, uninitialized_type>
       : mpl::true_
     {
-        typedef nil compatible_type;
+        typedef uninitialized_type compatible_type;
 
-        static bool is_compatible(int d) 
-        { 
-            return d == utree_type::nil_type; 
+        static bool is_compatible(int d)
+        {
+            return d == utree_type::uninitialized_type;
+        }
+    };
+
+    template <>
+    struct compute_compatible_component_variant<utree, nil_type>
+      : mpl::true_
+    {
+        typedef nil_type compatible_type;
+
+        static bool is_compatible(int d)
+        {
+            return d == utree_type::nil_type;
         }
     };
 
@@ -172,9 +300,9 @@ namespace boost { namespace spirit { namespace traits
     {
         typedef bool compatible_type;
 
-        static bool is_compatible(int d) 
-        { 
-            return d == utree_type::bool_type; 
+        static bool is_compatible(int d)
+        {
+            return d == utree_type::bool_type;
         }
     };
 
@@ -184,9 +312,9 @@ namespace boost { namespace spirit { namespace traits
     {
         typedef int compatible_type;
 
-        static bool is_compatible(int d) 
-        { 
-            return d == utree_type::int_type; 
+        static bool is_compatible(int d)
+        {
+            return d == utree_type::int_type;
         }
     };
 
@@ -196,22 +324,22 @@ namespace boost { namespace spirit { namespace traits
     {
         typedef double compatible_type;
 
-        static bool is_compatible(int d) 
-        { 
-            return d == utree_type::double_type; 
+        static bool is_compatible(int d)
+        {
+            return d == utree_type::double_type;
         }
     };
 
     template <>
     struct compute_compatible_component_variant<
-            utree, utf8_string_range>
+            utree, utf8_string_range_type>
       : mpl::true_
     {
-        typedef utf8_string_range compatible_type;
+        typedef utf8_string_range_type compatible_type;
 
-        static bool is_compatible(int d) 
-        { 
-            return d == utree_type::string_type; 
+        static bool is_compatible(int d)
+        {
+            return d == utree_type::string_type;
         }
     };
 
@@ -222,61 +350,61 @@ namespace boost { namespace spirit { namespace traits
     {
         typedef utf8_string_type compatible_type;
 
-        static bool is_compatible(int d) 
-        { 
-            return d == utree_type::string_type; 
+        static bool is_compatible(int d)
+        {
+            return d == utree_type::string_type;
         }
     };
 
     template <>
     struct compute_compatible_component_variant<
-            utree, utf8_symbol_range>
+            utree, utf8_symbol_range_type>
       : mpl::true_
     {
-        typedef utf8_symbol_range compatible_type;
+        typedef utf8_symbol_range_type compatible_type;
 
-        static bool is_compatible(int d) 
-        { 
-            return d == utree_type::symbol_type; 
+        static bool is_compatible(int d)
+        {
+            return d == utree_type::symbol_type;
         }
     };
 
     template <>
     struct compute_compatible_component_variant<
-            utree, utf8_symbol>
+            utree, utf8_symbol_type>
       : mpl::true_
     {
-        typedef utf8_symbol compatible_type;
+        typedef utf8_symbol_type compatible_type;
 
-        static bool is_compatible(int d) 
-        { 
-            return d == utree_type::symbol_type; 
+        static bool is_compatible(int d)
+        {
+            return d == utree_type::symbol_type;
         }
     };
 
     template <>
     struct compute_compatible_component_variant<
-            utree, binary_range>
+            utree, binary_range_type>
       : mpl::true_
     {
-        typedef binary_range compatible_type;
+        typedef binary_range_type compatible_type;
 
-        static bool is_compatible(int d) 
-        { 
-            return d == utree_type::binary_type; 
+        static bool is_compatible(int d)
+        {
+            return d == utree_type::binary_type;
         }
     };
 
     template <>
     struct compute_compatible_component_variant<
-            utree, binary_string>
+            utree, binary_string_type>
       : mpl::true_
     {
-        typedef binary_string compatible_type;
+        typedef binary_string_type compatible_type;
 
-        static bool is_compatible(int d) 
-        { 
-            return d == utree_type::binary_type; 
+        static bool is_compatible(int d)
+        {
+            return d == utree_type::binary_type;
         }
     };
 
@@ -286,10 +414,10 @@ namespace boost { namespace spirit { namespace traits
     {
         typedef utree compatible_type;
 
-        static bool is_compatible(int d) 
-        { 
-            return d >= utree_type::nil_type &&
-                   d <= utree_type::reference_type; 
+        static bool is_compatible(int d)
+        {
+            return d >= utree_type::uninitialized_type &&
+                   d <= utree_type::reference_type;
         }
     };
 
@@ -300,10 +428,10 @@ namespace boost { namespace spirit { namespace traits
     {
         typedef utree compatible_type;
 
-        static bool is_compatible(int d) 
-        { 
-            return d >= utree_type::nil_type &&
-                   d <= utree_type::reference_type; 
+        static bool is_compatible(int d)
+        {
+            return d >= utree_type::uninitialized_type &&
+                   d <= utree_type::reference_type;
         }
     };
 
@@ -315,31 +443,31 @@ namespace boost { namespace spirit { namespace traits
     {
         typedef iterator_range<utree::const_iterator> compatible_type;
 
-        static bool is_compatible(int d) 
-        { 
-            return d == utree_type::list_type; 
+        static bool is_compatible(int d)
+        {
+            return d == utree_type::list_type;
         }
     };
 
     ///////////////////////////////////////////////////////////////////////////
     template <>
-    struct symbols_lookup<utree, utf8_symbol>
+    struct symbols_lookup<utree, utf8_symbol_type>
     {
         typedef std::string type;
 
         static type call(utree const& t)
         {
-            utf8_symbol_range r = boost::get<utf8_symbol_range>(t);
+            utf8_symbol_range_type r = boost::get<utf8_symbol_range_type>(t);
             return std::string(r.begin(), r.end());
         }
     };
 
     template <>
-    struct symbols_lookup<utf8_symbol, utf8_symbol>
+    struct symbols_lookup<utf8_symbol_type, utf8_symbol_type>
     {
         typedef std::string type;
 
-        static type call(utf8_symbol const& t)
+        static type call(utf8_symbol_type const& t)
         {
             return t;
         }
@@ -347,52 +475,202 @@ namespace boost { namespace spirit { namespace traits
 
     ///////////////////////////////////////////////////////////////////////////
     template <>
-    struct extract_from_attribute<utree, utf8_symbol>
+    struct extract_from_attribute<utree, char>
     {
-        typedef std::string type;
+        typedef char type;
 
         template <typename Context>
         static type call(utree const& t, Context&)
         {
-            utf8_symbol_range r = boost::get<utf8_symbol_range>(t);
-            return std::string(r.begin(), r.end());
+            utf8_symbol_range_type r = boost::get<utf8_symbol_range_type>(t);
+            return r.front();
         }
     };
 
     template <>
-    struct extract_from_attribute<utree, utf8_string>
+    struct extract_from_attribute<utree, bool>
     {
-        typedef std::string type;
+        typedef bool type;
 
         template <typename Context>
         static type call(utree const& t, Context&)
         {
-            utf8_string_range r = boost::get<utf8_string_range>(t);
-            return std::string(r.begin(), r.end());
+            return boost::get<bool>(t);
+        }
+    };
+
+    template <>
+    struct extract_from_attribute<utree, int>
+    {
+        typedef int type;
+
+        template <typename Context>
+        static type call(utree const& t, Context&)
+        {
+            return boost::get<int>(t);
+        }
+    };
+
+    template <>
+    struct extract_from_attribute<utree, double>
+    {
+        typedef double type;
+
+        template <typename Context>
+        static type call(utree const& t, Context&)
+        {
+            return boost::get<double>(t);
+        }
+    };
+
+    template <typename Traits, typename Alloc>
+    struct extract_from_attribute<utree, std::basic_string<char, Traits, Alloc> >
+    {
+        typedef std::basic_string<char, Traits, Alloc> type;
+
+        template <typename Context>
+        static type call(utree const& t, Context&)
+        {
+            utf8_symbol_range_type r = boost::get<utf8_string_range_type>(t);
+            return std::basic_string<char, Traits, Alloc>(r.begin(), r.end());
         }
     };
 
     ///////////////////////////////////////////////////////////////////////////
     template <>
-    struct transform_attribute<utree const, utf8_string, karma::domain>
+    struct extract_from_attribute<utree, utf8_symbol_type>
     {
         typedef std::string type;
 
-        static type pre(utree const& t) 
-        { 
-            utf8_string_range r = boost::get<utf8_string_range>(t);
+        template <typename Context>
+        static type call(utree const& t, Context&)
+        {
+            utf8_symbol_range_type r = boost::get<utf8_symbol_range_type>(t);
             return std::string(r.begin(), r.end());
         }
     };
 
     template <>
-    struct transform_attribute<utree const, utf8_symbol, karma::domain>
+    struct extract_from_attribute<utree, utf8_string_type>
     {
         typedef std::string type;
 
-        static type pre(utree const& t) 
-        { 
-            utf8_symbol_range r = boost::get<utf8_symbol_range>(t);
+        template <typename Context>
+        static type call(utree const& t, Context&)
+        {
+            utf8_string_range_type r = boost::get<utf8_string_range_type>(t);
+            return std::string(r.begin(), r.end());
+        }
+    };
+
+//     template <typename Iterator>
+//     struct extract_from_attribute<utree, iterator_range<Iterator> >
+//     {
+//         typedef utree type;
+// 
+//         template <typename Context>
+//         static type call(utree const& t, Context&)
+//         {
+//             // return utree the begin iterator points to
+//             return utree(boost::ref(t.front()));
+//         }
+//     };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <>
+    struct transform_attribute<utree const, char, karma::domain>
+    {
+        typedef char type;
+
+        static type pre(utree const& t)
+        {
+            utf8_string_range_type r = boost::get<utf8_string_range_type>(t);
+            return r.front();
+        }
+    };
+
+    template <>
+    struct transform_attribute<utree const, bool, karma::domain>
+    {
+        typedef bool type;
+
+        static type pre(utree const& t)
+        {
+            return boost::get<bool>(t);
+        }
+    };
+
+    template <>
+    struct transform_attribute<utree const, int, karma::domain>
+    {
+        typedef int type;
+
+        static type pre(utree const& t)
+        {
+            return boost::get<int>(t);
+        }
+    };
+
+    template <>
+    struct transform_attribute<utree const, double, karma::domain>
+    {
+        typedef double type;
+
+        static type pre(utree const& t)
+        {
+            return boost::get<double>(t);
+        }
+    };
+
+    template <typename Traits, typename Alloc>
+    struct transform_attribute<
+        utree const, std::basic_string<char, Traits, Alloc>, karma::domain>
+    {
+        typedef std::basic_string<char, Traits, Alloc> type;
+
+        static type pre(utree const& t)
+        {
+            utf8_symbol_range_type r = boost::get<utf8_string_range_type>(t);
+            return std::basic_string<char, Traits, Alloc>(r.begin(), r.end());
+        }
+    };
+
+    // this specialization is used whenever a utree is passed to a rule as part
+    // of a sequence
+    template <typename Iterator>
+    struct transform_attribute<
+        iterator_range<Iterator> const, utree, karma::domain>
+    {
+        typedef utree type;
+
+        static type pre(iterator_range<Iterator> const& t)
+        {
+            // return utree the begin iterator points to
+            return utree(boost::ref(t.front()));
+        }
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <>
+    struct transform_attribute<utree const, utf8_string_type, karma::domain>
+    {
+        typedef std::string type;
+
+        static type pre(utree const& t)
+        {
+            utf8_string_range_type r = boost::get<utf8_string_range_type>(t);
+            return std::string(r.begin(), r.end());
+        }
+    };
+
+    template <>
+    struct transform_attribute<utree const, utf8_symbol_type, karma::domain>
+    {
+        typedef std::string type;
+
+        static type pre(utree const& t)
+        {
+            utf8_symbol_range_type r = boost::get<utf8_symbol_range_type>(t);
             return std::string(r.begin(), r.end());
         }
     };

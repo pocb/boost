@@ -16,7 +16,6 @@
 #include <boost/graph/stoer_wagner_min_cut.hpp>
 #include <boost/graph/property_maps/constant_property_map.hpp>
 #include <boost/property_map/property_map.hpp>
-#define BOOST_TEST_DYN_LINK 1
 #include <boost/test/unit_test.hpp>
 #include <boost/tuple/tuple.hpp>
 
