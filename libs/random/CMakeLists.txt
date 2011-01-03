@@ -15,12 +15,12 @@ set (lib_headers
 # Add a library target to the build system
 boost_library_project(
   random
-  #  SRCDIRS 
+  SRCDIRS  src 
   TESTDIRS  test
   HEADERS ${lib_headers}
   #  DOCDIRS 
   DESCRIPTION  "A complete system for random number generation."
-  MODULARIZED 
+  MODULARIZED
   AUTHORS  "Jens Maurer <Jens.Maurer -at- gmx.net>"
   #  MAINTAINERS 
 )
