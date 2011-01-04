@@ -145,7 +145,7 @@ namespace
   bool visit_predicate( const path & pth )
   {
     string local( boost::inspect::relative_to( pth, fs::initial_path() ) );
-    string leaf( pth.leaf() );
+    string leaf( pth.leaf().string() );
     return
       // so we can inspect a checkout
       leaf != "CVS"
@@ -153,12 +153,13 @@ namespace
       && leaf != "bin"
       && leaf != "bin.v2"
       // this really out of our hands
-      && local.find("tools/jam/src") != 0
       && local.find("tools/build/v2/engine") != 0
+      && local.find("tools\\build\\v2\\engine") != 0
       // too many issues with generated HTML files
       && leaf != "status"
       // no point in checking doxygen xml output
       && local.find("doc/xml") != 0
+      && local.find("doc\\xml") != 0
       // ignore some web files
       && leaf != ".htaccess"
       // ignore svn files:
@@ -202,7 +203,7 @@ namespace
   bool find_signature( const path & file_path,
     const boost::inspect::string_set & signatures )
   {
-    string name( file_path.leaf() );
+    string name( file_path.leaf().string() );
     if ( signatures.find( name ) == signatures.end() )
     {
       string::size_type pos( name.rfind( '.' ) );
@@ -347,6 +348,32 @@ namespace
       std::cout << "</blockquote>\n"; 
   }
 
+//  html_encode  -------------------------------------------------------------//
+
+  std::string html_encode(std::string const& text)
+  {
+    std::string result;
+    
+    for(std::string::const_iterator it = text.begin(),
+        end = text.end(); it != end; ++it)
+    {
+      switch(*it) {
+      case '<':
+        result += "&lt;";
+        break;
+      case '>':
+        result += "&gt;";
+        break;
+      case '&':
+        result += "&amp;";
+        break;
+      default:
+        result += *it;
+      }      
+    }
+    
+    return result;
+  }
 
 //  display_details  ---------------------------------------------------------//
 
@@ -441,8 +468,8 @@ namespace
 
           // print the message
           if (itr->line_number)
-            std::cout << sep << "(line " << itr->line_number << ") " << itr->msg;
-          else std::cout << sep << itr->msg;
+            std::cout << sep << "(line " << itr->line_number << ") " << html_encode(itr->msg);
+          else std::cout << sep << html_encode(itr->msg);
 
           first_sep = false;
         }
@@ -675,13 +702,12 @@ namespace boost
     // may return an empty string [gps]
     string impute_library( const path & full_dir_path )
     {
-      path relative( relative_to( full_dir_path, fs::initial_path() ),
-        fs::no_check );
+      path relative( relative_to( full_dir_path, fs::initial_path() ) );
       if ( relative.empty() ) return "boost-root";
-      string first( *relative.begin() );
+      string first( (*relative.begin()).string() );
       string second =  // borland 5.61 requires op=
         ++relative.begin() == relative.end()
-          ? string() : *++relative.begin();
+          ? string() : (*++relative.begin()).string();
 
       if ( first == "boost" )
         return second;

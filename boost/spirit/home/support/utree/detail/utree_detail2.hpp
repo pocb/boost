@@ -330,12 +330,11 @@ namespace boost { namespace spirit { namespace detail
     template <typename T>
     inline void list::push_back(T const& val)
     {
-
         if (last == 0)
             push_front(val);
         else {
-            detail::list::node* new_node
-              = new detail::list::node(val, last->next, last);
+            detail::list::node* new_node = 
+                new detail::list::node(val, last->next, last);
             last->next = new_node;
             last = new_node;
             ++size;
@@ -460,11 +459,11 @@ namespace boost { namespace spirit { namespace detail
                     boost::throw_exception(bad_type_exception());
                     break;
 
-                case type::uninitialized_type:
-                    return f(uninitialized);
+                case type::invalid_type:
+                    return f(utree::invalid);
 
                 case type::nil_type:
-                    return f(nil);
+                    return f(utree::nil);
 
                 case type::bool_type:
                     return f(x.b);
@@ -523,11 +522,11 @@ namespace boost { namespace spirit { namespace detail
                     boost::throw_exception(bad_type_exception());
                     break;
 
-                case type::uninitialized_type:
-                    return visit_impl::apply(y, detail::bind(f, uninitialized));
+                case type::invalid_type:
+                    return visit_impl::apply(y, detail::bind(f, utree::invalid));
 
                 case type::nil_type:
-                    return visit_impl::apply(y, detail::bind(f, nil));
+                    return visit_impl::apply(y, detail::bind(f, utree::nil));
 
                 case type::bool_type:
                     return visit_impl::apply(y, detail::bind(f, x.b));
@@ -621,18 +620,18 @@ namespace boost { namespace spirit
         return new stored_function<F>(*this);
     }
 
-    inline utree::utree(uninitialized_type)
+    inline utree::utree(utree::invalid_type)
     {
         s.initialize();
-        set_type(type::uninitialized_type);
+        set_type(type::invalid_type);
     }
 
-    inline utree::utree(nil_type)
+    inline utree::utree(utree::nil_type)
     {
         s.initialize();
         set_type(type::nil_type);
     }
-
+    
     inline utree::utree(bool b_) 
     {
         s.initialize();
@@ -725,7 +724,7 @@ namespace boost { namespace spirit
     inline utree::utree(boost::iterator_range<Iter> r)
     {
         s.initialize();
-        set_type(type::uninitialized_type);
+
         assign(r.begin(), r.end());
     }
 
@@ -1009,63 +1008,20 @@ namespace boost { namespace spirit
             insert(pos, *first++);
     }
 
-    namespace detail
-    {
-        struct assign_impl
-        {
-            template <typename Iterator>
-            static void dispatch(utree& ut, Iterator first, Iterator last)
-            {
-                ut.ensure_list_type();
-                ut.clear();
-                while (first != last)
-                {
-                    ut.push_back(*first);
-                    ++first;
-                }
-            }
-
-            template <typename Iterator>
-            static void dispatch_string(utree& ut, Iterator first, Iterator last)
-            {
-                ut.free();
-                ut.s.construct(first, last);
-                ut.set_type(utree_type::string_type);
-            }
-
-            static void dispatch(utree& ut,
-                std::basic_string<char>::iterator first,
-                std::basic_string<char>::iterator last)
-            {
-                dispatch_string(ut, first, last);
-            }
-
-            static void dispatch(utree& ut,
-                std::basic_string<char>::const_iterator first,
-                std::basic_string<char>::const_iterator last)
-            {
-                dispatch_string(ut, first, last);
-            }
-
-            static void dispatch(utree& ut, char const* first, char const* last)
-            {
-                dispatch_string(ut, first, last);
-            }
-
-            template <typename Iterator>
-            static void call(utree& ut, Iterator first, Iterator last)
-            {
-                dispatch(ut, first, last);
-            }
-        };
-    }
-
     template <typename Iterator>
     inline void utree::assign(Iterator first, Iterator last)
     {
         if (get_type() == type::reference_type)
             return p->assign(first, last);
-        detail::assign_impl::call(*this, first, last);
+
+        clear();
+        set_type(type::list_type);
+
+        while (first != last)
+        {
+            push_back(*first);
+            ++first;
+        }
     }
 
     inline void utree::clear()
@@ -1073,9 +1029,9 @@ namespace boost { namespace spirit
         if (get_type() == type::reference_type)
             return p->clear();
 
-        // clear will always make this an uninitialized type
+        // clear will always make this an invalid type
         free();
-        set_type(type::uninitialized_type);
+        set_type(type::invalid_type);
     }
 
     inline void utree::pop_front()
@@ -1208,7 +1164,7 @@ namespace boost { namespace spirit
         if (t == type::list_type)
             return l.size == 0;
 
-        return t == type::nil_type || t == type::uninitialized_type;
+        return t == type::nil_type || t == type::invalid_type;
     }
 
     inline std::size_t utree::size() const
@@ -1330,7 +1286,7 @@ namespace boost { namespace spirit
     inline void utree::ensure_list_type()
     {
         type::info t = get_type();
-        if (t == type::uninitialized_type || t == type::nil_type)
+        if (t == type::invalid_type)
         {
             set_type(type::list_type);
             l.default_construct();
@@ -1370,7 +1326,7 @@ namespace boost { namespace spirit
             default:
                 boost::throw_exception(bad_type_exception());
                 break;
-            case type::uninitialized_type:
+            case type::invalid_type:
             case type::nil_type:
                 break;
             case type::bool_type:

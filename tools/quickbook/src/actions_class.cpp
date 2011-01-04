@@ -11,6 +11,7 @@
 #include "actions_class.hpp"
 #include "markups.hpp"
 #include "quickbook.hpp"
+#include "grammar.hpp"
 
 #if (defined(BOOST_MSVC) && (BOOST_MSVC <= 1310))
 #pragma warning(disable:4355)
@@ -19,8 +20,10 @@
 namespace quickbook
 {
     actions::actions(char const* filein_, fs::path const& outdir_, string_stream& out_)
+        : grammar_()
+
     // header info
-        : doc_type()
+        , doc_type()
         , doc_title()
         , doc_version()
         , doc_id()
@@ -68,6 +71,10 @@ namespace quickbook
         , image_fileref()
         , attribute_name()
         , attributes()
+        , anchors()
+        , saved_anchors()
+        , no_eols(true)
+        , suppress(false)
 
     // actions
         , error(error_count)
@@ -84,6 +91,7 @@ namespace quickbook
         , extract_doc_category(doc_category, phrase, *this)
         , extract_doc_biblioid(doc_biblioid.second, phrase, *this)
         , extract_doc_lang(doc_lang, phrase, *this)
+        , scoped_block(*this)
         , code(out, phrase, *this)
         , code_block(phrase, phrase, *this)
         , inline_code(phrase, *this)
@@ -98,6 +106,7 @@ namespace quickbook
         , hr(out, hr_, *this)
         , blurb(out, blurb_pre, blurb_post, *this)
         , blockquote(out, blockquote_pre, blockquote_post, *this)
+        , set_no_eols(*this)
         , preformatted(out, phrase, preformatted_pre, preformatted_post, *this)
         , warning(out, warning_pre, warning_post, *this)
         , caution(out, caution_pre, caution_post, *this)
@@ -110,8 +119,8 @@ namespace quickbook
         , escape_unicode(phrase, *this)
         , attribute(attributes, attribute_name, error_count)
         , image(phrase, attributes, image_fileref, *this)
-        , cond_phrase_pre(phrase, conditions, macro, *this)
-        , cond_phrase_post(phrase, conditions, macro, *this)
+        , cond_phrase_pre(condition, macro)
+        , scoped_cond_phrase(*this)
 
         , list(out, list_buffer, list_indent, list_marks, *this)
         , list_format(list_buffer, list_indent, list_marks, error_count, *this)
@@ -176,9 +185,9 @@ namespace quickbook
         , link_pre(phrase, link_pre_, *this)
         , link_post(phrase, link_post_, *this)
         , table(*this)
-        , start_row(phrase, table_span, table_header)
+        , start_row(phrase, table_span, table_header, *this)
         , end_row(phrase, end_row_, *this)
-        , cell(phrase, table_span)
+        , cell(phrase, table_span, *this)
         , anchor(*this)
 
         , begin_section(out, phrase, doc_id, section_id, section_level, qualified_section_id, element_id, *this)
@@ -205,8 +214,12 @@ namespace quickbook
             ("__TIME__", std::string(quickbook_get_time))
             ("__FILENAME__", filename_str)
         ;
+        
+        boost::scoped_ptr<quickbook_grammar> g(
+            new quickbook_grammar(*this));
+        grammar_.swap(g);
     }
-
+    
     void actions::push()
     {
         state_stack.push(
@@ -266,5 +279,9 @@ namespace quickbook
         phrase.pop();
         list_buffer.pop();
         templates.pop();
+    }
+    
+    quickbook_grammar& actions::grammar() const {
+        return *grammar_;
     }
 }

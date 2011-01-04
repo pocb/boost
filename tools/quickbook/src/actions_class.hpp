@@ -11,7 +11,9 @@
 #define BOOST_SPIRIT_ACTIONS_CLASS_HPP
 
 #include "actions.hpp"
+#include "scoped_parser.hpp"
 #include <boost/tuple/tuple.hpp>
+#include <boost/scoped_ptr.hpp>
 
 namespace quickbook
 {
@@ -22,6 +24,10 @@ namespace quickbook
     {
         actions(char const* filein_, fs::path const& outdir, string_stream& out_);
 
+    private:
+        boost::scoped_ptr<quickbook_grammar> grammar_;
+
+    public:
     ///////////////////////////////////////////////////////////////////////////
     // State
     ///////////////////////////////////////////////////////////////////////////
@@ -102,7 +108,7 @@ namespace quickbook
         std::string             macro_id;
         std::stack<mark_type>   list_marks;
         int                     list_indent;
-        std::vector<bool>       conditions;
+        bool                    condition;
         std::string             template_identifier;
         string_list             template_info;
         int                     template_depth;
@@ -117,11 +123,14 @@ namespace quickbook
         attribute_map           attributes;
         string_list             anchors;
         string_list             saved_anchors;
+        bool                    no_eols;
+        bool                    suppress;
 
     // push/pop the states and the streams
         void copy_macros_for_write();
         void push();
         void pop();
+        quickbook_grammar& grammar() const;
 
     ///////////////////////////////////////////////////////////////////////////
     // actions
@@ -141,6 +150,9 @@ namespace quickbook
         phrase_to_docinfo_action extract_doc_biblioid;
         phrase_to_docinfo_action extract_doc_lang;
 
+        scoped_parser<scoped_block_push>
+                                scoped_block;
+
         code_action             code;
         code_action             code_block;
         inline_code_action      inline_code;
@@ -149,6 +161,8 @@ namespace quickbook
         header_action           h1, h2, h3, h4, h5, h6;
         markup_action           hr;
         tagged_action           blurb, blockquote;
+        scoped_parser<set_no_eols_scoped>
+                                set_no_eols;
         phrase_action           preformatted;
         tagged_action           warning, caution, important, note, tip;
         space                   space_char;
@@ -158,7 +172,8 @@ namespace quickbook
         attribute_action        attribute;
         image_action            image;
         cond_phrase_action_pre  cond_phrase_pre;
-        cond_phrase_action_post cond_phrase_post;
+        scoped_parser<cond_phrase_push>
+                                scoped_cond_phrase;
 
         list_action             list;
         list_format_action      list_format;

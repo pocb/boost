@@ -1,5 +1,5 @@
-//  Copyright (c) 2001-2010 Hartmut Kaiser
-//  Copyright (c) 2001-2010 Joel de Guzman
+//  Copyright (c) 2001-2011 Hartmut Kaiser
+//  Copyright (c) 2001-2011 Joel de Guzman
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -188,13 +188,17 @@ namespace boost { namespace spirit { namespace traits
       : nary_has_semantic_action<Elements> {};
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Elements, typename Attribute>
-    struct handles_container<karma::alternative<Elements>, Attribute>
-      : nary_handles_container<Elements, Attribute> {};
-
-    template <typename Elements, typename Attribute>
-    struct handles_container<karma::strict_alternative<Elements>, Attribute>
-      : nary_handles_container<Elements, Attribute> {};
+    template <typename Elements, typename Attribute, typename Context
+      , typename Iterator>
+    struct handles_container<karma::alternative<Elements>, Attribute, Context
+      , Iterator>
+      : nary_handles_container<Elements, Attribute, Context, Iterator> {};
+    
+    template <typename Elements, typename Attribute, typename Context
+      , typename Iterator>
+    struct handles_container<karma::strict_alternative<Elements>, Attribute
+      , Context, Iterator>
+      : nary_handles_container<Elements, Attribute, Context, Iterator> {};
 }}}
 
 #endif

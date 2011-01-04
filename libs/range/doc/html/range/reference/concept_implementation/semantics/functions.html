@@ -168,8 +168,10 @@
                   </td>
 <td>
                     <p>
-                      <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">end</span><span class="special">(</span><span class="identifier">x</span><span class="special">)</span>
-                      <span class="special">-</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">begin</span><span class="special">(</span><span class="identifier">x</span><span class="special">)</span></code>
+                      <code class="computeroutput"><span class="identifier">range_calculate_size</span><span class="special">(</span><span class="identifier">x</span><span class="special">)</span></code> which by default is <code class="computeroutput"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">end</span><span class="special">(</span><span class="identifier">x</span><span class="special">)</span>
+                      <span class="special">-</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">begin</span><span class="special">(</span><span class="identifier">x</span><span class="special">)</span></code>. Users may supply alternative
+                      implementations by implementing <code class="computeroutput"><span class="identifier">range_calculate_size</span><span class="special">(</span><span class="identifier">x</span><span class="special">)</span></code> so that it will be found via
+                      ADL
                     </p>
                   </td>
 <td>

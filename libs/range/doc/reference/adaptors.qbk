@@ -1,3 +1,8 @@
+[/
+    Copyright 2010 Neil Groves
+    Distributed under the Boost Software License, Version 1.0.
+    (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+/]
 [section:adaptors Range Adaptors]
 
 [section:introduction Introduction and motivation]
@@ -172,6 +177,7 @@ rng | boost::adaptors::adaptor_generator
 [include adaptors/reversed.qbk]
 [include adaptors/sliced.qbk]
 [include adaptors/strided.qbk]
+[include adaptors/type_erased.qbk]
 [include adaptors/tokenized.qbk]
 [include adaptors/transformed.qbk]
 [include adaptors/uniqued.qbk]

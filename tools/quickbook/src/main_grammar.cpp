@@ -11,7 +11,6 @@
 #include "grammar_impl.hpp"
 #include "actions_class.hpp"
 #include "utils.hpp"
-#include "scoped_block.hpp"
 #include <boost/spirit/include/classic_core.hpp>
 #include <boost/spirit/include/classic_confix.hpp>
 #include <boost/spirit/include/classic_chset.hpp>
@@ -64,7 +63,7 @@ namespace quickbook
                         block_markup, block_markup_start,
                         code, code_line, blank_line, hr,
                         list, ordered_list, list_item,
-                        phrase_markup,
+                        phrase_markup, extended_phrase_markup,
                         simple_phrase_end,
                         escape,
                         inline_code, simple_format,
@@ -101,7 +100,7 @@ namespace quickbook
         local.top_level
             =   local.blocks
             >>  *(
-                    local.block_markup >> local.blocks
+                    local.block_markup >> !(+eol >> local.blocks)
                 |   local.paragraph_separator >> local.blocks
                 |   common
                 |   cl::space_p                 [actions.space_char]
@@ -131,7 +130,7 @@ namespace quickbook
         local.block_markup
             =   local.block_markup_start        [actions.inside_paragraph]
             >>  (   local.block_keyword_rule
-                >>  (   (space >> ']' >> +eol)
+                >>  (   (space >> ']')
                     |   cl::eps_p               [actions.error]
                     )
                 |   cl::eps_p                   [actions.error]
@@ -328,6 +327,13 @@ namespace quickbook
             )
             ;
 
+        extended_phrase =
+           *(   local.extended_phrase_markup
+            |   common
+            |   (cl::anychar_p - phrase_end)    [actions.plain_char]
+            )
+            ;
+
         inside_paragraph =
             (*( common
             |   (cl::anychar_p - phrase_end)    [actions.plain_char]
@@ -337,6 +343,7 @@ namespace quickbook
 
         local.phrase_markup
             =   '['
+            >>  space
             >>  (   phrase_keyword_rules        [detail::assign_rule(local.phrase_keyword_rule)]
                 >>  (cl::eps_p - (cl::alnum_p | '_'))
                 >>  local.phrase_keyword_rule
@@ -346,6 +353,20 @@ namespace quickbook
                 |   cl::str_p("br")             [actions.break_]
                 )
             >>  ']'
+            ;
+
+        local.extended_phrase_markup
+            =   '['
+            >>  space
+            >>  extended_phrase_keyword_rules   [detail::assign_rule(local.block_keyword_rule)]
+            >>  (cl::eps_p - (cl::alnum_p | '_'))
+                                                [actions.inside_paragraph]
+            >>  (   local.block_keyword_rule
+                >>  (   (space >> ']')
+                    |   cl::eps_p               [actions.error]
+                    )
+                |   cl::eps_p                   [actions.error]
+                )
             ;
 
         local.escape =
@@ -423,7 +444,7 @@ namespace quickbook
 
         phrase_end =
             ']' |
-            cl::if_p(var(no_eols))
+            cl::if_p(var(actions.no_eols))
             [
                 cl::eol_p >> *cl::blank_p >> cl::eol_p
                                                 // Make sure that we don't go

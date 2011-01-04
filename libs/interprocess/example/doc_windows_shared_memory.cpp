@@ -8,8 +8,9 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 #include <boost/interprocess/detail/config_begin.hpp>
+#include <boost/interprocess/detail/workaround.hpp>
 
-#ifdef BOOST_INTERPROCESS_WINDOWS
+#if defined(BOOST_INTERPROCESS_WINDOWS) || defined(BOOST_INTERPROCESS_DOXYGEN_INVOKED)
 
 //[doc_windows_shared_memory
 #include <boost/interprocess/windows_shared_memory.hpp>
@@ -56,7 +57,7 @@ int main(int argc, char *argv[])
       //Open already created shared memory object.
       //<-
       #if 1
-      windows_shared_memory shm (open_only, test::get_process_id_name(), read_only);
+      windows_shared_memory shm (open_only, argv[2], read_only);
       #else
       //->
       windows_shared_memory shm (open_only, "MySharedMemory", read_only);
