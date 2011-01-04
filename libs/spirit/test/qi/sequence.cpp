@@ -1,5 +1,5 @@
 /*=============================================================================
-    Copyright (c) 2001-2010 Joel de Guzman
+    Copyright (c) 2001-2011 Joel de Guzman
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -155,6 +155,28 @@ main()
 
         std::vector<char> v;
         BOOST_TEST(test_attr("a,b,c", char_ >> *(',' >> char_), v));
+        BOOST_TEST(v.size() == 3);
+        BOOST_TEST(v[0] == 'a');
+        BOOST_TEST(v[1] == 'b');
+        BOOST_TEST(v[2] == 'c');
+    }
+
+    { // alternative forms of attributes. Allow sequences to take in
+      // stl containers.
+
+        std::vector<char> v;
+        BOOST_TEST(test_attr("abc", char_ >> *char_, v));
+        BOOST_TEST(v.size() == 3);
+        BOOST_TEST(v[0] == 'a');
+        BOOST_TEST(v[1] == 'b');
+        BOOST_TEST(v[2] == 'c');
+    }
+
+    { // alternative forms of attributes. Allow sequences to take in
+      // stl containers.
+
+        std::vector<char> v;
+        BOOST_TEST(test_attr("abc", char_ >> -(+char_), v));
         BOOST_TEST(v.size() == 3);
         BOOST_TEST(v[0] == 'a');
         BOOST_TEST(v[1] == 'b');

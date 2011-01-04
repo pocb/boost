@@ -1,4 +1,5 @@
-//  Copyright (c) 2001-2010 Hartmut Kaiser
+//  Copyright (c) 2001-2011 Hartmut Kaiser
+//  Copyright (c)      2010 Bryce Lelbach
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -160,9 +161,13 @@ namespace boost { namespace spirit { namespace karma
             // fail if attribute isn't matched by immediate literal
             typedef typename attribute<Context>::type attribute_type;
 
+            typedef typename spirit::result_of::extract_from<attribute_type, Attribute>::type
+                extracted_string_type;
+
             using spirit::traits::get_c_string;
             if (!detail::string_compare(
-                    get_c_string(traits::extract_from<attribute_type>(attr, context))
+                    get_c_string(
+                        traits::extract_from<attribute_type>(attr, context))
                   , get_c_string(str_), char_encoding(), Tag()))
             {
                 return false;
@@ -276,15 +281,17 @@ namespace boost { namespace spirit { namespace karma
 namespace boost { namespace spirit { namespace traits
 {
     ///////////////////////////////////////////////////////////////////////////
-    template <typename CharEncoding, typename Tag, typename Attribute>
-    struct handles_container<karma::any_string<CharEncoding, Tag>, Attribute>
+    template <typename CharEncoding, typename Tag, typename Attribute
+            , typename Context, typename Iterator>
+    struct handles_container<karma::any_string<CharEncoding, Tag>, Attribute
+      , Context, Iterator>
       : mpl::false_ {};
 
     template <typename String, typename CharEncoding, typename Tag
-      , bool no_attribute, typename Attribute>
-    struct handles_container<
-            karma::literal_string<String, CharEncoding, Tag, no_attribute>
-          , Attribute>
+            , bool no_attribute, typename Attribute, typename Context
+            , typename Iterator>
+    struct handles_container<karma::literal_string<String, CharEncoding, Tag
+      , no_attribute>, Attribute, Context, Iterator>
       : mpl::false_ {};
 }}}
 

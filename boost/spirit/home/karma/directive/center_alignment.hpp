@@ -1,4 +1,4 @@
-//  Copyright (c) 2001-2010 Hartmut Kaiser
+//  Copyright (c) 2001-2011 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -313,15 +313,19 @@ namespace boost { namespace spirit { namespace traits
       : unary_has_semantic_action<Subject> {};
 
     ///////////////////////////////////////////////////////////////////////////
-    template <typename Subject, typename Width, typename Attribute>
+    template <typename Subject, typename Width, typename Attribute
+      , typename Context, typename Iterator>
     struct handles_container<
-            karma::simple_center_alignment<Subject, Width>, Attribute>
-      : unary_handles_container<Subject, Attribute> {};
+            karma::simple_center_alignment<Subject, Width>, Attribute
+          , Context, Iterator>
+      : unary_handles_container<Subject, Attribute, Context, Iterator> {};
 
-    template <typename Subject, typename Padding, typename Width, typename Attribute>
+    template <typename Subject, typename Padding, typename Width
+      , typename Attribute, typename Context, typename Iterator>
     struct handles_container<
-            karma::padding_center_alignment<Subject, Padding, Width>, Attribute>
-      : unary_handles_container<Subject, Attribute> {};
+            karma::padding_center_alignment<Subject, Padding, Width>
+          , Attribute, Context, Iterator>
+      : unary_handles_container<Subject, Attribute, Context, Iterator> {};
 }}}
 
 #endif

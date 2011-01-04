@@ -148,6 +148,9 @@ typedef struct _REPARSE_DATA_BUFFER {
 #define REPARSE_DATA_BUFFER_HEADER_SIZE \
   FIELD_OFFSET(REPARSE_DATA_BUFFER, GenericReparseBuffer)
 
+#endif
+
+#ifndef MAXIMUM_REPARSE_DATA_BUFFER_SIZE
 #define MAXIMUM_REPARSE_DATA_BUFFER_SIZE  ( 16 * 1024 )
 #endif
 
@@ -1445,6 +1448,9 @@ namespace detail
       {
         return process_status_failure(p, ec);
       }
+
+      if (!is_reparse_point_a_symlink(p))
+        return file_status(reparse_file);
     }
 
     if (ec != 0) ec->clear();

@@ -1,6 +1,7 @@
 /*=============================================================================
-    Copyright (c) 2001-2010 Hartmut Kaiser
-    Copyright (c) 2001-2010 Joel de Guzman
+    Copyright (c) 2001-2011 Hartmut Kaiser
+    Copyright (c) 2001-2011 Joel de Guzman
+    Copyright (c)      2010 Bryce Lelbach
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -17,6 +18,7 @@
     (defined(__APPLE__) && defined(__INTEL_COMPILER))
 #include <boost/utility/enable_if.hpp>
 #endif
+#include <boost/spirit/home/support/unused.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace boost { namespace spirit { namespace result_of
@@ -25,8 +27,8 @@ namespace boost { namespace spirit { namespace result_of
     template <typename Exposed, typename Attribute>
     struct extract_from;
 
-    template <typename Attribute>
-    struct attribute_as_string;
+    template <typename T, typename Attribute>
+    struct attribute_as;
 
     template <typename Exposed, typename Transformed, typename Domain>
     struct pre_transform;
@@ -100,6 +102,9 @@ namespace boost { namespace spirit { namespace traits
     template <typename Attribute, typename T, typename Enable = void>
     struct assign_to_attribute_from_value;
 
+    template <typename Attribute, typename T, typename Enable = void>
+    struct assign_to_container_from_value;
+
     template <typename T, typename Attribute>
     void assign_to(T const& val, Attribute& attr);
 
@@ -122,18 +127,24 @@ namespace boost { namespace spirit { namespace traits
 
     ///////////////////////////////////////////////////////////////////////////
     // Karma only
-    template <typename Attribute, typename Enable = void>
-    struct attribute_as_string;
+    template <typename T, typename Attribute, typename Enable = void>
+    struct attribute_as;
 
-    template <typename Attribute>
-    typename spirit::result_of::attribute_as_string<Attribute>::type
-    as_string(Attribute const& attr);
+    template <typename T, typename Attribute>
+    typename spirit::result_of::attribute_as<T, Attribute>::type
+    as(Attribute const& attr);
+    
+    template <typename T, typename Attribute>
+    bool valid_as(Attribute const& attr);
 
     ///////////////////////////////////////////////////////////////////////////
     // return the type currently stored in the given variant
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, typename Enable = void>
     struct variant_which;
+
+    template <typename T>
+    int which(T const& v);
 
     ///////////////////////////////////////////////////////////////////////////
     // Determine, whether T is a variant like type
@@ -160,8 +171,8 @@ namespace boost { namespace spirit { namespace traits
     struct is_container;
 
     ///////////////////////////////////////////////////////////////////////////
-    // Karma only
-    template <typename T, typename Attribute, typename Enable = void>
+    template <typename T, typename Attribute, typename Context = unused_type
+            , typename Iterator = unused_type, typename Enable = void>
     struct handles_container;
 
     ///////////////////////////////////////////////////////////////////////////
@@ -171,6 +182,9 @@ namespace boost { namespace spirit { namespace traits
 
     template <typename Container, typename Enable = void>
     struct is_empty_container;
+
+    template <typename Container, typename Enable = void>
+    struct make_container_attribute;
 
     ///////////////////////////////////////////////////////////////////////
     // Determine the iterator type of the given container type
@@ -218,7 +232,6 @@ namespace boost { namespace spirit { namespace traits
 
     template <typename Attribute, typename T, typename Enable = void>
     struct symbols_value;
-
 }}}
 
 #endif

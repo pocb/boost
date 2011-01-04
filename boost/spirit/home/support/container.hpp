@@ -1,6 +1,6 @@
 /*=============================================================================
-    Copyright (c) 2001-2010 Joel de Guzman
-    Copyright (c) 2001-2010 Hartmut Kaiser
+    Copyright (c) 2001-2011 Joel de Guzman
+    Copyright (c) 2001-2011 Hartmut Kaiser
     http://spirit.sourceforge.net/
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -349,10 +349,30 @@ namespace boost { namespace spirit { namespace traits
         return is_empty_container<Container>::call(c);
     }
 
-    template <typename T>
-    bool is_empty(unused_type)
+    inline bool is_empty(unused_type)
     {
         return true;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Ensure the attribute is actually a container type
+    template <typename Container, typename Enable/* = void*/>
+    struct make_container_attribute
+    {
+        static void call(Container& c)
+        {
+            // for static types this function does nothing
+        }
+    };
+
+    template <typename T>
+    void make_container(T& t)
+    {
+        make_container_attribute<T>::call(t);
+    }
+
+    inline void make_container(unused_type)
+    {
     }
 
     ///////////////////////////////////////////////////////////////////////////

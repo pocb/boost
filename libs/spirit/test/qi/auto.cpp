@@ -1,4 +1,4 @@
-//  Copyright (c) 2001-2010 Hartmut Kaiser
+//  Copyright (c) 2001-2011 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -118,14 +118,6 @@ int main()
     }
 
     {
-        // test primitive types
-        bool b = false;
-        BOOST_TEST(test_create_parser_auto("true", b) && b == true);
-        int i = 0;
-        BOOST_TEST(test_create_parser_auto("1", i) && i == 1);
-        double d = 0;
-        BOOST_TEST(test_create_parser_auto("1.1", d) && d == 1.1);
-
         // test containers
         std::vector<int> v;
         BOOST_TEST(test_create_parser_auto("0 1 2", v) && v.size() == 3 && 

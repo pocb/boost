@@ -1,6 +1,6 @@
 /*=============================================================================
-    Copyright (c) 2001-2010 Hartmut Kaiser
-    Copyright (c) 2001-2010 Joel de Guzman
+    Copyright (c) 2001-2011 Hartmut Kaiser
+    Copyright (c) 2001-2011 Joel de Guzman
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -114,7 +114,8 @@ namespace boost { namespace spirit { namespace karma { namespace detail
 
             typedef mpl::and_<
                 traits::is_container<attribute_type>
-              , traits::handles_container<Component, Attr> > predicate;
+              , traits::handles_container<Component, Attr, context_type>
+            > predicate;
 
             return dispatch_attribute_element(component, predicate());
         }
@@ -164,11 +165,11 @@ namespace boost { namespace spirit { namespace karma { namespace detail
 
             typedef mpl::and_<
                 has_same_elements<rhs, lhs_attribute>
-              , traits::handles_container<Component, Attr> > predicate;
+              , traits::handles_container<Component, Attr, context_type>
+            > predicate;
 
             // false means everything went ok
             return dispatch_main(component, predicate());
-//              , has_same_elements<rhs, lhs_attribute>());
         }
 
         F f;

@@ -22,7 +22,6 @@ namespace quickbook
     struct quickbook_grammar::impl
     {
         quickbook::actions& actions;
-        bool no_eols;
         rule_store store_;
 
         // Main Grammar
@@ -31,6 +30,7 @@ namespace quickbook
         cl::rule<scanner> common;
         cl::rule<scanner> simple_phrase;
         cl::rule<scanner> phrase;
+        cl::rule<scanner> extended_phrase;
         cl::rule<scanner> inside_paragraph;
         cl::rule<scanner> command_line;
 
@@ -49,6 +49,8 @@ namespace quickbook
 
         cl::symbols<cl::rule<scanner>*> block_keyword_rules;
         cl::symbols<cl::rule<scanner>*> block_symbol_rules;
+        
+        cl::symbols<cl::rule<scanner>*> extended_phrase_keyword_rules;
         
         // Doc Info
         cl::rule<scanner> doc_info_details;
