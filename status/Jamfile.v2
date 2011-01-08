@@ -55,12 +55,14 @@ run-tests libs :
     any/test                    # test-suite any
     bimap/test                  # test-suite bimap
     bind/test                   # test-suite bind
+    chrono/test                 # test-suite chrono
     circular_buffer/test        # test-suite circular_buffer
     concept_check               # test-suite concept_check
     config/test                 # test-suite config
     conversion/test             # test-suite conversion
     crc/test                    # test-suite crc
     date_time/test              # test-suite date_time
+    detail/test                 # test-suite detail
     disjoint_sets               # test-suite disjoint_sets
     dynamic_bitset              # test-suite dynamic_bitset
     exception/test

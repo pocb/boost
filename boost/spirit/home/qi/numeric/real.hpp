@@ -60,6 +60,7 @@ namespace boost { namespace spirit
       : mpl::true_ {};
 
     ///////////////////////////////////////////////////////////////////////////
+#if 0
     template <> // enables lit(0.f)
     struct use_terminal<qi::domain, float>
       : mpl::true_ {};
@@ -71,6 +72,7 @@ namespace boost { namespace spirit
     template <> // enables lit(0.l)
     struct use_terminal<qi::domain, long double>
       : mpl::true_ {};
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename A0> // enables float_(...)
@@ -262,6 +264,7 @@ namespace boost { namespace spirit { namespace qi
     };
 
     ///////////////////////////////////////////////////////////////////////////
+#if 0
     template <typename Modifiers>
     struct make_primitive<float, Modifiers>
       : make_literal_real<float> {};
@@ -273,6 +276,7 @@ namespace boost { namespace spirit { namespace qi
     template <typename Modifiers>
     struct make_primitive<long double, Modifiers>
       : make_literal_real<long double> {};
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, typename Policies, typename Modifiers>
@@ -290,29 +294,29 @@ namespace boost { namespace spirit { namespace qi
     template <typename Modifiers>
     struct make_primitive<tag::float_, Modifiers>
       : make_real<float> {};
-    
+
     template <typename Modifiers, typename A0>
     struct make_primitive<
         terminal_ex<tag::float_
       , fusion::vector1<A0> >, Modifiers>
       : make_direct_real<float> {};
-    
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Modifiers>
     struct make_primitive<tag::double_, Modifiers>
       : make_real<double> {};
-    
+
     template <typename Modifiers, typename A0>
     struct make_primitive<
         terminal_ex<tag::double_
       , fusion::vector1<A0> >, Modifiers>
       : make_direct_real<double> {};
-    
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename Modifiers>
     struct make_primitive<tag::long_double, Modifiers>
       : make_real<long double> {};
-    
+
     template <typename Modifiers, typename A0>
     struct make_primitive<
         terminal_ex<tag::long_double

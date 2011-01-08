@@ -49,9 +49,11 @@ namespace boost { namespace spirit
     struct use_terminal<qi::domain, tag::short_> : mpl::true_ {};
     //]
 
+#if 0
     template <> // enables lit(short(n))
     struct use_terminal<qi::domain, short> : mpl::true_ {};
-
+#endif
+  
     template <typename A0> // enables short_(n)
     struct use_terminal<qi::domain
         , terminal_ex<tag::short_, fusion::vector1<A0> > >
@@ -66,8 +68,10 @@ namespace boost { namespace spirit
     struct use_terminal<qi::domain, tag::int_> : mpl::true_ {};
     //]   
 
+#if 0
     template <> // enables lit(int(n))
     struct use_terminal<qi::domain, int> : mpl::true_ {};
+#endif
 
     template <typename A0> // enables int_(n)
     struct use_terminal<qi::domain
@@ -82,9 +86,11 @@ namespace boost { namespace spirit
     template <> // enables long_
     struct use_terminal<qi::domain, tag::long_> : mpl::true_ {};
     //]   
-    
+   
+#if 0 
     template <> // enables lit(long(n))
     struct use_terminal<qi::domain, long> : mpl::true_ {};
+#endif
 
     template <typename A0> // enables long_(n)
     struct use_terminal<qi::domain
@@ -101,8 +107,10 @@ namespace boost { namespace spirit
     struct use_terminal<qi::domain, tag::long_long> : mpl::true_ {};
     //]
 
+#if 0
     template <> // enables lit(boost::long_long_type(n))
     struct use_terminal<qi::domain, boost::long_long_type> : mpl::true_ {};
+#endif
 
     template <typename A0> // enables long_long(n)
     struct use_terminal<qi::domain
@@ -112,7 +120,7 @@ namespace boost { namespace spirit
     template <> // enables *lazy* long_long(n)
     struct use_lazy_terminal<qi::domain, tag::long_long, 1> : mpl::true_ {};
 #endif
-    
+
     ///////////////////////////////////////////////////////////////////////////
     // enables any custom int_parser
     template <typename T, unsigned Radix, unsigned MinDigits
@@ -287,6 +295,7 @@ namespace boost { namespace spirit { namespace qi
     };
     
     ///////////////////////////////////////////////////////////////////////////
+#if 0
     template <typename Modifiers>
     struct make_primitive<short, Modifiers> 
       : make_literal_int<short> {};
@@ -304,6 +313,8 @@ namespace boost { namespace spirit { namespace qi
     struct make_primitive<boost::long_long_type, Modifiers> 
       : make_literal_int<boost::long_long_type> {};
 #endif
+#endif
+
     ///////////////////////////////////////////////////////////////////////////
     template <typename T, unsigned Radix, unsigned MinDigits, int MaxDigits
             , typename Modifiers>
@@ -311,7 +322,7 @@ namespace boost { namespace spirit { namespace qi
         tag::int_parser<T, Radix, MinDigits, MaxDigits>
       , Modifiers>
       : make_int<T, Radix, MinDigits, MaxDigits> {};
-    
+
     template <typename T, unsigned Radix, unsigned MinDigits, int MaxDigits
             , typename A0, typename Modifiers>
     struct make_primitive<
