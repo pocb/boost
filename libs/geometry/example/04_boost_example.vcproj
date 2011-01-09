@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8.00"
-	Name="qbk_5"
-	ProjectGUID="{0CDE9E15-C937-4D05-B9BF-A2D96B8EAD33}"
-	RootNamespace="qbk_5"
+	Name="04_boost_example"
+	ProjectGUID="{6254AA18-1E45-4ECD-B574-D20F97F5BBA3}"
+	RootNamespace="04_boost_example"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -18,7 +18,7 @@
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)\qbk_5"
+			IntermediateDirectory="$(ConfigurationName)\04_boost_example"
 			ConfigurationType="1"
 			InheritedPropertySheets=".\boost.vsprops"
 			CharacterSet="1"
@@ -41,12 +41,11 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../../../../..;../../../test"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
-				MinimalRebuild="true"
-				RuntimeLibrary="3"
+				RuntimeLibrary="1"
+				DisableLanguageExtensions="false"
 				UsePrecompiledHeader="0"
-				DebugInformationFormat="3"
+				DebugInformationFormat="1"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -59,8 +58,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="kernel32.lib $(NoInherit)"
-				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				TargetMachine="1"
@@ -88,13 +85,12 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine=""
 			/>
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)\qbk_5"
+			IntermediateDirectory="$(ConfigurationName)\04_boost_example"
 			ConfigurationType="1"
 			InheritedPropertySheets=".\boost.vsprops"
 			CharacterSet="1"
@@ -117,11 +113,8 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="../../../../..;../../../test"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
-				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
-				DebugInformationFormat="3"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -134,9 +127,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="kernel32.lib $(NoInherit)"
-				LinkIncremental="1"
-				GenerateDebugInformation="true"
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
@@ -165,7 +155,6 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine=""
 			/>
 		</Configuration>
 	</Configurations>
@@ -173,7 +162,7 @@
 	</References>
 	<Files>
 		<File
-			RelativePath=".\qbk_5.cpp"
+			RelativePath=".\04_boost_example.cpp"
 			>
 		</File>
 	</Files>
