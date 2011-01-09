@@ -1,4 +1,5 @@
 /build
+tools/build/CMake/
 tmp
 *.pyc
 ._*
