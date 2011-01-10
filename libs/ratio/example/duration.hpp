@@ -308,7 +308,7 @@ namespace chrono {
             typedef typename common_type<
                 typename ToDuration::rep,
                 typename FromDuration::rep,
-                intmax_t>::type C;
+                boost::intmax_t>::type C;
             return ToDuration(static_cast<typename ToDuration::rep>(
                               static_cast<C>(fd.count()) / static_cast<C>(Period::den)));
         }
@@ -327,7 +327,7 @@ namespace chrono {
             typedef typename common_type<
               typename ToDuration::rep,
               typename FromDuration::rep,
-              intmax_t>::type C;
+              boost::intmax_t>::type C;
             return ToDuration(static_cast<typename ToDuration::rep>(
                               static_cast<C>(fd.count()) * static_cast<C>(Period::num)));
         }
@@ -347,7 +347,7 @@ namespace chrono {
             typedef typename common_type<
               typename ToDuration::rep,
               typename FromDuration::rep,
-              intmax_t>::type C;
+              boost::intmax_t>::type C;
             return ToDuration(static_cast<typename ToDuration::rep>(
                static_cast<C>(fd.count()) * static_cast<C>(Period::num)
                  / static_cast<C>(Period::den)));
@@ -487,16 +487,17 @@ namespace chrono {
                         >
                     >
                 >::type* = 0)
-#ifdef        __GNUC__
+//~ #ifdef        __GNUC__
             // GCC 4.2.4 refused to accept a definition at this point,
             // yet both VC++ 9.0 SP1 and Intel ia32 11.0 accepted the definition
             // without complaint. VC++ 9.0 SP1 refused to accept a later definition,
             // although that was fine with GCC 4.2.4 and Intel ia32 11.0. Thus we
             // have to support both approaches.
-            ;
-#else
-            : rep_(duration_cast<duration>(d).count()) {}
-#endif
+            //~ ;
+//~ #else
+            //~ : rep_(chrono::duration_cast<duration>(d).count()) {}
+            : rep_(chrono::detail::duration_cast<duration<Rep2, Period2>, duration>()(d).count()) {}
+//~ #endif
 
         // observer
 
@@ -771,6 +772,7 @@ namespace chrono {
 //              See comment in the class duration synopsis                    //
 //----------------------------------------------------------------------------//
 
+#if 0
 #ifdef __GNUC__
     // see comment above in section 20.9.3 Class template duration [time.duration]
     template <class Rep, class Period>
@@ -786,6 +788,7 @@ namespace chrono {
             >
             >::type*)
           : rep_(duration_cast<duration>(d).count()) {}
+#endif
 #endif
 
 } 

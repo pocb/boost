@@ -1,3 +1,13 @@
-build
+/build
+tools/build/CMake/
 tmp
+*.pyc
+._*
+bjam
+project-config.jam
+bin.v2/
+dist/
+.\#*
+*.tar.*
+*.zip
 

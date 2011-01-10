@@ -60,9 +60,11 @@ namespace boost { namespace spirit
       : mpl::true_ {};
 
     ///////////////////////////////////////////////////////////////////////////
+#if 0
     template <> // enables lit(true)
     struct use_terminal<qi::domain, bool>
       : mpl::true_ {};
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename A0> // enables bool_(...)
@@ -105,8 +107,9 @@ namespace boost { namespace spirit { namespace qi
     using spirit::true__type;
     using spirit::false_;
     using spirit::false__type;
-    
-    using spirit::lit; // lit(true) is equivalent to true
+
+    using spirit::lit;    // lit(true) is equivalent to true
+    using spirit::lit_type;
 
     namespace detail
     {
@@ -218,7 +221,7 @@ namespace boost { namespace spirit { namespace qi
             return result_type();
         }
     };
-    
+
     template <typename T, typename Modifiers
             , typename Policies = bool_policies<T> >
     struct make_direct_bool
@@ -241,7 +244,7 @@ namespace boost { namespace spirit { namespace qi
             return result_type(fusion::at_c<0>(term.args));
         }
     };
-    
+
     template <typename T, typename Modifiers, bool b 
             , typename Policies = bool_policies<T> >
     struct make_predefined_direct_bool
@@ -263,7 +266,6 @@ namespace boost { namespace spirit { namespace qi
             return result_type(b);
         }
     };
-
 
     template <typename T, typename Modifiers
             , typename Policies = bool_policies<T> >
@@ -287,11 +289,13 @@ namespace boost { namespace spirit { namespace qi
             return result_type(i);
         }
     };
-    
+
     ///////////////////////////////////////////////////////////////////////////
+#if 0
     template <typename Modifiers>
     struct make_primitive<bool, Modifiers>
       : make_literal_bool<bool, Modifiers> {};
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Modifiers>
@@ -320,7 +324,7 @@ namespace boost { namespace spirit { namespace qi
     template <typename Modifiers>
     struct make_primitive<tag::bool_, Modifiers>
       : make_bool<bool, Modifiers> {};
-    
+
     template <typename Modifiers, typename A0>
     struct make_primitive<
         terminal_ex<tag::bool_

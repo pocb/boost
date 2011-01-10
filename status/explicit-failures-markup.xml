@@ -478,6 +478,17 @@
         </test>
     </library>
 
+    <!-- chrono -->
+    <library name="chrono">
+      <mark-unusable>
+        <toolset name="borland-*"/>
+        <toolset name="pathscale*"/>
+        <note author="Vicente J. Botet Escriba">
+            The compiler does not support features that are essential for the library.
+        </note>
+      </mark-unusable>
+    </library>
+
     <!-- circular_buffer -->
     <library name="circular_buffer">
         <mark-expected-failures>
@@ -1852,22 +1863,10 @@
             <toolset name="sun-5.9"/>
         </mark-unusable>
         <mark-expected-failures>
-          <test name="graphviz_test"/>
-          <toolset name="*mingw-4.4*"/>
-          <toolset name="*mingw-4.5*"/>
-          <note author="Jeremiah Willcock" refid="49"/>
-        </mark-expected-failures>
-        <mark-expected-failures>
           <test name="grid_graph_cc"/>
           <test name="grid_graph_test"/>
           <toolset name="msvc-7.1"/>
           <note author="Jeremiah Willcock" refid="2"/>
-        </mark-expected-failures>
-        <mark-expected-failures>
-          <test name="boykov_kolmogorov_max_flow_test"/>
-          <test name="max_flow_test"/>
-          <toolset name="acc*"/>
-          <note author="Markus Schoepflin" refid="45"/>
         </mark-expected-failures>
     </library>
 
@@ -2547,24 +2546,52 @@ for more information.
             <toolset name="gcc-3.4.6_linux_ia64"/>
             <toolset name="gcc-4.2.*"/>
             <toolset name="gcc-4.1.2_sunos_i86pc"/>
-                <note author="Fernando Cacciola" refid="2"/>
+                <note author="Fernando Cacciola" id="optional-compiler-bug">
+                <p>This failure is caused by a compiler bug, and as far as we can 
+                tell, can't be worked around in the library, although we think 
+                the library might be made safer with respect to this bug.</p>
+
+                <p>Specifics: the following simple test fails when it should succeed.</p>
+                <pre>
+                #include &lt;cassert&gt;
+
+                int const x = 0;
+                struct A
+                {
+                   A(int const&amp; y)
+                   {
+                     assert(&amp;x == &amp;y);
+                   }
+                };
+
+                int main()
+                {
+                    A a(x);  // direct initialization works fine
+                    A b = x; // copy initialization causes x to be copied before it is bound
+                }
+                </pre>
+
+                The possible safety enhancement would be to cause the constructor 
+                in question to be explicit for optional&lt;T const&amp;&gt;; that 
+                would prevent copy initialization.
+                </note>
         </mark-expected-failures>
         <mark-expected-failures>
             <test name="optional_test_ref_fail1"/>
             <toolset name="borland-5.6*"/>
             <toolset name="borland-5.8*"/>
             <toolset name="borland-5.9*"/>
-            <note author="Fernando Cacciola" refid="2"/>
+            <note author="Fernando Cacciola" refid="optional-compiler-bug"/>
         </mark-expected-failures>
         <mark-expected-failures>
             <test name="optional_test_fail3a"/>
             <toolset name="gcc-3_3-darwin"/>
-            <note author="Fernando Cacciola" refid="2"/>
+            <note author="Fernando Cacciola" refid="optional-compiler-bug"/>
         </mark-expected-failures>
         <mark-expected-failures>
             <test name="optional_test_inplace_fail2"/>
             <toolset name="gcc-3_3-darwin"/>
-            <note author="Fernando Cacciola" refid="2"/>
+            <note author="Fernando Cacciola" refid="optional-compiler-bug"/>
         </mark-expected-failures>
     </library>
 
@@ -4440,6 +4467,29 @@ for more information.
             <note author="Thorsten Ottosen">
                 The test requires support for Argument Dependent Lookup (ADL)
                 which the compiler in question does not provide.
+            </note>
+        </mark-expected-failures>
+    </library>
+
+    <!-- ratio -->
+    <library name="ratio">
+      <mark-unusable>
+        <toolset name="borland-*"/>
+        <toolset name="pathscale*"/>
+        <note author="Vicente J. Botet Escriba">
+            The compiler does not support features that are essential for the library.
+        </note>
+      </mark-unusable>
+        <mark-expected-failures>
+            <test name="mpl_plus_pass"/>
+            <test name="ratio_ext_pass"/>
+            <toolset name="intel-*-10.1"/>
+            <toolset name="intel-*-11.0"/>
+            <toolset name="intel-*-11.1"/>
+            <note author="Vicente J. Botet Escriba">
+                internal error: assertion failed: copy_template_param_expr.
+                It seems to be already an Intel internal bug database (tracker number #82149).
+                I have no workaround yet.
             </note>
         </mark-expected-failures>
     </library>
