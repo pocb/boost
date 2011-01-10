@@ -2,7 +2,7 @@
     Boost.Wave: A Standard compliant C++ preprocessor library
     http://www.boost.org/
 
-    Copyright (c) 2001-2010 Hartmut Kaiser. Distributed under the Boost
+    Copyright (c) 2001-2011 Hartmut Kaiser. Distributed under the Boost
     Software License, Version 1.0. (See accompanying file
     LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 =============================================================================*/
@@ -54,7 +54,7 @@ namespace fs = boost::filesystem;
 ///////////////////////////////////////////////////////////////////////////////
 // testwave version definitions
 #define TESTWAVE_VERSION_MAJOR           0
-#define TESTWAVE_VERSION_MINOR           5
+#define TESTWAVE_VERSION_MINOR           6
 #define TESTWAVE_VERSION_SUBMINOR        0
 
 namespace {
@@ -591,7 +591,7 @@ testwave_app::print_copyright()
         "Testwave: A test driver for the Boost.Wave C++ preprocessor library",
         "http://www.boost.org/",
         "",
-        "Copyright (c) 2001-2010 Hartmut Kaiser, Distributed under the Boost",
+        "Copyright (c) 2001-2011 Hartmut Kaiser, Distributed under the Boost",
         "Software License, Version 1.0. (See accompanying file",
         "LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)",
         0
