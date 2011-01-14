@@ -13,6 +13,10 @@
 
 #include <boost/config.hpp>
 
+#if defined(BOOST_CHRONO_SOURCE) && !defined(BOOST_USE_WINDOWS_H)
+#define BOOST_USE_WINDOWS_H
+#endif
+
 //  BOOST_CHRONO_POSIX_API, BOOST_CHRONO_MAC_API, or BOOST_CHRONO_WINDOWS_API
 //  can be defined by the user to specify which API should be used
 
@@ -60,7 +64,12 @@
 #   endif
 # endif
 
-// unicode support
+#if defined(BOOST_CHRONO_THREAD_DISABLED) && defined(BOOST_CHRONO_HAS_THREAD_CLOCK)
+#undef BOOST_CHRONO_HAS_THREAD_CLOCK
+#undef BOOST_CHRONO_THREAD_CLOCK_IS_STEADY
+#endif
+
+// unicode support  ------------------------------//
 
 #if defined(BOOST_NO_UNICODE_LITERALS) || defined(BOOST_NO_CHAR16_T) || defined(BOOST_NO_CHAR32_T)
 //~ #define BOOST_CHRONO_HAS_UNICODE_SUPPORT
@@ -93,10 +102,6 @@
 #define BOOST_CHRONO_STATIC static
 
 //  enable dynamic linking on Windows  ---------------------------------------//
-
-//#  if (defined(BOOST_ALL_DYN_LINK) || defined(BOOST_CHRONO_DYN_LINK)) && defined(__BORLANDC__) && defined(__WIN32__)
-//#    error Dynamic linking Boost.System does not work for Borland; use static linking instead
-//#  endif
 
 #ifdef BOOST_HAS_DECLSPEC // defined by boost.config
 // we need to import/export our code only if the user has specifically

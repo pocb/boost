@@ -1,13 +1,14 @@
-/*<-============================================================================
-    Copyright (c) 2010      Bryce Lelbach
+/*==============================================================================
+    Copyright (c) 2010-2011 Bryce Lelbach
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-============================================================================->*/
+==============================================================================*/
 
 #ifndef BOOST_DETAIL_IOMANIP_HPP
 #define BOOST_DETAIL_IOMANIP_HPP
 
+#include <ios>
 #include <istream>
 #include <ostream>
 
@@ -26,7 +27,8 @@ class resetiosflags_manip {
   template<class CharT, class Traits>
   friend std::basic_istream<CharT, Traits>&
   operator>> (std::basic_istream<CharT, Traits>& is,
-              resetiosflags_manip const& x) {
+              resetiosflags_manip const& x)
+  {
     is.unsetf(x.mask);
     return is;
   }
@@ -34,7 +36,8 @@ class resetiosflags_manip {
   template<class CharT, class Traits>
   friend std::basic_ostream<CharT, Traits>&
   operator<< (std::basic_ostream<CharT, Traits>& os,
-              resetiosflags_manip const& x) {
+              resetiosflags_manip const& x)
+  {
     os.unsetf(x.mask);
     return os;
   }
@@ -91,13 +94,13 @@ class setbase_manip {
     using namespace std;
     switch (x.base) {
       case 8:
-        is.setf(ios_base::oct, ios_base::basefield);
+        is << std::oct; 
         return is;
       case 10:
-        is.setf(ios_base::dec, ios_base::basefield);
+        is << std::dec;
         return is;
       case 16:
-        is.setf(ios_base::hex, ios_base::basefield);
+        is << std::hex; 
         return is;
       default:
         is.setf(ios_base::fmtflags(0), ios_base::basefield);
@@ -111,13 +114,13 @@ class setbase_manip {
     using namespace std;
     switch (x.base) {
       case 8:
-        os.setf(ios_base::oct, ios_base::basefield);
+        os << std::oct; 
         return os;
       case 10:
-        os.setf(ios_base::dec, ios_base::basefield);
+        os << std::dec;
         return os;
       case 16:
-        os.setf(ios_base::hex, ios_base::basefield);
+        os << std::hex; 
         return os;
       default:
         os.setf(ios_base::fmtflags(0), ios_base::basefield);
