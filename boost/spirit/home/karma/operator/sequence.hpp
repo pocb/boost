@@ -1,5 +1,5 @@
-//  Copyright (c) 2001-2010 Hartmut Kaiser
-//  Copyright (c) 2001-2010 Joel de Guzman
+//  Copyright (c) 2001-2011 Hartmut Kaiser
+//  Copyright (c) 2001-2011 Joel de Guzman
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -23,6 +23,8 @@
 #include <boost/spirit/home/support/algorithm/any_if.hpp>
 #include <boost/spirit/home/support/unused.hpp>
 #include <boost/spirit/home/support/sequence_base_id.hpp>
+#include <boost/spirit/home/support/has_semantic_action.hpp>
+#include <boost/spirit/home/support/handles_container.hpp>
 #include <boost/fusion/include/vector.hpp>
 #include <boost/fusion/include/as_vector.hpp>
 #include <boost/fusion/include/for_each.hpp>
@@ -147,6 +149,9 @@ namespace boost { namespace spirit { namespace karma
             indirect_iterator(Iterator& iter)
               : iter_(&iter)
             {}
+            indirect_iterator(indirect_iterator const& iter)
+              : iter_(iter.iter_)
+            {}
 
         private:
             friend class boost::iterator_core_access;
@@ -176,6 +181,12 @@ namespace boost { namespace spirit { namespace karma
             typedef indirect_iterator<Iterator> type;
         };
 
+        template <typename Iterator>
+        struct make_indirect_iterator<indirect_iterator<Iterator> >
+        {
+            typedef indirect_iterator<Iterator> type;
+        };
+
         template <>
         struct make_indirect_iterator<unused_type const*>
         {
@@ -199,8 +210,9 @@ namespace boost { namespace spirit { namespace karma
         {
             // Put all the element attributes in a tuple
             typedef typename traits::build_attribute_sequence<
-                Elements, Context, mpl::identity, Iterator>::type
-            all_attributes;
+                Elements, Context, traits::sequence_attribute_transform
+              , Iterator, karma::domain
+            >::type all_attributes;
 
             // Now, build a fusion vector over the attributes. Note
             // that build_fusion_vector 1) removes all unused attributes
@@ -359,10 +371,20 @@ namespace boost { namespace spirit { namespace karma
     struct make_composite<proto::tag::shift_left, Elements, Modifiers>
       : detail::make_sequence<Elements, detail::get_stricttag<Modifiers>::value>
     {};
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Helper template allowing to get the required container type for a rule
+    // attribute, which is part of a sequence.
+    template <typename Iterator>
+    struct make_sequence_iterator_range
+    {
+        typedef iterator_range<detail::indirect_iterator<Iterator> > type;
+    };
 }}} 
 
 namespace boost { namespace spirit { namespace traits
 {
+    ///////////////////////////////////////////////////////////////////////////
     template <typename Elements>
     struct has_semantic_action<karma::sequence<Elements> >
       : nary_has_semantic_action<Elements> {};
@@ -370,6 +392,19 @@ namespace boost { namespace spirit { namespace traits
     template <typename Elements>
     struct has_semantic_action<karma::strict_sequence<Elements> >
       : nary_has_semantic_action<Elements> {};
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Elements, typename Attribute, typename Context
+      , typename Iterator>
+    struct handles_container<karma::sequence<Elements>, Attribute, Context
+      , Iterator>
+      : nary_handles_container<Elements, Attribute, Context, Iterator> {};
+    
+    template <typename Elements, typename Attribute, typename Context
+      , typename Iterator>
+    struct handles_container<karma::strict_sequence<Elements>, Attribute
+      , Context, Iterator>
+      : nary_handles_container<Elements, Attribute, Context, Iterator> {};
 }}}
 
 #endif

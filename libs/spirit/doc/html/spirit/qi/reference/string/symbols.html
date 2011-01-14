@@ -1,13 +1,14 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
-<title>Symbols (symbols)</title>
+<title>Symbols Parser (symbols)</title>
 <link rel="stylesheet" href="../../../../../../../../doc/src/boostbook.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.75.0">
-<link rel="home" href="../../../../index.html" title="Spirit 2.4.1">
-<link rel="up" href="../string.html" title="String">
-<link rel="prev" href="string.html" title="String (string, lit)">
-<link rel="next" href="../../../karma.html" title="Karma - Writing Generators">
+<link rel="home" href="../../../../index.html" title="Spirit 2.4.2">
+<link rel="up" href="../string.html" title="String Parsers">
+<link rel="prev" href="string.html" title="String Parsers (string, lit)">
+<link rel="next" href="../../s04.html" title="Qi Index">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
 <table cellpadding="2" width="100%"><tr>
@@ -20,14 +21,15 @@
 </tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="string.html"><img src="../../../../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../string.html"><img src="../../../../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../../index.html"><img src="../../../../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="../../../karma.html"><img src="../../../../../../../../doc/src/images/next.png" alt="Next"></a>
+<a accesskey="p" href="string.html"><img src="../../../../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../string.html"><img src="../../../../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../../index.html"><img src="../../../../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="../../s04.html"><img src="../../../../../../../../doc/src/images/next.png" alt="Next"></a>
 </div>
 <div class="section">
 <div class="titlepage"><div><div><h5 class="title">
-<a name="spirit.qi.reference.string.symbols"></a><a class="link" href="symbols.html" title="Symbols (symbols)">Symbols (<code class="computeroutput"><span class="identifier">symbols</span></code>)</a>
+<a name="spirit.qi.reference.string.symbols"></a><a class="link" href="symbols.html" title="Symbols Parser (symbols)">Symbols Parser
+          (<code class="computeroutput"><span class="identifier">symbols</span></code>)</a>
 </h5></div></div></div>
 <a name="spirit.qi.reference.string.symbols.description"></a><h6>
-<a name="id1009454"></a>
+<a name="id1022969"></a>
             <a class="link" href="symbols.html#spirit.qi.reference.string.symbols.description">Description</a>
           </h6>
 <p>
@@ -47,7 +49,7 @@
             added, thus, dynamically altering its behavior.
           </p>
 <a name="spirit.qi.reference.string.symbols.header"></a><h6>
-<a name="id1009496"></a>
+<a name="id1023011"></a>
             <a class="link" href="symbols.html#spirit.qi.reference.string.symbols.header">Header</a>
           </h6>
 <pre class="programlisting"><span class="comment">// forwards to &lt;boost/spirit/home/qi/string/symbols.hpp&gt;
@@ -57,7 +59,7 @@
             Also, see <a class="link" href="../../../structure/include.html" title="Include">Include Structure</a>.
           </p>
 <a name="spirit.qi.reference.string.symbols.namespace"></a><h6>
-<a name="id1009570"></a>
+<a name="id1023085"></a>
             <a class="link" href="symbols.html#spirit.qi.reference.string.symbols.namespace">Namespace</a>
           </h6>
 <div class="informaltable"><table class="table">
@@ -86,14 +88,14 @@
 </tbody>
 </table></div>
 <a name="spirit.qi.reference.string.symbols.synopsis"></a><h6>
-<a name="id1009730"></a>
+<a name="id1023245"></a>
             <a class="link" href="symbols.html#spirit.qi.reference.string.symbols.synopsis">Synopsis</a>
           </h6>
 <pre class="programlisting"><span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">typename</span> <span class="identifier">Char</span><span class="special">,</span> <span class="keyword">typename</span> <span class="identifier">T</span><span class="special">,</span> <span class="keyword">typename</span> <span class="identifier">Lookup</span><span class="special">&gt;</span>
 <span class="keyword">struct</span> <span class="identifier">symbols</span><span class="special">;</span>
 </pre>
 <a name="spirit.qi.reference.string.symbols.template_parameters"></a><h6>
-<a name="id1009808"></a>
+<a name="id1023323"></a>
             <a class="link" href="symbols.html#spirit.qi.reference.string.symbols.template_parameters">Template
             parameters</a>
           </h6>
@@ -176,7 +178,7 @@
 </tbody>
 </table></div>
 <a name="spirit.qi.reference.string.symbols.model_of"></a><h6>
-<a name="id1010001"></a>
+<a name="id1023517"></a>
             <a class="link" href="symbols.html#spirit.qi.reference.string.symbols.model_of">Model of</a>
           </h6>
 <div class="blockquote"><blockquote class="blockquote"><p>
@@ -232,7 +234,7 @@
 </dl>
 </div>
 <a name="spirit.qi.reference.string.symbols.expression_semantics"></a><h6>
-<a name="id1010318"></a>
+<a name="id1023833"></a>
             <a class="link" href="symbols.html#spirit.qi.reference.string.symbols.expression_semantics">Expression
             Semantics</a>
           </h6>
@@ -494,14 +496,14 @@
 </tbody>
 </table></div>
 <a name="spirit.qi.reference.string.symbols.attributes"></a><h6>
-<a name="id1012162"></a>
+<a name="id1026222"></a>
             <a class="link" href="symbols.html#spirit.qi.reference.string.symbols.attributes">Attributes</a>
           </h6>
 <p>
             The attribute of <code class="computeroutput"><span class="identifier">symbol</span><span class="special">&lt;</span><span class="identifier">Char</span><span class="special">,</span> <span class="identifier">T</span><span class="special">&gt;</span></code> is <code class="computeroutput"><span class="identifier">T</span></code>.
           </p>
 <a name="spirit.qi.reference.string.symbols.complexity"></a><h6>
-<a name="id1012212"></a>
+<a name="id1026273"></a>
             <a class="link" href="symbols.html#spirit.qi.reference.string.symbols.complexity">Complexity</a>
           </h6>
 <p>
@@ -538,7 +540,7 @@
 <pre class="programlisting"><span class="identifier">symbols</span><span class="special">&lt;</span><span class="identifier">Char</span><span class="special">,</span> <span class="identifier">T</span><span class="special">,</span> <span class="identifier">tst_map</span><span class="special">&lt;</span><span class="identifier">Char</span><span class="special">,</span> <span class="identifier">T</span><span class="special">&gt;</span> <span class="special">&gt;</span> <span class="identifier">sym</span><span class="special">;</span>
 </pre>
 <a name="spirit.qi.reference.string.symbols.example"></a><h6>
-<a name="id1012344"></a>
+<a name="id1026405"></a>
             <a class="link" href="symbols.html#spirit.qi.reference.string.symbols.example">Example</a>
           </h6>
 <div class="note"><table border="0" summary="Note">
@@ -583,7 +585,7 @@
           </p>
 <p>
             When <code class="computeroutput"><span class="identifier">symbols</span></code> is used
-            for case-insensitive parsing (in a <a class="link" href="../directive/no_case.html" title="Inhibiting Case Sensitivity (no_case[])"><code class="computeroutput"><span class="identifier">no_case</span></code></a> directive), added symbol
+            for case-insensitive parsing (in a <a class="link" href="../directive/no_case.html" title="Parser Directive Inhibiting Case Sensitivity (no_case[])"><code class="computeroutput"><span class="identifier">no_case</span></code></a> directive), added symbol
             strings should be in lowercase. Symbol strings containing one or more
             uppercase characters will not match any input when symbols is used in
             a <code class="computeroutput"><span class="identifier">no_case</span></code> directive.
@@ -611,7 +613,7 @@
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
 <td align="left"></td>
-<td align="right"><div class="copyright-footer">Copyright &#169; 2001-2010 Joel de Guzman, Hartmut Kaiser<p>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2001-2011 Joel de Guzman, Hartmut Kaiser<p>
         Distributed under the Boost Software License, Version 1.0. (See accompanying
         file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
       </p>
@@ -619,7 +621,7 @@
 </tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="string.html"><img src="../../../../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../string.html"><img src="../../../../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../../index.html"><img src="../../../../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="../../../karma.html"><img src="../../../../../../../../doc/src/images/next.png" alt="Next"></a>
+<a accesskey="p" href="string.html"><img src="../../../../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../string.html"><img src="../../../../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../../../index.html"><img src="../../../../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="../../s04.html"><img src="../../../../../../../../doc/src/images/next.png" alt="Next"></a>
 </div>
 </body>
 </html>

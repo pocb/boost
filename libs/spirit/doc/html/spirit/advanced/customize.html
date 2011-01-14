@@ -1,10 +1,11 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
 <title>Customization of Spirit's Attribute Handling</title>
 <link rel="stylesheet" href="../../../../../../doc/src/boostbook.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.75.0">
-<link rel="home" href="../../index.html" title="Spirit 2.4.1">
+<link rel="home" href="../../index.html" title="Spirit 2.4.2">
 <link rel="up" href="../advanced.html" title="Advanced">
 <link rel="prev" href="indepth/parsers_indepth.html" title="Parsers in Depth">
 <link rel="next" href="customize/is_container.html" title="Determine if a Type Should be Treated as a Container (Qi and Karma)">
@@ -30,6 +31,8 @@
 <div class="toc"><dl>
 <dt><span class="section"><a href="customize/is_container.html">Determine if
         a Type Should be Treated as a Container (Qi and Karma)</a></span></dt>
+<dt><span class="section"><a href="customize/handles_container.html">Determine
+        Whether a Component Handles Container Attributes (Qi and Karma)</a></span></dt>
 <dt><span class="section"><a href="customize/transform.html">Transform an Attribute
         to a Different Type (Qi and Karma)</a></span></dt>
 <dt><span class="section"><a href="customize/assign_to.html">Store a Parsed
@@ -46,7 +49,7 @@
         Attributes</a></span></dt>
 </dl></div>
 <a name="spirit.advanced.customize.why_do_we_need_attribute_customization_points"></a><h5>
-<a name="id1217579"></a>
+<a name="id1244439"></a>
         <a class="link" href="customize.html#spirit.advanced.customize.why_do_we_need_attribute_customization_points">Why
         do we need Attribute Customization Points</a>
       </h5>
@@ -81,8 +84,8 @@
       </p>
 <p>
         Here is an example showing the <a class="link" href="customize/store_value/container_value.html" title="Determine the Type to be Stored in a Container (Qi)"><code class="computeroutput"><span class="identifier">container_value</span></code></a> customization point
-        used by different parsers (such as <a class="link" href="../qi/reference/operator/kleene.html" title="Kleene (*a)">Kleene</a>,
-        <a class="link" href="../qi/reference/operator/plus.html" title="Plus (+a)">Plus</a>, etc.) to find
+        used by different parsers (such as <a class="link" href="../qi/reference/operator/kleene.html" title="Kleene Parser (*a)">Kleene</a>,
+        <a class="link" href="../qi/reference/operator/plus.html" title="Plus Parser (+a)">Plus</a>, etc.) to find
         the attribute type to be stored in a supplied STL container:
       </p>
 <p>
@@ -131,7 +134,7 @@
         a description which needs to be specialized for what purpose.
       </p>
 <a name="spirit.advanced.customize.the_usage_of_customization_points"></a><h5>
-<a name="id1217892"></a>
+<a name="id1245188"></a>
         <a class="link" href="customize.html#spirit.advanced.customize.the_usage_of_customization_points">The
         Usage of Customization Points</a>
       </h5>
@@ -149,7 +152,7 @@
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
 <td align="left"></td>
-<td align="right"><div class="copyright-footer">Copyright &#169; 2001-2010 Joel de Guzman, Hartmut Kaiser<p>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2001-2011 Joel de Guzman, Hartmut Kaiser<p>
         Distributed under the Boost Software License, Version 1.0. (See accompanying
         file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
       </p>
