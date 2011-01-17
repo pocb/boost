@@ -1,0 +1,41 @@
+
+           CMake-ified Boost
+           -----------------
+
+First of all, the (pristine/official) Boost project can be found on:
+http://www.boost.org
+
+The CMake build framework (set of CMakeLists.txt and module.cmake files)
+is then added on top of the official Boost release, thanks to a 
+dedicated patch.
+
+That CMake framework (and patch) is hosted and maintained on GitHub,
+for now in the following Git repository:
+https://github.com/denisarnaud/boost-cmake
+
+[A clone also exists on Gitorious, where CMake-related work was formely done:
+http://gitorious.org/~denisarnaud/boost/denisarnauds-cmake]
+
+Upstream work is synchronised thanks to the Ryppl's hosted Git clone:
+https://github.com/ryppl/boost-svn/tree/trunk
+
+A discussion explaining the details can be read on the Ryppl Google Group:
+https://groups.google.com/group/ryppl-dev/browse_thread/thread/4e2ffe397d03eaee/b619c95964b0e003?hl=en&#b619c95964b0e003
+
+The Ryppl project (http://www.ryppl.org) is maintained by Eric Niebler and
+Dave Abrahams, from the Boost project, and is itself a lot more than just 
+about synchronisation:
+"Ryppl aims to be a distributed cross-platform software management system 
+designed to accommodate both end-users and developers. Ryppl unites
+version control, test management, package management, release management,
+reporting, and other sub-systems into a coherent and scalable software 
+management system."
+
+That current CMake-ification (sub-)project aims to be fully integrated 
+into the Ryppl project. There is still some work to be done on the
+CMake-ification of modularised Boost. If you would like to contribute,
+do not hesitate to subscribe to the Ryppl mailing list:
+http://groups.google.com/group/ryppl-dev/subscribe
+
+Denis Arnaud (January 2011)
+
