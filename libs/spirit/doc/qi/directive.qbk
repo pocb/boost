@@ -7,7 +7,7 @@
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ===============================================================================/]
 
-[section:directive Parser Directive]
+[section:directive Parser Directives]
 
 This module includes different directives usable to augment and parameterize
 other parsers. It includes the `no_case`, `lexeme`, `omit`, `raw`, `repeat`,
@@ -763,10 +763,13 @@ subject parser passes, the temporary object will be assigned to the directive's
 supplied attribute with a single call to __customize_assign_to__.  If the
 subject parser fails, the directive's attribute is not mutated. 
 
+[note `T` is required to be a container type. If __customize_is_container__ 
+does not return true for `T`, a compile-time error will occur.]
+
 [note The `as<T>` implicitly causes commit/rollback semantics
 similar in nature to the __qi_hold__ directive.]
 
-[caution The __customize_assign_to__ customization point will may end up
+[caution The __customize_assign_to__ customization point may end up
 using __customize_push_back_container__ to assign the temporary object to the
 supplied attribute by default, depending on the types involved. Use the
 interface described in __sec_customization_points__ to manipulate the semantics
@@ -783,6 +786,7 @@ Also, see __include_structure__.
 
 [table
     [[Name]]
+    [[`boost::spirit::as         // alias: boost::spirit::qi::as` ]]
     [[`boost::spirit::as_string  // alias: boost::spirit::qi::as_string` ]]
     [[`boost::spirit::as_wstring // alias: boost::spirit::qi::as_wstring` ]]
 ]
@@ -796,7 +800,7 @@ Also, see __include_structure__.
 
 [table
     [[Parameter]    [Description]                       [Default]]
-    [[`T`]          [Attribute type.]                   [none]]
+    [[`T`]          [A container type.                  [none]]
 ]
 
 [heading Model of]
@@ -805,7 +809,7 @@ Also, see __include_structure__.
 
 [variablelist Notation
     [[`a`]      [A __parser_concept__.]]
-    [[`t`]      [A temporary object of type `T`.]]
+    [[`t`]      [A container of type `T`.]]
     [[`attr`]   [The attribute supplied to the directive.]]
 ]
 
@@ -836,8 +840,8 @@ See __qi_comp_attr_notation__.
 [heading Complexity]
 
 [:The complexity is defined by the complexity of the subject parser, `a`, and
-the complexity of the assignment of the temporary object `t` to the supplied
-attribute `attr`]
+the complexity of the assignment of the container `t` to the supplied
+attribute `attr`.]
 
 [heading Example]
 
