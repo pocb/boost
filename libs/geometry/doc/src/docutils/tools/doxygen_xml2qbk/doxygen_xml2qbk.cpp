@@ -35,6 +35,7 @@
 
 #include <file_to_string.hpp>
 
+
 // -------------------------------------------------------------
 // rapid xml convenience code
 // -------------------------------------------------------------
@@ -107,6 +108,17 @@ struct param
     std::string fulltype; // post-processed
 };
 
+struct markup
+{
+    int code;
+    std::string value;
+
+    markup(int c = 0, std::string const& v = "") 
+        : code(c), value(v)
+    {}
+
+};
+
 // Basic element, base of a class/struct, function, define
 struct element
 {
@@ -114,11 +126,10 @@ struct element
     std::string brief_description, detailed_description;
     std::string location;
     int line; // To sort - Doxygen changes order - we change it back
-    std::vector<std::string> examples;
-    std::vector<std::string> behaviors;
-    std::vector<std::string> admonitions;
-    std::vector<std::string> images;
-    std::string complexity;
+
+    // QBK-includes
+    // Filled with e.g.: \qbk([include reference/myqbk.qbk]}
+    std::vector<markup> qbk_markup; 
 
     // To distinguish overloads: unary, binary etc,
     // Filled with: \qbk{distinguish,<A discerning description>}
@@ -353,22 +364,13 @@ static void parse_element(rapidxml::xml_node<>* node, std::string const& parent,
             el.location = loc;
             el.line = atol(get_attribute(node, "line").c_str());
         }
-        else if (full == ".detaileddescription.para.qbk.example")
+        else if (full == ".detaileddescription.para.qbk")
         {
-            el.examples.push_back(boost::trim_copy(std::string(node->value())));
+            el.qbk_markup.push_back(markup(0, boost::trim_copy(std::string(node->value()))));
         }
-        else if (full == ".detaileddescription.para.qbk.admonition")
+        else if (full == ".detaileddescription.para.qbk.include")
         {
-            el.admonitions.push_back(boost::trim_copy(std::string(node->value())));
-        }
-        else if (full == ".detaileddescription.para.qbk.behavior")
-        {
-            el.behaviors.push_back(boost::trim_copy(std::string(node->value())));
-        }
-        else if (full == ".detaileddescription.para.qbk.complexity")
-        {
-            el.complexity = node->value();
-            boost::trim(el.complexity);
+            el.qbk_markup.push_back(markup(1, boost::trim_copy(std::string(node->value()))));
         }
         else if (full == ".detaileddescription.para.qbk.distinguish")
         {
@@ -436,11 +438,6 @@ static void parse_function(rapidxml::xml_node<>* node, std::string const& parent
         }
         else if (full == ".detaileddescription.para.image")
         {
-            std::string image = get_attribute(node, "name");
-            if (! image.empty())
-            {
-                f.images.push_back(image);
-            }
         }
 
         parse_function(node->first_node(), full, f);
@@ -661,42 +658,25 @@ void quickbook_header(std::string const& location,
     }
 }
 
-void quickbook_examples(std::vector<std::string> const& examples, std::ostream& out)
+
+void quickbook_markup(std::vector<markup> const& qbk_markup, std::ostream& out)
 {
-    if (! examples.empty())
+    BOOST_FOREACH(markup const& inc, qbk_markup)
     {
-        out << "[heading Examples]" << std::endl;
-        BOOST_FOREACH(std::string const& example, examples)
+        switch(inc.code)
         {
-            out << "[" << example << "]" << std::endl;
+          case 0 :  
+              // Verbatim
+              out << inc.value << std::endl;
+              break;
+          case 1 :  
+              out << "[include " << inc.value << "]" << std::endl;
+              break;
         }
-        out << std::endl;
     }
 }
 
-void quickbook_behaviors(std::vector<std::string> const& behaviors, std::ostream& out)
-{
-    if (! behaviors.empty())
-    {
-        out << "[heading Behavior]" << std::endl
-            << "[table" << std::endl
-            << "[[Case] [Behavior] ]" << std::endl;
-        BOOST_FOREACH(std::string const& behavior, behaviors)
-        {
-            // Split at first ":"
-            std::size_t pos = behavior.find(":");
-            if (pos != std::string::npos)
-            {
-                std::string c = behavior.substr(0, pos);
-                std::string b = behavior.substr(pos + 1);
-                out << "[[" << c << "][" << b << "]]" << std::endl;
-            }
-        }
-        out << "]" << std::endl
-            << std::endl
-            << std::endl;
-    }
-}
+
 
 void quickbook_heading_string(std::string const& heading,
             std::string const& contents, std::ostream& out)
@@ -798,30 +778,12 @@ void quickbook_output(function const& f, configuration const& config, std::ostre
         << std::endl;
 
     quickbook_heading_string("Returns", f.return_description, out);
-    //quickbook_heading_string("Model of", f.model_of, out);
 
     quickbook_header(f.location, config, out);
-    quickbook_behaviors(f.behaviors, out);
 
-    quickbook_heading_string("Complexity", f.complexity, out);
+    quickbook_markup(f.qbk_markup, out);
 
-    BOOST_FOREACH(std::string const& admonition, f.admonitions)
-    {
-        out << admonition << std::endl;
-    }
-
-    quickbook_examples(f.examples, out);
-
-    if (! f.images.empty())
-    {
-        out << "[heading Image(s)]" << std::endl;
-        BOOST_FOREACH(std::string const& image, f.images)
-        {
-            out << "[$" << image << "]" << std::endl;
-        }
-    }
     out << std::endl;
-
     out << "[endsect]" << std::endl;
     out << std::endl;
 }
@@ -843,15 +805,6 @@ void quickbook_short_output(function const& f, std::ostream& out)
         out << std::endl;
     }
 
-
-    if (! f.examples.empty())
-    {
-        out << std::endl << std::endl << "[*Examples]" << std::endl;
-        BOOST_FOREACH(std::string const& example, f.examples)
-        {
-            out << "[" << example << "]" << std::endl;
-        }
-    }
     out << std::endl;
 }
 
@@ -940,7 +893,8 @@ void quickbook_output(class_or_struct const& cos, configuration const& config, s
     }
 
     quickbook_header(cos.location, config, out);
-    quickbook_examples(cos.examples, out);
+    //quickbook_examples(cos.examples, out);
+    quickbook_markup(cos.qbk_markup, out);
 
     out << "[endsect]" << std::endl
         << std::endl;
@@ -955,6 +909,7 @@ inline bool equal_ignore_fix(std::string const& a, std::string const& b, std::st
 
 int main(int argc, char** argv)
 {
+    // TODO: use boost::program_options
     if (argc < 2)
     {
         std::cerr
@@ -977,21 +932,6 @@ int main(int argc, char** argv)
         for (std::size_t j = i + 1; j < doc.functions.size(); j++)
         {
             function& f2 = doc.functions[j];
-            if (f1.name == f2.name
-                || equal_ignore_fix(f1.name, f2.name, "make_")
-                || equal_ignore_fix(f1.name, f2.name, "_inserter"))
-            {
-                // Boost.Geometry specific
-                // Copy behaviors if empty and function has same name
-                if (f1.behaviors.empty() && !f2.behaviors.empty())
-                {
-                    f1.behaviors = f2.behaviors;
-                }
-                if (f1.complexity.empty() && !f2.complexity.empty())
-                {
-                    f1.complexity = f2.complexity;
-                }
-            }
 
             if (f1.name == f2.name)
             {
