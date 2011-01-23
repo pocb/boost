@@ -4,7 +4,7 @@
 # Distributed under the Boost Software License, Version 1.0.
 # See http://www.boost.org/LICENSE_1_0.txt
 #
-boost_additional_test_dependencies(typeof BOOST_DEPENDS test)
+boost_additional_test_dependencies(units BOOST_DEPENDS test)
 
 set(COMPILE_TESTS 
   test_predicates
@@ -13,6 +13,9 @@ set(COMPILE_TESTS
   test_dimensionless_ice2
   test_mixed_value_types
   test_complicated_system
+  test_reduce_unit
+  test_unscale
+  test_constants
   )
 
 foreach(C ${COMPILE_TESTS})
@@ -38,9 +41,16 @@ foreach(R ${RUN_TESTS})
   boost_test_run(${R})
 endforeach(R ${RUN_TESTS})
 
-boost_test_run(test_conversion DEPENDS boost_unit_test_framework)
-boost_test_run(test_scaled_unit DEPENDS boost_unit_test_framework)
+set(RUN_TESTS_WITH_DEPS
+  test_conversion
+  test_scaled_unit
+  test_output
+  test_trig
+)
 
+foreach(RD ${RUN_TESTS_WITH_DEPS})
+  boost_test_run(${RD} DEPENDS boost_unit_test_framework)
+endforeach(RD ${RUN_TESTS_WITH_DEPS})
 
 set(COMPILE_FAIL_TESTS
   fail_implicit_conversion
