@@ -25,7 +25,6 @@ boost_test_compile(compile_uuid_no_type_traits
 
 #
 SET(TEST_SUFFIXES
-  include1 include2 # inclucing all .hpp files in 2 translations units
   uuid # main test
   io # uuid_io.hpp
   nil_generator name_generator string_generator random_generator # generators
@@ -37,6 +36,11 @@ SET(TEST_SUFFIXES
 FOREACH(test_suffix ${TEST_SUFFIXES})
   boost_test_run(test_${test_suffix} test_${test_suffix}.cpp)
 ENDFOREACH(test_suffix ${TEST_SUFFIXES})
+
+# Test inclucing all .hpp files in 2 translations units
+# to look for issues when using multiple translation units
+# eg. missing inline on a global functionstate is not missing
+boost_test_run(test_include test_include1.cpp test_include2.cpp)
 
 # Test serializing uuids
 boost_test_run(test_serialization test_serialization.cpp
