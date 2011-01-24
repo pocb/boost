@@ -6,7 +6,6 @@
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-
 #ifndef BOOST_GEOMETRY_CORE_INTERIOR_RINGS_HPP
 #define BOOST_GEOMETRY_CORE_INTERIOR_RINGS_HPP
 
@@ -167,7 +166,7 @@ inline typename interior_return_type<Polygon const>::type interior_rings(
 \param geometry \param_geometry
 \return \return_calc{number of interior rings}
 
-\qbk{include,ref/algorithms/num_interior_rings.qbk}
+\qbk{[include ref/algorithms/num_interior_rings.qbk]}
 
 \note Defined by OGC as "numInteriorRing". To be consistent with "numPoints"
     letter "s" is appended

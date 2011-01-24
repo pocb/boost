@@ -18,7 +18,8 @@ if --enable-index in  [ modules.peek : ARGV ]
         <format>html:<auto-index-internal>on
         <auto-index-script>index.idx
         <auto-index-prefix>../../../.. 
-        <quickbook-define>enable_index ;
+        <quickbook-define>enable_index 
+        <format>pdf:<xsl:param>index.on.type=1 ;
 }
 else
 {
@@ -85,5 +86,7 @@ boostbook standalone
         <format>pdf:<xsl:param>boost.url.prefix=http://www.boost.org/doc/libs/release/libs/math/doc/sf_and_dist/html
     ;
 
-install pdf-install : standalone : <location>. <install-type>PDF ;
+install pdf-install : standalone : <location>. <install-type>PDF <name>math.pdf ;
+
+
 
