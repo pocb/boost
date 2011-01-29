@@ -16,11 +16,6 @@
 [heading New Features in Qi or Karma]
 
 * Added keyword indexes for __qi__ and __karma__ to the docs.
-* Added __utree__, a generic, hierarchical, and dynamic data structure that can 
-  represent abstract syntax trees. It's well integrated with __qi__ and 
-  __karma__. It can be passed as an attribute while parsing almost any
-  grammars. At the same time, it can be used as an attribute to generate output 
-  from.
 * Introduced a new customization point __customize_assign_to_container_from_value__
   which is invoked for container attributes whenever a attribute value needs to 
   be added to that container.
@@ -113,7 +108,14 @@
   performed lexer state changes and was using `pass_fail` in semantic actions
   to make a token match fail.
 
-[endsect] [/ spirit_2_4_2]
+[heading Known Problems]
+
+* Integer literals (like `int_(10)`) consume input on failure, which can lead to 
+  problems with the alternative operator:
+
+[endsect]
+
+[/ spirit_2_4_2]
 
 [/////////////////////////////////////////////////////////////////////////////]
 [section:spirit_2_4_1 Spirit V2.4.1] 
