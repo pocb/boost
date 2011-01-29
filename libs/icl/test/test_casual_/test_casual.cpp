@@ -24,15 +24,13 @@ using namespace boost;
 using namespace unit_test;
 using namespace boost::icl;
 
-
-
 BOOST_AUTO_TEST_CASE(casual)
 {
-    typedef int T;
-    typedef int U;
-    typedef interval_map<T,U, total_absorber> IntervalMapT;
-    typedef interval_set<T>                   IntervalSetT;
-    typedef IntervalMapT::interval_type       IntervalT;
+    //typedef int T;
+    //typedef int U;
+    //typedef interval_map<T,U, total_absorber> IntervalMapT;
+    //typedef interval_set<T>                   IntervalSetT;
+    //typedef IntervalMapT::interval_type       IntervalT;
 
     BOOST_CHECK_EQUAL(true, true);
 }

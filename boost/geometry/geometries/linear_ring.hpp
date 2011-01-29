@@ -9,6 +9,14 @@
 #ifndef BOOST_GEOMETRY_GEOMETRIES_LINEAR_RING_HPP
 #define BOOST_GEOMETRY_GEOMETRIES_LINEAR_RING_HPP
 
+#include <boost/config.hpp>
+
+#if defined(BOOST_MSVC_FULL_VER)
+#pragma message ("linear_ring is renamed to 'ring', so deprecated. Prefer using ring")
+#else
+#warning "linear_ring is renamed to 'ring', so deprecated. Prefer using ring"
+#endif
+
 #include <memory>
 #include <vector>
 
@@ -31,8 +39,8 @@ namespace model
     \brief A linear_ring (linear linear_ring) is a closed line which should not be selfintersecting
     \ingroup geometries
     \tparam Point point type
-    \tparam Container optional container type, for example std::vector, std::list, std::deque
-    \tparam Allocator optional container-allocator-type
+    \tparam Container container type, for example std::vector, std::deque
+    \tparam Allocator container-allocator-type
 */
 template
 <

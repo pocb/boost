@@ -13,7 +13,6 @@
 #include <string>
 #include <fstream>
 
-#include <boost/algorithm/string.hpp>
 
 inline std::string file_to_string(std::string const& filename)
 {
@@ -26,9 +25,7 @@ inline std::string file_to_string(std::string const& filename)
         {
             std::string line;
             std::getline(cpp_file, line);
-            boost::trim(line);
-
-            result += line;
+            result += line + "\n";
         }
     }
     return result;

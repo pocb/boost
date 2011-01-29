@@ -61,7 +61,7 @@ Finally, the library can perfectly be used together with the \b Boost \b Graph \
 
 The GGL makes substantial use of the std library, and is designed to be compatible with it.
 - provided geometries (linestring, ring, polygon, multi-s) make default use of std::vector (but that is configurable)
-- std sorting, unique copies, maps can make use of provided functors in \ref compare "compare".
+- std sorting, unique copies, maps can make use of provided functors in compare "compare".
 - internally, there are vector's, deque's, there is sorting, many things are implemented using the std library
 
 */
@@ -257,7 +257,7 @@ Library users does not have to use this point, they might also use their own poi
 - \ref boost::geometry::model::linestring "linestring": Sequence of point values with linear interpolation
 between points. Note that library users does not have to use this type. Algorithms works on iterators, so
 all algorithms also accept iterators on a vector (or other container) of points.
-- \ref boost::geometry::model::linear_ring "linear_ring": Sequence of point values with linear interpolation
+- \ref boost::geometry::model::ring "linear_ring": Sequence of point values with linear interpolation
 between points, which is closed and not self-intersecting
 - \ref boost::geometry::model::polygon "polygon": Plane figure, consisting of an outer ring and zero or more
 inner rings. So basically a polygon which might have holes.

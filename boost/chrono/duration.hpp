@@ -429,9 +429,9 @@ namespace chrono {
 
         BOOST_CHRONO_CONSTEXPR
         duration() { }
-//#if defined(BOOST_MSVC) && (BOOST_MSVC == 1500)
-//        duration(const rep& r) : rep_(r) { }
-//#endif        
+#if defined(BOOST_MSVC) && (BOOST_MSVC == 1500)
+        duration(const rep& r) : rep_(r) { }
+#endif        
         template <class Rep2>
         BOOST_CHRONO_CONSTEXPR
         explicit duration(const Rep2& r,
@@ -457,11 +457,6 @@ namespace chrono {
         }
 
         // conversions
-//#if defined(BOOST_MSVC) && (BOOST_MSVC == 1500)
-//        BOOST_CHRONO_CONSTEXPR
-//        duration(const duration& d)
-//            : rep_(d.rep_) {}
-//#endif                
         template <class Rep2, class Period2>
         BOOST_CHRONO_CONSTEXPR
         duration(const duration<Rep2, Period2>& d,
@@ -695,7 +690,15 @@ namespace detail
         bool operator()(const LhsDuration& lhs, const RhsDuration& rhs)
         {
             typedef typename common_type<LhsDuration, RhsDuration>::type CD;
+#if defined(BOOST_MSVC) && (BOOST_MSVC == 1500)
+            // trying to simplify expression so enable_if is not used (Pb. with MSVC.9.0)
+            return
+                chrono::detail::duration_cast<LhsDuration, CD>()(lhs).count()
+            <
+                chrono::detail::duration_cast<RhsDuration, CD>()(rhs).count();
+#else
             return CD(lhs).count() < CD(rhs).count();
+#endif            
         }
     };
 

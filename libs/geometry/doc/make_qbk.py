@@ -10,11 +10,16 @@
 #  http://www.boost.org/LICENSE_1_0.txt)9
 # ============================================================================
 
-
 import os, sys
 
-
-cmd="doxygen_xml2qbk  doxy/doxygen_output/xml/%s.xml ../../../ boost/geometry/geometry.hpp boost/geometry/geometries/geometries.hpp boost/geometry/multi/multi.hpp > reference/%s.qbk"
+cmd = "doxygen_xml2qbk"
+cmd = cmd + " --xml doxy/doxygen_output/xml/%s.xml"
+cmd = cmd + " --start_include boost/geometry/"
+cmd = cmd + " --convenience_header_path ../../../boost/geometry/"
+cmd = cmd + " --convenience_headers geometry.hpp,geometries/geometries.hpp,multi/multi.hpp"
+cmd = cmd + " --skip_namespace boost::geometry::"
+cmd = cmd + " --copyright src/copyright_block.qbk"
+cmd = cmd + " > reference/%s.qbk"
 
 def call_doxygen():
     os.chdir("doxy");
@@ -71,7 +76,7 @@ views = ["closeable_view", "reversible_view", "identity_view"]
 strategies = ["distance::pythagoras", "distance::haversine"
     , "distance::cross_track", "distance::projected_point"
     , "within::winding", "within::franklin", "within::crossings_multiply"
-    , "area::by_triangles", "area::huiller"
+    , "area::surveyor", "area::huiller"
     , "centroid::bashein_detmer", "centroid::average"
     , "convex_hull::graham_andrew"
     , "simplify::douglas_peucker"
@@ -122,7 +127,7 @@ model_to_quickbook("segment", "segment")
 model_to_quickbook("multi__linestring", "multi_linestring")
 model_to_quickbook("multi__point", "multi_point")
 model_to_quickbook("multi__polygon", "multi_polygon")
-model_to_quickbook("linear__ring", "ring")
+model_to_quickbook("ring", "ring")
 model_to_quickbook("referring__segment", "referring_segment")
 
 

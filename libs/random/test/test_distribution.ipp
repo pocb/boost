@@ -10,6 +10,7 @@
  */
 
 #include <boost/random/linear_congruential.hpp>
+#include <boost/random/lagged_fibonacci.hpp>
 #include <sstream>
 #include "concepts.hpp"
 
@@ -25,15 +26,30 @@ BOOST_AUTO_TEST_CASE(test_constructors) {
 #ifdef BOOST_RANDOM_ARG2
     BOOST_CHECK_EQUAL(dist.BOOST_RANDOM_ARG2(), BOOST_RANDOM_ARG2_DEFAULT);
 #endif
+#ifdef BOOST_RANDOM_ARG3
+    BOOST_CHECK_EQUAL(dist.BOOST_RANDOM_ARG3(), BOOST_RANDOM_ARG3_DEFAULT);
+#endif
     BOOST_RANDOM_DISTRIBUTION dist_one(BOOST_RANDOM_ARG1_VALUE);
     BOOST_CHECK_EQUAL(dist_one.BOOST_RANDOM_ARG1(), BOOST_RANDOM_ARG1_VALUE);
 #ifdef BOOST_RANDOM_ARG2
     BOOST_CHECK_EQUAL(dist_one.BOOST_RANDOM_ARG2(), BOOST_RANDOM_ARG2_DEFAULT);
 #endif
+#ifdef BOOST_RANDOM_ARG3
+    BOOST_CHECK_EQUAL(dist_one.BOOST_RANDOM_ARG3(), BOOST_RANDOM_ARG3_DEFAULT);
+#endif
 #ifdef BOOST_RANDOM_ARG2
     BOOST_RANDOM_DISTRIBUTION dist_two(BOOST_RANDOM_ARG1_VALUE, BOOST_RANDOM_ARG2_VALUE);
     BOOST_CHECK_EQUAL(dist_two.BOOST_RANDOM_ARG1(), BOOST_RANDOM_ARG1_VALUE);
     BOOST_CHECK_EQUAL(dist_two.BOOST_RANDOM_ARG2(), BOOST_RANDOM_ARG2_VALUE);
+#ifdef BOOST_RANDOM_ARG3
+    BOOST_CHECK_EQUAL(dist_two.BOOST_RANDOM_ARG3(), BOOST_RANDOM_ARG3_DEFAULT);
+#endif
+#endif
+#ifdef BOOST_RANDOM_ARG3
+    BOOST_RANDOM_DISTRIBUTION dist_three(BOOST_RANDOM_ARG1_VALUE, BOOST_RANDOM_ARG2_VALUE, BOOST_RANDOM_ARG3_VALUE);
+    BOOST_CHECK_EQUAL(dist_three.BOOST_RANDOM_ARG1(), BOOST_RANDOM_ARG1_VALUE);
+    BOOST_CHECK_EQUAL(dist_three.BOOST_RANDOM_ARG2(), BOOST_RANDOM_ARG2_VALUE);
+    BOOST_CHECK_EQUAL(dist_three.BOOST_RANDOM_ARG3(), BOOST_RANDOM_ARG3_VALUE);
 #endif
     BOOST_RANDOM_DISTRIBUTION copy(dist);
     BOOST_CHECK_EQUAL(dist, copy);
@@ -43,10 +59,16 @@ BOOST_AUTO_TEST_CASE(test_constructors) {
     BOOST_RANDOM_DISTRIBUTION copy_two(dist_two);
     BOOST_CHECK_EQUAL(dist_two, copy_two);
 #endif
+#ifdef BOOST_RANDOM_ARG3
+    BOOST_RANDOM_DISTRIBUTION copy_three(dist_three);
+    BOOST_CHECK_EQUAL(dist_three, copy_three);
+#endif
 }
 
 BOOST_AUTO_TEST_CASE(test_param) {
-#ifdef BOOST_RANDOM_ARG2
+#if defined(BOOST_RANDOM_ARG3)
+    BOOST_RANDOM_DISTRIBUTION dist(BOOST_RANDOM_ARG1_VALUE, BOOST_RANDOM_ARG2_VALUE, BOOST_RANDOM_ARG3_VALUE);
+#elif defined(BOOST_RANDOM_ARG2)
     BOOST_RANDOM_DISTRIBUTION dist(BOOST_RANDOM_ARG1_VALUE, BOOST_RANDOM_ARG2_VALUE);
 #else
     BOOST_RANDOM_DISTRIBUTION dist(BOOST_RANDOM_ARG1_VALUE);
@@ -55,6 +77,9 @@ BOOST_AUTO_TEST_CASE(test_param) {
     BOOST_CHECK_EQUAL(param.BOOST_RANDOM_ARG1(), BOOST_RANDOM_ARG1_VALUE);
 #ifdef BOOST_RANDOM_ARG2
     BOOST_CHECK_EQUAL(param.BOOST_RANDOM_ARG2(), BOOST_RANDOM_ARG2_VALUE);
+#endif
+#ifdef BOOST_RANDOM_ARG3
+    BOOST_CHECK_EQUAL(param.BOOST_RANDOM_ARG3(), BOOST_RANDOM_ARG3_VALUE);
 #endif
     BOOST_RANDOM_DISTRIBUTION copy1(param);
     BOOST_CHECK_EQUAL(dist, copy1);
@@ -71,12 +96,18 @@ BOOST_AUTO_TEST_CASE(test_param) {
 #ifdef BOOST_RANDOM_ARG2
     BOOST_CHECK_EQUAL(param_default.BOOST_RANDOM_ARG2(), BOOST_RANDOM_ARG2_DEFAULT);
 #endif
+#ifdef BOOST_RANDOM_ARG3
+    BOOST_CHECK_EQUAL(param_default.BOOST_RANDOM_ARG3(), BOOST_RANDOM_ARG3_DEFAULT);
+#endif
     BOOST_CHECK(param != param_default);
     BOOST_CHECK(!(param == param_default));
     BOOST_RANDOM_DISTRIBUTION::param_type param_one(BOOST_RANDOM_ARG1_VALUE);
     BOOST_CHECK_EQUAL(param_one.BOOST_RANDOM_ARG1(), BOOST_RANDOM_ARG1_VALUE);
 #ifdef BOOST_RANDOM_ARG2
     BOOST_CHECK_EQUAL(param_one.BOOST_RANDOM_ARG2(), BOOST_RANDOM_ARG2_DEFAULT);
+#endif
+#ifdef BOOST_RANDOM_ARG3
+    BOOST_CHECK_EQUAL(param_one.BOOST_RANDOM_ARG3(), BOOST_RANDOM_ARG3_DEFAULT);
 #endif
 #ifdef BOOST_RANDOM_ARG2
     BOOST_CHECK(param != param_one);
@@ -88,6 +119,15 @@ BOOST_AUTO_TEST_CASE(test_param) {
     BOOST_RANDOM_DISTRIBUTION::param_type param_two(BOOST_RANDOM_ARG1_VALUE, BOOST_RANDOM_ARG2_VALUE);
     BOOST_CHECK_EQUAL(param_two.BOOST_RANDOM_ARG1(), BOOST_RANDOM_ARG1_VALUE);
     BOOST_CHECK_EQUAL(param_two.BOOST_RANDOM_ARG2(), BOOST_RANDOM_ARG2_VALUE);
+#ifdef BOOST_RANDOM_ARG3
+    BOOST_CHECK_EQUAL(param_two.BOOST_RANDOM_ARG3(), BOOST_RANDOM_ARG3_DEFAULT);
+#endif
+#endif
+#ifdef BOOST_RANDOM_ARG3
+    BOOST_RANDOM_DISTRIBUTION::param_type param_three(BOOST_RANDOM_ARG1_VALUE, BOOST_RANDOM_ARG2_VALUE, BOOST_RANDOM_ARG3_VALUE);
+    BOOST_CHECK_EQUAL(param_three.BOOST_RANDOM_ARG1(), BOOST_RANDOM_ARG1_VALUE);
+    BOOST_CHECK_EQUAL(param_three.BOOST_RANDOM_ARG2(), BOOST_RANDOM_ARG2_VALUE);
+    BOOST_CHECK_EQUAL(param_three.BOOST_RANDOM_ARG3(), BOOST_RANDOM_ARG3_VALUE);
 #endif
 }
 
@@ -103,6 +143,11 @@ BOOST_AUTO_TEST_CASE(test_min_max) {
     BOOST_CHECK_EQUAL((dist_two.min)(), BOOST_RANDOM_DIST2_MIN);
     BOOST_CHECK_EQUAL((dist_two.max)(), BOOST_RANDOM_DIST2_MAX);
 #endif
+#ifdef BOOST_RANDOM_ARG3
+    BOOST_RANDOM_DISTRIBUTION dist_three(BOOST_RANDOM_ARG1_VALUE, BOOST_RANDOM_ARG2_VALUE, BOOST_RANDOM_ARG3_VALUE);
+    BOOST_CHECK_EQUAL((dist_three.min)(), BOOST_RANDOM_DIST3_MIN);
+    BOOST_CHECK_EQUAL((dist_three.max)(), BOOST_RANDOM_DIST3_MAX);
+#endif
 }
 
 BOOST_AUTO_TEST_CASE(test_comparison) {
@@ -113,6 +158,10 @@ BOOST_AUTO_TEST_CASE(test_comparison) {
 #ifdef BOOST_RANDOM_ARG2
     BOOST_RANDOM_DISTRIBUTION dist_two(BOOST_RANDOM_ARG1_VALUE, BOOST_RANDOM_ARG2_VALUE);
     BOOST_RANDOM_DISTRIBUTION dist_two_copy(dist_two);
+#endif
+#ifdef BOOST_RANDOM_ARG3
+    BOOST_RANDOM_DISTRIBUTION dist_three(BOOST_RANDOM_ARG1_VALUE, BOOST_RANDOM_ARG2_VALUE, BOOST_RANDOM_ARG3_VALUE);
+    BOOST_RANDOM_DISTRIBUTION dist_three_copy(dist_three);
 #endif
     BOOST_CHECK(dist == dist_copy);
     BOOST_CHECK(!(dist != dist_copy));
@@ -128,10 +177,22 @@ BOOST_AUTO_TEST_CASE(test_comparison) {
     BOOST_CHECK(dist_one != dist_two);
     BOOST_CHECK(!(dist_one == dist_two));
 #endif
+#ifdef BOOST_RANDOM_ARG3
+    BOOST_CHECK(dist_three == dist_three_copy);
+    BOOST_CHECK(!(dist_three != dist_three_copy));
+    BOOST_CHECK(dist != dist_three);
+    BOOST_CHECK(!(dist == dist_three));
+    BOOST_CHECK(dist_one != dist_three);
+    BOOST_CHECK(!(dist_one == dist_three));
+    BOOST_CHECK(dist_two != dist_three);
+    BOOST_CHECK(!(dist_two == dist_three));
+#endif
 }
 
 BOOST_AUTO_TEST_CASE(test_streaming) {
-#ifdef BOOST_RANDOM_ARG2
+#if defined(BOOST_RANDOM_ARG3)
+    BOOST_RANDOM_DISTRIBUTION dist(BOOST_RANDOM_ARG1_VALUE, BOOST_RANDOM_ARG2_VALUE, BOOST_RANDOM_ARG2_VALUE);
+#elif defined(BOOST_RANDOM_ARG2)
     BOOST_RANDOM_DISTRIBUTION dist(BOOST_RANDOM_ARG1_VALUE, BOOST_RANDOM_ARG2_VALUE);
 #else
     BOOST_RANDOM_DISTRIBUTION dist(BOOST_RANDOM_ARG1_VALUE);
@@ -179,3 +240,41 @@ BOOST_AUTO_TEST_CASE(test_generation) {
 #endif
     }
 }
+
+BOOST_AUTO_TEST_CASE(test_generation_float) {
+    boost::lagged_fibonacci607 gen;
+    BOOST_RANDOM_DISTRIBUTION dist BOOST_RANDOM_TEST1_PARAMS;
+    BOOST_RANDOM_DISTRIBUTION dist_two BOOST_RANDOM_TEST2_PARAMS;
+	typedef BOOST_RANDOM_DISTRIBUTION::result_type result_type;
+    for(int i = 0; i < 10; ++i) {
+        result_type value = dist(gen);
+#ifdef BOOST_RANDOM_TEST1_MIN
+        BOOST_CHECK_GE(value, BOOST_RANDOM_TEST1_MIN);
+#endif
+#ifdef BOOST_RANDOM_TEST1_MAX
+        BOOST_CHECK_LE(value, BOOST_RANDOM_TEST1_MAX);
+#endif
+        result_type value_two = dist_two(gen);
+#ifdef BOOST_RANDOM_TEST2_MIN
+        BOOST_CHECK_GE(value_two, BOOST_RANDOM_TEST2_MIN);
+#endif
+#ifdef BOOST_RANDOM_TEST2_MAX
+        BOOST_CHECK_LE(value_two, BOOST_RANDOM_TEST2_MAX);
+#endif
+        result_type value_param = dist_two(gen, dist.param());
+#ifdef BOOST_RANDOM_TEST1_MIN
+        BOOST_CHECK_GE(value_param, BOOST_RANDOM_TEST1_MIN);
+#endif
+#ifdef BOOST_RANDOM_TEST1_MAX
+        BOOST_CHECK_LE(value_param, BOOST_RANDOM_TEST1_MAX);
+#endif
+        result_type value_two_param = dist(gen, dist_two.param());
+#ifdef BOOST_RANDOM_TEST2_MIN
+        BOOST_CHECK_GE(value_two_param, BOOST_RANDOM_TEST2_MIN);
+#endif
+#ifdef BOOST_RANDOM_TEST2_MAX
+        BOOST_CHECK_LE(value_two_param, BOOST_RANDOM_TEST2_MAX);
+#endif
+    }
+}
+

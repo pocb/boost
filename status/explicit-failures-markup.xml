@@ -482,7 +482,7 @@
     <library name="chrono">
         <mark-unusable>
             <toolset name="borland-*"/>
-            <toolset name="pathscale*"/>
+            <toolset name="vacpp*"/>
             <note author="Vicente J. Botet Escriba">
                 The compiler does not support features that are essential for the library.
             </note>
@@ -2895,8 +2895,24 @@ for more information.
         </mark-expected-failures>
    </library>
 
-    <!-- spirit -->
+    <!-- spirit (v2) -->
     <library name="spirit">
+      <mark-unusable>
+        <toolset name="borland-cb2009"/>
+        <toolset name="borland-cb2010"/>
+      </mark-unusable>
+    </library>
+
+    <!-- spirit (v2) repository -->
+    <library name="spirit/repository">
+      <mark-unusable>
+        <toolset name="borland-cb2009"/>
+        <toolset name="borland-cb2010"/>
+      </mark-unusable>
+    </library>
+
+    <!-- spirit (classic) -->
+    <library name="spirit/classic">
         <mark-unusable>
             <toolset name="msvc-6.5*"/>
             <toolset name="borland-5.5*"/>
@@ -4501,7 +4517,6 @@ for more information.
     <library name="ratio">
       <mark-unusable>
         <toolset name="borland-*"/>
-        <toolset name="pathscale*"/>
         <note author="Vicente J. Botet Escriba">
             The compiler does not support features that are essential for the library.
         </note>
@@ -5861,9 +5876,10 @@ These tests will fail in most compilers that don't support rvalue references.
         <test name="compile_map"/>
         <test name="compile_set"/>
         <toolset name="gcc-open64"/>
-        <toolset name="pathscale-*"/>
+        <toolset name="pathscale-3.*"/>
         <note author="Daniel James">
-            Concept checks don't seem to work on pathscale.
+            Failing on compilers that don't have good support
+            concept check support.
         </note>
       </mark-expected-failures>
     </library>

@@ -207,6 +207,7 @@
 [include reference/box.qbk]
 [include reference/ring.qbk]
 [include reference/segment.qbk]
+[include reference/referring_segment.qbk]
 [endsect]
 
 [section:register Adaption and adapted models]
@@ -218,7 +219,7 @@
 [include reference/distance_haversine.qbk]
 [include reference/distance_projected_point.qbk]
 [include reference/distance_cross_track.qbk]
-[include reference/area_by_triangles.qbk]
+[include reference/area_surveyor.qbk]
 [include reference/area_huiller.qbk]
 [include reference/centroid_average.qbk]
 [include reference/centroid_bashein_detmer.qbk]
