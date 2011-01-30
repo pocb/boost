@@ -10,8 +10,7 @@ is then added on top of the official Boost release, thanks to a
 dedicated patch.
 
 That CMake framework (and patch) is hosted and maintained on GitHub,
-for now in the following Git repository:
-https://github.com/denisarnaud/boost-cmake
+in the following Git repository: https://github.com/boost-lib/boost-cmake
 
 [A clone also exists on Gitorious, where CMake-related work was formely done:
 http://gitorious.org/~denisarnaud/boost/denisarnauds-cmake]
