@@ -13,7 +13,7 @@ That CMake framework (and patch) is hosted and maintained on GitHub,
 in the following Git repository: https://github.com/boost-lib/boost-cmake
 
 [A clone also exists on Gitorious, where CMake-related work was formely done:
-http://gitorious.org/~denisarnaud/boost/denisarnauds-cmake]
+http://gitorious.org/boost/cmake.git]
 
 Upstream work is synchronised thanks to the Ryppl's hosted Git clone:
 https://github.com/ryppl/boost-svn/tree/trunk
