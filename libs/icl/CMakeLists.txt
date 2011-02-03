@@ -9,7 +9,6 @@
 # Add a variable to hold the headers for the library
 set (lib_headers
     icl
-    icl.hpp
 )
 
 # Add a library target to the build system
