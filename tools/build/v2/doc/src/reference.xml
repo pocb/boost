@@ -1568,8 +1568,9 @@ using boostbook : <optional><replaceable>docbook-xsl-dir</replaceable></optional
 
           </variablelist>
 
-          The boostbook module defines a rule for creating a target
-          following the common syntax.
+          <para>The boostbook module defines a rule for creating a target
+          following the common syntax.</para>
+
           <variablelist>
 
             <varlistentry>
@@ -1652,8 +1653,9 @@ using doxygen : <optional><replaceable>name</replaceable></optional> ;
 
           </variablelist>
 
-          The doxygen module defines a rule for creating a target
-          following the common syntax.
+          <para>The doxygen module defines a rule for creating a target
+          following the common syntax.</para>
+
           <variablelist>
 
             <varlistentry>
@@ -1687,8 +1689,9 @@ using quickbook : <optional><replaceable>command</replaceable></optional> ;
 </programlisting>
           <para>
           <replaceable>command</replaceable> is the quickbook executable.
-          If it is not specified, Boost.Build will compile it from source
-          or search for it in PATH.
+          If it is not specified, Boost.Build will compile it from source.
+          If it is unable to find the source it will search for a quickbook
+          executable in PATH.
           </para>
 
         </section>
