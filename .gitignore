@@ -10,5 +10,5 @@ dist/
 *.tar.*
 *.zip
 #tools/build/CMake/docs/
-tools/build/CMake/install_me/
+#tools/build/CMake/install_me/
 
