@@ -17,8 +17,8 @@
 #define BOOST_RANDOM_LINEAR_CONGRUENTIAL_HPP
 
 #include <iostream>
-#include <cassert>
 #include <stdexcept>
+#include <boost/assert.hpp>
 #include <boost/config.hpp>
 #include <boost/limits.hpp>
 #include <boost/static_assert.hpp>
@@ -28,6 +28,7 @@
 #include <boost/random/detail/config.hpp>
 #include <boost/random/detail/const_mod.hpp>
 #include <boost/random/detail/seed.hpp>
+#include <boost/random/detail/seed_impl.hpp>
 #include <boost/detail/workaround.hpp>
 
 #include <boost/random/detail/disable_warnings.hpp>
@@ -138,28 +139,15 @@ public:
         if(increment == 0 && _x == 0) {
             _x = 1;
         }
-        assert(_x >= (min)());
-        assert(_x <= (max)());
+        BOOST_ASSERT(_x >= (min)());
+        BOOST_ASSERT(_x <= (max)());
     }
 
     /**
      * Seeds a @c linear_congruential_engine using values from a SeedSeq.
      */
     BOOST_RANDOM_DETAIL_SEED_SEQ_SEED(linear_congruential_engine, SeedSeq, seq)
-    {
-        static const int log = ::boost::static_log2<m>::value;
-        static const int k =
-            (log + ((~(static_cast<IntType>(1) << log) & m)? 32 : 31)) / 32;
-        boost::uint32_t array[k + 3];
-        seq.generate(&array[0], &array[0] + k + 3);
-        IntType s = 0;
-        IntType mul = 1;
-        for(int j = 0; j < k; ++j) {
-            s = const_mod<IntType, m>::mult_add(array[j + 3], mul, s);
-            mul <<= 32;
-        }
-        seed(s);
-    }
+    { seed(detail::seed_one_int<IntType, m>(seq)); }
 
     /**
      * seeds a @c linear_congruential_engine with values taken
@@ -210,8 +198,38 @@ public:
     /** Advances the state of the generator by @c z. */
     void discard(boost::ulong_long_type z)
     {
-        for(boost::ulong_long_type j = 0; j < z; ++j) {
-            (*this)();
+        typedef const_mod<IntType, m> mod_type;
+        IntType b_inv = mod_type::invert(a-1);
+        IntType b_gcd = mod_type::mult(a-1, b_inv);
+        if(b_gcd == 1) {
+            IntType a_z = mod_type::pow(a, z);
+            _x = mod_type::mult_add(a_z, _x, 
+                mod_type::mult(mod_type::mult(c, b_inv), a_z - 1));
+        } else {
+            // compute (a^z - 1)*c % (b_gcd * m) / (b / b_gcd) * inv(b / b_gcd)
+            // we're storing the intermediate result / b_gcd
+            IntType a_zm1_over_gcd = 0;
+            IntType a_km1_over_gcd = (a - 1) / b_gcd;
+            boost::ulong_long_type exponent = z;
+            while(exponent != 0) {
+                if(exponent % 2 == 1) {
+                    a_zm1_over_gcd =
+                        mod_type::mult_add(
+                            b_gcd,
+                            mod_type::mult(a_zm1_over_gcd, a_km1_over_gcd),
+                            mod_type::add(a_zm1_over_gcd, a_km1_over_gcd));
+                }
+                a_km1_over_gcd = mod_type::mult_add(
+                    b_gcd,
+                    mod_type::mult(a_km1_over_gcd, a_km1_over_gcd),
+                    mod_type::add(a_km1_over_gcd, a_km1_over_gcd));
+                exponent /= 2;
+            }
+            
+            IntType a_z = mod_type::mult_add(b_gcd, a_zm1_over_gcd, 1);
+            IntType num = mod_type::mult(c, a_zm1_over_gcd);
+            b_inv = mod_type::invert((a-1)/b_gcd);
+            _x = mod_type::mult_add(a_z, _x, mod_type::mult(b_inv, num));
         }
     }
 #endif
@@ -246,7 +264,7 @@ public:
 
 private:
 
-    /// \cond
+    /// \cond show_private
 
     template<class CharT, class Traits>
     void read(std::basic_istream<CharT, Traits>& is) {
@@ -279,7 +297,7 @@ template<class IntType, IntType a, IntType c, IntType m>
 const IntType linear_congruential_engine<IntType,a,c,m>::default_seed;
 #endif
 
-/// \cond
+/// \cond show_deprecated
 
 // provided for backwards compatibility
 template<class IntType, IntType a, IntType c, IntType m, IntType val = 0>
@@ -311,7 +329,7 @@ public:
  *  the ACM, Vol. 31, No. 10, October 1988, pp. 1192-1201 
  *  @endblockquote
  */
-typedef linear_congruential_engine<int32_t, 16807, 0, 2147483647> minstd_rand0;
+typedef linear_congruential_engine<uint32_t, 16807, 0, 2147483647> minstd_rand0;
 
 /** The specialization \minstd_rand was suggested in
  *
@@ -321,7 +339,7 @@ typedef linear_congruential_engine<int32_t, 16807, 0, 2147483647> minstd_rand0;
  *  the ACM, Vol. 31, No. 10, October 1988, pp. 1192-1201
  *  @endblockquote
  */
-typedef linear_congruential_engine<int32_t, 48271, 0, 2147483647> minstd_rand;
+typedef linear_congruential_engine<uint32_t, 48271, 0, 2147483647> minstd_rand;
 
 
 #if !defined(BOOST_NO_INT64_T) && !defined(BOOST_NO_INTEGRAL_INT64_T)
@@ -338,21 +356,21 @@ typedef linear_congruential_engine<int32_t, 48271, 0, 2147483647> minstd_rand;
 class rand48 
 {
 public:
-    typedef int32_t result_type;
+    typedef uint32_t result_type;
 
     BOOST_STATIC_CONSTANT(bool, has_fixed_range = false);
     /**
      * Returns the smallest value that the generator can produce
      */
-    static int32_t min BOOST_PREVENT_MACRO_SUBSTITUTION () { return 0; }
+    static uint32_t min BOOST_PREVENT_MACRO_SUBSTITUTION () { return 0; }
     /**
      * Returns the largest value that the generator can produce
      */
-    static int32_t max BOOST_PREVENT_MACRO_SUBSTITUTION ()
-    { return (std::numeric_limits<int32_t>::max)(); }
+    static uint32_t max BOOST_PREVENT_MACRO_SUBSTITUTION ()
+    { return 0x7FFFFFFF; }
   
     /** Seeds the generator with the default seed. */
-    rand48() : lcf(cnv(static_cast<int32_t>(1))) {}
+    rand48() : lcf(cnv(static_cast<uint32_t>(1))) {}
     /**
      * If T is an integral type smaller than int64_t, constructs
      * a \rand48 generator with x(0) := (x0 << 16) | 0x330e.  Otherwise
@@ -372,7 +390,7 @@ public:
     // compiler-generated copy ctor and assignment operator are fine
 
     /** Seeds the generator with the default seed. */
-    void seed() { seed(static_cast<int32_t>(1)); }
+    void seed() { seed(static_cast<uint32_t>(1)); }
     /**
      * If T is an integral type smaller than int64_t, changes
      * the current value x(n) of the generator to (x0 << 16) | 0x330e.
@@ -390,7 +408,7 @@ public:
     template<class SeedSeq> void seed(SeedSeq& seq) { lcf.seed(cnv(seq)); }
 
     /**  Returns the next value of the generator. */
-    int32_t operator()() { return static_cast<int32_t>(lcf() >> 17); }
+    uint32_t operator()() { return static_cast<uint32_t>(lcf() >> 17); }
     
 #ifndef BOOST_NO_LONG_LONG
     /** Advances the state of the generator by @c z. */
@@ -433,7 +451,7 @@ public:
     friend bool operator!=(const rand48& x, const rand48& y)
     { return !(x == y); }
 private:
-    /// \cond
+    /// \cond show_private
     typedef random::linear_congruential_engine<uint64_t,
         // xxxxULL is not portable
         uint64_t(0xDEECE66DUL) | (uint64_t(0x5) << 32),

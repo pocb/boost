@@ -17,7 +17,7 @@
 #ifndef BOOST_RANDOM_UNIFORM_INT_HPP
 #define BOOST_RANDOM_UNIFORM_INT_HPP
 
-#include <cassert>
+#include <boost/assert.hpp>
 #include <boost/random/uniform_int_distribution.hpp>
 
 namespace boost {
@@ -72,13 +72,25 @@ public:
     /** Sets the parameters of the distribution. */
     void param(const param_type& parm) { this->base_type::param(parm); }
 
-    using base_type::operator();
+    // Codergear seems to have trouble with a using declaration here
 
     template<class Engine>
-    IntType operator()(Engine& eng, IntType n)
+    IntType operator()(Engine& eng) const
     {
-        assert(n > 0);
-        return (*this)(eng, param_type(0, n - 1));
+        return static_cast<const base_type&>(*this)(eng);
+    }
+
+    template<class Engine>
+    IntType operator()(Engine& eng, const param_type& parm) const
+    {
+        return static_cast<const base_type&>(*this)(eng, parm);
+    }
+
+    template<class Engine>
+    IntType operator()(Engine& eng, IntType n) const
+    {
+        BOOST_ASSERT(n > 0);
+        return static_cast<const base_type&>(*this)(eng, param_type(0, n - 1));
     }
 };
 

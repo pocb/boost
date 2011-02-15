@@ -22,9 +22,11 @@
 #include <stdexcept>
 #include <boost/config.hpp>
 #include <boost/cstdint.hpp>
+#include <boost/integer/integer_mask.hpp>
 #include <boost/random/detail/config.hpp>
 #include <boost/random/detail/ptr_helper.hpp>
 #include <boost/random/detail/seed.hpp>
+#include <boost/random/detail/seed_impl.hpp>
 #include <boost/random/detail/generator_seed_seq.hpp>
 
 namespace boost {
@@ -152,15 +154,7 @@ public:
      */
     BOOST_RANDOM_DETAIL_SEED_SEQ_SEED(mersenne_twister_engine, SeeqSeq, seq)
     {
-        boost::uint_least32_t storage[((w+31)/32) * n];
-        seq.generate(&storage[0], &storage[0] + ((w+31)/32) * n);
-        for(std::size_t j = 0; j < n; j++) {
-            UIntType val = 0;
-            for(std::size_t k = 0; k < (w+31)/32; ++k) {
-                val += storage[(w+31)/32*j + k] << 32*k;
-            }
-            x[j] = val;
-        }
+        detail::seed_array_int<w>(seq, x);
         i = n;
 
         // fix up the state if it's all zeroes.
@@ -189,13 +183,7 @@ public:
     { return 0; }
     /** Returns the largest value that the generator can produce. */
     static result_type max BOOST_PREVENT_MACRO_SUBSTITUTION ()
-    {
-        // avoid "left shift count >= width of type" warning
-        result_type res = 0;
-        for(std::size_t j = 0; j < w; ++j)
-            res |= (static_cast<result_type>(1) << j);
-        return res;
-    }
+    { return boost::low_bits_mask_t<w>::sig_bits; }
     
     /** Produces the next value of the generator. */
     result_type operator()();
@@ -203,11 +191,7 @@ public:
     /** Fills a range with random values */
     template<class Iter>
     void generate(Iter first, Iter last)
-    {
-        for(; first != last; ++first) {
-            *first = (*this)();
-        }
-    }
+    { detail::generate_from_int(*this, first, last); }
 
 #ifndef BOOST_NO_LONG_LONG
     /**
@@ -273,7 +257,7 @@ public:
     { return !(x == y); }
 
 private:
-    /// \cond hide_private_members
+    /// \cond show_private
 
     void twist();
 
@@ -372,7 +356,7 @@ private:
     std::size_t i;
 };
 
-/// \cond
+/// \cond show_private
 
 #ifndef BOOST_NO_INCLASS_MEMBER_INITIALIZATION
 //  A definition is required even for integral static constants
@@ -509,8 +493,7 @@ typedef mersenne_twister_engine<uint64_t,64,312,156,31,
     UINT64_C(6364136223846793005)> mt19937_64;
 #endif
 
-
-/// \cond
+/// \cond show_deprecated
 
 template<class UIntType,
          int w, int n, int m, int r,

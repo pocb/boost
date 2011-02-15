@@ -14,11 +14,11 @@
 #define BOOST_RANDOM_DISCRETE_DISTRIBUTION_HPP_INCLUDED
 
 #include <vector>
-#include <cassert>
 #include <limits>
 #include <numeric>
 #include <utility>
 #include <iterator>
+#include <boost/assert.hpp>
 #include <boost/random/uniform_01.hpp>
 #include <boost/random/uniform_int.hpp>
 #include <boost/random/detail/config.hpp>
@@ -104,7 +104,7 @@ public:
         {
             std::size_t n = (nw == 0) ? 1 : nw;
             double delta = (xmax - xmin) / n;
-            assert(delta > 0);
+            BOOST_ASSERT(delta > 0);
             for(std::size_t k = 0; k < n; ++k) {
                 _probabilities.push_back(fw(xmin + k*delta + delta/2));
             }
@@ -146,7 +146,7 @@ public:
         /** Returns true if the two sets of parameters are different. */
         BOOST_RANDOM_DETAIL_INEQUALITY_OPERATOR(param_type)
     private:
-        /// @cond
+        /// @cond show_private
         friend class discrete_distribution;
         explicit param_type(const discrete_distribution& dist)
           : _probabilities(dist.probabilities())
@@ -233,7 +233,7 @@ public:
     {
         std::size_t n = (nw == 0) ? 1 : nw;
         double delta = (xmax - xmin) / n;
-        assert(delta > 0);
+        BOOST_ASSERT(delta > 0);
         std::vector<WeightType> weights;
         for(std::size_t k = 0; k < n; ++k) {
             weights.push_back(fw(xmin + k*delta + delta/2));
@@ -255,7 +255,7 @@ public:
     template<class URNG>
     IntType operator()(URNG& urng) const
     {
-        assert(!_alias_table.empty());
+        BOOST_ASSERT(!_alias_table.empty());
         WeightType test = uniform_01<WeightType>()(urng);
         IntType result = uniform_int<IntType>((min)(), (max)())(urng);
         if(test < _alias_table[result].first) {
@@ -374,7 +374,7 @@ public:
 
 private:
 
-    /// @cond
+    /// @cond show_private
 
     template<class Iter>
     void init(Iter first, Iter last, std::input_iterator_tag)

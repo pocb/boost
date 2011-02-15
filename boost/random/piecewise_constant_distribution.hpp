@@ -14,8 +14,8 @@
 #define BOOST_RANDOM_PIECEWISE_CONSTANT_DISTRIBUTION_HPP_INCLUDED
 
 #include <vector>
-#include <cassert>
 #include <numeric>
+#include <boost/assert.hpp>
 #include <boost/random/uniform_real.hpp>
 #include <boost/random/discrete_distribution.hpp>
 #include <boost/random/detail/config.hpp>
@@ -150,7 +150,7 @@ public:
         {
             std::size_t n = (nw == 0) ? 1 : nw;
             double delta = (xmax - xmin) / n;
-            assert(delta > 0);
+            BOOST_ASSERT(delta > 0);
             for(std::size_t k = 0; k < n; ++k) {
                 _weights.push_back(f(xmin + k*delta + delta/2));
                 _intervals.push_back(xmin + k*delta);
@@ -211,19 +211,15 @@ public:
 
     private:
 
-        /// @cond
-
         friend class piecewise_constant_distribution;
 
         std::vector<RealType> _intervals;
         std::vector<WeightType> _weights;
-
-        /// @endcond
     };
 
     /**
      * Creates a new @c piecewise_constant_distribution with
-     * a single interval, [0, 1)$.
+     * a single interval, [0, 1).
      */
     piecewise_constant_distribution()
     {
@@ -460,13 +456,8 @@ public:
     BOOST_RANDOM_DETAIL_INEQUALITY_OPERATOR(piecewise_constant_distribution)
 
 private:
-
-    /// @cond
-
     discrete_distribution<std::size_t, WeightType> _bins;
     std::vector<RealType> _intervals;
-
-    /// @endcond
 };
 
 }

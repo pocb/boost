@@ -20,6 +20,11 @@ BOOST_CONCEPT_ASSERT((RandomNumberEngine< BOOST_RANDOM_URNG >));
 
 typedef BOOST_RANDOM_URNG::result_type result_type;
 
+#ifdef BOOST_MSVC
+#pragma warning(push)
+#pragma warning(disable:4244)
+#endif
+
 template<class Converted, class URNG, class T>
 void test_seed_conversion(URNG & urng, const T & t)
 {
@@ -33,6 +38,10 @@ void test_seed_conversion(URNG & urng, const T & t)
         BOOST_CHECK_MESSAGE(urng == urng2, msg.str());
     }
 }
+
+#ifdef BOOST_MSVC
+#pragma warning(pop)
+#endif
 
 void test_seed(result_type value)
 {
@@ -79,7 +88,7 @@ BOOST_AUTO_TEST_CASE(test_arithmetic_seed)
    
 BOOST_AUTO_TEST_CASE(test_iterator_seed)
 {
-    const std::vector<int> v(9999u, 0x41);
+    const std::vector<int> v((std::max)(std::size_t(9999u), sizeof(BOOST_RANDOM_URNG) / 4), 0x41);
     std::vector<int>::const_iterator it = v.begin();
     std::vector<int>::const_iterator it_end = v.end();
     BOOST_RANDOM_URNG urng(it, it_end);
@@ -87,7 +96,7 @@ BOOST_AUTO_TEST_CASE(test_iterator_seed)
     std::iterator_traits<std::vector<int>::const_iterator>::difference_type n_words = (it - v.begin());
     BOOST_CHECK_GT(n_words, 0);
 
-	it = v.begin();
+    it = v.begin();
     BOOST_RANDOM_URNG urng2;
     urng2.seed(it, it_end);
     std::iterator_traits<std::vector<int>::const_iterator>::difference_type n_words2 = (it - v.begin());
@@ -101,7 +110,7 @@ BOOST_AUTO_TEST_CASE(test_iterator_seed)
     if(n_words > 1) {
         it = v.end();
         --it;
-		BOOST_CHECK_THROW(BOOST_RANDOM_URNG(it, it_end), std::invalid_argument);
+        BOOST_CHECK_THROW(BOOST_RANDOM_URNG(it, it_end), std::invalid_argument);
         it = v.end();
         --it;
         BOOST_CHECK_THROW(urng.seed(it, it_end), std::invalid_argument);
@@ -110,7 +119,7 @@ BOOST_AUTO_TEST_CASE(test_iterator_seed)
 
 BOOST_AUTO_TEST_CASE(test_seed_seq_seed)
 {
-	boost::random::seed_seq q;
+    boost::random::seed_seq q;
     BOOST_RANDOM_URNG urng(q);
     BOOST_RANDOM_URNG urng2;
     BOOST_CHECK_NE(urng, urng2);
@@ -192,3 +201,13 @@ BOOST_AUTO_TEST_CASE(test_comparison)
     BOOST_CHECK(urng != urng2);
     BOOST_CHECK(!(urng == urng2));
 }
+
+BOOST_AUTO_TEST_CASE(validate)
+{
+    BOOST_RANDOM_URNG urng;
+    for(int i = 0; i < 9999; ++i) {
+        urng();
+    }
+    BOOST_CHECK_EQUAL(urng(), BOOST_RANDOM_VALIDATION_VALUE);
+}
+

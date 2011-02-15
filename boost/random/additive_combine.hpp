@@ -78,7 +78,10 @@ public:
      */
     BOOST_RANDOM_DETAIL_ARITHMETIC_CONSTRUCTOR(additive_combine_engine,
         result_type, seed_arg)
-      : _mlcg1(seed_arg), _mlcg2(seed_arg) { }
+    {
+        _mlcg1.seed(seed_arg);
+        _mlcg2.seed(seed_arg);
+    }
     /**
      * Constructs an @c additive_combine_engine, using seq as
      * the constructor argument for both base generators.
@@ -93,7 +96,10 @@ public:
      */
     BOOST_RANDOM_DETAIL_SEED_SEQ_CONSTRUCTOR(additive_combine_engine,
         SeedSeq, seq)
-      : _mlcg1(seq), _mlcg2(seq) { }
+    {
+        _mlcg1.seed(seq);
+        _mlcg2.seed(seq);
+    }
     /**
      * Constructs an @c additive_combine_engine, using
      * @c seed1 and @c seed2 as the constructor argument to
@@ -143,7 +149,7 @@ public:
      * See the warning on the corresponding constructor.
      */
     BOOST_RANDOM_DETAIL_SEED_SEQ_SEED(additive_combine_engine,
-        result_type, seq)
+        SeedSeq, seq)
     {
         _mlcg1.seed(seq);
         _mlcg2.seed(seq);
@@ -178,10 +184,10 @@ public:
 
     /** Returns the next value of the generator. */
     result_type operator()() {
-        result_type z = _mlcg1() - _mlcg2();
-        if(z < 1)
-            z += MLCG1::modulus-1;
-        return z;
+        result_type val1 = _mlcg1();
+        result_type val2 = _mlcg2();
+        if(val2 < val1) return val1 - val2;
+        else return val1 - val2 + MLCG1::modulus - 1;
     }
   
     /** Fills a range with random values */
@@ -241,7 +247,8 @@ template<class MLCG1, class MLCG2>
 const bool additive_combine_engine<MLCG1, MLCG2>::has_fixed_range;
 #endif
 
-/// \cond
+/// \cond show_deprecated
+
 /** Provided for backwards compatibility. */
 template<class MLCG1, class MLCG2, typename MLCG1::result_type val = 0>
 class additive_combine : public additive_combine_engine<MLCG1, MLCG2>
@@ -257,6 +264,7 @@ public:
     template<class It>
     additive_combine(It& first, It last) : base_t(first, last) {}
 };
+
 /// \endcond
 
 /**
@@ -268,8 +276,8 @@ public:
  *  @endblockquote
  */
 typedef additive_combine_engine<
-    linear_congruential_engine<int32_t, 40014, 0, 2147483563>,
-    linear_congruential_engine<int32_t, 40692, 0, 2147483399>
+    linear_congruential_engine<uint32_t, 40014, 0, 2147483563>,
+    linear_congruential_engine<uint32_t, 40692, 0, 2147483399>
 > ecuyer1988;
 
 } // namespace random

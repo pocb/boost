@@ -16,8 +16,8 @@
 #ifndef BOOST_RANDOM_CONST_MOD_HPP
 #define BOOST_RANDOM_CONST_MOD_HPP
 
-#include <cassert>
 #include <algorithm>
+#include <boost/assert.hpp>
 #include <boost/static_assert.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/integer_traits.hpp>
@@ -81,6 +81,19 @@ public:
       return add(mult(a, x), c);
   }
 
+  static IntType pow(IntType a, boost::uintmax_t exponent)
+  {
+      IntType result = 1;
+      while(exponent != 0) {
+          if(exponent % 2 == 1) {
+              result = mult(result, a);
+          }
+          a = mult(a, a);
+          exponent /= 2;
+      }
+      return result;
+  }
+
   static IntType invert(IntType x)
   { return x == 0 ? 0 : (m == 0? invert_euclidian0(x) : invert_euclidian(x)); }
 
@@ -100,7 +113,7 @@ private:
     const IntType q = m / a;
     const IntType r = m % a;
 
-    assert(r < q);        // check that overflow cannot happen
+    BOOST_ASSERT(r < q);        // check that overflow cannot happen
 
     return sub(a*(value%q), r*(value/q));
   }
@@ -156,7 +169,7 @@ private:
   static IntType invert_euclidian(IntType c)
   {
     // we are interested in the gcd factor for c, because this is our inverse
-    assert(c > 0);
+    BOOST_ASSERT(c > 0);
     IntType l1 = 0;
     IntType l2 = 1;
     IntType n = c;
@@ -179,7 +192,7 @@ private:
   static IntType invert_euclidian0(IntType c)
   {
     // we are interested in the gcd factor for c, because this is our inverse
-    assert(c > 0);
+    BOOST_ASSERT(c > 0);
     if(c == 1) return 1;
     IntType l1 = 0;
     IntType l2 = 1;
@@ -187,7 +200,7 @@ private:
     IntType p = m;
     IntType max = (std::numeric_limits<IntType>::max)();
     IntType q = max / n;
-    assert(max % n != n - 1 && "c must be relatively prime to m.");
+    BOOST_ASSERT(max % n != n - 1 && "c must be relatively prime to m.");
     l1 += q * l2;
     p = max - q * n + 1;
     for(;;) {

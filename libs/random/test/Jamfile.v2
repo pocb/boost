@@ -1,5 +1,5 @@
 # Copyright 2003 Jens Maurer
-# Copyright 2009-2010 Steven Watanabe
+# Copyright 2009-2011 Steven Watanabe
 # Distributed under the Boost Software License, Version 1.0. (See accompany-
 # ing file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -12,39 +12,55 @@ project /boost/random/test ;
 
 run random_test.cpp ;
 run test_const_mod.cpp /boost//unit_test_framework ;
+run test_generate_canonical.cpp /boost//unit_test_framework ;
 run ../example/random_demo.cpp ;
-run validate.cpp ;
 run test_random_device.cpp /boost//random : : : <link>static : test_random_device ;
 run test_random_device.cpp /boost//random : : : <link>shared : test_random_device_dll ;
 
-local all-urngs = 
-    rand48
-    minstd_rand0
-    minstd_rand
-    kreutzer1986
-    hellekalek1995
-    mt11213b
-    mt19937_64
-    lagged_fibonacci
-    lagged_fibonacci607
-    ranlux3
-    ranlux4
-    ranlux3_01
-    ranlux4_01
-    ranlux64_3_01
-    ranlux64_4_01
-    ranlux24
-    ranlux48
-    taus88
-;
-
-for urng in $(all-urngs)
-{
-    run instantiate.cpp : : : <define>BOOST_RANDOM_URNG_TEST=$(urng) : test_$(urng) ;
-}
-
+run test_minstd_rand0.cpp /boost//unit_test_framework ;
+run test_minstd_rand.cpp /boost//unit_test_framework ;
+run test_rand48.cpp /boost//unit_test_framework ;
+run test_mt11213b.cpp /boost//unit_test_framework ;
 run test_mt19937.cpp /boost//unit_test_framework ;
+run test_mt19937_64.cpp /boost//unit_test_framework ;
 run test_ecuyer1988.cpp /boost//unit_test_framework ;
+run test_hellekalek1995.cpp /boost//unit_test_framework ;
+run test_linear_feedback_shift.cpp /boost//unit_test_framework ;
+run test_taus88.cpp /boost//unit_test_framework ;
+run test_kreutzer1986.cpp /boost//unit_test_framework ;
+run test_ranlux3.cpp /boost//unit_test_framework ;
+run test_ranlux4.cpp /boost//unit_test_framework ;
+run test_ranlux3_01.cpp /boost//unit_test_framework ;
+run test_ranlux4_01.cpp /boost//unit_test_framework ;
+run test_ranlux64_4.cpp /boost//unit_test_framework ;
+run test_ranlux64_3.cpp /boost//unit_test_framework ;
+run test_ranlux64_3_01.cpp /boost//unit_test_framework ;
+run test_ranlux64_4_01.cpp /boost//unit_test_framework ;
+run test_ranlux24_base.cpp /boost//unit_test_framework ;
+run test_ranlux24.cpp /boost//unit_test_framework ;
+run test_ranlux48_base.cpp /boost//unit_test_framework ;
+run test_ranlux48.cpp /boost//unit_test_framework ;
+run test_knuth_b.cpp /boost//unit_test_framework ;
+run test_independent_bits31.cpp /boost//unit_test_framework ;
+run test_independent_bits32.cpp /boost//unit_test_framework ;
+run test_lagged_fibonacci.cpp /boost//unit_test_framework ;
+run test_lagged_fibonacci607.cpp /boost//unit_test_framework ;
+run test_lagged_fibonacci1279.cpp /boost//unit_test_framework ;
+run test_lagged_fibonacci2281.cpp /boost//unit_test_framework ;
+run test_lagged_fibonacci3217.cpp /boost//unit_test_framework ;
+run test_lagged_fibonacci4423.cpp /boost//unit_test_framework ;
+run test_lagged_fibonacci9689.cpp /boost//unit_test_framework ;
+run test_lagged_fibonacci19937.cpp /boost//unit_test_framework ;
+run test_lagged_fibonacci23209.cpp /boost//unit_test_framework ;
+run test_lagged_fibonacci44497.cpp /boost//unit_test_framework ;
+
+# Disable by default.  These don't add much and the larger
+# ones can overflow the stack.
+explicit test_lagged_fibonacci1279 test_lagged_fibonacci2281
+    test_lagged_fibonacci2281 test_lagged_fibonacci3217
+    test_lagged_fibonacci4423 test_lagged_fibonacci9689
+    test_lagged_fibonacci19937 test_lagged_fibonacci23209
+    test_lagged_fibonacci44497 ;
 
 run test_seed_seq.cpp /boost//unit_test_framework ;
 

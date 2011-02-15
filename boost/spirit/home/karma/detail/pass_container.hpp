@@ -19,11 +19,11 @@
 #include <boost/type_traits/is_base_of.hpp>
 #include <boost/type_traits/is_convertible.hpp>
 #include <boost/mpl/bool.hpp>
+#include <boost/mpl/and.hpp>
 #include <boost/mpl/or.hpp>
 #include <boost/preprocessor/cat.hpp>
-#include <boost/preprocessor/repeat.hpp>
+#include <boost/preprocessor/repetition/repeat.hpp>
 #include <boost/range/iterator_range.hpp>
-#include <boost/iterator/iterator_facade.hpp>
 
 namespace boost { namespace spirit { namespace karma { namespace detail
 {
@@ -44,15 +44,15 @@ namespace boost { namespace spirit { namespace karma { namespace detail
         > {};
 
     template <typename RHS, typename T>
-    struct has_same_elements<RHS, optional<T>, false, false>
+    struct has_same_elements<RHS, boost::optional<T>, false, false>
       : has_same_elements<RHS, T> {};
 
     template <typename RHS, typename T>
-    struct has_same_elements<RHS, optional<T>, true, false>
+    struct has_same_elements<RHS, boost::optional<T>, true, false>
       : has_same_elements<RHS, T> {};
 
     template <typename RHS, typename T>
-    struct has_same_elements<RHS, optional<T>, false, true>
+    struct has_same_elements<RHS, boost::optional<T>, false, true>
       : has_same_elements<RHS, T> {};
 
 #define BOOST_SPIRIT_IS_CONVERTIBLE(z, N, data)                               \
@@ -203,7 +203,9 @@ namespace boost { namespace spirit { namespace karma { namespace detail
                 Component, context_type>::type lhs_attribute;
 
             typedef mpl::and_<
-                has_same_elements<rhs, lhs_attribute>
+                mpl::or_<
+                    has_same_elements<rhs, lhs_attribute>
+                  , has_same_elements<Attr, lhs_attribute> >
               , traits::handles_container<Component, Attr, context_type>
             > predicate;
 

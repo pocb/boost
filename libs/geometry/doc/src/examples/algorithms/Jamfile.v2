@@ -14,10 +14,18 @@ project boost-geometry-doc-example-algorithms
 exe area : area.cpp ;
 exe area_with_strategy : area_with_strategy.cpp ;
 
+exe for_each_point : for_each_point.cpp ;
+exe for_each_point_const : for_each_point_const.cpp ;
+
 exe intersection_ls_ls_point : intersection_ls_ls_point.cpp ;
 exe intersection_segment : intersection_segment.cpp ;
 
 exe intersects_linestring : intersects_linestring.cpp ;
+
+exe num_geometries : num_geometries.cpp ;
+exe num_interior_rings : num_interior_rings.cpp ;
+exe num_points : num_points.cpp ;
+
 
 exe length : length.cpp ;
 exe length_with_strategy : length_with_strategy.cpp ;

@@ -25,6 +25,10 @@
 #endif
 #endif
 
+#ifndef BOOST_RANDOM_P_CUTOFF
+#define BOOST_RANDOM_P_CUTOFF 0.99
+#endif
+
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/exception/diagnostic_information.hpp>
@@ -40,7 +44,7 @@ bool do_test(BOOST_RANDOM_ARG1_TYPE BOOST_RANDOM_ARG1_NAME,
 #ifdef BOOST_RANDOM_ARG2_TYPE
              BOOST_RANDOM_ARG2_TYPE BOOST_RANDOM_ARG2_NAME,
 #endif
-             long long max) {
+             long long max, boost::mt19937& gen) {
     std::cout << "running " BOOST_PP_STRINGIZE(BOOST_RANDOM_DISTRIBUTION_NAME) "("
         << BOOST_RANDOM_ARG1_NAME;
 #ifdef BOOST_RANDOM_ARG2_NAME
@@ -51,7 +55,6 @@ bool do_test(BOOST_RANDOM_ARG1_TYPE BOOST_RANDOM_ARG1_NAME,
     BOOST_MATH_DISTRIBUTION expected BOOST_MATH_DISTRIBUTION_INIT;
     
     BOOST_RANDOM_DISTRIBUTION dist BOOST_RANDOM_DISTRIBUTION_INIT;
-    boost::mt19937 gen;
 
 #ifdef BOOST_RANDOM_DISTRIBUTION_MAX
 
@@ -67,7 +70,7 @@ bool do_test(BOOST_RANDOM_ARG1_TYPE BOOST_RANDOM_ARG1_NAME,
     
     std::vector<long long> results(max_value + 1);
     for(long long i = 0; i < max; ++i) {
-        ++results[std::min(dist(gen), max_value)];
+        ++results[(std::min)(dist(gen), max_value)];
     }
 
     long long sum = boost::accumulate(results, 0ll);
@@ -86,7 +89,7 @@ bool do_test(BOOST_RANDOM_ARG1_TYPE BOOST_RANDOM_ARG1_NAME,
 
 #endif
 
-    bool result = prob < 0.99;
+    bool result = prob < BOOST_RANDOM_P_CUTOFF;
     const char* err = result? "" : "*";
     std::cout << std::setprecision(17) << prob << err << std::endl;
 
@@ -112,7 +115,7 @@ bool do_tests(int repeat, Dist1 d1,
 #ifdef BOOST_RANDOM_ARG2_NAME
             d2(gen),
 #endif
-            trials)) {
+            trials, gen)) {
             ++errors;
         }
     }
@@ -148,12 +151,12 @@ bool handle_option(int& argc, char**& argv, const char* opt, T& value) {
 }
 
 int main(int argc, char** argv) {
-    int repeat = 10;
+    int repeat = 1;
     BOOST_RANDOM_ARG1_TYPE max_arg1 = BOOST_RANDOM_ARG1_DEFAULT;
 #ifdef BOOST_RANDOM_ARG2_TYPE
     BOOST_RANDOM_ARG2_TYPE max_arg2 = BOOST_RANDOM_ARG2_DEFAULT;
 #endif
-    long long trials = 1000000;
+    long long trials = 100000;
 
     if(argc > 0) {
         --argc;

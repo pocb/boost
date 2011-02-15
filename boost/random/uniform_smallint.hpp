@@ -17,9 +17,9 @@
 #ifndef BOOST_RANDOM_UNIFORM_SMALLINT_HPP
 #define BOOST_RANDOM_UNIFORM_SMALLINT_HPP
 
-#include <cassert>
 #include <istream>
 #include <iosfwd>
+#include <boost/assert.hpp>
 #include <boost/config.hpp>
 #include <boost/limits.hpp>
 #include <boost/type_traits/is_integral.hpp>
@@ -63,7 +63,8 @@ namespace random {
  *
  * The template parameter IntType shall denote an integer-like value type.
  *
- * Note: The property above is the square sum of the relative differences
+ * @xmlnote
+ * The property above is the square sum of the relative differences
  * in probabilities between the desired uniform distribution
  * \f$p_{\mathtt{out}}(i)\f$ and the generated distribution
  * \f$p_{\mathtt{out\_s}}(i)\f$.
@@ -85,6 +86,7 @@ namespace random {
  * {r_{\mathtt{out}}}\right\rfloor/r_{\mathtt{base}}\f$ otherwise.
  * Substituting this in the
  * above sum formula leads to the desired result.
+ * @endxmlnote
  *
  * Note: The upper bound for
  * \f$(r_{\mathtt{base}} \mbox{ mod } r_{\mathtt{out}})
@@ -114,7 +116,7 @@ public:
         param_type(IntType min_arg = 0, IntType max_arg = 9)
           : _min(min_arg), _max(max_arg)
         {
-            assert(_min <= _max);
+            BOOST_ASSERT(_min <= _max);
         }
 
         /** Returns the minimum value. */
@@ -228,7 +230,7 @@ public:
 
 private:
     
-    // \cond
+    // \cond show_private
     template<class Engine>
     result_type generate(Engine& eng, boost::mpl::true_) const
     {
