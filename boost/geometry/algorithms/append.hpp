@@ -13,14 +13,14 @@
 
 
 #include <boost/geometry/core/access.hpp>
-#include <boost/geometry/core/container_access.hpp>
+#include <boost/geometry/core/mutable_range.hpp>
 #include <boost/geometry/core/point_type.hpp>
 #include <boost/geometry/core/tags.hpp>
 
 #include <boost/geometry/algorithms/num_interior_rings.hpp>
+#include <boost/geometry/algorithms/detail/convert_point_to_point.hpp>
 #include <boost/geometry/geometries/concepts/check.hpp>
 
-#include <boost/geometry/util/copy.hpp>
 
 namespace boost { namespace geometry
 {
@@ -37,8 +37,8 @@ struct append_point
                 int = 0, int = 0)
     {
         typename geometry::point_type<Geometry>::type copy;
-        copy_coordinates(point, copy);
-        traits::push_back<Geometry&>::apply(geometry, copy);
+        geometry::detail::convert::convert_point_to_point(point, copy);
+        traits::push_back<Geometry>::apply(geometry, copy);
     }
 };
 

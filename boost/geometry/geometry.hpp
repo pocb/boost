@@ -41,7 +41,6 @@
 #include <boost/geometry/algorithms/convex_hull.hpp>
 #include <boost/geometry/algorithms/correct.hpp>
 #include <boost/geometry/algorithms/difference.hpp>
-#include <boost/geometry/algorithms/dissolve.hpp>
 #include <boost/geometry/algorithms/distance.hpp>
 #include <boost/geometry/algorithms/envelope.hpp>
 #include <boost/geometry/algorithms/for_each.hpp>
@@ -64,7 +63,6 @@
 // check includes all concepts
 #include <boost/geometry/geometries/concepts/check.hpp>
 
-#include <boost/geometry/util/copy.hpp>
 #include <boost/geometry/util/for_each_coordinate.hpp>
 #include <boost/geometry/util/math.hpp>
 #include <boost/geometry/util/select_most_precise.hpp>

@@ -13,9 +13,9 @@
 #include <boost/type_traits/remove_const.hpp>
 
 #include <boost/geometry/core/access.hpp>
-#include <boost/geometry/core/container_access.hpp>
 #include <boost/geometry/core/exterior_ring.hpp>
 #include <boost/geometry/core/interior_rings.hpp>
+#include <boost/geometry/core/mutable_range.hpp>
 #include <boost/geometry/core/tag_cast.hpp>
 
 #include <boost/geometry/geometries/concepts/check.hpp>
@@ -33,7 +33,7 @@ struct collection_clear
 {
     static inline void apply(Geometry& geometry)
     {
-        traits::clear<Geometry&>::apply(geometry);
+        traits::clear<Geometry>::apply(geometry);
     }
 };
 
@@ -42,8 +42,20 @@ struct polygon_clear
 {
     static inline void apply(Polygon& polygon)
     {
-        traits::clear<typename traits::interior_mutable_type<Polygon>::type>::apply(interior_rings(polygon));
-        traits::clear<typename traits::ring_mutable_type<Polygon>::type>::apply(exterior_ring(polygon));
+        traits::clear
+            <
+                typename boost::remove_reference
+                    <
+                        typename traits::interior_mutable_type<Polygon>::type
+                    >::type
+            >::apply(interior_rings(polygon));
+        traits::clear
+            <
+                typename boost::remove_reference
+                    <
+                        typename traits::ring_mutable_type<Polygon>::type
+                    >::type
+            >::apply(exterior_ring(polygon));
     }
 };
 
