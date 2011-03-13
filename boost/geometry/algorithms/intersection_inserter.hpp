@@ -25,6 +25,7 @@
 #include <boost/geometry/algorithms/detail/overlay/clip_linestring.hpp>
 #include <boost/geometry/algorithms/detail/overlay/get_intersection_points.hpp>
 #include <boost/geometry/algorithms/detail/overlay/overlay.hpp>
+#include <boost/geometry/algorithms/detail/overlay/overlay_type.hpp>
 #include <boost/geometry/ranges/segment_range.hpp>
 
 
@@ -339,7 +340,7 @@ namespace detail { namespace intersection
 template
 <
     typename GeometryOut,
-    bool Reverse1, bool Reverse2, bool ReverseOut,
+    bool ReverseSecond,
     overlay_type OverlayType,
     typename Geometry1, typename Geometry2,
     typename OutputIterator,
@@ -362,9 +363,9 @@ inline OutputIterator inserter(Geometry1 const& geometry1,
                 geometry::is_areal<Geometry2>::value,
                 geometry::is_areal<GeometryOut>::value,
                 Geometry1, Geometry2,
-                overlay::do_reverse<geometry::point_order<Geometry1>::value, Reverse1>::value,
-                overlay::do_reverse<geometry::point_order<Geometry2>::value, Reverse2>::value,
-                ReverseOut,
+                overlay::do_reverse<geometry::point_order<Geometry1>::value>::value,
+                overlay::do_reverse<geometry::point_order<Geometry2>::value, ReverseSecond>::value,
+                overlay::do_reverse<geometry::point_order<GeometryOut>::value>::value,
                 OutputIterator, GeometryOut,
                 OverlayType,
                 Strategy
@@ -378,9 +379,9 @@ inline OutputIterator inserter(Geometry1 const& geometry1,
                 geometry::is_areal<Geometry2>::value,
                 geometry::is_areal<GeometryOut>::value,
                 Geometry1, Geometry2,
-                overlay::do_reverse<geometry::point_order<Geometry1>::value, Reverse1>::value,
-                overlay::do_reverse<geometry::point_order<Geometry2>::value, Reverse2>::value,
-                ReverseOut,
+                overlay::do_reverse<geometry::point_order<Geometry1>::value>::value,
+                overlay::do_reverse<geometry::point_order<Geometry2>::value, ReverseSecond>::value,
+                overlay::do_reverse<geometry::point_order<GeometryOut>::value>::value,
                 OutputIterator, GeometryOut,
                 OverlayType,
                 Strategy
@@ -401,15 +402,15 @@ inline OutputIterator inserter(Geometry1 const& geometry1,
 \tparam Geometry1 \tparam_geometry
 \tparam Geometry2 \tparam_geometry
 \tparam OutputIterator \tparam_out{\p_l_or_c}
-\tparam Strategy Compound strategy for intersection
+\tparam Strategy \tparam_strategy_overlay
 \param geometry1 \param_geometry
 \param geometry2 \param_geometry
 \param out \param_out{intersection}
-\param strategy The strategy
+\param strategy \param_strategy{intersection}
 \return \return_out
 
 \qbk{distinguish,with strategy}
-\qbk{[include ref/algorithms/intersection.qbk]}
+\qbk{[include reference/algorithms/intersection.qbk]}
 */
 template
 <
@@ -427,15 +428,18 @@ inline OutputIterator intersection_inserter(Geometry1 const& geometry1,
     concept::check<Geometry1 const>();
     concept::check<Geometry2 const>();
 
-    return detail::intersection::inserter<GeometryOut, false, false, true, overlay_intersection>(
-            geometry1, geometry2, out, strategy);
+    return detail::intersection::inserter
+        <
+            GeometryOut, false, overlay_intersection
+        >(geometry1, geometry2, out, strategy);
 }
 
 
 /*!
 \brief \brief_calc2{intersection}
 \ingroup intersection
-\details \details_calc2{intersection_inserter, spatial set theoretic intersection}. \details_inserter{intersection}
+\details \details_calc2{intersection_inserter, spatial set theoretic intersection}.
+    \details_inserter{intersection}
 \tparam GeometryOut \tparam_geometry{\p_l_or_c}
 \tparam Geometry1 \tparam_geometry
 \tparam Geometry2 \tparam_geometry
@@ -445,7 +449,7 @@ inline OutputIterator intersection_inserter(Geometry1 const& geometry1,
 \param out \param_out{intersection}
 \return \return_out
 
-\qbk{[include ref/algorithms/intersection.qbk]}
+\qbk{[include reference/algorithms/intersection.qbk]}
 */
 template
 <

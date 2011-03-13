@@ -18,7 +18,7 @@
 
 #include <boost/geometry/multi/geometries/multi_point.hpp>
 #include <boost/geometry/multi/geometries/multi_polygon.hpp>
-#include <boost/geometry/extensions/gis/io/wkt/read_wkt_multi.hpp>
+#include <boost/geometry/domains/gis/io/wkt/read_wkt_multi.hpp>
 
 
 // #define REPORT_RESULTS
@@ -102,6 +102,10 @@ int test_main(int, char* [])
     test_2d<bg::model::d2::point_xy<long int> >(true);
     //test_2d<bg::model::d2::point_xy<long long> >(true);
     test_2d<bg::model::d2::point_xy<long double> >();
+
+#ifdef HAVE_TTMATH
+    test_2d<bg::model::d2::point_xy<ttmath_big> >();
+#endif
 
     return 0;
 }

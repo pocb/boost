@@ -111,7 +111,7 @@ struct intersection
             Geometry1, Geometry2,
             detail::overlay::do_reverse<geometry::point_order<Geometry1>::value, false>::value,
             detail::overlay::do_reverse<geometry::point_order<Geometry2>::value, false>::value,
-            false,
+            detail::overlay::do_reverse<geometry::point_order<OneOut>::value>::value,
             output_iterator, OneOut,
             overlay_intersection,
             Strategy
@@ -186,7 +186,7 @@ struct intersection_reversed
 \param geometry_out The output geometry, either a multi_point, multi_polygon,
     multi_linestring, or a box (for intersection of two boxes)
 
-\qbk{[include ref/algorithms/intersection.qbk]}
+\qbk{[include reference/algorithms/intersection.qbk]}
 */
 template
 <
@@ -210,7 +210,7 @@ inline bool intersection(Geometry1 const& geometry1,
         > strategy;
 
 
-        return boost::mpl::if_c
+    return boost::mpl::if_c
         <
             geometry::reverse_dispatch<Geometry1, Geometry2>::type::value,
             dispatch::intersection_reversed

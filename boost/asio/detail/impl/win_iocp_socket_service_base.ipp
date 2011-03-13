@@ -92,6 +92,8 @@ boost::system::error_code win_iocp_socket_service_base::close(
 {
   if (is_open(impl))
   {
+    BOOST_ASIO_HANDLER_OPERATION(("socket", &impl, "close"));
+
     // Check if the reactor was created, in which case we need to close the
     // socket on the reactor as well to cancel any operations that might be
     // running there.
@@ -99,7 +101,7 @@ boost::system::error_code win_iocp_socket_service_base::close(
           interlocked_compare_exchange_pointer(
             reinterpret_cast<void**>(&reactor_), 0, 0));
     if (r)
-      r->close_descriptor(impl.socket_, impl.reactor_data_);
+      r->deregister_descriptor(impl.socket_, impl.reactor_data_, true);
   }
 
   if (socket_ops::close(impl.socket_, impl.state_, false, ec) == 0)
@@ -124,7 +126,10 @@ boost::system::error_code win_iocp_socket_service_base::cancel(
     ec = boost::asio::error::bad_descriptor;
     return ec;
   }
-  else if (FARPROC cancel_io_ex_ptr = ::GetProcAddress(
+
+  BOOST_ASIO_HANDLER_OPERATION(("socket", &impl, "cancel"));
+
+  if (FARPROC cancel_io_ex_ptr = ::GetProcAddress(
         ::GetModuleHandleA("KERNEL32"), "CancelIoEx"))
   {
     // The version of Windows supports cancellation from any thread.
@@ -474,7 +479,7 @@ void win_iocp_socket_service_base::start_connect_op(
 
   if ((impl.state_ & socket_ops::non_blocking) != 0
       || socket_ops::set_internal_non_blocking(
-        impl.socket_, impl.state_, op->ec_))
+        impl.socket_, impl.state_, true, op->ec_))
   {
     if (socket_ops::connect(impl.socket_, addr, addrlen, op->ec_) != 0)
     {
@@ -497,6 +502,8 @@ void win_iocp_socket_service_base::close_for_destruction(
 {
   if (is_open(impl))
   {
+    BOOST_ASIO_HANDLER_OPERATION(("socket", &impl, "close"));
+
     // Check if the reactor was created, in which case we need to close the
     // socket on the reactor as well to cancel any operations that might be
     // running there.
@@ -504,7 +511,7 @@ void win_iocp_socket_service_base::close_for_destruction(
           interlocked_compare_exchange_pointer(
             reinterpret_cast<void**>(&reactor_), 0, 0));
     if (r)
-      r->close_descriptor(impl.socket_, impl.reactor_data_);
+      r->deregister_descriptor(impl.socket_, impl.reactor_data_, true);
   }
 
   boost::system::error_code ignored_ec;

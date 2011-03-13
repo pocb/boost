@@ -65,6 +65,25 @@ void resolver_service_base::shutdown_service()
   }
 }
 
+void resolver_service_base::fork_service(
+    boost::asio::io_service::fork_event event)
+{
+  if (work_thread_)
+  {
+    if (event == boost::asio::io_service::fork_prepare)
+    {
+      work_io_service_->stop();
+      work_thread_->join();
+    }
+    else
+    {
+      work_io_service_->reset();
+      work_thread_.reset(new boost::asio::detail::thread(
+            work_io_service_runner(*work_io_service_)));
+    }
+  }
+}
+
 void resolver_service_base::construct(
     resolver_service_base::implementation_type& impl)
 {
@@ -72,13 +91,18 @@ void resolver_service_base::construct(
 }
 
 void resolver_service_base::destroy(
-    resolver_service_base::implementation_type&)
+    resolver_service_base::implementation_type& impl)
 {
+  BOOST_ASIO_HANDLER_OPERATION(("resolver", &impl, "cancel"));
+
+  impl.reset();
 }
 
 void resolver_service_base::cancel(
     resolver_service_base::implementation_type& impl)
 {
+  BOOST_ASIO_HANDLER_OPERATION(("resolver", &impl, "cancel"));
+
   impl.reset(static_cast<void*>(0), socket_ops::noop_deleter());
 }
 

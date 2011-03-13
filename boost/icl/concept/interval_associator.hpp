@@ -202,7 +202,6 @@ distance(const Type& object)
     return dist;
 }
 
-
 //==============================================================================
 //= Range<IntervalSet|IntervalMap>
 //==============================================================================
@@ -650,7 +649,7 @@ operator & (Type object, const Type& operand)
 //------------------------------------------------------------------------------
 template<class Type, class CoType>
 typename enable_if<mpl::and_< is_interval_container<Type>
-                            , is_same<CoType, typename domain_type_of<Type>::type> >, 
+                            , boost::is_same<CoType, typename domain_type_of<Type>::type> >, 
                    bool>::type
 intersects(const Type& left, const CoType& right)
 {
@@ -659,7 +658,7 @@ intersects(const Type& left, const CoType& right)
 
 template<class Type, class CoType>
 typename enable_if<mpl::and_< is_interval_container<Type>
-                            , is_same<CoType, typename interval_type_of<Type>::type> >, 
+                            , boost::is_same<CoType, typename interval_type_of<Type>::type> >, 
                    bool>::type
 intersects(const Type& left, const CoType& right)
 {
@@ -724,16 +723,6 @@ intersects(const LeftT& left, const RightT& right)
 
     return false; 
 }
-
-//CL?
-//template<class Type, class AssociateT>
-//typename enable_if<mpl::and_< is_interval_map<Type>
-//                            , is_inter_derivative<Type, AssociateT> >, 
-//                   bool>::type
-//intersects(const Type& left, const AssociateT& right)
-//{
-//    return icl::intersects(left, right);
-//}
 
 /** \b Returns true, if \c left and \c right have no common elements.
     Intervals are interpreted as sequence of elements.
@@ -901,51 +890,6 @@ elements_rend(const Type& object)
 { 
     return typename Type::element_const_reverse_iterator(object.rend());
 }
-
-//==============================================================================
-//= Morphisms
-//==============================================================================
-template<class Type>
-typename enable_if<is_interval_container<Type>, Type>::type&
-join(Type& object)
-{
-    typedef typename Type::interval_type interval_type;
-    typedef typename Type::iterator      iterator;
-
-    iterator it_ = object.begin();
-    if(it_ == object.end()) 
-        return object;
-
-    iterator next_ = it_; next_++;
-
-    while(next_ != object.end())
-    {
-        if( segmental::is_joinable<Type>(it_, next_) )
-        {
-            iterator fst_mem = it_;  // hold the first member
-            
-            // Go on while touching members are found
-            it_++; next_++;
-            while(     next_ != object.end()
-                    && segmental::is_joinable<Type>(it_, next_) )
-            { it_++; next_++; }
-
-            // finally we arrive at the end of a sequence of joinable intervals
-            // and it points to the last member of that sequence
-            const_cast<interval_type&>(key_value<Type>(it_)) 
-                = hull(key_value<Type>(it_), key_value<Type>(fst_mem));
-            object.erase(fst_mem, it_);
-
-            it_++; next_=it_; 
-            if(next_!=object.end())
-                next_++;
-        }
-        else { it_++; next_++; }
-    }
-    return object;
-}
-
-
 
 }} // namespace boost icl
 

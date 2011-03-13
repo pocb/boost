@@ -14,8 +14,12 @@
 #include <boost/foreach.hpp>
 #include <geometry_test_common.hpp>
 
+#include <boost/range/algorithm/copy.hpp>
+
+#include <boost/geometry/algorithms/correct.hpp>
 #include <boost/geometry/algorithms/difference.hpp>
 #include <boost/geometry/algorithms/sym_difference.hpp>
+#include <boost/geometry/multi/algorithms/difference.hpp>
 
 #include <boost/geometry/algorithms/area.hpp>
 #include <boost/geometry/algorithms/num_points.hpp>
@@ -23,9 +27,14 @@
 
 #include <boost/geometry/geometries/geometries.hpp>
 
+
+#include <boost/geometry/multi/geometries/multi_point.hpp>
+#include <boost/geometry/multi/geometries/multi_linestring.hpp>
+#include <boost/geometry/multi/geometries/multi_polygon.hpp>
+
 #include <boost/geometry/strategies/strategies.hpp>
 
-#include <boost/geometry/extensions/gis/io/wkt/wkt.hpp>
+#include <boost/geometry/domains/gis/io/wkt/wkt.hpp>
 
 
 #if defined(TEST_WITH_SVG)
@@ -49,14 +58,14 @@ void test_difference(std::string const& caseid, G1 const& g1, G2 const& g2,
 
     if (sym)
     {
-        bg::sym_difference<OutputType>(g1, g2, clip);
+        bg::sym_difference(g1, g2, clip);
     }
     else
     {
-        bg::difference<OutputType>(g1, g2, clip);
+        bg::difference(g1, g2, clip);
     }
 
-    double area = 0;
+    typename bg::area_result<G1>::type area = 0;
     std::size_t n = 0;
     for (typename std::vector<OutputType>::iterator it = clip.begin();
             it != clip.end();
@@ -72,6 +81,26 @@ void test_difference(std::string const& caseid, G1 const& g1, G2 const& g2,
 
         area += bg::area(*it);
     }
+
+#ifndef BOOST_GEOMETRY_DEBUG_ASSEMBLE
+    {
+        // Test inserter functionality
+        // Test if inserter returns output-iterator (using Boost.Range copy)
+        std::vector<OutputType> inserted, array_with_one_empty_geometry;
+        array_with_one_empty_geometry.push_back(OutputType());
+        if (sym)
+        {
+            boost::copy(array_with_one_empty_geometry, bg::sym_difference_inserter<OutputType>(g1, g2, std::back_inserter(inserted)));
+        }
+        else
+        {
+            boost::copy(array_with_one_empty_geometry, bg::difference_inserter<OutputType>(g1, g2, std::back_inserter(inserted)));
+        }
+
+        BOOST_CHECK_EQUAL(boost::size(clip), boost::size(inserted) - 1);
+    }
+#endif
+
 
 
 #if ! defined(BOOST_GEOMETRY_NO_BOOST_TEST)
@@ -121,7 +150,7 @@ void test_difference(std::string const& caseid, G1 const& g1, G2 const& g2,
         for (typename std::vector<OutputType>::const_iterator it = clip.begin();
                 it != clip.end(); ++it)
         {
-            mapper.map(*it, 
+            mapper.map(*it,
                 //sym ? "fill-opacity:0.2;stroke-opacity:0.4;fill:rgb(255,255,0);stroke:rgb(255,0,255);stroke-width:8" :
                 "fill-opacity:0.2;stroke-opacity:0.4;fill:rgb(255,0,0);stroke:rgb(255,0,255);stroke-width:8");
         }
@@ -148,15 +177,34 @@ void test_one(std::string const& caseid,
 
         double percentage = 0.0001)
 {
+#ifdef BOOST_GEOMETRY_CHECK_WITH_SQLSERVER
+    std::cout
+        << "-- " << caseid << std::endl
+        << "with qu as (" << std::endl
+        << "select geometry::STGeomFromText('" << wkt1 << "',0) as p," << std::endl
+        << "geometry::STGeomFromText('" << wkt2 << "',0) as q)" << std::endl
+        << "select " << std::endl
+        << " p.STDifference(q).STNumGeometries() as cnt1,p.STDifference(q).STNumPoints() as pcnt1,p.STDifference(q).STArea() as area1," << std::endl
+        << " q.STDifference(p).STNumGeometries() as cnt2,q.STDifference(p).STNumPoints() as pcnt2,q.STDifference(p).STArea() as area2," << std::endl
+        << " p.STDifference(q) as d1,q.STDifference(p) as d2 from qu" << std::endl << std::endl;
+#endif
+
+
     G1 g1;
     bg::read_wkt(wkt1, g1);
 
     G2 g2;
     bg::read_wkt(wkt2, g2);
 
+    bg::correct(g1);
+    bg::correct(g2);
+
     test_difference<OutputType, void>(caseid + "_a", g1, g2,
         expected_count1, expected_point_count1,
         expected_area1, percentage);
+#ifdef BOOST_GEOMETRY_DEBUG_ASSEMBLE
+    return;
+#endif
     test_difference<OutputType, void>(caseid + "_b", g2, g1,
         expected_count2, expected_point_count2,
         expected_area2, percentage);
@@ -165,6 +213,7 @@ void test_one(std::string const& caseid,
         expected_point_count1 + expected_point_count2,
         expected_area1 + expected_area2,
         percentage, true);
+
 
 #ifdef BOOST_GEOMETRY_CHECK_WITH_POSTGIS
     std::cout

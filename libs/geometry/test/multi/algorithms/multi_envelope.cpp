@@ -15,7 +15,7 @@
 #include <boost/geometry/multi/geometries/multi_linestring.hpp>
 #include <boost/geometry/multi/geometries/multi_polygon.hpp>
 
-#include <boost/geometry/extensions/gis/io/wkt/read_wkt_multi.hpp>
+#include <boost/geometry/domains/gis/io/wkt/read_wkt_multi.hpp>
 
 #include <boost/geometry/geometries/geometries.hpp>
 #include <boost/geometry/geometries/adapted/c_array_cartesian.hpp>
@@ -53,6 +53,11 @@ int test_main( int , char* [] )
 
     test_3d<boost::tuple<float, float, float> >();
     test_3d<bg::model::point<double, 3, bg::cs::cartesian> >();
+
+#ifdef HAVE_TTMATH
+    test_2d<bg::model::d2::point_xy<ttmath_big> >();
+    test_2d<bg::model::point<ttmath_big, 3, bg::cs::cartesian> >();
+#endif
 
     return 0;
 }

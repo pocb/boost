@@ -19,6 +19,7 @@
 #include <cstddef>
 #include <boost/asio/basic_socket.hpp>
 #include <boost/asio/datagram_socket_service.hpp>
+#include <boost/asio/detail/handler_type_requirements.hpp>
 #include <boost/asio/detail/throw_error.hpp>
 #include <boost/asio/error.hpp>
 
@@ -42,8 +43,12 @@ class basic_datagram_socket
   : public basic_socket<Protocol, DatagramSocketService>
 {
 public:
+  /// (Deprecated: Use native_handle_type.) The native representation of a
+  /// socket.
+  typedef typename DatagramSocketService::native_handle_type native_type;
+
   /// The native representation of a socket.
-  typedef typename DatagramSocketService::native_type native_type;
+  typedef typename DatagramSocketService::native_handle_type native_handle_type;
 
   /// The protocol type.
   typedef Protocol protocol_type;
@@ -121,7 +126,7 @@ public:
    * @throws boost::system::system_error Thrown on failure.
    */
   basic_datagram_socket(boost::asio::io_service& io_service,
-      const protocol_type& protocol, const native_type& native_socket)
+      const protocol_type& protocol, const native_handle_type& native_socket)
     : basic_socket<Protocol, DatagramSocketService>(
         io_service, protocol, native_socket)
   {
@@ -154,7 +159,7 @@ public:
   {
     boost::system::error_code ec;
     std::size_t s = this->service.send(this->implementation, buffers, 0, ec);
-    boost::asio::detail::throw_error(ec);
+    boost::asio::detail::throw_error(ec, "send");
     return s;
   }
 
@@ -182,7 +187,7 @@ public:
     boost::system::error_code ec;
     std::size_t s = this->service.send(
         this->implementation, buffers, flags, ec);
-    boost::asio::detail::throw_error(ec);
+    boost::asio::detail::throw_error(ec, "send");
     return s;
   }
 
@@ -249,7 +254,12 @@ public:
   template <typename ConstBufferSequence, typename WriteHandler>
   void async_send(const ConstBufferSequence& buffers, WriteHandler handler)
   {
-    this->service.async_send(this->implementation, buffers, 0, handler);
+    // If you get an error on the following line it means that your handler does
+    // not meet the documented type requirements for a WriteHandler.
+    BOOST_ASIO_WRITE_HANDLER_CHECK(WriteHandler, handler) type_check;
+
+    this->service.async_send(this->implementation, buffers, 0,
+        BOOST_ASIO_MOVE_CAST(WriteHandler)(handler));
   }
 
   /// Start an asynchronous send on a connected socket.
@@ -285,7 +295,12 @@ public:
   void async_send(const ConstBufferSequence& buffers,
       socket_base::message_flags flags, WriteHandler handler)
   {
-    this->service.async_send(this->implementation, buffers, flags, handler);
+    // If you get an error on the following line it means that your handler does
+    // not meet the documented type requirements for a WriteHandler.
+    BOOST_ASIO_WRITE_HANDLER_CHECK(WriteHandler, handler) type_check;
+
+    this->service.async_send(this->implementation, buffers, flags,
+        BOOST_ASIO_MOVE_CAST(WriteHandler)(handler));
   }
 
   /// Send a datagram to the specified endpoint.
@@ -320,7 +335,7 @@ public:
     boost::system::error_code ec;
     std::size_t s = this->service.send_to(
         this->implementation, buffers, destination, 0, ec);
-    boost::asio::detail::throw_error(ec);
+    boost::asio::detail::throw_error(ec, "send_to");
     return s;
   }
 
@@ -347,7 +362,7 @@ public:
     boost::system::error_code ec;
     std::size_t s = this->service.send_to(
         this->implementation, buffers, destination, flags, ec);
-    boost::asio::detail::throw_error(ec);
+    boost::asio::detail::throw_error(ec, "send_to");
     return s;
   }
 
@@ -417,8 +432,12 @@ public:
   void async_send_to(const ConstBufferSequence& buffers,
       const endpoint_type& destination, WriteHandler handler)
   {
+    // If you get an error on the following line it means that your handler does
+    // not meet the documented type requirements for a WriteHandler.
+    BOOST_ASIO_WRITE_HANDLER_CHECK(WriteHandler, handler) type_check;
+
     this->service.async_send_to(this->implementation, buffers, destination, 0,
-        handler);
+        BOOST_ASIO_MOVE_CAST(WriteHandler)(handler));
   }
 
   /// Start an asynchronous send.
@@ -453,8 +472,12 @@ public:
       const endpoint_type& destination, socket_base::message_flags flags,
       WriteHandler handler)
   {
+    // If you get an error on the following line it means that your handler does
+    // not meet the documented type requirements for a WriteHandler.
+    BOOST_ASIO_WRITE_HANDLER_CHECK(WriteHandler, handler) type_check;
+
     this->service.async_send_to(this->implementation, buffers, destination,
-        flags, handler);
+        flags, BOOST_ASIO_MOVE_CAST(WriteHandler)(handler));
   }
 
   /// Receive some data on a connected socket.
@@ -487,7 +510,7 @@ public:
     boost::system::error_code ec;
     std::size_t s = this->service.receive(
         this->implementation, buffers, 0, ec);
-    boost::asio::detail::throw_error(ec);
+    boost::asio::detail::throw_error(ec, "receive");
     return s;
   }
 
@@ -516,7 +539,7 @@ public:
     boost::system::error_code ec;
     std::size_t s = this->service.receive(
         this->implementation, buffers, flags, ec);
-    boost::asio::detail::throw_error(ec);
+    boost::asio::detail::throw_error(ec, "receive");
     return s;
   }
 
@@ -584,7 +607,12 @@ public:
   template <typename MutableBufferSequence, typename ReadHandler>
   void async_receive(const MutableBufferSequence& buffers, ReadHandler handler)
   {
-    this->service.async_receive(this->implementation, buffers, 0, handler);
+    // If you get an error on the following line it means that your handler does
+    // not meet the documented type requirements for a ReadHandler.
+    BOOST_ASIO_READ_HANDLER_CHECK(ReadHandler, handler) type_check;
+
+    this->service.async_receive(this->implementation, buffers, 0,
+        BOOST_ASIO_MOVE_CAST(ReadHandler)(handler));
   }
 
   /// Start an asynchronous receive on a connected socket.
@@ -619,7 +647,12 @@ public:
   void async_receive(const MutableBufferSequence& buffers,
       socket_base::message_flags flags, ReadHandler handler)
   {
-    this->service.async_receive(this->implementation, buffers, flags, handler);
+    // If you get an error on the following line it means that your handler does
+    // not meet the documented type requirements for a ReadHandler.
+    BOOST_ASIO_READ_HANDLER_CHECK(ReadHandler, handler) type_check;
+
+    this->service.async_receive(this->implementation, buffers, flags,
+        BOOST_ASIO_MOVE_CAST(ReadHandler)(handler));
   }
 
   /// Receive a datagram with the endpoint of the sender.
@@ -655,7 +688,7 @@ public:
     boost::system::error_code ec;
     std::size_t s = this->service.receive_from(
         this->implementation, buffers, sender_endpoint, 0, ec);
-    boost::asio::detail::throw_error(ec);
+    boost::asio::detail::throw_error(ec, "receive_from");
     return s;
   }
   
@@ -682,7 +715,7 @@ public:
     boost::system::error_code ec;
     std::size_t s = this->service.receive_from(
         this->implementation, buffers, sender_endpoint, flags, ec);
-    boost::asio::detail::throw_error(ec);
+    boost::asio::detail::throw_error(ec, "receive_from");
     return s;
   }
   
@@ -751,8 +784,12 @@ public:
   void async_receive_from(const MutableBufferSequence& buffers,
       endpoint_type& sender_endpoint, ReadHandler handler)
   {
+    // If you get an error on the following line it means that your handler does
+    // not meet the documented type requirements for a ReadHandler.
+    BOOST_ASIO_READ_HANDLER_CHECK(ReadHandler, handler) type_check;
+
     this->service.async_receive_from(this->implementation, buffers,
-        sender_endpoint, 0, handler);
+        sender_endpoint, 0, BOOST_ASIO_MOVE_CAST(ReadHandler)(handler));
   }
 
   /// Start an asynchronous receive.
@@ -789,8 +826,12 @@ public:
       endpoint_type& sender_endpoint, socket_base::message_flags flags,
       ReadHandler handler)
   {
+    // If you get an error on the following line it means that your handler does
+    // not meet the documented type requirements for a ReadHandler.
+    BOOST_ASIO_READ_HANDLER_CHECK(ReadHandler, handler) type_check;
+
     this->service.async_receive_from(this->implementation, buffers,
-        sender_endpoint, flags, handler);
+        sender_endpoint, flags, BOOST_ASIO_MOVE_CAST(ReadHandler)(handler));
   }
 };
 

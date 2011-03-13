@@ -72,12 +72,6 @@ public:
   {
   }
 
-  /// Destroy all user-defined handler objects owned by the service.
-  void shutdown_service()
-  {
-    service_impl_.shutdown_service();
-  }
-
   /// Construct a new timer implementation.
   void construct(implementation_type& impl)
   {
@@ -94,6 +88,13 @@ public:
   std::size_t cancel(implementation_type& impl, boost::system::error_code& ec)
   {
     return service_impl_.cancel(impl, ec);
+  }
+
+  /// Cancels one asynchronous wait operation associated with the timer.
+  std::size_t cancel_one(implementation_type& impl,
+      boost::system::error_code& ec)
+  {
+    return service_impl_.cancel_one(impl, ec);
   }
 
   /// Get the expiry time for the timer as an absolute time.
@@ -136,6 +137,12 @@ public:
   }
 
 private:
+  // Destroy all user-defined handler objects owned by the service.
+  void shutdown_service()
+  {
+    service_impl_.shutdown_service();
+  }
+
   // The platform-specific implementation.
   service_impl_type service_impl_;
 };

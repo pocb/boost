@@ -45,8 +45,12 @@ class basic_handle
   : public basic_io_object<HandleService>
 {
 public:
+  /// (Deprecated: Use native_handle_type.) The native representation of a
+  /// handle.
+  typedef typename HandleService::native_handle_type native_type;
+
   /// The native representation of a handle.
-  typedef typename HandleService::native_type native_type;
+  typedef typename HandleService::native_handle_type native_handle_type;
 
   /// A basic_handle is always the lowest layer.
   typedef basic_handle<HandleService> lowest_layer_type;
@@ -70,17 +74,17 @@ public:
    * @param io_service The io_service object that the handle will use to
    * dispatch handlers for any asynchronous operations performed on the handle.
    *
-   * @param native_handle A native handle.
+   * @param handle A native handle.
    *
    * @throws boost::system::system_error Thrown on failure.
    */
   basic_handle(boost::asio::io_service& io_service,
-      const native_type& native_handle)
+      const native_handle_type& handle)
     : basic_io_object<HandleService>(io_service)
   {
     boost::system::error_code ec;
-    this->service.assign(this->implementation, native_handle, ec);
-    boost::asio::detail::throw_error(ec);
+    this->service.assign(this->implementation, handle, ec);
+    boost::asio::detail::throw_error(ec, "assign");
   }
 
   /// Get a reference to the lowest layer.
@@ -115,29 +119,29 @@ public:
   /*
    * This function opens the handle to hold an existing native handle.
    *
-   * @param native_handle A native handle.
+   * @param handle A native handle.
    *
    * @throws boost::system::system_error Thrown on failure.
    */
-  void assign(const native_type& native_handle)
+  void assign(const native_handle_type& handle)
   {
     boost::system::error_code ec;
-    this->service.assign(this->implementation, native_handle, ec);
-    boost::asio::detail::throw_error(ec);
+    this->service.assign(this->implementation, handle, ec);
+    boost::asio::detail::throw_error(ec, "assign");
   }
 
   /// Assign an existing native handle to the handle.
   /*
    * This function opens the handle to hold an existing native handle.
    *
-   * @param native_handle A native handle.
+   * @param handle A native handle.
    *
    * @param ec Set to indicate what error occurred, if any.
    */
-  boost::system::error_code assign(const native_type& native_handle,
+  boost::system::error_code assign(const native_handle_type& handle,
       boost::system::error_code& ec)
   {
-    return this->service.assign(this->implementation, native_handle, ec);
+    return this->service.assign(this->implementation, handle, ec);
   }
 
   /// Determine whether the handle is open.
@@ -158,7 +162,7 @@ public:
   {
     boost::system::error_code ec;
     this->service.close(this->implementation, ec);
-    boost::asio::detail::throw_error(ec);
+    boost::asio::detail::throw_error(ec, "close");
   }
 
   /// Close the handle.
@@ -174,7 +178,7 @@ public:
     return this->service.close(this->implementation, ec);
   }
 
-  /// Get the native handle representation.
+  /// (Deprecated: Use native_handle().) Get the native handle representation.
   /**
    * This function may be used to obtain the underlying representation of the
    * handle. This is intended to allow access to native handle functionality
@@ -182,7 +186,18 @@ public:
    */
   native_type native()
   {
-    return this->service.native(this->implementation);
+    return this->service.native_handle(this->implementation);
+  }
+
+  /// Get the native handle representation.
+  /**
+   * This function may be used to obtain the underlying representation of the
+   * handle. This is intended to allow access to native handle functionality
+   * that is not otherwise provided.
+   */
+  native_handle_type native_handle()
+  {
+    return this->service.native_handle(this->implementation);
   }
 
   /// Cancel all asynchronous operations associated with the handle.
@@ -197,7 +212,7 @@ public:
   {
     boost::system::error_code ec;
     this->service.cancel(this->implementation, ec);
-    boost::asio::detail::throw_error(ec);
+    boost::asio::detail::throw_error(ec, "cancel");
   }
 
   /// Cancel all asynchronous operations associated with the handle.

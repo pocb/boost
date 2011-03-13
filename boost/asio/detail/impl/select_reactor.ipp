@@ -84,6 +84,12 @@ void select_reactor::shutdown_service()
   timer_queues_.get_all_timers(ops);
 }
 
+void select_reactor::fork_service(boost::asio::io_service::fork_event event)
+{
+  if (event == boost::asio::io_service::fork_child)
+    interrupter_.recreate();
+}
+
 void select_reactor::init_task()
 {
   io_service_.init_task();
@@ -92,6 +98,18 @@ void select_reactor::init_task()
 int select_reactor::register_descriptor(socket_type,
     select_reactor::per_descriptor_data&)
 {
+  return 0;
+}
+
+int select_reactor::register_internal_descriptor(
+    int op_type, socket_type descriptor,
+    select_reactor::per_descriptor_data&, reactor_op* op)
+{
+  boost::asio::detail::mutex::scoped_lock lock(mutex_);
+
+  op_queue_[op_type].enqueue_operation(descriptor, op);
+  interrupter_.interrupt();
+
   return 0;
 }
 
@@ -119,11 +137,20 @@ void select_reactor::cancel_ops(socket_type descriptor,
   cancel_ops_unlocked(descriptor, boost::asio::error::operation_aborted);
 }
 
-void select_reactor::close_descriptor(socket_type descriptor,
-    select_reactor::per_descriptor_data&)
+void select_reactor::deregister_descriptor(socket_type descriptor,
+    select_reactor::per_descriptor_data&, bool)
 {
   boost::asio::detail::mutex::scoped_lock lock(mutex_);
   cancel_ops_unlocked(descriptor, boost::asio::error::operation_aborted);
+}
+
+void select_reactor::deregister_internal_descriptor(
+    socket_type descriptor, select_reactor::per_descriptor_data&)
+{
+  boost::asio::detail::mutex::scoped_lock lock(mutex_);
+  op_queue<operation> ops;
+  for (int i = 0; i < max_ops; ++i)
+    op_queue_[i].cancel_operations(descriptor, ops);
 }
 
 void select_reactor::run(bool block, op_queue<operation>& ops)

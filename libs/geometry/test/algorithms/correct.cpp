@@ -15,8 +15,8 @@
 
 #include <boost/geometry/util/write_dsv.hpp>
 
-#include <boost/geometry/extensions/gis/io/wkt/read_wkt.hpp>
-#include <boost/geometry/extensions/gis/io/wkt/write_wkt.hpp>
+#include <boost/geometry/domains/gis/io/wkt/read_wkt.hpp>
+#include <boost/geometry/domains/gis/io/wkt/write_wkt.hpp>
 
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/geometry/geometries/box.hpp>
@@ -167,6 +167,10 @@ int test_main(int, char* [])
     //test_all<point_xy<int> >();
     test_all<bg::model::d2::point_xy<float> >();
     test_all<bg::model::d2::point_xy<double> >();
+
+#if defined(HAVE_TTMATH)
+    test_all<bg::model::d2::point_xy<ttmath_big> >();
+#endif
 
     return 0;
 }

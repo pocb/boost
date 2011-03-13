@@ -43,6 +43,7 @@
 [include requirements/AsyncReadStream.qbk]
 [include requirements/AsyncWriteStream.qbk]
 [include requirements/CompletionHandler.qbk]
+[include requirements/ComposedConnectHandler.qbk]
 [include requirements/ConnectHandler.qbk]
 [include requirements/ConstBufferSequence.qbk]
 [include requirements/ConvertibleToConstBuffer.qbk]
@@ -64,10 +65,13 @@
 [include requirements/ReadHandler.qbk]
 [include requirements/ResolveHandler.qbk]
 [include requirements/ResolverService.qbk]
+[include requirements/SeqPacketSocketService.qbk]
 [include requirements/SerialPortService.qbk]
 [include requirements/Service.qbk]
 [include requirements/SettableSerialPortOption.qbk]
 [include requirements/SettableSocketOption.qbk]
+[include requirements/SignalHandler.qbk]
+[include requirements/SignalSetService.qbk]
 [include requirements/SocketAcceptorService.qbk]
 [include requirements/SocketService.qbk]
 [include requirements/StreamDescriptorService.qbk]
@@ -1281,6 +1285,9 @@
         <xsl:when test="declname = 'CompletionCondition'">
           <xsl:value-of select="declname"/>
         </xsl:when>
+        <xsl:when test="declname = 'ConnectCondition'">
+          <xsl:value-of select="declname"/>
+        </xsl:when>
         <xsl:when test="declname = 'Context_Service'">
           <xsl:value-of select="declname"/>
         </xsl:when>
@@ -1294,6 +1301,9 @@
           <xsl:value-of select="declname"/>
         </xsl:when>
         <xsl:when test="declname = 'HandshakeHandler'">
+          <xsl:value-of select="declname"/>
+        </xsl:when>
+        <xsl:when test="declname = 'Iterator'">
           <xsl:value-of select="declname"/>
         </xsl:when>
         <xsl:when test="declname = 'MatchCondition'">

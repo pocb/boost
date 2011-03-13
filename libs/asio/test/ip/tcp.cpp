@@ -26,7 +26,9 @@
 #include <boost/asio/read.hpp>
 #include <boost/asio/write.hpp>
 #include "../unit_test.hpp"
+#include "../archetypes/gettable_socket_option.hpp"
 #include "../archetypes/io_control_command.hpp"
+#include "../archetypes/settable_socket_option.hpp"
 
 //------------------------------------------------------------------------------
 
@@ -156,6 +158,12 @@ void test()
     const char const_char_buffer[128] = "";
     socket_base::message_flags in_flags = 0;
     socket_base::keep_alive socket_option;
+    archetypes::settable_socket_option<void> settable_socket_option1;
+    archetypes::settable_socket_option<int> settable_socket_option2;
+    archetypes::settable_socket_option<double> settable_socket_option3;
+    archetypes::gettable_socket_option<void> gettable_socket_option1;
+    archetypes::gettable_socket_option<int> gettable_socket_option2;
+    archetypes::gettable_socket_option<double> gettable_socket_option3;
     archetypes::io_control_command io_control_command;
     boost::system::error_code ec;
 
@@ -171,7 +179,7 @@ void test()
 
     // basic_io_object functions.
 
-    io_service& ios_ref = socket1.io_service();
+    io_service& ios_ref = socket1.get_io_service();
     (void)ios_ref;
 
     // basic_socket functions.
@@ -203,6 +211,10 @@ void test()
     ip::tcp::socket::native_type native_socket4 = socket1.native();
     (void)native_socket4;
 
+    ip::tcp::socket::native_handle_type native_socket5
+      = socket1.native_handle();
+    (void)native_socket5;
+
     socket1.cancel();
     socket1.cancel(ec);
 
@@ -229,14 +241,32 @@ void test()
     socket1.async_connect(ip::tcp::endpoint(ip::tcp::v4(), 0), connect_handler);
     socket1.async_connect(ip::tcp::endpoint(ip::tcp::v6(), 0), connect_handler);
 
-    socket1.set_option(socket_option);
-    socket1.set_option(socket_option, ec);
+    socket1.set_option(settable_socket_option1);
+    socket1.set_option(settable_socket_option1, ec);
+    socket1.set_option(settable_socket_option2);
+    socket1.set_option(settable_socket_option2, ec);
+    socket1.set_option(settable_socket_option3);
+    socket1.set_option(settable_socket_option3, ec);
 
-    socket1.get_option(socket_option);
-    socket1.get_option(socket_option, ec);
+    socket1.get_option(gettable_socket_option1);
+    socket1.get_option(gettable_socket_option1, ec);
+    socket1.get_option(gettable_socket_option2);
+    socket1.get_option(gettable_socket_option2, ec);
+    socket1.get_option(gettable_socket_option3);
+    socket1.get_option(gettable_socket_option3, ec);
 
     socket1.io_control(io_control_command);
     socket1.io_control(io_control_command, ec);
+
+    bool non_blocking1 = socket1.non_blocking();
+    (void)non_blocking1;
+    socket1.non_blocking(true);
+    socket1.non_blocking(false, ec);
+
+    bool non_blocking2 = socket1.native_non_blocking();
+    (void)non_blocking2;
+    socket1.native_non_blocking(true);
+    socket1.native_non_blocking(false, ec);
 
     ip::tcp::endpoint endpoint1 = socket1.local_endpoint();
     ip::tcp::endpoint endpoint2 = socket1.local_endpoint(ec);
@@ -515,6 +545,9 @@ void test()
   ip::tcp::endpoint client_endpoint;
   acceptor.accept(server_side_socket, client_endpoint);
 
+  ip::tcp::acceptor::non_blocking_io command(false);
+  acceptor.io_control(command);
+
   ip::tcp::endpoint client_side_local_endpoint
     = client_side_socket.local_endpoint();
   BOOST_CHECK(client_side_local_endpoint.port() == client_endpoint.port());
@@ -581,7 +614,7 @@ void test()
 
     // basic_io_object functions.
 
-    io_service& ios_ref = resolver.io_service();
+    io_service& ios_ref = resolver.get_io_service();
     (void)ios_ref;
 
     // basic_resolver functions.

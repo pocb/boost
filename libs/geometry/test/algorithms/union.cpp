@@ -18,14 +18,50 @@
 
 #include <algorithms/overlay/overlay_cases.hpp>
 
+static std::string javier4[2] =
+    {
+    "POLYGON((-2 2, 1842 2, 1842 -2362, -2 -2362, -2 2), (0 0, 0 -2360, 1840 -2360, 1840 0, 0 0))",
+    // "POLYGON((-0.01 -1960, 0 -1960, 0 -1880, 0.01 -1960, -0.01 -1960))"
+    "POLYGON ((-0.01 -1960, 80.01 -1960, 0 -1880, -0.01 -1960))"
+    };
+
+
+
+
+
+
+
+
 template <typename Ring, typename Polygon>
 void test_areal()
 {
+    test_one<Polygon, Polygon, Polygon>("javier4",
+        javier4[0], javier4[1],
+        1, 1, 13, 20016.4);
+
+    test_one<Polygon, Polygon, Polygon>("simplex_normal",
+        simplex_normal[0], simplex_normal[1],
+        1, 0, 13, 11.526367);
+
+    test_one<Polygon, Polygon, Polygon>("simplex_with_empty_1",
+        simplex_normal[0], polygon_empty,
+        1, 0, 4, 8.0);
+    test_one<Polygon, Polygon, Polygon>("simplex_with_empty_2",
+        polygon_empty, simplex_normal[0], 
+        1, 0, 4, 8.0);
+
     test_one<Polygon, Polygon, Polygon>("star_ring", example_star, example_ring,
         1, 0, 23, 5.67017141);
 
+    // This sample was selected because of the border case, and ttmath generates one point more.
     test_one<Polygon, Polygon, Polygon>("star_poly", example_star, example_polygon,
-        1, 1, 27,  5.647949);
+        1, 1,
+#if defined(HAVE_TTMATH)
+        boost::is_same<typename bg::coordinate_type<Ring>::type, ttmath_big>::value ? 28 : 27,
+#else
+        27,
+#endif
+            5.647949);
 
     // Pseudo-box as Polygon
     // (note, internally, the intersection points is different, so yes,
@@ -33,39 +69,32 @@ void test_areal()
     test_one<Polygon, Polygon, Polygon>("box_poly3", "POLYGON((1.5 1.5 , 1.5 2.5 , 4.5 2.5 , 4.5 1.5 , 1.5 1.5))",
             "POLYGON((2 1.3,2.4 1.7,2.8 1.8,3.4 1.2,3.7 1.6,3.4 2,4.1 2.5,5.3 2.5,5.4 1.2,4.9 0.8,2.9 0.7,2 1.3))",
                 1, 1, 15, 5.93625);
-    // First inside second
+
     test_one<Polygon, Polygon, Polygon>("first_within_second",
         first_within_second[0], first_within_second[1],
         1, 0, 5, 25.0);
 
-    // Second inside first
-    test_one<Polygon, Polygon, Polygon>("seond_within_first",
+    test_one<Polygon, Polygon, Polygon>("second_within_first",
         first_within_second[1], first_within_second[0],
         1, 0, 5, 25.0);
 
-    // First inside hole of second
     test_one<Polygon, Polygon, Polygon>("first_within_hole_of_second",
         first_within_hole_of_second[0], first_within_hole_of_second[1],
         2, 1, 15, 17.0);
 
-    // forming new hole
     test_one<Polygon, Polygon, Polygon>("new_hole",
         new_hole[0], new_hole[1],
         1, 1, 14, 23.0);
 
-    // side by side
     test_one<Polygon, Polygon, Polygon>("side_side",
         side_side[0], side_side[1], 1, 0, 7, 2.0);
 
-    // identical
     test_one<Polygon, Polygon, Polygon>("identical",
         identical[0], identical[1], 1, 0, 5, 1.0);
 
-    // disjoint
     test_one<Polygon, Polygon, Polygon>("disjoint",
         disjoint[0], disjoint[1], 2, 0, 10, 2.0);
 
-    // inside each other, having intersections; holes separate intersections
     test_one<Polygon, Polygon, Polygon>("intersect_holes_intersect",
         intersect_holes_intersect[0], intersect_holes_intersect[1],
         1, 1, 14, 39.75);
@@ -82,13 +111,11 @@ void test_areal()
         intersect_holes_new_ring[0], intersect_holes_new_ring[1],
         1, 2, 15, 253.8961);
 
-    // inside each other, having intersections but holes are disjoint
     test_one<Polygon, Polygon, Polygon>("intersect_holes_disjoint",
         intersect_holes_disjoint[0],
         intersect_holes_disjoint[1],
         1, 0, 9, 40.0);
 
-    // inside each other, having no intersections but holes are disjoint
     test_one<Polygon, Polygon, Polygon>("within_holes_disjoint",
         within_holes_disjoint[0], within_holes_disjoint[1],
         1, 0, 5, 49.0);
@@ -101,6 +128,9 @@ void test_areal()
         two_bends[0], two_bends[1],
         1, 0, 7, 40.0);
 
+    test_one<Polygon, Polygon, Polygon>("star_comb_15",
+        star_comb_15[0], star_comb_15[1],
+        1, 27, 204, 898.09693338);
 
     test_one<Polygon, Polygon, Polygon>("equal_holes_disjoint",
         equal_holes_disjoint[0], equal_holes_disjoint[1],
@@ -117,14 +147,17 @@ void test_areal()
         intersect_exterior_and_interiors_winded[0], intersect_exterior_and_interiors_winded[1],
         1, 1, 26, 66.5333333);
 
-
-    test_one<Polygon, Polygon, Polygon>("simplex_normal",
-        simplex_normal[0], simplex_normal[1],
-        1, 0, 13, 11.526367);
+    test_one<Polygon, Polygon, Polygon>("crossed",
+        crossed[0], crossed[1],
+        1, 3, 17, 23.5); // Area from SQL Server - was somehow wrong before
 
     test_one<Polygon, Polygon, Polygon>("fitting",
         fitting[0], fitting[1],
         1, 0, 5, 25);
+
+    test_one<Polygon, Polygon, Polygon>("distance_zero",
+        distance_zero[0], distance_zero[1],
+        1, 0, 11, 9.0098387);
 
     test_one<Polygon, Polygon, Polygon>("wrapped_a",
         wrapped[0], wrapped[1],
@@ -132,7 +165,6 @@ void test_areal()
     test_one<Polygon, Polygon, Polygon>("wrapped_b",
         wrapped[0], wrapped[2],
         1, 1, 16, 16);
-
 
     test_one<Polygon, Polygon, Polygon>("9",
                 case_9[0], case_9[1], 2, 0, 8, 11);
@@ -195,28 +227,24 @@ void test_areal()
     // "new hole", tested with Ring -> the newly formed hole will be omitted
     test_one<Ring, Ring, Ring>("new_hole_discarded", new_hole[0], new_hole[1], 1, 0, 9, 24.0);
 
-    // Isovist (submitted by Brandon during Formal Review)
-    /***
-    TODO: review this. Even on gcc the number of points are different.
-    {
-        std::string tn = string_from_type<typename bg::coordinate_type<P>::type>::name();
-        //std::cout << tn << std::endl;
-        test_one<Polygon, Polygon, Polygon>("isovist", isovist[0], isovist[1], 1, 0,
+    test_one<Polygon, Polygon, Polygon>("ggl_list_20110306_javier",
+        ggl_list_20110306_javier[0], ggl_list_20110306_javier[1],
+        1, 1, 16, 80456.4904910401);
 
-            // Note, the number of resulting points differs per point type AND
-            // per operating system (showing this test is quite demanding)
-#if defined(_MSC_VER)
-            tn == std::string("f") ? 71 : 72,
-#else
-            tn == std::string("f") ? 71 :
-                tn == std::string("e") ? 75 :
-                    tn == std::string("d") ? 72 :
-                        70,
-#endif
-            313.3603646,
-            0.1);
+#ifdef _MSC_VER
+    {
+        // Isovist (submitted by Brandon during Formal Review)
+        std::string tn = string_from_type<typename bg::coordinate_type<Polygon>::type>::name();
+        test_one<Polygon, Polygon, Polygon>("isovist",
+            isovist1[0], isovist1[1],
+            1,
+            0,
+            tn == std::string("f") ? 71 
+                : tn == std::string("d") ? 72 
+                : 73,
+            313.36036462);
     }
-    ***/
+#endif
 }
 
 template <typename P>

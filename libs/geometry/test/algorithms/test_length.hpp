@@ -11,14 +11,14 @@
 #include <geometry_test_common.hpp>
 
 #include <boost/geometry/algorithms/length.hpp>
-#include <boost/geometry/extensions/gis/io/wkt/read_wkt.hpp>
+#include <boost/geometry/domains/gis/io/wkt/read_wkt.hpp>
 #include <boost/geometry/strategies/strategies.hpp>
 
 
 template <typename Geometry>
 void test_length(Geometry const& geometry, long double expected_length)
 {
-    long double length = bg::length(geometry);
+    typename bg::length_result<Geometry>::type length = bg::length(geometry);
 
 #ifdef GEOMETRY_TEST_DEBUG
     std::ostringstream out;

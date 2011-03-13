@@ -58,7 +58,7 @@ inline void buffer_box(BoxIn const& box_in, T const& distance, BoxOut& box_out)
     static const std::size_t N = dimension<BoxIn>::value;
 
     box_loop<BoxIn, BoxOut, T, min_corner, 0, N>::apply(box_in, -distance, box_out);
-    box_loop<BoxIn, BoxOut, T, max_corner, 0, N>::apply(box_in, +distance, box_out);
+    box_loop<BoxIn, BoxOut, T, max_corner, 0, N>::apply(box_in, distance, box_out);
 }
 
 
@@ -106,7 +106,7 @@ struct buffer<box_tag, box_tag, BoxIn, T, BoxOut>
 \param chord_length (optional) The length of the chord's in the generated arcs around points or bends
 \note Currently only implemented for box, the trivial case, but still useful
 
-\qbk{[include ref/algorithms/buffer.qbk]}
+\qbk{[include reference/algorithms/buffer.qbk]}
  */
 template <typename Input, typename Output, typename Distance>
 inline void buffer(Input const& geometry_in, Output& geometry_out,

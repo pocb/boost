@@ -230,18 +230,22 @@ struct centroid_linestring
             typedef typename boost::range_iterator<Linestring const>::type point_iterator_type;
             typedef segment_returning_iterator<point_iterator_type, point_type> segment_iterator;
 
-            double length = double();
-            std::pair<double, double> average_sum;
+            typedef typename geometry::distance_result<Linestring>::type distance_type;
+            distance_type length = distance_type();
+            std::pair<distance_type, distance_type> average_sum;
 
             segment_iterator it(boost::begin(line), boost::end(line));
             segment_iterator end(boost::end(line));
             while (it != end)
             {
-                double const d = geometry::distance(it->first, it->second);
+
+                distance_type const d = geometry::distance(it->first, it->second);
                 length += d;
 
-                double const mx = (get<0>(it->first) + get<0>(it->second)) / 2;
-                double const my = (get<1>(it->first) + get<1>(it->second)) / 2;
+                distance_type two(2);
+
+                distance_type const mx = (get<0>(it->first) + get<0>(it->second)) / two;
+                distance_type const my = (get<1>(it->first) + get<1>(it->second)) / two;
                 average_sum.first += d * mx;
                 average_sum.second += d * my;
                 ++it;
@@ -378,7 +382,7 @@ struct centroid<polygon_tag, Polygon, Point, Strategy>
 \param strategy \param_strategy{centroid}
 
 \qbk{distinguish,with strategy}
-\qbk{[include ref/algorithms/centroid.qbk]}
+\qbk{[include reference/algorithms/centroid.qbk]}
 
 \qbk{
 [heading Available Strategies]
@@ -417,7 +421,7 @@ inline void centroid(Geometry const& geometry, Point& c,
 \param geometry \param_geometry
 \param c the calculated centroid will be assigned to this point reference
 
-\qbk{[include ref/algorithms/centroid.qbk]}
+\qbk{[include reference/algorithms/centroid.qbk]}
  */
 template<typename Geometry, typename Point>
 inline void centroid(Geometry const& geometry, Point& c)
@@ -445,7 +449,7 @@ inline void centroid(Geometry const& geometry, Point& c)
 \tparam Geometry \tparam_geometry
 \param geometry \param_geometry
 \return \return_calc{centroid}
-\qbk{[include ref/algorithms/centroid.qbk]}
+\qbk{[include reference/algorithms/centroid.qbk]}
  */
 template<typename Point, typename Geometry>
 inline Point make_centroid(Geometry const& geometry)
@@ -469,7 +473,7 @@ inline Point make_centroid(Geometry const& geometry)
 \return \return_calc{centroid}
 
 \qbk{distinguish,with strategy}
-\qbk{[include ref/algorithms/centroid.qbk]}
+\qbk{[include reference/algorithms/centroid.qbk]}
 
 \qbk{
 [heading Available Strategies]

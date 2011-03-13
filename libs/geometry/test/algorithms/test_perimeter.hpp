@@ -15,13 +15,13 @@
 #include <boost/geometry/strategies/strategies.hpp>
 
 
-#include <boost/geometry/extensions/gis/io/wkt/read_wkt.hpp>
+#include <boost/geometry/domains/gis/io/wkt/read_wkt.hpp>
 
 
 template <typename Geometry>
 void test_perimeter(Geometry const& geometry, long double expected_perimeter)
 {
-    long double perimeter = bg::perimeter(geometry);
+    typename bg::distance_result<Geometry>::type perimeter = bg::perimeter(geometry);
 
 #ifdef GEOMETRY_TEST_DEBUG
     std::ostringstream out;

@@ -10,7 +10,7 @@
 #include <boost/geometry/algorithms/unique.hpp>
 #include <boost/geometry/multi/algorithms/unique.hpp>
 
-#include <boost/geometry/extensions/gis/io/wkt/wkt.hpp>
+#include <boost/geometry/domains/gis/io/wkt/wkt.hpp>
 
 #include <boost/geometry/geometries/geometries.hpp>
 
@@ -49,6 +49,10 @@ int test_main( int , char* [] )
 {
     test_all<bg::model::d2::point_xy<int> >();
     test_all<bg::model::d2::point_xy<double> >();
+
+#ifdef HAVE_TTMATH
+    test_all<bg::model::d2::point_xy<ttmath_big> >();
+#endif
 
     return 0;
 }

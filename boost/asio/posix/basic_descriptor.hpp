@@ -46,8 +46,12 @@ class basic_descriptor
     public descriptor_base
 {
 public:
+  /// (Deprecated: Use native_handle_type.) The native representation of a
+  /// descriptor.
+  typedef typename DescriptorService::native_handle_type native_type;
+
   /// The native representation of a descriptor.
-  typedef typename DescriptorService::native_type native_type;
+  typedef typename DescriptorService::native_handle_type native_handle_type;
 
   /// A basic_descriptor is always the lowest layer.
   typedef basic_descriptor<DescriptorService> lowest_layer_type;
@@ -79,12 +83,12 @@ public:
    * @throws boost::system::system_error Thrown on failure.
    */
   basic_descriptor(boost::asio::io_service& io_service,
-      const native_type& native_descriptor)
+      const native_handle_type& native_descriptor)
     : basic_io_object<DescriptorService>(io_service)
   {
     boost::system::error_code ec;
     this->service.assign(this->implementation, native_descriptor, ec);
-    boost::asio::detail::throw_error(ec);
+    boost::asio::detail::throw_error(ec, "assign");
   }
 
   /// Get a reference to the lowest layer.
@@ -123,11 +127,11 @@ public:
    *
    * @throws boost::system::system_error Thrown on failure.
    */
-  void assign(const native_type& native_descriptor)
+  void assign(const native_handle_type& native_descriptor)
   {
     boost::system::error_code ec;
     this->service.assign(this->implementation, native_descriptor, ec);
-    boost::asio::detail::throw_error(ec);
+    boost::asio::detail::throw_error(ec, "assign");
   }
 
   /// Assign an existing native descriptor to the descriptor.
@@ -138,7 +142,7 @@ public:
    *
    * @param ec Set to indicate what error occurred, if any.
    */
-  boost::system::error_code assign(const native_type& native_descriptor,
+  boost::system::error_code assign(const native_handle_type& native_descriptor,
       boost::system::error_code& ec)
   {
     return this->service.assign(this->implementation, native_descriptor, ec);
@@ -156,13 +160,14 @@ public:
    * write operations will be cancelled immediately, and will complete with the
    * boost::asio::error::operation_aborted error.
    *
-   * @throws boost::system::system_error Thrown on failure.
+   * @throws boost::system::system_error Thrown on failure. Note that, even if
+   * the function indicates an error, the underlying descriptor is closed.
    */
   void close()
   {
     boost::system::error_code ec;
     this->service.close(this->implementation, ec);
-    boost::asio::detail::throw_error(ec);
+    boost::asio::detail::throw_error(ec, "close");
   }
 
   /// Close the descriptor.
@@ -171,11 +176,24 @@ public:
    * write operations will be cancelled immediately, and will complete with the
    * boost::asio::error::operation_aborted error.
    *
-   * @param ec Set to indicate what error occurred, if any.
+   * @param ec Set to indicate what error occurred, if any. Note that, even if
+   * the function indicates an error, the underlying descriptor is closed.
    */
   boost::system::error_code close(boost::system::error_code& ec)
   {
     return this->service.close(this->implementation, ec);
+  }
+
+  /// (Deprecated: Use native_handle().) Get the native descriptor
+  /// representation.
+  /**
+   * This function may be used to obtain the underlying representation of the
+   * descriptor. This is intended to allow access to native descriptor
+   * functionality that is not otherwise provided.
+   */
+  native_type native()
+  {
+    return this->service.native_handle(this->implementation);
   }
 
   /// Get the native descriptor representation.
@@ -184,9 +202,24 @@ public:
    * descriptor. This is intended to allow access to native descriptor
    * functionality that is not otherwise provided.
    */
-  native_type native()
+  native_handle_type native_handle()
   {
-    return this->service.native(this->implementation);
+    return this->service.native_handle(this->implementation);
+  }
+
+  /// Release ownership of the native descriptor implementation.
+  /**
+   * This function may be used to obtain the underlying representation of the
+   * descriptor. After calling this function, @c is_open() returns false. The
+   * caller is responsible for closing the descriptor.
+   *
+   * All outstanding asynchronous read or write operations will finish
+   * immediately, and the handlers for cancelled operations will be passed the
+   * boost::asio::error::operation_aborted error.
+   */
+  native_handle_type release()
+  {
+    return this->service.release(this->implementation);
   }
 
   /// Cancel all asynchronous operations associated with the descriptor.
@@ -201,7 +234,7 @@ public:
   {
     boost::system::error_code ec;
     this->service.cancel(this->implementation, ec);
-    boost::asio::detail::throw_error(ec);
+    boost::asio::detail::throw_error(ec, "cancel");
   }
 
   /// Cancel all asynchronous operations associated with the descriptor.
@@ -244,7 +277,7 @@ public:
   {
     boost::system::error_code ec;
     this->service.io_control(this->implementation, command, ec);
-    boost::asio::detail::throw_error(ec);
+    boost::asio::detail::throw_error(ec, "io_control");
   }
 
   /// Perform an IO control command on the descriptor.
@@ -279,6 +312,123 @@ public:
       boost::system::error_code& ec)
   {
     return this->service.io_control(this->implementation, command, ec);
+  }
+
+  /// Gets the non-blocking mode of the descriptor.
+  /**
+   * @returns @c true if the descriptor's synchronous operations will fail with
+   * boost::asio::error::would_block if they are unable to perform the requested
+   * operation immediately. If @c false, synchronous operations will block
+   * until complete.
+   *
+   * @note The non-blocking mode has no effect on the behaviour of asynchronous
+   * operations. Asynchronous operations will never fail with the error
+   * boost::asio::error::would_block.
+   */
+  bool non_blocking() const
+  {
+    return this->service.non_blocking(this->implementation);
+  }
+
+  /// Sets the non-blocking mode of the descriptor.
+  /**
+   * @param mode If @c true, the descriptor's synchronous operations will fail
+   * with boost::asio::error::would_block if they are unable to perform the
+   * requested operation immediately. If @c false, synchronous operations will
+   * block until complete.
+   *
+   * @throws boost::system::system_error Thrown on failure.
+   *
+   * @note The non-blocking mode has no effect on the behaviour of asynchronous
+   * operations. Asynchronous operations will never fail with the error
+   * boost::asio::error::would_block.
+   */
+  void non_blocking(bool mode)
+  {
+    boost::system::error_code ec;
+    this->service.non_blocking(this->implementation, mode, ec);
+    boost::asio::detail::throw_error(ec, "non_blocking");
+  }
+
+  /// Sets the non-blocking mode of the descriptor.
+  /**
+   * @param mode If @c true, the descriptor's synchronous operations will fail
+   * with boost::asio::error::would_block if they are unable to perform the
+   * requested operation immediately. If @c false, synchronous operations will
+   * block until complete.
+   *
+   * @param ec Set to indicate what error occurred, if any.
+   *
+   * @note The non-blocking mode has no effect on the behaviour of asynchronous
+   * operations. Asynchronous operations will never fail with the error
+   * boost::asio::error::would_block.
+   */
+  boost::system::error_code non_blocking(
+      bool mode, boost::system::error_code& ec)
+  {
+    return this->service.non_blocking(this->implementation, mode, ec);
+  }
+
+  /// Gets the non-blocking mode of the native descriptor implementation.
+  /**
+   * This function is used to retrieve the non-blocking mode of the underlying
+   * native descriptor. This mode has no effect on the behaviour of the
+   * descriptor object's synchronous operations.
+   *
+   * @returns @c true if the underlying descriptor is in non-blocking mode and
+   * direct system calls may fail with boost::asio::error::would_block (or the
+   * equivalent system error).
+   *
+   * @note The current non-blocking mode is cached by the descriptor object.
+   * Consequently, the return value may be incorrect if the non-blocking mode
+   * was set directly on the native descriptor.
+   */
+  bool native_non_blocking() const
+  {
+    return this->service.native_non_blocking(this->implementation);
+  }
+
+  /// Sets the non-blocking mode of the native descriptor implementation.
+  /**
+   * This function is used to modify the non-blocking mode of the underlying
+   * native descriptor. It has no effect on the behaviour of the descriptor
+   * object's synchronous operations.
+   *
+   * @param mode If @c true, the underlying descriptor is put into non-blocking
+   * mode and direct system calls may fail with boost::asio::error::would_block
+   * (or the equivalent system error).
+   *
+   * @throws boost::system::system_error Thrown on failure. If the @c mode is
+   * @c false, but the current value of @c non_blocking() is @c true, this
+   * function fails with boost::asio::error::invalid_argument, as the
+   * combination does not make sense.
+   */
+  void native_non_blocking(bool mode)
+  {
+    boost::system::error_code ec;
+    this->service.native_non_blocking(this->implementation, mode, ec);
+    boost::asio::detail::throw_error(ec, "native_non_blocking");
+  }
+
+  /// Sets the non-blocking mode of the native descriptor implementation.
+  /**
+   * This function is used to modify the non-blocking mode of the underlying
+   * native descriptor. It has no effect on the behaviour of the descriptor
+   * object's synchronous operations.
+   *
+   * @param mode If @c true, the underlying descriptor is put into non-blocking
+   * mode and direct system calls may fail with boost::asio::error::would_block
+   * (or the equivalent system error).
+   *
+   * @param ec Set to indicate what error occurred, if any. If the @c mode is
+   * @c false, but the current value of @c non_blocking() is @c true, this
+   * function fails with boost::asio::error::invalid_argument, as the
+   * combination does not make sense.
+   */
+  boost::system::error_code native_non_blocking(
+      bool mode, boost::system::error_code& ec)
+  {
+    return this->service.native_non_blocking(this->implementation, mode, ec);
   }
 
 protected:

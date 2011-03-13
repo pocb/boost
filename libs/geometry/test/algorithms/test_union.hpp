@@ -12,6 +12,8 @@
 
 #include <geometry_test_common.hpp>
 
+#include <boost/range/algorithm/copy.hpp>
+
 #include <boost/geometry/algorithms/union.hpp>
 
 #include <boost/geometry/algorithms/area.hpp>
@@ -24,7 +26,7 @@
 
 #include <boost/geometry/strategies/strategies.hpp>
 
-#include <boost/geometry/extensions/gis/io/wkt/read_wkt.hpp>
+#include <boost/geometry/domains/gis/io/wkt/wkt.hpp>
 
 
 #if defined(TEST_WITH_SVG)
@@ -41,9 +43,9 @@ void test_union(std::string const& caseid, G1 const& g1, G2 const& g2,
 {
     typedef typename bg::coordinate_type<G1>::type coordinate_type;
     std::vector<OutputType> clip;
-    bg::union_inserter<OutputType>(g1, g2, std::back_inserter(clip));
+    bg::union_(g1, g2, clip);
 
-    double area = 0;
+    typename bg::area_result<G1>::type area = 0;
     std::size_t n = 0;
     std::size_t holes = 0;
     for (typename std::vector<OutputType>::iterator it = clip.begin();
@@ -58,6 +60,24 @@ void test_union(std::string const& caseid, G1 const& g1, G2 const& g2,
         bg::unique(*it);
         n += bg::num_points(*it, true);
     }
+
+    {
+        // Test inserter functionality
+        // Test if inserter returns output-iterator (using Boost.Range copy)
+        std::vector<OutputType> inserted, array_with_one_empty_geometry;
+        array_with_one_empty_geometry.push_back(OutputType());
+        boost::copy(array_with_one_empty_geometry, bg::union_inserter<OutputType>(g1, g2, std::back_inserter(inserted)));
+
+        typename bg::area_result<G1>::type area_inserted = 0;
+        for (typename std::vector<OutputType>::iterator it = inserted.begin();
+                it != inserted.end(); ++it)
+        {
+            area_inserted += bg::area(*it);
+        }
+        BOOST_CHECK_EQUAL(boost::size(clip), boost::size(inserted) - 1);
+        BOOST_CHECK_CLOSE(area_inserted, expected_area, percentage);
+    }
+
 
 
     /***

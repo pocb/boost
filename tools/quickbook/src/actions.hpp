@@ -37,6 +37,14 @@ namespace quickbook
     extern int qbk_major_version;
     extern int qbk_minor_version;
     extern unsigned qbk_version_n; // qbk_major_version * 100 + qbk_minor_version
+    
+    // This struct is used to avoid an optimization bug
+    // in g++ 4.4 on 64-bit linux.
+    struct assign_qbk_version {
+        assign_qbk_version(int& v) : v_(v) {}
+        void operator()(int value) const;
+        int& v_;
+    };
 
     struct quickbook_range {
         template <typename Arg>
@@ -213,8 +221,7 @@ namespace quickbook
             std::string const& library_id,
             std::string const& section_id,
             std::string const& qualified_section_id,
-            std::string const& pre,
-            std::string const& post,
+            int level,
             quickbook::actions& actions)
         : out(out)
         , phrase(phrase)
@@ -222,8 +229,7 @@ namespace quickbook
         , library_id(library_id)
         , section_id(section_id)
         , qualified_section_id(qualified_section_id)
-        , pre(pre)
-        , post(post)
+        , level(level)
         , actions(actions) {}
 
         void operator()(iterator first, iterator last) const;
@@ -234,8 +240,7 @@ namespace quickbook
         std::string const& library_id;
         std::string const& section_id;
         std::string const& qualified_section_id;
-        std::string pre;
-        std::string post;
+        int level;
         quickbook::actions& actions;
     };
 

@@ -38,12 +38,12 @@ namespace boost { namespace fusion
             static void
             call(I1 const& src, I2 const& dest, mpl::false_)
             {
-                *src = *dest;
+                *dest = *src;
                 call(fusion::next(src), fusion::next(dest));
             }
 
             template <typename I1, typename I2>
-            static bool
+            static void
             call(I1 const& src, I2 const& dest)
             {
                 typename result_of::equal_to<I1, end1_type>::type eq;

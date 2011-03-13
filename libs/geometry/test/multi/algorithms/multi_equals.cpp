@@ -13,7 +13,7 @@
 #include <boost/geometry/geometries/geometries.hpp>
 #include <boost/geometry/multi/geometries/multi_polygon.hpp>
 
-#include <boost/geometry/extensions/gis/io/wkt/read_wkt_multi.hpp>
+#include <boost/geometry/domains/gis/io/wkt/read_wkt_multi.hpp>
 
 
 
@@ -46,6 +46,10 @@ void test_all()
 int test_main( int , char* [] )
 {
     test_all<bg::model::d2::point_xy<double> >();
+
+#ifdef HAVE_TTMATH
+    test_all<bg::model::d2::point_xy<ttmath_big> >();
+#endif
 
     return 0;
 }

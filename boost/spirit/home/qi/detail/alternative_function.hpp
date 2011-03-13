@@ -87,7 +87,7 @@ namespace boost { namespace spirit { namespace qi { namespace detail
         }
 
         template <typename Component>
-        bool call_optional_or_variant(Component const& component, mpl::false_) const
+        bool call_variant(Component const& component, mpl::false_) const
         {
             // If Attribute is a variant, then search the variant types for a
             // suitable substitute type.
@@ -107,6 +107,27 @@ namespace boost { namespace spirit { namespace qi { namespace detail
         }
 
         template <typename Component>
+        bool call_variant(Component const& component, mpl::true_) const
+        {
+            // If Attribute is a variant and the expected attribute is
+            // the same type (pass the variant as-is).
+
+            return component.parse(first, last, context, skipper, attr);
+        }
+
+        template <typename Component>
+        bool call_optional_or_variant(Component const& component, mpl::false_) const
+        {
+            // Attribute is a variant...
+
+            typedef typename
+                traits::attribute_of<Component, Context, Iterator>::type
+            expected;
+            return call_variant(component,
+                is_same<Attribute, expected>());
+        }
+
+        template <typename Component>
         bool call(Component const& component, mpl::false_) const
         {
             return call_optional_or_variant(
@@ -114,7 +135,7 @@ namespace boost { namespace spirit { namespace qi { namespace detail
         }
 
         template <typename Component>
-        bool operator()(Component const& component) const
+        bool call_unused(Component const& component, mpl::true_) const
         {
             // return true if the parser succeeds
             return call(component,
@@ -122,6 +143,23 @@ namespace boost { namespace spirit { namespace qi { namespace detail
                     spirit::traits::not_is_variant<Attribute, qi::domain>,
                     spirit::traits::not_is_optional<Attribute, qi::domain>
                 >());
+        }
+
+        template <typename Component>
+        bool call_unused(Component const& component, mpl::false_) const
+        {
+            return component.parse(first, last, context, skipper, unused);
+        }
+
+        template <typename Component>
+        bool operator()(Component const& component) const
+        {
+            // return true if the parser succeeds
+            typedef typename traits::not_is_unused<
+                typename traits::attribute_of<Component, Context, Iterator>::type
+            >::type predicate;
+
+            return call_unused(component, predicate());
         }
 
         Iterator& first;

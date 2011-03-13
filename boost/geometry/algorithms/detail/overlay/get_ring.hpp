@@ -32,17 +32,8 @@ template<typename Tag>
 struct get_ring
 {};
 
-template<>
-struct get_ring<ring_tag>
-{
-    template<typename Ring>
-    static inline Ring const& apply(ring_identifier const& , Ring const& ring)
-    {
-        return ring;
-    }
-};
-
-
+// A container of rings (multi-ring but that does not exist)
+// gets the "void" tag and is dispatched here.
 template<>
 struct get_ring<void>
 {
@@ -51,6 +42,19 @@ struct get_ring<void>
                 apply(ring_identifier const& id, Container const& container)
     {
         return container[id.multi_index];
+    }
+};
+
+
+
+
+template<>
+struct get_ring<ring_tag>
+{
+    template<typename Ring>
+    static inline Ring const& apply(ring_identifier const& , Ring const& ring)
+    {
+        return ring;
     }
 };
 

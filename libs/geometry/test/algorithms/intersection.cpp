@@ -23,10 +23,26 @@
 #include <test_common/with_pointer.hpp>
 #include <test_geometries/custom_segment.hpp>
 
+static std::string pie_2_3_23_0[2] =
+{
+    "POLYGON((2500 2500,2855 3828,2500 3875,2500 2500))",
+    "POLYGON((2500 2500,2791 3586,2499 3625,2208 3586,2500 2500))"
+};
 
 template <typename Polygon>
 void test_areal()
 {
+    test_one<Polygon, Polygon, Polygon>("pie_2_3_23_0",
+        pie_2_3_23_0[0], pie_2_3_23_0[1],
+        1, 4, 163292.679042133, 0.1);
+
+    test_one<Polygon, Polygon, Polygon>("simplex_with_empty_1",
+        simplex_normal[0], polygon_empty,
+        0, 0, 0.0);
+    test_one<Polygon, Polygon, Polygon>("simplex_with_empty_2",
+        polygon_empty, simplex_normal[0], 
+        0, 0, 0.0);
+
     test_one<Polygon, Polygon, Polygon>("simplex_normal",
         simplex_normal[0], simplex_normal[1],
         1, 7, 5.47363293);
@@ -58,12 +74,14 @@ void test_areal()
         identical[0], identical[1],
         1, 5, 1.0);
 
-    // Two, inside each other, having intersections but holes are disjoint
+    test_one<Polygon, Polygon, Polygon>("intersect_exterior_and_interiors_winded",
+        intersect_exterior_and_interiors_winded[0], intersect_exterior_and_interiors_winded[1],
+        1, 14, 25.2166667);
+
     test_one<Polygon, Polygon, Polygon>("intersect_holes_disjoint",
         intersect_holes_disjoint[0], intersect_holes_disjoint[1],
         1, 15, 18.0);
 
-    // Two, inside each other, having intersections; holes separate intersections
     test_one<Polygon, Polygon, Polygon>("intersect_holes_intersect",
         intersect_holes_intersect[0], intersect_holes_intersect[1],
         1, 14, 18.25);
@@ -84,27 +102,31 @@ void test_areal()
         winded[0], winded[1],
         1, 22, 40.0);
 
+    test_one<Polygon, Polygon, Polygon>("within_holes_disjoint",
+        within_holes_disjoint[0], within_holes_disjoint[1],
+        1, 15, 23.0);
+
+    test_one<Polygon, Polygon, Polygon>("side_side",
+        side_side[0], side_side[1],
+        0, 0, 0.0);
+
     test_one<Polygon, Polygon, Polygon>("two_bends",
         two_bends[0], two_bends[1],
         1, 7, 24.0);
 
     test_one<Polygon, Polygon, Polygon>("star_comb_15",
-        star_15, comb_15,
+        star_comb_15[0], star_comb_15[1],
         28, 150, 189.952883);
 
     test_one<Polygon, Polygon, Polygon>("simplex_normal",
         simplex_normal[0], simplex_normal[1],
         1, 7, 5.47363293);
 
-    test_one<Polygon, Polygon, Polygon>("fitting",
-        fitting[0], fitting[1],
-        0, 0, 0);
-
-    test_one<Polygon, Polygon, Polygon>("dist_zero",
+    test_one<Polygon, Polygon, Polygon>("distance_zero",
         distance_zero[0], distance_zero[1],
         1, 0 /* f: 4, other: 5 */, 0.29516139, 0.01);
 
-    test_one<Polygon, Polygon, Polygon>("ehd",
+    test_one<Polygon, Polygon, Polygon>("equal_holes_disjoint",
         equal_holes_disjoint[0], equal_holes_disjoint[1],
         1, 20, 81 - 2 * 3 * 3 - 3 * 7);
 
@@ -115,9 +137,26 @@ void test_areal()
         only_hole_intersections[0], only_hole_intersections[2],
         1, 21, 149.090909);
 
-    test_one<Polygon, Polygon, Polygon>("intersect_exterior_and_interiors_winded",
-        intersect_exterior_and_interiors_winded[0], intersect_exterior_and_interiors_winded[1],
-        1, 14, 25.2166667);
+    test_one<Polygon, Polygon, Polygon>("fitting",
+        fitting[0], fitting[1],
+        0, 0, 0);
+
+    test_one<Polygon, Polygon, Polygon>("crossed",
+        crossed[0], crossed[1],
+        3, 0, 1.5);
+
+#ifdef _MSC_VER
+    {
+        // Isovist (submitted by Brandon during Formal Review)
+        std::string tn = string_from_type<typename bg::coordinate_type<Polygon>::type>::name();
+        test_one<Polygon, Polygon, Polygon>("isovist",
+            isovist1[0], isovist1[1],
+            1,
+            tn == std::string("f") ? 19 : tn == std::string("d") ? 22 : 20,
+            88.19203,
+            tn == std::string("f") ? 0.5 : tn == std::string("d") ? 0.1 : 0.01);
+    }
+#endif
 
     return;
 
@@ -127,28 +166,6 @@ void test_areal()
             "Polygon((0 0,0 4,4 4,4 0,0 0))",
             "Polygon((2 -2,2 -1,2 6,2 -2))",
             5, 22, 1.1901714);
-
-
-    // Icovist (submitted by Brandon during Formal Review)
-    // Test the FORWARD case
-    {
-        std::string tn = string_from_type<typename bg::coordinate_type<Polygon>::type>::name();
-        test_one<Polygon, Polygon, Polygon>("isovist",
-            isovist1[0], isovist1[1],
-            1,
-            tn == std::string("f") ? 19 : tn == std::string("d") ? 21 : 20,
-            88.19203,
-            tn == std::string("f") ? 0.5 : tn == std::string("d") ? 0.1 : 0.01);
-    }
-
-
-    // Test the REVERSE case - does not give correct results yet
-    /*
-    test_one<Polygon, Polygon, Polygon>("icovist_r",
-        isovist[0], isovist[2],
-        1, 4, 0.29516139, 0.01);
-    */
-
 }
 
 template <typename Polygon, typename Box>
@@ -169,23 +186,26 @@ void test_areal_clip()
     test_one<Polygon, Box, Polygon>("clip_poly2", example_box,
         "POLYGON((2 1.3,2.4 1.7,2.8 1.8,3.4 1.2,3.7 1.6,3.4 2,4.1 2.5,5.3 2.5,5.4 1.2,4.9 0.8,2.9 0.7,2 1.3))",
         2, 12, 1.00375);
+
     test_one<Polygon, Box, Polygon>("clip_poly3", example_box,
         "POLYGON((2 1.3,2.4 1.7,2.8 1.8,3.4 1.2,3.7 1.6,3.4 2,4.1 2.5,4.5 2.5,4.5 1.2,4.9 0.8,2.9 0.7,2 1.3))",
         2, 12, 1.00375);
+
     test_one<Polygon, Box, Polygon>("clip_poly4", example_box,
         "POLYGON((2 1.3,2.4 1.7,2.8 1.8,3.4 1.2,3.7 1.6,3.4 2,4.1 2.5,4.5 2.5,4.5 2.3,5.0 2.3,5.0 2.1,4.5 2.1,4.5 1.9,4.0 1.9,4.5 1.2,4.9 0.8,2.9 0.7,2 1.3))",
         2, 16, 0.860892);
 
     test_one<Polygon, Box, Polygon>("clip_poly5", example_box,
-            "POLYGON((2 1.3,2.4 1.7,2.8 1.8,3.4 1.2,3.7 1.6,3.4 2,4.1 2.5,4.5 1.2,2.9 0.7,2 1.3))",
-                2, 11, 0.7575961);
+        "POLYGON((2 1.3,2.4 1.7,2.8 1.8,3.4 1.2,3.7 1.6,3.4 2,4.1 2.5,4.5 1.2,2.9 0.7,2 1.3))",
+        2, 11, 0.7575961);
 
     test_one<Polygon, Box, Polygon>("clip_poly6", example_box,
-            "POLYGON((2 1.3,2.4 1.7,2.8 1.8,3.4 1.2,3.7 1.6,3.4 2,4.0 3.0,5.0 2.0,2.9 0.7,2 1.3))",
-                2, 13, 1.0744456);
+        "POLYGON((2 1.3,2.4 1.7,2.8 1.8,3.4 1.2,3.7 1.6,3.4 2,4.0 3.0,5.0 2.0,2.9 0.7,2 1.3))",
+        2, 13, 1.0744456);
 
     test_one<Polygon, Box, Polygon>("clip_poly7", "Box(0 0, 3 3)",
-            "POLYGON((2 2, 1 4, 2 4, 3 3, 2 2))", 1, 4, 0.75);
+        "POLYGON((2 2, 1 4, 2 4, 3 3, 2 2))", 
+        1, 4, 0.75);
 }
 
 template <typename Box>
@@ -197,7 +217,7 @@ void test_boxes(std::string const& wkt1, std::string const& wkt2, double expecte
 
     Box box_out;
     bool detected = bg::intersection(box1, box2, box_out);
-    double area = bg::area(box_out);
+    typename bg::area_result<Box>::type area = bg::area(box_out);
 
     BOOST_CHECK_EQUAL(detected, expected_result);
     if (detected && expected_result)
@@ -223,6 +243,7 @@ void test_all()
 
     // Test polygons clockwise and counter clockwise
     test_areal<polygon>();
+
     test_areal<polygon_ccw>();
     test_areal<polygon_open>();
     test_areal<polygon_ccw_open>();
@@ -267,9 +288,6 @@ void test_all()
     // which occur 4 times, the length is expected to be 2.0)
     test_one<linestring, linestring, box>("llb_2", "LINESTRING(1.7 1.6,2.3 2.4,2.9 1.6,3.5 2.4,4.1 1.6)", clip, 2, 6, 4 * 0.5);
     
-
-
-
     // linear
     test_one<P, linestring, linestring>("llp1", "LINESTRING(0 0,1 1)", "LINESTRING(0 1,1 0)", 1, 1, 0);
     test_one<P, segment, segment>("ssp1", "LINESTRING(0 0,1 1)", "LINESTRING(0 1,1 0)", 1, 1, 0);
@@ -319,7 +337,6 @@ void test_pointer_version()
     BOOST_CHECK_EQUAL(n, 2);
     BOOST_CHECK_CLOSE(length, sqrt(2.0 * 6.0 * 6.0), 0.001);
 
-
     for (unsigned int i = 0; i < ln.size(); i++)
     {
         delete ln[i];
@@ -331,7 +348,7 @@ void test_pointer_version()
 
 int test_main(int, char* [])
 {
-    //test_all<bg::model::d2::point_xy<float> >();
+    test_all<bg::model::d2::point_xy<float> >();
     test_all<bg::model::d2::point_xy<double> >();
 
 #if defined(HAVE_TTMATH)

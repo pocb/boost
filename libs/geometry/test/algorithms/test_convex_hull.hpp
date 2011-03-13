@@ -16,8 +16,8 @@
 
 #include <boost/geometry/strategies/strategies.hpp>
 
-#include <boost/geometry/extensions/gis/io/wkt/read_wkt.hpp>
-#include <boost/geometry/extensions/gis/io/wkt/write_wkt.hpp>
+#include <boost/geometry/domains/gis/io/wkt/read_wkt.hpp>
+#include <boost/geometry/domains/gis/io/wkt/write_wkt.hpp>
 
 #include <boost/geometry/geometries/polygon.hpp>
 
@@ -41,7 +41,7 @@ void test_convex_hull(Geometry const& geometry, Hull const& hull,
 
     BOOST_CHECK(bg::num_points(geometry) == size_original);
 
-    double ah = bg::area(hull);
+    typename bg::area_result<Geometry>::type ah = bg::area(hull);
     if (reverse)
     {
         ah = -ah;

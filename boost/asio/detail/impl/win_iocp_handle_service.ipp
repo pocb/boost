@@ -119,7 +119,7 @@ void win_iocp_handle_service::destroy(
 
 boost::system::error_code win_iocp_handle_service::assign(
     win_iocp_handle_service::implementation_type& impl,
-    const native_type& native_handle, boost::system::error_code& ec)
+    const native_handle_type& handle, boost::system::error_code& ec)
 {
   if (is_open(impl))
   {
@@ -127,10 +127,10 @@ boost::system::error_code win_iocp_handle_service::assign(
     return ec;
   }
 
-  if (iocp_service_.register_handle(native_handle, ec))
+  if (iocp_service_.register_handle(handle, ec))
     return ec;
 
-  impl.handle_ = native_handle;
+  impl.handle_ = handle;
   ec = boost::system::error_code();
   return ec;
 }
@@ -141,6 +141,8 @@ boost::system::error_code win_iocp_handle_service::close(
 {
   if (is_open(impl))
   {
+    BOOST_ASIO_HANDLER_OPERATION(("handle", &impl, "close"));
+
     if (!::CloseHandle(impl.handle_))
     {
       DWORD last_error = ::GetLastError();
@@ -164,8 +166,12 @@ boost::system::error_code win_iocp_handle_service::cancel(
   if (!is_open(impl))
   {
     ec = boost::asio::error::bad_descriptor;
+    return ec;
   }
-  else if (FARPROC cancel_io_ex_ptr = ::GetProcAddress(
+
+  BOOST_ASIO_HANDLER_OPERATION(("handle", &impl, "cancel"));
+
+  if (FARPROC cancel_io_ex_ptr = ::GetProcAddress(
         ::GetModuleHandleA("KERNEL32"), "CancelIoEx"))
   {
     // The version of Windows supports cancellation from any thread.
@@ -437,6 +443,8 @@ void win_iocp_handle_service::close_for_destruction(implementation_type& impl)
 {
   if (is_open(impl))
   {
+    BOOST_ASIO_HANDLER_OPERATION(("handle", &impl, "close"));
+
     ::CloseHandle(impl.handle_);
     impl.handle_ = INVALID_HANDLE_VALUE;
     impl.safe_cancellation_thread_id_ = 0;
