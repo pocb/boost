@@ -101,10 +101,10 @@ the getting started guide] for an introduction.
 
 Make directory for xml files, say [^ c:\\boost-tools\\xml].
 
-* [http://docbook.sourceforge.net/ Norman Walsh's DocBook XSL
+* [@http://docbook.sourceforge.net/ Norman Walsh's DocBook XSL
   stylesheets] from their
-  [@http://sourceforge.net/project/showfiles.php?group_id=21935&
-  package_id=16608 Sourceforge download page] to
+  [@http://sourceforge.net/project/showfiles.php?group_id=21935&package_id=16608
+  Sourceforge download page] to
   [^ c:\\boost-tools\\xml\\docbook-xsl].
 * [@http://www.oasis-open.org/docbook/xml/4.2/ The DocBook DTD] to
   [^ c:\\boost-tools\\xml\\docbook-xml].
@@ -225,7 +225,7 @@ Install libxslt, docbook and doxygen using macports:
 
 [section:latex Latex and Ghostscript]
 
-[http://mactex-wiki.tug.org/wiki/index.php?title=TeX_Distributions List of TeX distributions]
+[@http://mactex-wiki.tug.org/wiki/index.php?title=TeX_Distributions List of TeX distributions]
 
 [endsect] [/ latex]
 
