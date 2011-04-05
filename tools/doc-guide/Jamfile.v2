@@ -6,27 +6,17 @@
 #   http://www.boost.org/LICENSE_1_0.txt)
 #==============================================================================
 
-project boost/quickbook/doc ;
+project boost/doc-guide ;
 
 using boostbook ;
 using quickbook ;
 
-xml install : install.qbk ;
+xml doc-tools : doc-tools.qbk ;
 
-path-constant images : . ;
-
-boostbook standalone
+boostbook doc-tools-book
     :
-        install
+        doc-tools
     :
         <xsl:param>boost.root=../../..
-        <xsl:param>generate.section.toc.level=3
-        <xsl:param>chunk.section.depth=1
-        <xsl:param>chunk.first.sections=1
-
-        <format>html:<xsl:param>img.src.path=../
-
-        #<xsl:param>callout.graphics.path=../../images/callouts//
-        <format>pdf:<xsl:param>img.src.path=$(images)/
-        <format>pdf:<xsl:param>boost.url.prefix=http://www.boost.org/doc/libs/release/doc/html
+        <xsl:param>img.src.path=../
     ;

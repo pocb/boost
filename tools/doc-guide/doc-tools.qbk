@@ -1,0 +1,9 @@
+[book Boost Documentation Tools
+    [quickbook 1.6]
+    [id doc-guide]
+]
+
+[include preface.qbk]
+[include documentation.qbk]
+[include ../quickbook/doc/quickbook.qbk]
+[xinclude ../boostbook/doc/boostbook.xml]

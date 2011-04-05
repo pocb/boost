@@ -1,0 +1,6 @@
+[part Documentation
+    [quickbook 1.6]
+    [id doc-guide.docs]
+]
+
+[include install.qbk]

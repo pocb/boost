@@ -1,6 +1,7 @@
-[article How to build boost documentation
-[quickbook 1.5]
-[source-mode teletype]
+[chapter Installation
+    [quickbook 1.5]
+    [source-mode teletype]
+    [id doc-guide.install]
 ]
 
 Required packages (see below for platform specific instructions):
