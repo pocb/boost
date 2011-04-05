@@ -1,0 +1,377 @@
+[article How to build boost documentation
+[quickbook 1.5]
+[source-mode teletype]
+]
+
+Required packages (see below for platform specific instructions):
+
+* bjam
+* xsltproc
+* [@http://docbook.sourceforge.net/ Norman Walsh's DocBook XSL
+  stylesheets] Note that sourceforge has organized these files so that
+  the documentation for the stylesheets is the first set of files
+  offered for download; you have to look farther down for the actual
+  stylesheets.
+* [@http://www.oasis-open.org/docbook/xml/4.2/ The DocBook DTD]
+* doxygen (optional for writing your own, but required for several
+  libraries' documentation).
+* latex (optional for writing your own, but required for
+  Boost.Accumulators' formulas).
+* An FO processor, either Apache FOP from
+  [@http://xmlgraphics.apache.org/fop/] or XEP Personal edition from
+  [@http://www.renderx.com/download/personal.html] (Optional, required
+  only for building PDF's).
+* A Java runtime (Optional, required for the FO procesors).
+
+The overall toolchain setup looks like this:
+
+[$documentation-toolchain.png]
+
+[section:windows_cygwin Windows, using the Windows command prompt and Cygwin toolchain]
+
+First, you need to get the boost build tools set up.
+
+Install these [@http://www.cygwin.com Cygwin] packages:
+
+* [^ Libs/libxml2]
+* [^ Libs/libxslt]
+* [^ Text/docbook-xml42]
+* [^ Text/docbook-xsl]
+* [^ Devel/gcc4-g++] (optional, if you don't already have a compiler)
+* [^ Devel/doxygen] (optional, used for several libraries)
+* [^ Text/tetex-extra] (optional, used for the accumulators library
+  documentation)
+* [^ Graphics/ghostscript] (optional, also used for the accumulators
+  library documentation)
+
+As of Cygwin 1.7.5, May 2010, the Cygwin installation isn't using
+Windows symlinks for a few packages, so you will need to set up your
+own in the Cygwin bin directory:
+
+* [^ cd ['cygwin-root]/bin]
+* [^ mklink latex.exe pdfetex.exe]
+* [^ mklink gswin32c.exe gs.exe]
+
+If you have an older version of Windows that doesn't support symlinks,
+you might try copying pdfetex.exe -> latex.exe and gs.exe ->
+gwsin32c.exe. 
+
+Build bjam. Be sure to under the Windows command prompt rather than
+Cygwin bash:
+
+* [^ cd ['boost-root]/tools/jam/src]
+* [^ build]
+* copy [^ bin.ntx86\\bjam.exe] to a directory in your path.
+
+Be sure your home directory bjam configuration file
+([^ %HOMEDRIVE%\\%HOMEPATH%\\user-config.jam]) is set up correctly.
+Here is an actual user-config.jam for a machine with Cygwin installed
+in [^c:\\cygwin] and several C++ compilers configured:
+
+    using msvc : 9.0express ;
+    using msvc : 10.0express ;
+    using gcc : 4.3 : c:/cygwin/bin/g++-4 ;
+
+    # MinGW from www.equation.com/servlet/equation.cmd?fa=fortran
+    using gcc : 4.4 : c:/mingw/gcc-4.4/bin/g++ : <cxxflags>"-std=gnu++0x" ;
+
+    using xsltproc ;
+
+    using boostbook
+        : c:/cygwin/usr/share/sgml/docbook/xsl-stylesheets
+        : c:/cygwin/usr/share/sgml/docbook/xml-dtd-4.2
+        ;
+
+    using doxygen ;
+    using quickbook ;
+
+[endsect] [/ windows_cygwin]
+
+[section:windows_manual Windows, using the Windows command prompt and manually downloaded toolchain]
+
+First, you need to get the boost build tools set up, see
+[@http://www.boost.org/doc/libs/1_37_0/more/getting_started/index.html
+the getting started guide] for an introduction.
+
+* Create directory for boost tools, say [^ c:\\boost-tools].
+* Create directory for binaries, say [^ c:\\boost-tools\\bin].
+* Add to path.
+* xml tools from [@http://www.zlatkovic.com/pub/libxml/ Igor Zlatkovic].
+  Require: [^ iconv], [^ libxml2] and [^ libxslt], [^ zlib].
+
+Make directory for xml files, say [^ c:\\boost-tools\\xml].
+
+* [http://docbook.sourceforge.net/ Norman Walsh's DocBook XSL
+  stylesheets] from their
+  [@http://sourceforge.net/project/showfiles.php?group_id=21935&
+  package_id=16608 Sourceforge download page] to
+  [^ c:\\boost-tools\\xml\\docbook-xsl].
+* [@http://www.oasis-open.org/docbook/xml/4.2/ The DocBook DTD] to
+  [^ c:\\boost-tools\\xml\\docbook-xml].
+
+[^ user-config.jam] in the
+[@http://www.boost.org/doc/libs/1_36_0/doc/html/bbv2/reference.html#bbv2.reference.init.config boost build search path],
+for most people this will be [^ C:\\Documents and Settings\\['username]].
+
+    using xsltproc
+        : "C:/boost-tools/bin/xsltproc.exe"
+        ;
+
+    using boostbook
+        : "C:/boost-tools/xml/docbook-xsl"
+        : "C:/boost-tools/xml/docbook-xml"
+        ;
+
+If you want to build the complete documentation, you'll also need to install:
+
+* [@http://www.stack.nl/~dimitri/doxygen/download.html#latestsrc
+  Doxygen]
+* [@http://miktex.org/ MikTeX] - select the version under 'Download' in
+  the left column, the basic installer should be fine.
+* [@http://pages.cs.wisc.edu/~ghost/ Ghostscript] - click on the latest
+  version of 'GPL Ghostscript', there should be a link for the latest
+  self extracting download near the bottom.
+
+The bin directories of these tools needs to be added to the path. I
+think Doxygen and MikTex's installers do this for you, but
+ghostscript's doesn't.
+
+[^ user-config.jam]:
+
+   using xsltproc
+       : "C:/Users/example/Documents/boost/xml/bin/xsltproc.exe"
+       ;
+
+   using boostbook
+       : "C:/Users/example/Documents/boost/xml/docbook-xsl"
+       : "C:/Users/example/Documents/boost/xml/docbook-xml"
+       ;
+
+   using doxygen ;
+   using quickbook ;
+
+[endsect] [/ windows_manual]
+
+[section:cygwin Windows, using bash and Cygwin toolchain]
+
+First, you need to get the boost build tools set up. [^ bjam] will need
+to be built using cygwin, so don't use the prebuilt windows binary.
+
+Cygwin packages:
+
+* [^ Libs/libxml2]
+* [^ Libs/libxslt]
+* [^ Text/docbook-xml42]
+* [^ Text/docbook-xsl]
+* [^ Devel/gcc4-g++]
+* [^ Devel/doxygen] (optional, used for several libraries)
+* [^ Text/tetex-extra] (optional, used for the accumulators library
+  documentation)
+* [^ Graphics/ghostscript] (optional, also used for the accumulators
+  library documentation)
+
+Build bjam:
+
+* Start bash
+* [^cd ['boost-root]/tools/jam/src]
+* [^./build.sh]
+* copy file ([^ bin.cygwinx86/bjam.exe]) to a directory in your path.
+
+Be sure your home directory bjam configuration file
+([^ ~/user-config.jam]) is set up correctly:
+
+    using gcc : 4 : /usr/bin/g++-4 ;
+
+    using xsltproc ;
+
+    using boostbook
+        : /usr/share/docbook-xsl
+        : /usr/share/xml/docbook/4.2
+        ;
+
+    using doxygen ;
+    using quickbook ;
+
+[endsect] [/cygwin]
+
+[section:unix Unix with automatic script]
+
+/TODO/
+
+[endsect]
+
+[section:mac OS X]
+
+Macports has packages for [^ boost-build] and [^ boost-jam] but I think it
+might be best to use the version from your boost tarball/checkout, so
+that you're up to date. OS X comes with xsltproc, but it's too old, so
+a recent version needs to be installed.
+
+Updated: Mac OS X 10.6.2 comes with "new enough" versions of libxml,
+libxslt, and xsltproc.
+
+Install libxslt, docbook and doxygen using macports:
+
+    sudo port install docbook-xml-4.2 docbook-xsl libxslt doxygen
+
+[^ user-config.jam]:
+
+    using darwin ;
+    using doxygen ;
+    using boostbook
+        : /opt/local/share/xsl/docbook-xsl/
+        : /opt/local/share/xml/docbook/4.2
+        ;
+
+[section:latex Latex and Ghostscript]
+
+[http://mactex-wiki.tug.org/wiki/index.php?title=TeX_Distributions List of TeX distributions]
+
+[endsect] [/ latex]
+
+[section:macports MacPorts]
+
+With macports latex is a large download - very slow.
+
+Texlive_base doesn't seem to compile with x11:
+[@http://trac.macports.org/ticket/18326]
+
+To avoid installing x11:
+
+    sudo port install graphviz +no_x11
+    sudo port install texlive_base +no_x11
+
+(or maybe just add [^ +no_x11] to the following command line).
+
+    sudo port install texlive
+
+[endsect] [/macports]
+
+[section:basictex BasicTex]
+
+Install [^ BasicTeX-2008.dmg] and [^ mactex-additions.mpkg.zip] from
+[@http://www.tug.org/mactex/morepackages.html]
+
+Add to path [^ /usr/local/bin/] (probably already in path) and
+[^/usr/local/texlive/2008basic/bin/universal-darwin/].
+
+[endsect] [/ basictex]
+
+[endsect] [/ mac]
+
+[section:debian Debian/ubuntu]
+
+First, you need to get the boost build tools set up, see
+[@http://www.boost.org/doc/libs/1_37_0/more/getting_started/index.html
+the getting started guide] for an introduction. You can probably use
+the [^bjam] package from your distribution.
+
+    sudo apt-get install xsltproc docbook-xsl docbook-xml
+
+    # Optional extras:
+    # TODO: What's the correct latex package?
+    sudo apt-get install doxygen texlive-full
+
+Add to [^ user-config.jam]:
+
+    using xsltproc ;
+
+    using boostbook
+        : /usr/share/xml/docbook/stylesheet/nwalsh
+        : /usr/share/xml/docbook/schema/dtd/4.2
+        ;
+
+    using quickbook ;
+
+    # Remove this line if you haven't installed doxygen
+    using doxygen ;
+
+[endsect] [/ debian]
+
+[section:quickbook Pre-build quickbook]
+
+Quickbook is built automatically during the build process, but as it
+takes a little while to build you might prefer to build it in advance.
+To do this, in the command line type (replacing [^$BOOST_ROOT] with the
+root directory of boost):
+
+    cd $BOOST_ROOT/tools/quickbook
+    bjam dist-bin
+
+Or for windows:
+
+    cd $BOOST_ROOT\\tools\\quickbook
+    bjam dist-bin
+
+Change [^ using quickbook] in [^ user-config.jam] to (replacing [^
+$BOOST_ROOT] with the root directory of boost, as before):
+
+    using quickbook : $BOOST_ROOT/dist/bin/quickbook
+
+Windows:
+
+    using quickbook : $BOOST_ROOT\\dist\\bin\\quickbook
+
+[endsect] [/quickbook]
+
+[section:pdfs How to build pdfs]
+
+First of all you will need an FO processor, there are basically only two free two choices here:
+
+* Apache FOP from [@http://xmlgraphics.apache.org/fop/]
+* XEP Personal edition from [@http://www.renderx.com/download/personal.html]
+
+The XEP processor generally produces much better results, but inserts
+a small "built with XEP" advert in the footer of each page.  You will
+also need a Java virtual machine to run the FO processor on.
+
+(March 12, 2011): Note that FOP 1.0 has a
+[@https://issues.apache.org/bugzilla/show_bug.cgi?id=49837 bug] that
+causes it to crash with an exception when attempting to build most
+Boost Docs.  The nightly build for March 12, 2011 is known to work
+however.
+
+You will then need to edit your [^user-config.jam] file to point to the
+location of the FO processor, for example:
+
+    using fop :  
+       # path to invocation batch file:
+       C:/Progra~1/RenderX/xep/xep.bat
+       :
+       # path to Java installation, this is ignored if you're using XEP:
+       C:/PROGRA~1/Java/j2re1.4.2_12 
+       ;
+
+You should now be able to build pdf docs via:
+
+    bjam pdf
+
+[note
+    You may actually experience errors at this point if Java runs out
+    of memory, whether or not this occurs depends on the complexity of
+    the documentation being built and how you Java runtime is
+    configured.  One way to fix this error is to add the -Xmx option
+    to the Java invocation command in the batch file that invokes the
+    FO processor, for example -Xmx500m if you want to allow the FO
+    processor to use 500MBytes of memory.
+]
+
+[endsect] [/ pdfs]
+
+[section:test How to test your build setup ]
+
+There is a set of test documentation that covers all the tools that
+can be used in the [^boost-root/doc/test] directory.
+
+Building this requires quickbook, doxygen, latex, dvips and ps as well
+as the basic Boostbook setup.
+
+[endsect] [/test]
+
+[section:links Useful Links]
+
+* [@http://www.sagehill.net/docbookxsl/ DocBook XSL: The Complete Guide]
+* [@http://docbook.sourceforge.net/release/xsl/current/doc/ Docbook XSL Stylesheet Reference].
+* [@http://www.docbook.org/tdg/en/html/docbook.html Docbook, the Definitive Guide].
+
+[endsect] [/links]
