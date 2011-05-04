@@ -1,7 +1,12 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
-//
-// Copyright Barend Gehrels 2007-2009, Geodan, Amsterdam, the Netherlands.
-// Copyright Bruno Lalande 2008, 2009
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2011 Bruno Lalande, Paris, France.
+// Copyright (c) 2009-2011 Mateusz Loskot, London, UK.
+
+// Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
+// (geolib/GGL), copyright (c) 1995-2010 Geodan, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -42,18 +47,11 @@ template
 >
 struct default_strategy
 {
-    // If we would assert here, we would have to implement
-    // default strategies for all combinations, all CS, etc.
-    // This explosion is not convenient.
-    // Another option is tag inheritance / grouping (so point-in-polygon will apply for point-in-ring, point-in-polygon, point-in-multi-polygon but not for point-in-box...)
-    // TODO: decide about this.
-
     BOOST_MPL_ASSERT_MSG
         (
             false, NOT_IMPLEMENTED_FOR_THIS_TYPES
             , (types<Point, PointContaining>)
         );
-
 };
 
 

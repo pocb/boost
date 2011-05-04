@@ -1,6 +1,7 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
-//
-// Copyright Barend Gehrels 2010, Geodan, Amsterdam, the Netherlands.
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -137,6 +138,31 @@ struct self_get_turn_points
 
 template
 <
+    typename Box,
+    typename Turns,
+    typename TurnPolicy,
+    typename InterruptPolicy
+>
+struct self_get_turn_points
+    <
+        box_tag, Box,
+        Turns,
+        TurnPolicy,
+        InterruptPolicy
+    >
+{
+    static inline bool apply(
+            Box const& ,
+            Turns& ,
+            InterruptPolicy& )
+    {
+        return true;
+    }
+};
+
+
+template
+<
     typename Polygon,
     typename Turns,
     typename TurnPolicy,
@@ -181,7 +207,7 @@ template
     typename Turns,
     typename InterruptPolicy
 >
-inline void get_turns(Geometry const& geometry,
+inline void self_turns(Geometry const& geometry,
             Turns& turns, InterruptPolicy& interrupt_policy)
 {
     concept::check<Geometry const>();

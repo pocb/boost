@@ -19,6 +19,7 @@
 
 #include <iostream>
 #include <boost/config.hpp>
+#include <boost/cstdint.hpp>
 #include <boost/limits.hpp>
 #include <boost/static_assert.hpp>
 #include <boost/random/detail/config.hpp>
@@ -40,6 +41,8 @@ namespace random {
 template<class UniformRandomNumberGenerator, std::size_t p, std::size_t r>
 class discard_block_engine
 {
+    typedef typename detail::seed_type<
+        typename UniformRandomNumberGenerator::result_type>::type seed_type;
 public:
     typedef UniformRandomNumberGenerator base_type;
     typedef typename base_type::result_type result_type;
@@ -68,7 +71,7 @@ public:
      * generator with @c value
      */
     BOOST_RANDOM_DETAIL_ARITHMETIC_CONSTRUCTOR(discard_block_engine,
-                                               result_type, value)
+                                               seed_type, value)
     { _rng.seed(value); _n = 0; }
     
     /**
@@ -88,7 +91,7 @@ public:
     /** default seeds the underlying generator. */
     void seed() { _rng.seed(); _n = 0; }
     /** Seeds the underlying generator with s. */
-    BOOST_RANDOM_DETAIL_ARITHMETIC_SEED(discard_block_engine, result_type, s)
+    BOOST_RANDOM_DETAIL_ARITHMETIC_SEED(discard_block_engine, seed_type, s)
     { _rng.seed(s); _n = 0; }
     /** Seeds the underlying generator with seq. */
     BOOST_RANDOM_DETAIL_SEED_SEQ_SEED(discard_block_engine, SeedSeq, seq)
@@ -105,22 +108,19 @@ public:
     {
         if(_n >= returned_block) {
             // discard values of random number generator
-            for( ; _n < total_block; ++_n)
-                _rng();
+            _rng.discard(total_block - _n);
             _n = 0;
         }
         ++_n;
         return _rng();
     }
 
-#ifndef BOOST_NO_LONG_LONG
-    void discard(boost::ulong_long_type z)
+    void discard(boost::uintmax_t z)
     {
-        for(boost::ulong_long_type j = 0; j < z; ++j) {
+        for(boost::uintmax_t j = 0; j < z; ++j) {
             (*this)();
         }
     }
-#endif
 
     template<class It>
     void generate(It first, It last)
@@ -156,7 +156,7 @@ public:
     operator<<(std::basic_ostream<CharT,Traits>& os,
                const discard_block_engine& s)
     {
-        os << s._rng << " " << s._n;
+        os << s._rng << ' ' << s._n;
         return os;
     }
 

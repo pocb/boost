@@ -1,7 +1,12 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
-//
-// Copyright Barend Gehrels 2007-2009, Geodan, Amsterdam, the Netherlands.
-// Copyright Bruno Lalande 2008, 2009
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2011 Bruno Lalande, Paris, France.
+// Copyright (c) 2009-2011 Mateusz Loskot, London, UK.
+
+// Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
+// (geolib/GGL), copyright (c) 1995-2010 Geodan, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -46,7 +51,7 @@ struct append_point
                 int = 0, int = 0)
     {
         typename geometry::point_type<Geometry>::type copy;
-        geometry::detail::convert::convert_point_to_point(point, copy);
+        geometry::detail::conversion::convert_point_to_point(point, copy);
         traits::push_back<Geometry>::apply(geometry, copy);
     }
 };

@@ -1,6 +1,8 @@
-// Boost.Geometry (aka GGL, Generic Geometry Library) test file
-//
-// Copyright Barend Gehrels 2010, Geodan, Amsterdam, the Netherlands
+// Boost.Geometry (aka GGL, Generic Geometry Library)
+// Unit Test
+
+// Copyright (c) 2010 Barend Gehrels, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -75,8 +77,8 @@ void test_coordinate_type()
     boost::polygon::rectangle_data<T> boost_polygon_box;
     bg::model::box<bg_point_type> boost_geometry_box;
 
-    bg::assign(boost_polygon_box, 0, 1, 5, 6);
-    bg::assign(boost_geometry_box, 0, 1, 5, 6);
+    bg::assign_values(boost_polygon_box, 0, 1, 5, 6);
+    bg::assign_values(boost_geometry_box, 0, 1, 5, 6);
     T boost_polygon_area = bg::area(boost_polygon_box);
     T boost_geometry_area = bg::area(boost_geometry_box);
     T boost_polygon_area_by_boost_polygon = boost::polygon::area(boost_polygon_box);

@@ -1,7 +1,12 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
-//
-// Copyright Barend Gehrels 2007-2009, Geodan, Amsterdam, the Netherlands.
-// Copyright Bruno Lalande 2008, 2009
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2011 Bruno Lalande, Paris, France.
+// Copyright (c) 2009-2011 Mateusz Loskot, London, UK.
+
+// Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
+// (geolib/GGL), copyright (c) 1995-2010 Geodan, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -147,17 +152,11 @@ private :
             , sum_y(calculation_type())
         {
             typedef calculation_type ct;
-            //std::cout << "-> calctype: " << typeid(ct).name()
-            //    << " size: " << sizeof(ct)
-            //    << " init: " << sum_a2
-            //    << std::endl;
         }
     };
 
 public :
     typedef sums state_type;
-    typedef Point point_type;
-    typedef PointOfSegment segment_point_type;
 
     static inline void apply(PointOfSegment const& p1,
             PointOfSegment const& p2, sums& state)
@@ -215,19 +214,9 @@ public :
 namespace services
 {
 
-// Register this strategy for rings and polygons, in two dimensions
+// Register this strategy for rings and (multi)polygons, in two dimensions
 template <typename Point, typename Geometry>
-struct default_strategy<cartesian_tag, ring_tag, 2, Point, Geometry>
-{
-    typedef bashein_detmer
-        <
-            Point,
-            typename point_type<Geometry>::type
-        > type;
-};
-
-template <typename Point, typename Geometry>
-struct default_strategy<cartesian_tag, polygon_tag, 2, Point, Geometry>
+struct default_strategy<cartesian_tag, areal_tag, 2, Point, Geometry>
 {
     typedef bashein_detmer
         <

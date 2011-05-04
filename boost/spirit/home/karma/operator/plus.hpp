@@ -49,7 +49,7 @@ namespace boost { namespace spirit { namespace karma
         // are just skipped). This allows to selectively generate items in 
         // the provided attribute.
         template <typename F, typename Attribute>
-        bool generate_subject(F f, Attribute const& attr, bool& result, mpl::false_) const
+        bool generate_subject(F f, Attribute const&, bool& result, mpl::false_) const
         {
             bool r = !f(subject);
             if (r) 
@@ -60,7 +60,7 @@ namespace boost { namespace spirit { namespace karma
         }
 
         template <typename F, typename Attribute>
-        bool generate_subject(F f, Attribute const& attr, bool& result, mpl::true_) const
+        bool generate_subject(F f, Attribute const&, bool& result, mpl::true_) const
         {
             bool r = !f(subject);
             if (r)
@@ -123,7 +123,7 @@ namespace boost { namespace spirit { namespace karma
                 typename traits::make_indirect_iterator<iterator_type>::type 
             indirect_iterator_type;
             typedef detail::pass_container<
-                fail_function, Attribute, indirect_iterator_type, Strict>
+                fail_function, Attribute, indirect_iterator_type, mpl::false_>
             pass_container;
 
             iterator_type it = traits::begin(attr);

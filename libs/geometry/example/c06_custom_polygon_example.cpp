@@ -1,6 +1,9 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
-//
-// Copyright Barend Gehrels 2007-2009, Geodan, Amsterdam, the Netherlands
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2011 Bruno Lalande, Paris, France.
+// Copyright (c) 2009-2011 Mateusz Loskot, London, UK.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -11,7 +14,6 @@
 #include <boost/geometry/geometry.hpp>
 
 #include <boost/geometry/geometries/register/point.hpp>
-#include <boost/geometry/geometries/register/ring.hpp>
 
 
 struct my_point
@@ -46,7 +48,11 @@ struct my_polygon
 
 // We can conveniently use macro's to register point and ring
 BOOST_GEOMETRY_REGISTER_POINT_2D(my_point, double, cs::cartesian, x, y)
-BOOST_GEOMETRY_REGISTER_RING(my_ring)
+
+// Register my_ring as a ring
+namespace boost { namespace geometry { namespace traits {
+template <> struct tag<my_ring> { typedef ring_tag type; };
+}}}
 
 
 
@@ -110,20 +116,20 @@ int main()
     // Fill it the my-way, triangle
     p1.boundary.push_back(my_point(2, 0));
     p1.boundary.push_back(my_point(1, 5));
-    p1.boundary.push_back(my_point(5, 5));
+    p1.boundary.push_back(my_point(7, 6));
     p1.boundary.push_back(my_point(2, 0));
 
     // Triangle
     p1.holes[0].push_back(my_point(2, 1));
-    p1.holes[0].push_back(my_point(1.9, 2));
     p1.holes[0].push_back(my_point(2.4, 2));
+    p1.holes[0].push_back(my_point(1.9, 2));
     p1.holes[0].push_back(my_point(2, 1));
 
     // Box
     p1.holes[1].push_back(my_point(3, 3));
-    p1.holes[1].push_back(my_point(3, 4));
-    p1.holes[1].push_back(my_point(4, 4));
     p1.holes[1].push_back(my_point(4, 3));
+    p1.holes[1].push_back(my_point(4, 4));
+    p1.holes[1].push_back(my_point(3, 4));
     p1.holes[1].push_back(my_point(3, 3));
 
     std::cout << "Representation of " << p1.name << ": "
@@ -133,7 +139,7 @@ int main()
     std::cout << "Perimeter of " << p1.name << ": "
         << boost::geometry::perimeter(p1) << std::endl;
     std::cout << "Centroid of " << p1.name << ": "
-        << boost::geometry::dsv(boost::geometry::make_centroid<my_point>(p1)) << std::endl;
+        << boost::geometry::dsv(boost::geometry::return_centroid<my_point>(p1)) << std::endl;
 
     return 0;
 }

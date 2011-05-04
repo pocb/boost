@@ -1,7 +1,10 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
-//
-// Copyright Barend Gehrels 2007-2009, Geodan, Amsterdam, the Netherlands.
-// Copyright Bruno Lalande 2008, 2009
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+
+// Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
+// (geolib/GGL), copyright (c) 1995-2010 Geodan, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -16,8 +19,6 @@
 #include <boost/geometry/strategies/side.hpp>
 #include <boost/geometry/strategies/within.hpp>
 
-// TEMP!
-#include <boost/geometry/multi/core/tags.hpp>
 
 namespace boost { namespace geometry
 {
@@ -179,47 +180,15 @@ public :
 namespace services
 {
 
+// Register using "areal_tag" for ring, polygon, multi-polygon
 template <typename Point, typename PointOfSegment>
-struct default_strategy<point_tag, polygon_tag, cartesian_tag, cartesian_tag, Point, PointOfSegment>
+struct default_strategy<point_tag, areal_tag, cartesian_tag, cartesian_tag, Point, PointOfSegment>
 {
     typedef winding<Point, PointOfSegment> type;
 };
 
 template <typename Point, typename PointOfSegment>
-struct default_strategy<point_tag, ring_tag, cartesian_tag, cartesian_tag, Point, PointOfSegment>
-{
-    typedef winding<Point, PointOfSegment> type;
-};
-
-template <typename Point, typename PointOfSegment>
-struct default_strategy<point_tag, polygon_tag, spherical_tag, spherical_tag, Point, PointOfSegment>
-{
-    typedef winding<Point, PointOfSegment> type;
-};
-
-// TEMP!
-// register it even for the multi here, and for the box
-// future: use tag inheritance, see elsewhere
-template <typename Point, typename PointOfSegment>
-struct default_strategy<point_tag, multi_polygon_tag, cartesian_tag, cartesian_tag, Point, PointOfSegment>
-{
-    typedef winding<Point, PointOfSegment> type;
-};
-
-template <typename Point, typename PointOfSegment>
-struct default_strategy<point_tag, multi_polygon_tag, spherical_tag, spherical_tag, Point, PointOfSegment>
-{
-    typedef winding<Point, PointOfSegment> type;
-};
-
-template <typename Point, typename PointOfSegment>
-struct default_strategy<point_tag, box_tag, cartesian_tag, cartesian_tag, Point, PointOfSegment>
-{
-    typedef winding<Point, PointOfSegment> type;
-};
-
-template <typename Point, typename PointOfSegment>
-struct default_strategy<point_tag, box_tag, spherical_tag, spherical_tag, Point, PointOfSegment>
+struct default_strategy<point_tag, areal_tag, spherical_tag, spherical_tag, Point, PointOfSegment>
 {
     typedef winding<Point, PointOfSegment> type;
 };

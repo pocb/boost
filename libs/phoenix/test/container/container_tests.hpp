@@ -43,14 +43,13 @@ template <typename Container>
 void test_assign(Container c)
 {
     using phx::arg_names::arg1;
-    using phx::assign;
 
     typename Container::size_type count = 2;
     typename Container::const_iterator first = c.begin();
     typename Container::const_iterator second = first;
     typename Container::value_type value = *first;
 
-    assign(arg1, count, value)(c);
+    phx::assign(arg1, count, value)(c);
 
     // iterators may be invalidated!
     first = c.begin();
@@ -64,7 +63,7 @@ void test_assign(Container c)
 #if defined(BOOST_PHOENIX_COMPILE_FAIL_TEST)
     // Should not --- does not, Yay! --- compile.
     Container const const_c = c;
-    assign(const_c, count, value);
+    phx::assign(const_c, count, value);
 #endif
 }
 
@@ -74,7 +73,6 @@ void test_assign2(Container c)
     using phx::arg_names::arg1;
     using phx::arg_names::arg2;
     using phx::arg_names::arg3;
-    using phx::assign;
 
     Container c2 = c;
     typename Container::const_iterator first = c2.begin();
@@ -82,7 +80,7 @@ void test_assign2(Container c)
     typename Container::size_type size = c2.size();
 
     c.clear();
-    assign(arg1, arg2, arg3)(c, first, last);
+    phx::assign(arg1, arg2, arg3)(c, first, last);
     if (test(c.size() != size)) {
         cerr << "Failed " << typeid(Container).name()
        << " test_assign2 1\n"
@@ -93,7 +91,7 @@ void test_assign2(Container c)
 #if defined(BOOST_PHOENIX_COMPILE_FAIL_TEST)
     // Should not --- does not, Yay! --- compile.
     Container const const_c = c;
-    assign(const_c, first, second);
+    phx::assign(const_c, first, second);
 #endif
 }
 
@@ -461,12 +459,13 @@ inline void test_multimap_insert(std::multimap<int, int> c)
 
     Multimap::value_type const value = *c.begin();
     Multimap::iterator c_begin = c.begin();
+    std::size_t old_size = c.size();
     // wrapper for
     // iterator insert(iterator where, const value_type& val);
     Multimap::iterator it =
         phx::insert(arg1, arg2, arg3)(c, c_begin, value);
 
-    if (test(it != c.begin() || *it != *(++it))) {
+    if (test(*it != value || c.size() != old_size + 1)) {
         cerr << "Failed " << typeid(Multimap).name()
        << " test_multimap_insert 1\n";
         return;
@@ -792,13 +791,13 @@ void test_splice(Container c)
     c2_begin = c2.begin();
     c2_end = c2.end();
     size = c.size() + c2.size();
-	/*
+    /*
     splice(arg1, arg2, arg3, arg4, arg5)(c, c_end, c2, c2_begin, c2_end);
     if (test(c.size() != size)) {
         cerr << "Failed " << typeid(Container).name() << " test_splice 3\n";
         return;
     }
-	*/
+    */
 }
 
 template <typename Container>

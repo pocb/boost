@@ -117,7 +117,8 @@ public:
   BOOST_ASIO_DECL void shutdown_service();
 
   // Perform fork-related housekeeping.
-  BOOST_ASIO_DECL void fork_service(boost::asio::io_service::fork_event event);
+  BOOST_ASIO_DECL void fork_service(
+      boost::asio::io_service::fork_event fork_ev);
 
   // Construct a new signal_set implementation.
   BOOST_ASIO_DECL void construct(implementation_type& impl);
@@ -143,7 +144,7 @@ public:
 
   // Start an asynchronous operation to wait for a signal to be delivered.
   template <typename Handler>
-  void async_wait(implementation_type& impl, Handler& handler)
+  void async_wait(implementation_type& impl, Handler handler)
   {
     // Allocate and construct an operation to wrap the handler.
     typedef signal_handler<Handler> op;

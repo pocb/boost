@@ -56,6 +56,22 @@ public:
     descriptor_service_.construct(impl);
   }
 
+  // Move-construct a new serial port implementation.
+  void move_construct(implementation_type& impl,
+      implementation_type& other_impl)
+  {
+    descriptor_service_.move_construct(impl, other_impl);
+  }
+
+  // Move-assign from another serial port implementation.
+  void move_assign(implementation_type& impl,
+      reactive_serial_port_service& other_service,
+      implementation_type& other_impl)
+  {
+    descriptor_service_.move_assign(impl,
+        other_service.descriptor_service_, other_impl);
+  }
+
   // Destroy a serial port implementation.
   void destroy(implementation_type& impl)
   {
@@ -142,7 +158,7 @@ public:
   // lifetime of the asynchronous operation.
   template <typename ConstBufferSequence, typename Handler>
   void async_write_some(implementation_type& impl,
-      const ConstBufferSequence& buffers, Handler& handler)
+      const ConstBufferSequence& buffers, Handler handler)
   {
     descriptor_service_.async_write_some(impl, buffers, handler);
   }
@@ -159,7 +175,7 @@ public:
   // valid for the lifetime of the asynchronous operation.
   template <typename MutableBufferSequence, typename Handler>
   void async_read_some(implementation_type& impl,
-      const MutableBufferSequence& buffers, Handler& handler)
+      const MutableBufferSequence& buffers, Handler handler)
   {
     descriptor_service_.async_read_some(impl, buffers, handler);
   }

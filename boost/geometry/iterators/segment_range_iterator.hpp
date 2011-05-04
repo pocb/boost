@@ -1,6 +1,12 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
-//
-// Copyright Barend Gehrels 2010, Geodan, Amsterdam, the Netherlands.
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2011 Bruno Lalande, Paris, France.
+// Copyright (c) 2009-2011 Mateusz Loskot, London, UK.
+
+// Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
+// (geolib/GGL), copyright (c) 1995-2010 Geodan, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -45,15 +51,6 @@ struct segment_range_iterator
     {
     }
 
-    // Operator= is required to check concept of Range
-    inline segment_range_iterator<Segment>& operator=(segment_range_iterator<Segment> const& source)
-    {
-        m_index = source.m_index;
-        m_segment_address = source.m_segment_address;
-        return *this;
-    }
-
-
     explicit inline segment_range_iterator(Segment const& segment)
         : m_index(0)
         , m_segment_address(&segment)
@@ -68,7 +65,15 @@ struct segment_range_iterator
     {
         init(segment);
     }
-
+    
+    // Operator= is required to check concept of Range
+    inline segment_range_iterator<Segment>& operator=(segment_range_iterator<Segment> const& source)
+    {
+        m_index = source.m_index;
+        m_segment_address = source.m_segment_address;
+        return *this;
+    }
+    
     typedef std::ptrdiff_t difference_type;
 
 private:
@@ -109,8 +114,8 @@ private:
 
     inline void init(Segment const& segment)
     {
-        assign_point_from_index<0>(segment, m_points[0]);
-        assign_point_from_index<1>(segment, m_points[1]);
+        geometry::detail::assign_point_from_index<0>(segment, m_points[0]);
+        geometry::detail::assign_point_from_index<1>(segment, m_points[1]);
     }
 
     // We HAVE TO copy the points, because a segment does not need

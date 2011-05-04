@@ -21,7 +21,6 @@
 #include <boost/preprocessor/tuple/elem.hpp>
 #include <boost/preprocessor/enum_params.hpp>
 #include <boost/preprocessor/repeat_from_to.hpp>
-#include <iostream>
 
 #define BOOST_PHOENIX_DEFINE_EXPRESSION(NAME_SEQ, SEQ)                          \
     BOOST_PHOENIX_DEFINE_EXPRESSION_BASE(                                       \
@@ -84,8 +83,9 @@ BOOST_PP_SEQ_FOR_EACH(                                                          
     namespace tag                                                               \
     {                                                                           \
         struct BOOST_PP_SEQ_HEAD(BOOST_PP_SEQ_REVERSE(NAME_SEQ)) {};            \
-        std::ostream &operator<<(                                               \
-            std::ostream & os                                                   \
+        template <typename Ostream>                                             \
+        inline Ostream &operator<<(                                             \
+            Ostream & os                                                        \
           , BOOST_PP_SEQ_HEAD(BOOST_PP_SEQ_REVERSE(NAME_SEQ)))                  \
         {                                                                       \
             os << BOOST_PP_STRINGIZE(                                           \
@@ -111,7 +111,7 @@ namespace boost { namespace phoenix                                             
 {                                                                               \
     template <typename Dummy>                                                   \
     struct meta_grammar::case_<                                                 \
-        BOOST_PP_SEQ_FOR_EACH(                                                  \
+        :: BOOST_PP_SEQ_FOR_EACH(                                               \
             BOOST_PHOENIX_DEFINE_EXPRESSION_NS                                  \
           , _                                                                   \
           , BOOST_PP_SEQ_POP_BACK(NAME_SEQ)                                     \
@@ -119,7 +119,7 @@ namespace boost { namespace phoenix                                             
       , Dummy                                                                   \
     >                                                                           \
         : enable_rule<                                                          \
-            BOOST_PP_SEQ_FOR_EACH(                                              \
+            :: BOOST_PP_SEQ_FOR_EACH(                                           \
                 BOOST_PHOENIX_DEFINE_EXPRESSION_NS                              \
               , _                                                               \
               , BOOST_PP_SEQ_POP_BACK(NAME_SEQ)                                 \
@@ -134,7 +134,11 @@ namespace boost { namespace phoenix                                             
         template <BOOST_PHOENIX_typename_A(BOOST_PP_SEQ_SIZE(GRAMMAR_SEQ))>     \
         struct BOOST_PP_SEQ_HEAD(BOOST_PP_SEQ_REVERSE(NAME_SEQ))                \
             : boost::phoenix::expr<                                             \
-                tag:: BOOST_PP_SEQ_HEAD(BOOST_PP_SEQ_REVERSE(NAME_SEQ))         \
+                :: BOOST_PP_SEQ_FOR_EACH(                                       \
+                    BOOST_PHOENIX_DEFINE_EXPRESSION_NS                          \
+                  , _                                                           \
+                  , BOOST_PP_SEQ_POP_BACK(NAME_SEQ)                             \
+                ) tag:: BOOST_PP_SEQ_HEAD(BOOST_PP_SEQ_REVERSE(NAME_SEQ))       \
               , BOOST_PP_ENUM_PARAMS(BOOST_PP_SEQ_SIZE(GRAMMAR_SEQ), A)>        \
         {};                                                                     \
 /**/
@@ -217,7 +221,7 @@ struct BOOST_PP_SEQ_HEAD(BOOST_PP_SEQ_REVERSE(NAME_SEQ))                        
 #define BOOST_PHOENIX_DEFINE_EXPRESSION_EXPRESSION_EXT(NAME_SEQ, GRAMMAR_SEQ, ACTOR) \
         template <BOOST_PHOENIX_typename_A(BOOST_PP_SEQ_SIZE(GRAMMAR_SEQ))>     \
         struct BOOST_PP_SEQ_HEAD(BOOST_PP_SEQ_REVERSE(NAME_SEQ))                \
-            : expr_ext<                                                         \
+            : ::boost::phoenix::expr_ext<                                       \
                 ACTOR                                                           \
               , tag:: BOOST_PP_SEQ_HEAD(BOOST_PP_SEQ_REVERSE(NAME_SEQ))         \
               , BOOST_PHOENIX_A(BOOST_PP_SEQ_SIZE(GRAMMAR_SEQ))>                \

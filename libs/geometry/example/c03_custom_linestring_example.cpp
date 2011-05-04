@@ -1,7 +1,9 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
-//
-// Copyright Barend Gehrels 2007-2009, Geodan, Amsterdam, the Netherlands
-// Copyright Bruno Lalande 2008, 2009
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2011 Bruno Lalande, Paris, France.
+// Copyright (c) 2009-2011 Mateusz Loskot, London, UK.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -14,7 +16,6 @@
 
 #include <boost/geometry/geometry.hpp>
 #include <boost/geometry/geometries/register/point.hpp>
-#include <boost/geometry/geometries/register/linestring.hpp>
 
 // To register the 'geographic' distance function to calculate distance over the earth:
 #include <boost/geometry/extensions/gis/geographic/strategies/andoyer.hpp>
@@ -59,7 +60,9 @@ BOOST_GEOMETRY_REGISTER_POINT_2D(gps_point, double, cs::geographic<degree>, long
 
 
 // Register the track as well, as being a "linestring"
-BOOST_GEOMETRY_REGISTER_LINESTRING(gps_track)
+namespace boost { namespace geometry { namespace traits {
+template <> struct tag<gps_track> { typedef ring_tag type; };
+}}}
 
 
 int main()

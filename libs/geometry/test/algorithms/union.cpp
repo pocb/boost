@@ -1,7 +1,13 @@
-// Boost.Geometry (aka GGL, Generic Geometry Library) test file
-//
-// Copyright Barend Gehrels 2007-2009, Geodan, Amsterdam, the Netherlands
-// Copyright Bruno Lalande 2008, 2009
+// Boost.Geometry (aka GGL, Generic Geometry Library)
+// Unit Test
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2011 Bruno Lalande, Paris, France.
+// Copyright (c) 2009-2011 Mateusz Loskot, London, UK.
+
+// Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
+// (geolib/GGL), copyright (c) 1995-2010 Geodan, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -47,7 +53,7 @@ void test_areal()
         simplex_normal[0], polygon_empty,
         1, 0, 4, 8.0);
     test_one<Polygon, Polygon, Polygon>("simplex_with_empty_2",
-        polygon_empty, simplex_normal[0], 
+        polygon_empty, simplex_normal[0],
         1, 0, 4, 8.0);
 
     test_one<Polygon, Polygon, Polygon>("star_ring", example_star, example_ring,
@@ -239,8 +245,8 @@ void test_areal()
             isovist1[0], isovist1[1],
             1,
             0,
-            tn == std::string("f") ? 71 
-                : tn == std::string("d") ? 72 
+            tn == std::string("f") ? 71
+                : tn == std::string("d") ? 72
                 : 73,
             313.36036462);
     }
@@ -305,12 +311,15 @@ void test_all()
 
 int test_main(int, char* [])
 {
-    test_all<bg::model::d2::point_xy<float> >();
     test_all<bg::model::d2::point_xy<double> >();
+
+#if ! defined(BOOST_GEOMETRY_TEST_ONLY_ONE_TYPE)
+    test_all<bg::model::d2::point_xy<float> >();
     //test_all<bg::model::d2::point_xy<long double> >();
 
 #if defined(HAVE_TTMATH)
     test_all<bg::model::d2::point_xy<ttmath_big> >();
+#endif
 #endif
 
     return 0;

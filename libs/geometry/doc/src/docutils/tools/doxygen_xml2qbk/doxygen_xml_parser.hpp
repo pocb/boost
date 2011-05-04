@@ -1,6 +1,6 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
 //
-// Copyright Barend Gehrels 2010, Geodan, Amsterdam, the Netherlands
+// Copyright (c) 2010-2011 Barend Gehrels, Amsterdam, the Netherlands.
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -430,9 +430,16 @@ static void parse(rapidxml::xml_node<>* node, configuration const& config, docum
             {
                 recurse = true;
             }
-            if (kind == "struct" || kind == "class")
+            else if (kind == "struct")
             {
                 recurse = true;
+                doc.cos.is_class = false;
+                parse_element(node->first_node(), config, "", doc.cos);
+            }
+            else if (kind == "class")
+            {
+                recurse = true;
+                doc.cos.is_class = true;
                 parse_element(node->first_node(), config, "", doc.cos);
             }
         }

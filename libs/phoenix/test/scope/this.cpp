@@ -1,9 +1,16 @@
+/*=============================================================================
+    Copyright (c) 2011 Thomas Heller
+    Distributed under the Boost Software License, Version 1.0. (See accompanying
+    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+==============================================================================*/
 
 #include <boost/phoenix/core.hpp>
 #include <boost/phoenix/scope/this.hpp>
 #include <boost/phoenix/statement.hpp>
 #include <boost/phoenix/operator.hpp>
 #include <boost/phoenix/scope.hpp>
+
+#include <iostream>
 
 template <typename T0>
 void f(T0 t)

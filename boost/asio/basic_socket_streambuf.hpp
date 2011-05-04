@@ -20,14 +20,10 @@
 #if !defined(BOOST_NO_IOSTREAM)
 
 #include <streambuf>
-#include <boost/array.hpp>
-#include <boost/preprocessor/arithmetic/inc.hpp>
-#include <boost/preprocessor/repetition/enum_binary_params.hpp>
-#include <boost/preprocessor/repetition/enum_params.hpp>
-#include <boost/preprocessor/repetition/repeat_from_to.hpp>
 #include <boost/utility/base_from_member.hpp>
 #include <boost/asio/basic_socket.hpp>
 #include <boost/asio/deadline_timer_service.hpp>
+#include <boost/asio/detail/array.hpp>
 #include <boost/asio/detail/throw_error.hpp>
 #include <boost/asio/io_service.hpp>
 #include <boost/asio/stream_socket_service.hpp>
@@ -37,9 +33,16 @@
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <boost/asio/detail/pop_options.hpp>
 
-#if !defined(BOOST_ASIO_SOCKET_STREAMBUF_MAX_ARITY)
-#define BOOST_ASIO_SOCKET_STREAMBUF_MAX_ARITY 5
-#endif // !defined(BOOST_ASIO_SOCKET_STREAMBUF_MAX_ARITY)
+#if !defined(BOOST_ASIO_HAS_VARIADIC_TEMPLATES)
+
+# include <boost/preprocessor/arithmetic/inc.hpp>
+# include <boost/preprocessor/repetition/enum_binary_params.hpp>
+# include <boost/preprocessor/repetition/enum_params.hpp>
+# include <boost/preprocessor/repetition/repeat_from_to.hpp>
+
+# if !defined(BOOST_ASIO_SOCKET_STREAMBUF_MAX_ARITY)
+#  define BOOST_ASIO_SOCKET_STREAMBUF_MAX_ARITY 5
+# endif // !defined(BOOST_ASIO_SOCKET_STREAMBUF_MAX_ARITY)
 
 // A macro that should expand to:
 //   template <typename T1, ..., typename Tn>
@@ -57,7 +60,7 @@
 //   }
 // This macro should only persist within this file.
 
-#define BOOST_ASIO_PRIVATE_CONNECT_DEF( z, n, data ) \
+# define BOOST_ASIO_PRIVATE_CONNECT_DEF( z, n, data ) \
   template <BOOST_PP_ENUM_PARAMS(n, typename T)> \
   basic_socket_streambuf<Protocol, StreamSocketService, \
     Time, TimeTraits, TimerService>* connect( \
@@ -72,6 +75,8 @@
     return !ec_ ? this : 0; \
   } \
   /**/
+
+#endif // !defined(BOOST_ASIO_HAS_VARIADIC_TEMPLATES)
 
 #include <boost/asio/detail/push_options.hpp>
 
@@ -145,8 +150,8 @@ public:
         endpoint, handler);
 
     ec_ = boost::asio::error::would_block;
-    this->service.get_io_service().reset();
-    do this->service.get_io_service().run_one();
+    this->get_service().get_io_service().reset();
+    do this->get_service().get_io_service().run_one();
     while (ec_ == boost::asio::error::would_block);
 
     return !ec_ ? this : 0;
@@ -165,6 +170,19 @@ public:
   template <typename T1, ..., typename TN>
   basic_socket_streambuf<Protocol, StreamSocketService>* connect(
       T1 t1, ..., TN tn);
+#elif defined(BOOST_ASIO_HAS_VARIADIC_TEMPLATES)
+  template <typename... T>
+  basic_socket_streambuf<Protocol, StreamSocketService,
+    Time, TimeTraits, TimerService>* connect(T... x)
+  {
+    init_buffers();
+    this->basic_socket<Protocol, StreamSocketService>::close(ec_);
+    typedef typename Protocol::resolver resolver_type;
+    typedef typename resolver_type::query resolver_query;
+    resolver_query query(x...);
+    resolve_and_connect(query);
+    return !ec_ ? this : 0;
+  }
 #else
   BOOST_PP_REPEAT_FROM_TO(
       1, BOOST_PP_INC(BOOST_ASIO_SOCKET_STREAMBUF_MAX_ARITY),
@@ -269,19 +287,19 @@ protected:
       }
 
       io_handler handler = { this };
-      this->service.async_receive(this->implementation,
+      this->get_service().async_receive(this->get_implementation(),
           boost::asio::buffer(boost::asio::buffer(get_buffer_) + putback_max),
           0, handler);
 
       ec_ = boost::asio::error::would_block;
-      this->service.get_io_service().reset();
-      do this->service.get_io_service().run_one();
+      this->get_service().get_io_service().reset();
+      do this->get_service().get_io_service().run_one();
       while (ec_ == boost::asio::error::would_block);
       if (ec_)
         return traits_type::eof();
 
-      setg(get_buffer_.begin(), get_buffer_.begin() + putback_max,
-          get_buffer_.begin() + putback_max + bytes_transferred_);
+      setg(&get_buffer_[0], &get_buffer_[0] + putback_max,
+          &get_buffer_[0] + putback_max + bytes_transferred_);
       return traits_type::to_int_type(*gptr());
     }
     else
@@ -310,12 +328,12 @@ protected:
         // Send the single character immediately.
         char_type ch = traits_type::to_char_type(c);
         io_handler handler = { this };
-        this->service.async_send(this->implementation,
+        this->get_service().async_send(this->get_implementation(),
             boost::asio::buffer(&ch, sizeof(char_type)), 0, handler);
 
         ec_ = boost::asio::error::would_block;
-        this->service.get_io_service().reset();
-        do this->service.get_io_service().run_one();
+        this->get_service().get_io_service().reset();
+        do this->get_service().get_io_service().run_one();
         while (ec_ == boost::asio::error::would_block);
         if (ec_)
           return traits_type::eof();
@@ -337,19 +355,19 @@ protected:
         }
 
         io_handler handler = { this };
-        this->service.async_send(this->implementation,
+        this->get_service().async_send(this->get_implementation(),
             boost::asio::buffer(buffer), 0, handler);
 
         ec_ = boost::asio::error::would_block;
-        this->service.get_io_service().reset();
-        do this->service.get_io_service().run_one();
+        this->get_service().get_io_service().reset();
+        do this->get_service().get_io_service().run_one();
         while (ec_ == boost::asio::error::would_block);
         if (ec_)
           return traits_type::eof();
 
         buffer = buffer + bytes_transferred_;
       }
-      setp(put_buffer_.begin(), put_buffer_.end());
+      setp(&put_buffer_[0], &put_buffer_[0] + put_buffer_.size());
 
       // If the new character is eof then our work here is done.
       if (traits_type::eq_int_type(c, traits_type::eof()))
@@ -392,13 +410,13 @@ protected:
 private:
   void init_buffers()
   {
-    setg(get_buffer_.begin(),
-        get_buffer_.begin() + putback_max,
-        get_buffer_.begin() + putback_max);
+    setg(&get_buffer_[0],
+        &get_buffer_[0] + putback_max,
+        &get_buffer_[0] + putback_max);
     if (unbuffered_)
       setp(0, 0);
     else
-      setp(put_buffer_.begin(), put_buffer_.end());
+      setp(&put_buffer_[0], &put_buffer_[0] + put_buffer_.size());
   }
 
   template <typename ResolverQuery>
@@ -428,8 +446,8 @@ private:
             *i, handler);
 
         ec_ = boost::asio::error::would_block;
-        this->service.get_io_service().reset();
-        do this->service.get_io_service().run_one();
+        this->get_service().get_io_service().reset();
+        do this->get_service().get_io_service().run_one();
         while (ec_ == boost::asio::error::would_block);
 
         ++i;
@@ -506,8 +524,8 @@ private:
 
   enum { putback_max = 8 };
   enum { buffer_size = 512 };
-  boost::array<char, buffer_size> get_buffer_;
-  boost::array<char, buffer_size> put_buffer_;
+  boost::asio::detail::array<char, buffer_size> get_buffer_;
+  boost::asio::detail::array<char, buffer_size> put_buffer_;
   bool unbuffered_;
   boost::system::error_code ec_;
   std::size_t bytes_transferred_;
@@ -521,7 +539,9 @@ private:
 
 #include <boost/asio/detail/pop_options.hpp>
 
-#undef BOOST_ASIO_PRIVATE_CONNECT_DEF
+#if !defined(BOOST_ASIO_HAS_VARIADIC_TEMPLATES)
+# undef BOOST_ASIO_PRIVATE_CONNECT_DEF
+#endif // !defined(BOOST_ASIO_HAS_VARIADIC_TEMPLATES)
 
 #endif // !defined(BOOST_NO_IOSTREAM)
 

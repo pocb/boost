@@ -1,6 +1,7 @@
-// Boost.Geometry (aka GGL, Generic Geometry Library) test file
-//
-// Copyright Barend Gehrels 2007-2009, Geodan, Amsterdam, the Netherlands
+// Boost.Geometry (aka GGL, Generic Geometry Library) 
+// Unit Test
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -41,7 +42,7 @@ void test_convex_hull(Geometry const& geometry, Hull const& hull,
 
     BOOST_CHECK(bg::num_points(geometry) == size_original);
 
-    typename bg::area_result<Geometry>::type ah = bg::area(hull);
+    typename bg::default_area_result<Geometry>::type ah = bg::area(hull);
     if (reverse)
     {
         ah = -ah;
@@ -68,7 +69,7 @@ void test_geometry_order(std::string const& wkt,
         > hull;
 
     // Test version with output iterator
-    bg::convex_hull_inserter(geometry, std::back_inserter(hull.outer()));
+    bg::detail::convex_hull::convex_hull_insert(geometry, std::back_inserter(hull.outer()));
     test_convex_hull(geometry, hull,
         size_original, size_hull, expected_area, ! Clockwise);
 
@@ -94,7 +95,7 @@ void test_geometry_order(std::string const& wkt,
 
     // Test version with output iterator and strategy
     bg::clear(hull);
-    bg::convex_hull_inserter(geometry, std::back_inserter(hull.outer()), graham);
+    bg::detail::convex_hull::convex_hull_insert(geometry, std::back_inserter(hull.outer()), graham);
     test_convex_hull(geometry, hull, size_original, size_hull, expected_area, ! Clockwise);
 }
 

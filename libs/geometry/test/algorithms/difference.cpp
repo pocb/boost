@@ -1,6 +1,8 @@
-// Boost.Geometry (aka GGL, Generic Geometry Library) test file
-//
-// Copyright Barend Gehrels 2010, Geodan, Amsterdam, the Netherlands
+// Boost.Geometry (aka GGL, Generic Geometry Library)
+// Unit Test
+
+// Copyright (c) 2010-2011 Barend Gehrels, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -16,9 +18,13 @@
 
 #include <boost/geometry/algorithms/correct.hpp>
 #include <boost/geometry/algorithms/perimeter.hpp>
+
 #include <boost/geometry/multi/algorithms/correct.hpp>
-#include <boost/geometry/extensions/gis/io/wkb/read_wkb.hpp>
-#include <boost/geometry/extensions/gis/io/wkb/utility.hpp>
+#include <boost/geometry/multi/algorithms/intersection.hpp>
+#include <boost/geometry/multi/algorithms/within.hpp>
+
+//#include <boost/geometry/extensions/gis/io/wkb/read_wkb.hpp>
+//#include <boost/geometry/extensions/gis/io/wkb/utility.hpp>
 
 #include <algorithms/test_difference.hpp>
 #include <algorithms/test_overlay.hpp>
@@ -38,7 +44,7 @@ void test_all()
     typedef bg::model::polygon<P> polygon;
     typedef bg::model::ring<P> ring;
 
-    bool const is_float = 
+    bool const is_float =
         boost::is_same<typename bg::coordinate_type<P>::type, float>::value;
 
     test_one<polygon, polygon, polygon>("simplex_normal",
@@ -211,17 +217,17 @@ void test_all()
                 5, 22, 1.1901714, 5, 27, 1.6701714);
 
         test_one<polygon, ring, polygon>(
-                "ring_star_ring", example_ring, example_star, 
+                "ring_star_ring", example_ring, example_star,
                 5, 22, 1.6701714, 5, 27, 1.1901714);
 
         static std::string const clip = "POLYGON((2.5 0.5,5.5 2.5))";
 
-        test_one<polygon, box, ring>("star_box", 
+        test_one<polygon, box, ring>("star_box",
             clip, example_star,
             4, 11, 2.833333, 4, 11, 0.833333);
 
-        test_one<polygon, ring, box>("box_star", 
-            example_star, clip, 
+        test_one<polygon, ring, box>("box_star",
+            example_star, clip,
             4, 11, 0.833333, 4, 11, 2.833333);
     }
 
@@ -247,16 +253,16 @@ void test_all()
 
         static std::string const clip = "POLYGON((2 2,4 4))";
 
-        test_one<polygon, box, mp>("simplex_multi_box_mp", 
+        test_one<polygon, box, mp>("simplex_multi_box_mp",
             clip, case_multi_simplex[0],
             3, 11, 4.53333, 3, 11, 8.53333);
-        test_one<polygon, mp, box>("simplex_multi_mp_box", 
-            case_multi_simplex[0], clip, 
+        test_one<polygon, mp, box>("simplex_multi_mp_box",
+            case_multi_simplex[0], clip,
             3, 11, 8.53333, 3, 11, 4.53333);
     }
 
     /***
-    Experimental (cut), does not work: 
+    Experimental (cut), does not work:
     test_one<polygon, polygon, polygon>(
             "polygon_pseudo_line",
             "POLYGON((0 0,0 4,4 4,4 0,0 0))",
@@ -266,7 +272,8 @@ void test_all()
     ***/
 }
 
-
+/*******
+// To be moved to another file
 template <typename T>
 void test_difference_parcel_precision()
 {
@@ -334,40 +341,22 @@ void test_difference_parcel_precision()
     }
 #endif
 }
-
-
-#include <boost/range/algorithm/reverse.hpp>
-
-
-template <typename P>
-void test_copy()
-{
-    std::vector<P> first;
-    first.push_back(P(1,1));
-    first.push_back(P(2,2));
-
-    std::vector<P> second;
-    boost::copy(first, std::back_inserter(second));
-    boost::reverse(second);
-
-    std::vector<P> third, fourth;
-    boost::copy(second, boost::copy(first, std::back_inserter(third)));
-
-}
+*****/
 
 int test_main(int, char* [])
 {
-    //test_copy<bg::model::d2::point_xy<double> >();
-
     //test_difference_parcel_precision<float>();
     //test_difference_parcel_precision<double>();
 
-    test_all<bg::model::d2::point_xy<float> >();
     test_all<bg::model::d2::point_xy<double> >();
+
+#if ! defined(BOOST_GEOMETRY_TEST_ONLY_ONE_TYPE)
+    test_all<bg::model::d2::point_xy<float> >();
 
 #ifdef HAVE_TTMATH
     test_all<bg::model::d2::point_xy<ttmath_big> >();
     //test_difference_parcel_precision<ttmath_big>();
+#endif
 #endif
 
     return 0;

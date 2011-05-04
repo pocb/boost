@@ -1,6 +1,7 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
-//
-// Copyright Barend Gehrels 2009, Geodan, Amsterdam, the Netherlands.
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -9,7 +10,7 @@
 #define BOOST_GEOMETRY_ALGORITHMS_DETAIL_OVERLAY_ENRICHMENT_INFO_HPP
 
 
-#include <boost/geometry/strategies/distance_result.hpp>
+#include <boost/geometry/strategies/default_distance_result.hpp>
 
 
 namespace boost { namespace geometry
@@ -30,7 +31,7 @@ namespace detail { namespace overlay
 template<typename P>
 struct enrichment_info
 {
-    typedef typename distance_result<P, P>::type distance_type;
+    typedef typename default_distance_result<P, P>::type distance_type;
 
     inline enrichment_info()
         : travels_to_vertex_index(-1)

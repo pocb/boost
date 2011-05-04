@@ -96,6 +96,23 @@ public:
     service_impl_.construct(impl);
   }
 
+#if defined(BOOST_ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
+  /// Move-construct a new socket acceptor implementation.
+  void move_construct(implementation_type& impl,
+      implementation_type& other_impl)
+  {
+    service_impl_.move_construct(impl, other_impl);
+  }
+
+  /// Move-assign from another socket acceptor implementation.
+  void move_assign(implementation_type& impl,
+      socket_acceptor_service& other_service,
+      implementation_type& other_impl)
+  {
+    service_impl_.move_assign(impl, other_service.service_impl_, other_impl);
+  }
+#endif // defined(BOOST_ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
+
   /// Destroy a socket acceptor implementation.
   void destroy(implementation_type& impl)
   {
@@ -234,9 +251,11 @@ public:
   template <typename SocketService, typename AcceptHandler>
   void async_accept(implementation_type& impl,
       basic_socket<protocol_type, SocketService>& peer,
-      endpoint_type* peer_endpoint, AcceptHandler handler)
+      endpoint_type* peer_endpoint,
+      BOOST_ASIO_MOVE_ARG(AcceptHandler) handler)
   {
-    service_impl_.async_accept(impl, peer, peer_endpoint, handler);
+    service_impl_.async_accept(impl, peer, peer_endpoint,
+        BOOST_ASIO_MOVE_CAST(AcceptHandler)(handler));
   }
 
 private:

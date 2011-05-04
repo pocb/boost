@@ -57,7 +57,7 @@ namespace boost { namespace phoenix
             }
         };
 
-        struct test;
+        struct function_equal_otherwise;
 
         struct function_equal_
             : proto::when<
@@ -68,17 +68,19 @@ namespace boost { namespace phoenix
                             proto::terminal<proto::_>
                           , compare(
                                 proto::_value
-                              , proto::_value(proto::_state)
+                              , proto::call<
+                                    proto::_value(proto::_state)
+                                >
                             )
                         >
-                      , proto::otherwise<test(proto::_, proto::_state)>
+                      , proto::otherwise<function_equal_otherwise(proto::_, proto::_state)>
                     >
-                  , test()
+                  , proto::call<function_equal_otherwise()>
                 >
             >
         {};
 
-        struct test
+        struct function_equal_otherwise
             : proto::callable
         {
             typedef bool result_type;

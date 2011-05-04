@@ -1,7 +1,13 @@
-// Boost.Geometry (aka GGL, Generic Geometry Library) test file
-//
-// Copyright Barend Gehrels 2007-2009, Geodan, Amsterdam, the Netherlands
-// Copyright Bruno Lalande 2008, 2009
+// Boost.Geometry (aka GGL, Generic Geometry Library)
+// Unit Test
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2011 Bruno Lalande, Paris, France.
+// Copyright (c) 2009-2011 Mateusz Loskot, London, UK.
+
+// Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
+// (geolib/GGL), copyright (c) 1995-2010 Geodan, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -18,10 +24,11 @@
 #include <boost/geometry/algorithms/transform.hpp>
 
 #include <boost/geometry/geometries/point.hpp>
-#include <boost/geometry/geometries/adapted/c_array_cartesian.hpp>
-#include <boost/geometry/geometries/adapted/tuple_cartesian.hpp>
+#include <boost/geometry/geometries/adapted/c_array.hpp>
+#include <boost/geometry/geometries/adapted/boost_tuple.hpp>
 
-
+BOOST_GEOMETRY_REGISTER_C_ARRAY_CS(cs::cartesian)
+BOOST_GEOMETRY_REGISTER_BOOST_TUPLE_CS(cs::cartesian)
 
 
 template <typename P, typename T>
@@ -40,7 +47,7 @@ template <typename P>
 void test_all()
 {
     P p;
-    bg::assign(p, 1, 1);
+    bg::assign_values(p, 1, 1);
 
     {
         bg::strategy::transform::translate_transformer<P, P> trans(1, 1);

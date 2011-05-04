@@ -1854,13 +1854,29 @@
             <toolset name="borland-cb2009"/>
             <toolset name="borland-cb2010"/>
             <toolset name="sun-5.10"/>
-            <toolset name="pathscale-3.2"/>
-            <toolset name="pgi-10.1"/>
             <toolset name="vacpp"/>
             <toolset name="vacpp-10.1"/>
             <toolset name="msvc-7.1"/>
             <note author="Barend Gehrels">
                 These compilers do not support features that are essential for the library.
+            </note>
+        </mark-unusable>
+        <mark-unusable>
+            <toolset name="intel-darwin-11.1"/>
+            <note author="Barend Gehrels">
+                Intel 11.1 on Darwin raises a SIGSEGV in almost all unit tests.
+            </note>
+        </mark-unusable>
+        <mark-unusable>
+            <toolset name="pgi-11.2"/>
+            <note author="Barend Gehrels">
+                pgi 11.1 does not support BOOST_AUTO and is not configured for UBLAS
+            </note>
+        </mark-unusable>
+        <mark-unusable>
+            <toolset name="msvc-9.0~wm5~stlport5.2"/>
+            <note author="Barend Gehrels">
+                This configruation is not well configured for UBLAS
             </note>
         </mark-unusable>
     </library>
@@ -1908,55 +1924,11 @@
 			</note>
 		</mark-unusable>
 		<mark-expected-failures>
-			<test name="fastest_icl_map"/>
-			<test name="fastest_interval_map"/>
-			<test name="fastest_interval_map_infix"/>
-			<test name="fastest_interval_set"/>
-			<test name="fastest_interval_set_infix"/>
-			<test name="fastest_partial_icl_quantifier"/>
-			<test name="fastest_partial_interval_quantifier"/>
-			<test name="fastest_separate_interval_set"/>
-			<test name="fastest_separate_interval_set_infix"/>
-			<test name="fastest_set_icl_set"/>
-			<test name="fastest_set_interval_set"/>
-			<test name="fastest_split_interval_map"/>
-			<test name="fastest_split_interval_map_infix"/>
-			<test name="fastest_split_interval_set"/>
-			<test name="fastest_split_interval_set_infix"/>
-			<test name="fastest_total_icl_quantifier"/>
-			<test name="fastest_total_interval_quantifier"/>
-			<test name="fix_icl_after_thread"/>
-			<toolset name="clang-darwin-2.0"/>
-			<toolset name="clang-darwin-4.2.1"/>
-			<toolset name="clang-darwin-normal"/>
-			<toolset name="clang-darwin-*"/>
-			<toolset name="clang-linux-2.8"/>
-			<toolset name="clang-linux-4.2.1"/>
-			<note author="Joachim Faulhaber">
-				The clang compiler seems to have problems with passing template template parameters	in 
-				some combinations with test function templates. This is done in the tests in order to be
-				able to vary more than one template parameter in the tests. Because this is a feature
-				of the tests, failure does not necessarily mean, that icl can not be used with clang. 
-				The tests most likely fail for a property that relates to the test environment rather
-				than to library code itself.
-			</note>
-		</mark-expected-failures>
-		<mark-expected-failures>
-			<test name="cmp_clang_ttp_passing"/>
-			<test name="cmp_clang_ttp_passing2"/>
-			<toolset name="clang-darwin-*"/>
-			<toolset name="clang-linux-4.2.1"/>
-			<note author="Joachim Faulhaber">
-				Compiler error expected for clang: Minimal examples for passing combinations 
-				of template template parameters that derail clang.
-			</note>
-		</mark-expected-failures>
-		<mark-expected-failures>
 			<test name="cmp_msvc_value_born_error"/>
 			<toolset name="msvc-7.1"/>
 			<toolset name="msvc-8.0"/>
 			<toolset name="msvc-9.0*"/>
-			<toolset name="msvc-10.0"/>
+			<toolset name="msvc-10.0*"/>
 			<note author="Joachim Faulhaber">
 				Compiler error expected for msvc: A minimal example of a class template 'value' that
 				results in syntax error in a subsequent meta function.
@@ -2339,6 +2311,25 @@
       </test>
     </library>
 
+    <!-- move-->
+    <library name="move">
+        <mark-unusable>
+            <toolset name="borland-5.*"/>
+            <toolset name="msvc-6.5*"/>
+            <toolset name="cw-9.*"/>
+            <toolset name="gcc-2.95*"/>
+            <toolset name="gcc-3.0*"/>
+            <toolset name="gcc-3.1*"/>
+            <toolset name="gcc-3.2*"/>
+            <toolset name="gcc-3.3*"/>
+            <toolset name="mipspro"/>
+            <toolset name="pathscale*"/>
+            <toolset name="intel-linux-8.*"/>
+            <note author="Ion Gazta&#241;aga">
+                The compiler does not support features that are essential for the library.
+            </note>
+        </mark-unusable>
+    </library>
 
     <!-- MPL -->
     <library name="mpl">
@@ -2692,6 +2683,30 @@ for more information.
             <note author="Fernando Cacciola" refid="optional-compiler-bug"/>
         </mark-expected-failures>
     </library>
+    
+    <!-- phoenix -->
+    <library name="phoenix">
+      <mark-unusable>
+        <toolset name="sun-5.7"/>
+        <toolset name="sun-5.8"/>
+        <toolset name="sun-5.9"/>
+        <toolset name="sun-5.10"/>
+        <toolset name="borland-*"/>
+        <toolset name="vacpp*"/>
+        <note author="Thomas Heller" id="phoenix-incompatible-compilers">
+            These compilers don't work with phoenix.
+            This is due to the fact that phoenix uses proto
+        </note>
+        </mark-unusable>
+        <mark-expected-failures>
+            <test name="member"/>
+            <toolset name="msvc*"/>
+            <note author="Thomas Heller" id="phoenix-operator-member-bug">
+                MSVC seems to have a code generation bug showing up when using operator->* with a member variable
+            </note>
+        </mark-expected-failures>
+    </library>
+
 
     <library name="pool">
       <mark-unusable>
@@ -2970,8 +2985,12 @@ for more information.
     <!-- spirit (v2) -->
     <library name="spirit">
       <mark-unusable>
-        <toolset name="borland-cb2009"/>
-        <toolset name="borland-cb2010"/>
+	<toolset name="sun-5.7"/>
+	<toolset name="sun-5.8"/>
+        <toolset name="sun-5.9"/>
+        <toolset name="sun-5.10"/>
+	<toolset name="vacpp*"/>
+	<toolset name="borland-*"/>
       </mark-unusable>
     </library>
 

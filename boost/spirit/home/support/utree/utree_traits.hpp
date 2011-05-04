@@ -38,11 +38,6 @@ namespace boost
     }
 }
 
-namespace boost { namespace spirit { namespace qi
-{
-    template <typename Subject> struct kleene;
-}}}
-
 ///////////////////////////////////////////////////////////////////////////////
 namespace boost { namespace spirit { namespace traits
 {
@@ -586,12 +581,38 @@ namespace boost { namespace spirit { namespace traits
     // or a grammar exposes an utree as it's attribute
     namespace detail
     {
-        // checks if the attr is the explicit utree list type, utree::list_type
-        template <typename Attribute>
-        struct attribute_is_not_utree_list
+        // Checks whether the exposed Attribute allows to handle utree or 
+        // utree::list_type directly. Returning mpl::false_ from this meta 
+        // function will force a new utree instance to be created for each
+        // invocation of the embedded parser.
+
+        // The purpose of using utree::list_type as an attribute is to force a 
+        // new sub-node in the result.
+        template <typename Attribute, typename Enable = void>
+        struct handles_utree_list_container 
           : mpl::and_<
                 mpl::not_<is_same<utree::list_type, Attribute> >,
                 traits::is_container<Attribute> >
+        {};
+
+        // The following specializations make sure that the actual handling of
+        // an utree (or utree::list_type) attribute is deferred to the embedded
+        // parsers of a sequence, alternative or optional component.
+        template <typename Attribute>
+        struct handles_utree_list_container<Attribute
+              , typename enable_if<fusion::traits::is_sequence<Attribute> >::type>
+          : mpl::true_
+        {};
+
+        template <typename Attribute>
+        struct handles_utree_list_container<boost::optional<Attribute> >
+          : mpl::true_
+        {};
+
+        template <BOOST_VARIANT_ENUM_PARAMS(typename T)>
+        struct handles_utree_list_container<
+                boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)> >
+          : mpl::true_
         {};
     }
 
@@ -599,8 +620,8 @@ namespace boost { namespace spirit { namespace traits
         typename IteratorA, typename IteratorB, typename Context
       , typename T1, typename T2, typename T3, typename T4>
     struct handles_container<qi::rule<IteratorA, T1, T2, T3, T4>
-      , utree, Context, IteratorB>
-      : detail::attribute_is_not_utree_list<typename attribute_of<
+          , utree, Context, IteratorB>
+      : detail::handles_utree_list_container<typename attribute_of<
             qi::rule<IteratorA, T1, T2, T3, T4>, Context, IteratorB
         >::type>
     {};
@@ -609,8 +630,8 @@ namespace boost { namespace spirit { namespace traits
         typename IteratorA, typename IteratorB, typename Context
       , typename T1, typename T2, typename T3, typename T4>
     struct handles_container<qi::grammar<IteratorA, T1, T2, T3, T4>
-      , utree, Context, IteratorB>
-      : detail::attribute_is_not_utree_list<typename attribute_of<
+          , utree, Context, IteratorB>
+      : detail::handles_utree_list_container<typename attribute_of<
             qi::grammar<IteratorA, T1, T2, T3, T4>, Context, IteratorB
         >::type>
     {};
@@ -619,8 +640,8 @@ namespace boost { namespace spirit { namespace traits
         typename IteratorA, typename IteratorB, typename Context
       , typename T1, typename T2, typename T3, typename T4>
     struct handles_container<qi::rule<IteratorA, T1, T2, T3, T4>
-      , utree::list_type, Context, IteratorB>
-      : detail::attribute_is_not_utree_list<typename attribute_of<
+          , utree::list_type, Context, IteratorB>
+      : detail::handles_utree_list_container<typename attribute_of<
             qi::rule<IteratorA, T1, T2, T3, T4>, Context, IteratorB
         >::type>
     {};
@@ -629,21 +650,60 @@ namespace boost { namespace spirit { namespace traits
         typename IteratorA, typename IteratorB, typename Context
       , typename T1, typename T2, typename T3, typename T4>
     struct handles_container<qi::grammar<IteratorA, T1, T2, T3, T4>
-      , utree::list_type, Context, IteratorB>
-      : detail::attribute_is_not_utree_list<typename attribute_of<
+          , utree::list_type, Context, IteratorB>
+      : detail::handles_utree_list_container<typename attribute_of<
             qi::grammar<IteratorA, T1, T2, T3, T4>, Context, IteratorB
         >::type>
     {};
 
     ///////////////////////////////////////////////////////////////////////////
+    template <typename Attribute, typename Sequence>
+    struct pass_through_container<
+            utree, utree, Attribute, Sequence, qi::domain>
+      : detail::handles_utree_list_container<Attribute>
+    {};
+
+    template <typename Attribute, typename Sequence>
+    struct pass_through_container<
+            utree::list_type, utree, Attribute, Sequence, qi::domain>
+      : detail::handles_utree_list_container<Attribute>
+    {};
+
+    ///////////////////////////////////////////////////////////////////////////
     namespace detail
     {
-        // checks if the attr is utree
-        template <typename Attribute>
-        struct attribute_is_not_utree
+        // Checks whether the exposed Attribute allows to handle utree or 
+        // utree::list_type directly. Returning mpl::false_ from this meta 
+        // function will force a new utree instance to be created for each
+        // invocation of the embedded parser.
+
+        // The purpose of using utree::list_type as an attribute is to force a 
+        // new sub-node in the result.
+        template <typename Attribute, typename Enable = void>
+        struct handles_utree_container 
           : mpl::and_<
                 mpl::not_<is_same<utree, Attribute> >,
                 traits::is_container<Attribute> >
+        {};
+
+        // The following specializations make sure that the actual handling of
+        // an utree (or utree::list_type) attribute is deferred to the embedded
+        // parsers of a sequence, alternative or optional component.
+        template <typename Attribute>
+        struct handles_utree_container<Attribute
+              , typename enable_if<fusion::traits::is_sequence<Attribute> >::type>
+          : mpl::true_
+        {};
+
+        template <typename Attribute>
+        struct handles_utree_container<boost::optional<Attribute> >
+          : mpl::true_
+        {};
+
+        template <BOOST_VARIANT_ENUM_PARAMS(typename T)>
+        struct handles_utree_container<
+                boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)> >
+          : mpl::true_
         {};
     }
 
@@ -651,8 +711,8 @@ namespace boost { namespace spirit { namespace traits
         typename IteratorA, typename IteratorB, typename Context
       , typename T1, typename T2, typename T3, typename T4>
     struct handles_container<karma::rule<IteratorA, T1, T2, T3, T4>
-      , utree, Context, IteratorB>
-      : detail::attribute_is_not_utree<typename attribute_of<
+          , utree, Context, IteratorB>
+      : detail::handles_utree_container<typename attribute_of<
             karma::rule<IteratorA, T1, T2, T3, T4>, Context, IteratorB
         >::type>
     {};
@@ -661,10 +721,17 @@ namespace boost { namespace spirit { namespace traits
         typename IteratorA, typename IteratorB, typename Context
       , typename T1, typename T2, typename T3, typename T4>
     struct handles_container<karma::grammar<IteratorA, T1, T2, T3, T4>
-      , utree, Context, IteratorB>
-      : detail::attribute_is_not_utree<typename attribute_of<
+          , utree, Context, IteratorB>
+      : detail::handles_utree_container<typename attribute_of<
             karma::grammar<IteratorA, T1, T2, T3, T4>, Context, IteratorB
         >::type>
+    {};
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Attribute, typename Sequence>
+    struct pass_through_container<
+            utree, utree, Attribute, Sequence, karma::domain>
+      : detail::handles_utree_container<Attribute>
     {};
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1087,7 +1154,7 @@ namespace boost { namespace spirit { namespace traits
     {
         typedef utree::nil_type type;
 
-        static type pre(utree const& t)
+        static type pre(utree const&)
         {
             return nil;
         }
@@ -1198,28 +1265,6 @@ namespace boost { namespace spirit { namespace traits
     struct transform_attribute<utree::list_type const, Attribute, karma::domain>
       : transform_attribute<utree const, Attribute, karma::domain>
     {};
-
-#if 0
-    // If a rule takes an utree attribute and that utree instance holds nothing
-    // more than a list, we dereference this to simplify attribute handling 
-    // down the stream, i.e. ( ( 1 2 3 ) ) --> ( 1 2 3 ).
-    template <>
-    struct transform_attribute<utree const, utree, karma::domain>
-    {
-        typedef utree const& type;
-        static utree const& pre(utree const& val) 
-        { 
-            if (detail::is_list(val) && 1 == val.size())
-                return val.front();
-            return val; 
-        }
-    };
-
-    template <>
-    struct transform_attribute<utree const&, utree, karma::domain>
-      : transform_attribute<utree const, utree, karma::domain>
-    {};
-#endif
 }}}
 
 #endif

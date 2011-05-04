@@ -98,6 +98,23 @@ public:
     service_impl_.construct(impl);
   }
 
+#if defined(BOOST_ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
+  /// Move-construct a new sequenced packet socket implementation.
+  void move_construct(implementation_type& impl,
+      implementation_type& other_impl)
+  {
+    service_impl_.move_construct(impl, other_impl);
+  }
+
+  /// Move-assign from another sequenced packet socket implementation.
+  void move_assign(implementation_type& impl,
+      seq_packet_socket_service& other_service,
+      implementation_type& other_impl)
+  {
+    service_impl_.move_assign(impl, other_service.service_impl_, other_impl);
+  }
+#endif // defined(BOOST_ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
+
   /// Destroy a sequenced packet socket implementation.
   void destroy(implementation_type& impl)
   {
@@ -186,9 +203,11 @@ public:
   /// Start an asynchronous connect.
   template <typename ConnectHandler>
   void async_connect(implementation_type& impl,
-      const endpoint_type& peer_endpoint, ConnectHandler handler)
+      const endpoint_type& peer_endpoint,
+      BOOST_ASIO_MOVE_ARG(ConnectHandler) handler)
   {
-    service_impl_.async_connect(impl, peer_endpoint, handler);
+    service_impl_.async_connect(impl, peer_endpoint,
+        BOOST_ASIO_MOVE_CAST(ConnectHandler)(handler));
   }
 
   /// Set a socket option.
@@ -275,9 +294,11 @@ public:
   template <typename ConstBufferSequence, typename WriteHandler>
   void async_send(implementation_type& impl,
       const ConstBufferSequence& buffers,
-      socket_base::message_flags flags, WriteHandler handler)
+      socket_base::message_flags flags,
+      BOOST_ASIO_MOVE_ARG(WriteHandler) handler)
   {
-    service_impl_.async_send(impl, buffers, flags, handler);
+    service_impl_.async_send(impl, buffers, flags,
+        BOOST_ASIO_MOVE_CAST(WriteHandler)(handler));
   }
 
   /// Receive some data from the peer.
@@ -294,10 +315,11 @@ public:
   template <typename MutableBufferSequence, typename ReadHandler>
   void async_receive(implementation_type& impl,
       const MutableBufferSequence& buffers, socket_base::message_flags in_flags,
-      socket_base::message_flags& out_flags, ReadHandler handler)
+      socket_base::message_flags& out_flags,
+      BOOST_ASIO_MOVE_ARG(ReadHandler) handler)
   {
-    service_impl_.async_receive_with_flags(impl,
-        buffers, in_flags, out_flags, handler);
+    service_impl_.async_receive_with_flags(impl, buffers, in_flags,
+        out_flags, BOOST_ASIO_MOVE_CAST(ReadHandler)(handler));
   }
 
 private:

@@ -1,6 +1,12 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
-//
-// Copyright Barend Gehrels 2010, Geodan, Amsterdam, the Netherlands.
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2011 Bruno Lalande, Paris, France.
+// Copyright (c) 2009-2011 Mateusz Loskot, London, UK.
+
+// Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
+// (geolib/GGL), copyright (c) 1995-2010 Geodan, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -51,8 +57,6 @@ struct collected_vector
     T x, y;
     T dx, dy;
     T dx_0, dy_0;
-
-    bool collinear;
 
     bool operator<(collected_vector<T> const& other) const
     {
@@ -158,7 +162,7 @@ struct box_collect_vectors
     {
         typename point_type<Box>::type lower_left, lower_right,
                 upper_left, upper_right;
-        assign_box_corners(box, lower_left, lower_right,
+        geometry::detail::assign_box_corners(box, lower_left, lower_right,
                 upper_left, upper_right);
 
         typedef typename boost::range_value<Collection>::type item;
@@ -183,7 +187,7 @@ struct polygon_collect_vectors
 
         typename interior_return_type<Polygon const>::type rings
                     = interior_rings(polygon);
-        for (BOOST_AUTO(it, boost::begin(rings)); it != boost::end(rings); ++it)
+        for (BOOST_AUTO_TPL(it, boost::begin(rings)); it != boost::end(rings); ++it)
         {
             per_range::apply(collection, *it);
         }

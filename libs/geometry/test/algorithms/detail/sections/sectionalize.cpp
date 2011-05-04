@@ -1,7 +1,13 @@
-// Boost.Geometry (aka GGL, Generic Geometry Library) test file
-//
-// Copyright Barend Gehrels 2007-2010, Geodan, Amsterdam, the Netherlands
-// Copyright Bruno Lalande 2008, 2009
+// Boost.Geometry (aka GGL, Generic Geometry Library)
+// Unit Test
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2011 Bruno Lalande, Paris, France.
+// Copyright (c) 2009-2011 Mateusz Loskot, London, UK.
+
+// Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
+// (geolib/GGL), copyright (c) 1995-2010 Geodan, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -21,7 +27,6 @@
 
 #include <test_common/test_point.hpp>
 
-#define TEST_WITH_SVG
 #if defined(TEST_WITH_SVG)
 #  include <boost/geometry/extensions/io/svg/svg_mapper.hpp>
 #  include <boost/geometry/algorithms/buffer.hpp>
@@ -51,13 +56,14 @@ void test_sectionalize_part()
     Geometry geometry;
     geometry.push_back(bg::make<point_type>(1, 1));
 
+    bg::ring_identifier ring_id;
     int index = 0;
     int ndi = 0;
-    sectionalize_part::apply(sections, section, index, ndi, geometry);
+    sectionalize_part::apply(sections, section, index, ndi, geometry, ring_id);
     // There should not yet be anything generated, because it is only ONE point
 
     geometry.push_back(bg::make<point_type>(2, 2));
-    sectionalize_part::apply(sections, section, index, ndi, geometry);
+    sectionalize_part::apply(sections, section, index, ndi, geometry, ring_id);
 
 }
 

@@ -75,11 +75,13 @@ void kqueue_reactor::shutdown_service()
   }
 
   timer_queues_.get_all_timers(ops);
+
+  io_service_.abandon_operations(ops);
 }
 
-void kqueue_reactor::fork_service(boost::asio::io_service::fork_event event)
+void kqueue_reactor::fork_service(boost::asio::io_service::fork_event fork_ev)
 {
-  if (event == boost::asio::io_service::fork_child)
+  if (fork_ev == boost::asio::io_service::fork_child)
   {
     // The kqueue descriptor is automatically closed in the child.
     kqueue_fd_ = -1;
@@ -163,6 +165,14 @@ int kqueue_reactor::register_internal_descriptor(
   ::kevent(kqueue_fd_, &event, 1, 0, 0, 0);
 
   return 0;
+}
+
+void kqueue_reactor::move_descriptor(socket_type,
+    kqueue_reactor::per_descriptor_data& target_descriptor_data,
+    kqueue_reactor::per_descriptor_data& source_descriptor_data)
+{
+  target_descriptor_data = source_descriptor_data;
+  source_descriptor_data = 0;
 }
 
 void kqueue_reactor::start_op(int op_type, socket_type descriptor,

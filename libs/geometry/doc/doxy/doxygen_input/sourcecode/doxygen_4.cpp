@@ -2,8 +2,8 @@ OBSOLETE
 
 // Boost.Geometry (aka GGL, Generic Geometry Library)
 //
-// Copyright Barend Gehrels 2007-2009, Geodan, Amsterdam, the Netherlands
-// Copyright Bruno Lalande 2008, 2009
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2011 Bruno Lalande, Paris, France.
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -70,7 +70,7 @@ void read_wkt(std::string const& filename, std::vector<Tuple>& tuples, Box& box)
                 Tuple tuple(geometry, name);
 
                 tuples.push_back(tuple);
-                boost::geometry::combine(box, boost::geometry::make_envelope<Box>(geometry));
+                boost::geometry::expand(box, boost::geometry::return_envelope<Box>(geometry));
             }
         }
     }

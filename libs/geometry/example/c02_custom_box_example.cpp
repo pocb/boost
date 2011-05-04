@@ -1,7 +1,9 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
-//
-// Copyright Barend Gehrels 2007-2009, Geodan, Amsterdam, the Netherlands
-// Copyright Bruno Lalande 2008, 2009
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2011 Bruno Lalande, Paris, France.
+// Copyright (c) 2009-2011 Mateusz Loskot, London, UK.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -51,7 +53,7 @@ struct my_box_t
 BOOST_GEOMETRY_REGISTER_POINT_2D(my_point, double, cs::cartesian, x, y)
 BOOST_GEOMETRY_REGISTER_POINT_2D(my_int_point, int, cs::cartesian, x, y)
 BOOST_GEOMETRY_REGISTER_BOX(my_box, my_point, ll, ur)
-BOOST_GEOMETRY_REGISTER_BOX_TEMPLATIZED(my_box_t, ll, ur)
+BOOST_GEOMETRY_REGISTER_BOX_TEMPLATED(my_box_t, ll, ur)
 BOOST_GEOMETRY_REGISTER_BOX_2D_4VALUES(my_box_ltrb, my_int_point, left, top, right, bottom)
 BOOST_GEOMETRY_REGISTER_BOX_2D_4VALUES(my_box_4, my_point, coors[0], coors[1], coors[2], coors[3])
 

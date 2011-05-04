@@ -1,6 +1,7 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
-//
-// Copyright Barend Gehrels 2007-2011, Geodan, Amsterdam, the Netherlands.
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -23,6 +24,8 @@
 #include <boost/geometry/algorithms/detail/overlay/traverse.hpp>
 #include <boost/geometry/algorithms/detail/overlay/traversal_info.hpp>
 #include <boost/geometry/algorithms/detail/overlay/turn_info.hpp>
+
+#include <boost/geometry/algorithms/detail/has_self_intersections.hpp>
 
 
 #include <boost/geometry/algorithms/num_points.hpp>
@@ -99,7 +102,7 @@ template
     typename Geometry1, typename Geometry2,
     typename OutputIterator
 >
-inline OutputIterator return_if_one_input_is_empty(Geometry1 const& geometry1, 
+inline OutputIterator return_if_one_input_is_empty(Geometry1 const& geometry1,
             Geometry2 const& geometry2,
             OutputIterator out)
 {
@@ -154,7 +157,7 @@ struct overlay
 
         // "Use" rangetype for ringtype:
         // -> for polygon, it is the type of the exterior ring.
-        // -> for ring, it is the ring itself. 
+        // -> for ring, it is the ring itself.
         // -> for multi-polygon, it is also the type of the ring.
         typedef typename geometry::range_type<GeometryOut>::type ring_type;
         typedef std::deque<ring_type> ring_container_type;
@@ -167,6 +170,9 @@ struct overlay
                     GeometryOut, Direction, ReverseOut
                 >(geometry1, geometry2, out);
         }
+        
+        has_self_intersections(geometry1);
+        has_self_intersections(geometry2);
 
         container_type turn_points;
 
@@ -178,7 +184,7 @@ struct overlay
 std::cout << "get turns" << std::endl;
 #endif
         detail::get_turns::no_interrupt_policy policy;
-        boost::geometry::get_turns
+        geometry::get_turns
             <
                 Reverse1, Reverse2,
                 detail::overlay::calculate_distance_policy
@@ -194,8 +200,8 @@ std::cout << "enrich" << std::endl;
         typename Strategy::side_strategy_type side_strategy;
         geometry::enrich_intersection_points<Reverse1, Reverse2>(turn_points,
                 Direction == overlay_union
-                    ? boost::geometry::detail::overlay::operation_union
-                    : boost::geometry::detail::overlay::operation_intersection,
+                    ? geometry::detail::overlay::operation_union
+                    : geometry::detail::overlay::operation_intersection,
                     geometry1, geometry2,
                     side_strategy);
 
@@ -213,8 +219,8 @@ std::cout << "traverse" << std::endl;
         ring_container_type rings;
         geometry::traverse<Reverse1, Reverse2>(geometry1, geometry2,
                 Direction == overlay_union
-                    ? boost::geometry::detail::overlay::operation_union
-                    : boost::geometry::detail::overlay::operation_intersection,
+                    ? geometry::detail::overlay::operation_union
+                    : geometry::detail::overlay::operation_intersection,
                 turn_points, rings);
 
 #ifdef BOOST_GEOMETRY_TIME_OVERLAY

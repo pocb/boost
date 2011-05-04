@@ -82,6 +82,15 @@ public:
   // Construct a new handle implementation.
   BOOST_ASIO_DECL void construct(implementation_type& impl);
 
+  // Move-construct a new handle implementation.
+  BOOST_ASIO_DECL void move_construct(implementation_type& impl,
+      implementation_type& other_impl);
+
+  // Move-assign from another handle implementation.
+  BOOST_ASIO_DECL void move_assign(implementation_type& impl,
+      win_iocp_handle_service& other_service,
+      implementation_type& other_impl);
+
   // Destroy a handle implementation.
   BOOST_ASIO_DECL void destroy(implementation_type& impl);
 
@@ -134,7 +143,7 @@ public:
   // lifetime of the asynchronous operation.
   template <typename ConstBufferSequence, typename Handler>
   void async_write_some(implementation_type& impl,
-      const ConstBufferSequence& buffers, Handler& handler)
+      const ConstBufferSequence& buffers, Handler handler)
   {
     // Allocate and construct an operation to wrap the handler.
     typedef win_iocp_handle_write_op<ConstBufferSequence, Handler> op;
@@ -155,7 +164,7 @@ public:
   // must be valid for the lifetime of the asynchronous operation.
   template <typename ConstBufferSequence, typename Handler>
   void async_write_some_at(implementation_type& impl, boost::uint64_t offset,
-      const ConstBufferSequence& buffers, Handler& handler)
+      const ConstBufferSequence& buffers, Handler handler)
   {
     // Allocate and construct an operation to wrap the handler.
     typedef win_iocp_handle_write_op<ConstBufferSequence, Handler> op;
@@ -196,7 +205,7 @@ public:
   // valid for the lifetime of the asynchronous operation.
   template <typename MutableBufferSequence, typename Handler>
   void async_read_some(implementation_type& impl,
-      const MutableBufferSequence& buffers, Handler& handler)
+      const MutableBufferSequence& buffers, Handler handler)
   {
     // Allocate and construct an operation to wrap the handler.
     typedef win_iocp_handle_read_op<MutableBufferSequence, Handler> op;
@@ -218,7 +227,7 @@ public:
   // operation.
   template <typename MutableBufferSequence, typename Handler>
   void async_read_some_at(implementation_type& impl, boost::uint64_t offset,
-      const MutableBufferSequence& buffers, Handler& handler)
+      const MutableBufferSequence& buffers, Handler handler)
   {
     // Allocate and construct an operation to wrap the handler.
     typedef win_iocp_handle_read_op<MutableBufferSequence, Handler> op;

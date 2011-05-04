@@ -28,40 +28,100 @@
 #include <boost/random/detail/integer_log2.hpp>
 #include <boost/random/detail/signed_unsigned_tools.hpp>
 
+#include <boost/random/detail/disable_warnings.hpp>
+
 namespace boost {
 namespace random {
 namespace detail {
 
+// finds the seed type of an engine, given its
+// result_type.  If the result_type is integral
+// the seed type is the same.  If the result_type
+// is floating point, the seed type is uint32_t
+template<class T>
+struct seed_type
+{
+    typedef typename boost::mpl::if_<boost::is_integral<T>,
+        T,
+        boost::uint32_t
+    >::type type;
+};
+
+template<int N>
+struct const_pow_impl
+{
+    template<class T>
+    static T call(T arg, int n, T result)
+    {
+        return const_pow_impl<N / 2>::call(arg * arg, n / 2,
+            n%2 == 0? result : result * arg);
+    }
+};
+
+template<>
+struct const_pow_impl<0>
+{
+    template<class T>
+    static T call(T, int, T result)
+    {
+        return result;
+    }
+};
+
+// requires N is an upper bound on n
+template<int N, class T>
+inline T const_pow(T arg, int n) { return const_pow_impl<N>::call(arg, n, T(1)); }
+
+template<class T>
+inline T pow2(int n)
+{
+    typedef unsigned int_type;
+    const int max_bits = std::numeric_limits<int_type>::digits;
+    T multiplier = T(int_type(1) << (max_bits - 1)) * 2;
+    return (int_type(1) << (n % max_bits)) *
+        const_pow<std::numeric_limits<T>::digits / max_bits>(multiplier, n / max_bits);
+}
+
 template<class Engine, class Iter>
 void generate_from_real(Engine& eng, Iter begin, Iter end)
 {
-    using std::ldexp;
+    using std::fmod;
     typedef typename Engine::result_type RealType;
     const int Bits = Engine::precision();
     int remaining_bits = 0;
     boost::uint_least32_t saved_bits = 0;
-    RealType multiplier = ldexp(RealType(1), Bits);
-    RealType mult32 = 4294967296.0; // 2^32
+    RealType multiplier = pow2<RealType>( Bits);
+    RealType mult32 = RealType(4294967296.0); // 2^32
     while(true) {
         RealType val = eng() * multiplier;
         int available_bits = Bits;
-        if(available_bits < 32 - remaining_bits) {
+        // Make sure the compiler can optimize this out
+        // if it isn't possible.
+        if(Bits < 32 && available_bits < 32 - remaining_bits) {
             saved_bits |= boost::uint_least32_t(val) << remaining_bits;
             remaining_bits += Bits;
         } else {
-            if(remaining_bits != 0) {
-                boost::uint_least32_t extra_bits = boost::uint_least32_t(val) & ((boost::uint_least32_t(1) << (32 - remaining_bits)) - 1);
-                val = ldexp(val, -(32 - remaining_bits));
+            // If Bits < 32, then remaining_bits != 0, since
+            // if remaining_bits == 0, available_bits < 32 - 0,
+            // and we won't get here to begin with.
+            if(Bits < 32 || remaining_bits != 0) {
+                boost::uint_least32_t divisor =
+                    (boost::uint_least32_t(1) << (32 - remaining_bits));
+                boost::uint_least32_t extra_bits = boost::uint_least32_t(fmod(val, mult32)) & (divisor - 1);
+                val = val / divisor;
                 *begin++ = saved_bits | (extra_bits << remaining_bits);
                 if(begin == end) return;
                 available_bits -= 32 - remaining_bits;
                 remaining_bits = 0;
             }
-            for(; available_bits >= 32; available_bits -= 32) {
-                boost::uint_least32_t word = boost::uint_least32_t(val);
-                val /= mult32;
-                *begin++ = word;
-                if(begin == end) return;
+            // If Bits < 32 we should never enter this loop
+            if(Bits >= 32) {
+                for(; available_bits >= 32; available_bits -= 32) {
+                    boost::uint_least32_t word = boost::uint_least32_t(fmod(val, mult32));
+                    val /= mult32;
+                    *begin++ = word;
+                    if(begin == end) return;
+                }
             }
             remaining_bits = available_bits;
             saved_bits = static_cast<boost::uint_least32_t>(val);
@@ -84,7 +144,7 @@ void generate_from_int(Engine& eng, Iter begin, Iter end)
             detail::integer_log2(range + 1);
 
     {
-        int discarded_bits = detail::integer_log2(static_cast<unsigned_type>(bits));
+        int discarded_bits = detail::integer_log2(bits);
         unsigned_type excess = (range + 1) >> (bits - discarded_bits);
         if(excess != 0) {
             int extra_bits = detail::integer_log2((excess - 1) ^ excess);
@@ -99,14 +159,26 @@ void generate_from_int(Engine& eng, Iter begin, Iter end)
         unsigned_type val;
         do {
             val = boost::random::detail::subtract<IntType>()(eng(), (eng.min)());
-        } while(val > limit);
+        } while(limit != range && val > limit);
         val &= mask;
         int available_bits = bits;
-        if(available_bits < 32 - remaining_bits) {
+        if(available_bits == 32) {
+            *begin++ = static_cast<boost::uint_least32_t>(val) & 0xFFFFFFFFu;
+            if(begin == end) return;
+        } else if(available_bits % 32 == 0) {
+            for(int i = 0; i < available_bits / 32; ++i) {
+                boost::uint_least32_t word = boost::uint_least32_t(val) & 0xFFFFFFFFu;
+                int supress_warning = (bits >= 32);
+                BOOST_ASSERT(supress_warning == 1);
+                val >>= (32 * supress_warning);
+                *begin++ = word;
+                if(begin == end) return;
+            }
+        } else if(bits < 32 && available_bits < 32 - remaining_bits) {
             saved_bits |= boost::uint_least32_t(val) << remaining_bits;
             remaining_bits += bits;
         } else {
-            if(remaining_bits != 0) {
+            if(bits < 32 || remaining_bits != 0) {
                 boost::uint_least32_t extra_bits = boost::uint_least32_t(val) & ((boost::uint_least32_t(1) << (32 - remaining_bits)) - 1);
                 val >>= 32 - remaining_bits;
                 *begin++ = saved_bits | (extra_bits << remaining_bits);
@@ -114,11 +186,15 @@ void generate_from_int(Engine& eng, Iter begin, Iter end)
                 available_bits -= 32 - remaining_bits;
                 remaining_bits = 0;
             }
-            for(; available_bits >= 32; available_bits -= 32) {
-                boost::uint_least32_t word = boost::uint_least32_t(val);
-                val >>= 32;
-                *begin++ = word;
-                if(begin == end) return;
+            if(bits >= 32) {
+                for(; available_bits >= 32; available_bits -= 32) {
+                    boost::uint_least32_t word = boost::uint_least32_t(val) & 0xFFFFFFFFu;
+                    int supress_warning = (bits >= 32);
+                    BOOST_ASSERT(supress_warning == 1);
+                    val >>= (32 * supress_warning);
+                    *begin++ = word;
+                    if(begin == end) return;
+                }
             }
             remaining_bits = available_bits;
             saved_bits = static_cast<boost::uint_least32_t>(val);
@@ -256,10 +332,9 @@ inline void fill_array_int(Iter& first, Iter last, IntType (&x)[n])
 template<int w, std::size_t n, class RealType>
 void seed_array_real_impl(const boost::uint_least32_t* storage, RealType (&x)[n])
 {
-    using std::pow;
     boost::uint_least32_t mask = ~((~boost::uint_least32_t(0)) << (w%32));
     RealType two32 = 4294967296.0;
-    const RealType divisor = pow(RealType(2), -w);
+    const RealType divisor = RealType(1)/detail::pow2<RealType>(w);
     unsigned int j;
     for(j = 0; j < n; ++j) {
         RealType val = RealType(0);
@@ -289,10 +364,9 @@ void seed_array_real(SeedSeq& seq, RealType (&x)[n])
 template<int w, std::size_t n, class Iter, class RealType>
 void fill_array_real(Iter& first, Iter last, RealType (&x)[n])
 {
-    using std::pow;
     boost::uint_least32_t mask = ~((~boost::uint_least32_t(0)) << (w%32));
     RealType two32 = 4294967296.0;
-    const RealType divisor = pow(RealType(2), -w);
+    const RealType divisor = RealType(1)/detail::pow2<RealType>(w);
     unsigned int j;
     for(j = 0; j < n; ++j) {
         RealType val = RealType(0);
@@ -316,5 +390,7 @@ void fill_array_real(Iter& first, Iter last, RealType (&x)[n])
 }
 }
 }
+
+#include <boost/random/detail/enable_warnings.hpp>
 
 #endif

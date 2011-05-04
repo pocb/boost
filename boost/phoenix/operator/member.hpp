@@ -12,6 +12,7 @@
 #include <boost/phoenix/operator/detail/mem_fun_ptr_gen.hpp>
 #include <boost/phoenix/support/iterate.hpp>
 #include <boost/type_traits/is_member_function_pointer.hpp>
+#include <boost/proto/operators.hpp>
 
 #include <boost/phoenix/operator/preprocessed/member.hpp>
 
@@ -32,6 +33,7 @@
 #include <boost/phoenix/operator/detail/mem_fun_ptr_gen.hpp>
 #include <boost/phoenix/support/iterate.hpp>
 #include <boost/type_traits/is_member_function_pointer.hpp>
+#include <boost/proto/operators.hpp>
 
 #if defined(__WAVE__) && defined(BOOST_PHOENIX_CREATE_PREPROCESSED_FILES)
 #pragma wave option(preserve: 2, line: 0, output: "preprocessed/member_" BOOST_PHOENIX_LIMIT_STR ".hpp")
@@ -59,20 +61,20 @@ BOOST_PHOENIX_DEFINE_EXPRESSION_VARARG(
 
 namespace boost { namespace phoenix
 {
-    BOOST_PHOENIX_BINARY_OPERATORS(
-        (mem_ptr)
-    )
+    BOOST_PHOENIX_BINARY_OPERATORS((mem_ptr))
 
     template <typename Object, typename MemPtr>
     inline
     typename enable_if<
         is_member_function_pointer<MemPtr>
       , detail::mem_fun_ptr_gen<actor<Object>, MemPtr> const
-      >::type
+    >::type
     operator->*(actor<Object> const& obj, MemPtr ptr)
     {
         return detail::mem_fun_ptr_gen<actor<Object>, MemPtr>(obj, ptr);
     }
+
+    using proto::exprns_::operator->*;
 
     namespace result_of
     {
@@ -93,7 +95,7 @@ namespace boost { namespace phoenix
 
     #define BOOST_PHOENIX_MEMBER_EVAL(Z, N, D)                                  \
         BOOST_PP_COMMA_IF(BOOST_PP_NOT(BOOST_PP_EQUAL(N, 2)))                   \
-        eval(BOOST_PP_CAT(a, N), ctx)                                           \
+        boost::phoenix::eval(BOOST_PP_CAT(a, N), ctx)                                           \
     /**/
 
     #define BOOST_PHOENIX_ITERATION_PARAMS                                      \
@@ -121,26 +123,27 @@ namespace boost { namespace phoenix
 
 #else // BOOST_PHOENIX_IS_ITERATING
 
-        template <typename This, typename Context, BOOST_PHOENIX_typename_A>
-        struct result<This(Context, BOOST_PHOENIX_A)>
-            : result<This(Context, BOOST_PHOENIX_A_const_ref)>
+        template <typename This, BOOST_PHOENIX_typename_A, typename Context>
+        struct result<This(BOOST_PHOENIX_A, Context)>
+            : result<This(BOOST_PHOENIX_A_const_ref, Context)>
         {};
 
-        template <typename This, typename Context, BOOST_PHOENIX_typename_A>
-        struct result<This(Context, BOOST_PHOENIX_A_ref)>
+        template <typename This, BOOST_PHOENIX_typename_A, typename Context>
+        struct result<This(BOOST_PHOENIX_A_ref, Context)>
             : result_of::mem_fun_ptr_eval<Context, BOOST_PHOENIX_A>
         {};
 
-        template <typename Context, BOOST_PHOENIX_typename_A>
+        template <BOOST_PHOENIX_typename_A, typename Context>
         typename result_of::mem_fun_ptr_eval<Context, BOOST_PHOENIX_A>::type
         operator()(
-            Context const & ctx, BOOST_PHOENIX_A_const_ref_a
+            BOOST_PHOENIX_A_const_ref_a
+          , Context & ctx
         ) const
         {
             return
                 (
-                    get_pointer(eval(a0, ctx))
-                    ->*eval(a1, ctx)
+                    get_pointer(boost::phoenix::eval(a0, ctx))
+                    ->*boost::phoenix::eval(a1, ctx)
                 )(
                     BOOST_PP_REPEAT_FROM_TO(
                         2

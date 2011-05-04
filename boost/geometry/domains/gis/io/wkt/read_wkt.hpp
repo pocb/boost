@@ -1,6 +1,12 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
-//
-// Copyright Barend Gehrels 2008-2009, Geodan, Amsterdam, the Netherlands.
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2011 Bruno Lalande, Paris, France.
+// Copyright (c) 2009-2011 Mateusz Loskot, London, UK.
+
+// Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
+// (geolib/GGL), copyright (c) 1995-2010 Geodan, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -525,8 +531,8 @@ struct box_parser
             throw read_wkt_exception("Box should have 2,4 or 5 points", wkt);
         }
 
-        assign_point_to_index<min_corner>(points.front(), box);
-        assign_point_to_index<max_corner>(points[index], box);
+        geometry::detail::assign_point_to_index<min_corner>(points.front(), box);
+        geometry::detail::assign_point_to_index<max_corner>(points[index], box);
     }
 };
 
@@ -564,8 +570,8 @@ struct segment_parser
 
         if (boost::size(points) == 2)
         {
-            assign_point_to_index<0>(points.front(), segment);
-            assign_point_to_index<1>(points.back(), segment);
+            geometry::detail::assign_point_to_index<0>(points.front(), segment);
+            geometry::detail::assign_point_to_index<1>(points.back(), segment);
         }
         else
         {
@@ -680,38 +686,7 @@ inline void read_wkt(std::string const& wkt, Geometry& geometry)
     dispatch::read_wkt<typename tag<Geometry>::type, Geometry>::apply(wkt, geometry);
 }
 
-/*!
-\brief Parses OGC Well-Known Text (\ref WKT) and outputs using an output iterator
-\ingroup wkt
-\param wkt string containing \ref WKT
-\param out output iterator
-\note Because the output iterator doesn't always have the type value_type, it should be
-specified in the function call.
-\par Example:
-Small example showing how to use read_wkt with an output iterator
-\dontinclude doxygen_1.cpp
-\skip example_from_wkt_output_iterator
-\line {
-\until }
-*/
-template <typename Geometry, typename OutputIterator>
-inline void read_wkt(std::string const& wkt, OutputIterator out)
-{
-    geometry::concept::check<Geometry>();
-
-    typedef typename point_type<Geometry>::type point_type;
-
-    std::string const& tag =
-        geometry_id<Geometry>::value == 2 ? "linestring" : "polygon";
-
-    detail::wkt::tokenizer tokens(wkt, boost::char_separator<char>(" ", ",()"));
-    detail::wkt::tokenizer::iterator it;
-    if (detail::wkt::initialize<point_type>(tokens, tag, wkt, it))
-    {
-        detail::wkt::container_inserter<point_type>::apply(it, tokens.end(), wkt, out);
-    }
-}
-
 }} // namespace boost::geometry
+
 
 #endif // BOOST_GEOMETRY_DOMAINS_GIS_IO_WKT_READ_WKT_HPP

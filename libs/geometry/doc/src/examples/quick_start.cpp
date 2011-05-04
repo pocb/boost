@@ -1,12 +1,17 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
-//
-// Copyright Barend Gehrels 2007-2009, Geodan, Amsterdam, the Netherlands
-// Copyright Bruno Lalande 2008, 2009
+// Quickbook Examples, for main page
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2011 Bruno Lalande, Paris, France.
+// Copyright (c) 2009-2011 Mateusz Loskot, London, UK.
+
+// Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
+// (geolib/GGL), copyright (c) 1995-2010 Geodan, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 //
-// Quickbook Examples, for main page
 
 #include <boost/tuple/tuple.hpp>
 
@@ -15,13 +20,15 @@
 //#pragma warning( disable : 4244 )
 #endif // defined(_MSC_VER)
 
-#include <boost/geometry/geometry.hpp>
+#include <boost/geometry.hpp>
 #include <boost/geometry/algorithms/overlaps.hpp>
 #include <boost/geometry/geometries/geometries.hpp>
 #include <boost/geometry/geometries/register/point.hpp>
-#include <boost/geometry/geometries/adapted/tuple_cartesian.hpp>
-#include <boost/geometry/geometries/adapted/c_array_cartesian.hpp>
-#include <boost/geometry/geometries/adapted/std_as_linestring.hpp>
+#include <boost/geometry/geometries/adapted/c_array.hpp>
+
+
+BOOST_GEOMETRY_REGISTER_BOOST_TUPLE_CS(cs::cartesian)
+BOOST_GEOMETRY_REGISTER_C_ARRAY_CS(cs::cartesian)
 
 
 // Small QRect simulations following http://doc.trolltech.com/4.4/qrect.html
@@ -124,7 +131,7 @@ void example_for_main_page()
     QRect r2(110, 210, 20, 20);
     if (overlaps(r1, r2))
     {
-        assign(r2, 200, 300, 220, 320);
+        assign_values(r2, 200, 300, 220, 320);
     }
     //]
 }
@@ -139,7 +146,7 @@ void example_for_transform()
     XYZ p;
 
     SPH sph1, sph2;
-    assign(sph1, 12.5, 41.90, 1.0);
+    assign_values(sph1, 12.5, 41.90, 1.0);
     // Go from spherical to Cartesian-3D:
     transform(sph1, p);
     // Go back from Cartesian 3D to spherical:

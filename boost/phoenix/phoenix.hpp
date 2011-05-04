@@ -17,5 +17,4 @@
 #include <boost/phoenix/bind.hpp>
 #include <boost/phoenix/stl.hpp>
 
-
 #endif

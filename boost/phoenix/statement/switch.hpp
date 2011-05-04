@@ -54,7 +54,7 @@ namespace boost { namespace phoenix
                 proto::when<
                     proto::comma<
                         switch_case_is_nullary
-                      , proto::or_<rule::switch_default_case, rule::switch_case>
+                      , proto::or_<phoenix::rule::switch_default_case, phoenix::rule::switch_case>
                     >
                   , mpl::and_<
                         switch_case_is_nullary(
@@ -68,7 +68,7 @@ namespace boost { namespace phoenix
                     >()
                 >
               , proto::when<
-                    proto::or_<rule::switch_default_case, rule::switch_case>
+                    proto::or_<phoenix::rule::switch_default_case, phoenix::rule::switch_case>
                   , evaluator(proto::_child_c<0>, proto::_state)
                 >
             >
@@ -76,15 +76,15 @@ namespace boost { namespace phoenix
 
         struct switch_case_grammar
             : proto::or_<
-                proto::comma<switch_case_grammar, rule::switch_case>
-              , proto::when<rule::switch_case, proto::_>
+                proto::comma<switch_case_grammar, phoenix::rule::switch_case>
+              , proto::when<phoenix::rule::switch_case, proto::_>
             >
         {};
 
         struct switch_case_with_default_grammar
             : proto::or_<
-                proto::comma<switch_case_grammar, rule::switch_default_case>
-              , proto::when<rule::switch_default_case, proto::_>
+                proto::comma<switch_case_grammar, phoenix::rule::switch_default_case>
+              , proto::when<phoenix::rule::switch_default_case, proto::_>
             >
         {};
 
@@ -96,7 +96,7 @@ namespace boost { namespace phoenix
                 >
               , proto::when<proto::_, mpl::int_<1>()>
             >
-	    {};
+        {};
     }
 }}
 
@@ -126,9 +126,9 @@ namespace boost { namespace phoenix {
         {
         }
 
-        template <typename Context, typename Cond, typename Cases>
+        template <typename Cond, typename Cases, typename Context>
         result_type
-        operator()(Context & ctx, Cond const & cond, Cases const & cases) const
+        operator()(Cond const & cond, Cases const & cases, Context & ctx) const
         {
             this->evaluate(
                     ctx
@@ -159,10 +159,10 @@ namespace boost { namespace phoenix {
                     >::type
                     case_label;
 
-                switch(eval(cond, ctx))
+                switch(boost::phoenix::eval(cond, ctx))
                 {
                     case case_label::value:
-                        eval(proto::child_c<1>(cases), ctx);
+                        boost::phoenix::eval(proto::child_c<1>(cases), ctx);
                 }
             }
             
@@ -176,10 +176,10 @@ namespace boost { namespace phoenix {
               , mpl::true_
             ) const
             {
-                switch(eval(cond, ctx))
+                switch(boost::phoenix::eval(cond, ctx))
                 {
                     default:
-                        eval(proto::child_c<0>(cases), ctx);
+                        boost::phoenix::eval(proto::child_c<0>(cases), ctx);
                 }
             }
 

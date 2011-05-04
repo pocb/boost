@@ -80,6 +80,15 @@ public:
   // Construct a new descriptor implementation.
   BOOST_ASIO_DECL void construct(implementation_type& impl);
 
+  // Move-construct a new descriptor implementation.
+  BOOST_ASIO_DECL void move_construct(implementation_type& impl,
+      implementation_type& other_impl);
+
+  // Move-assign from another descriptor implementation.
+  BOOST_ASIO_DECL void move_assign(implementation_type& impl,
+      reactive_descriptor_service& other_service,
+      implementation_type& other_impl);
+
   // Destroy a descriptor implementation.
   BOOST_ASIO_DECL void destroy(implementation_type& impl);
 
@@ -177,7 +186,7 @@ public:
   // lifetime of the asynchronous operation.
   template <typename ConstBufferSequence, typename Handler>
   void async_write_some(implementation_type& impl,
-      const ConstBufferSequence& buffers, Handler& handler)
+      const ConstBufferSequence& buffers, Handler handler)
   {
     // Allocate and construct an operation to wrap the handler.
     typedef descriptor_write_op<ConstBufferSequence, Handler> op;
@@ -197,7 +206,7 @@ public:
   // Start an asynchronous wait until data can be written without blocking.
   template <typename Handler>
   void async_write_some(implementation_type& impl,
-      const null_buffers&, Handler& handler)
+      const null_buffers&, Handler handler)
   {
     // Allocate and construct an operation to wrap the handler.
     typedef reactive_null_buffers_op<Handler> op;
@@ -239,7 +248,7 @@ public:
   // valid for the lifetime of the asynchronous operation.
   template <typename MutableBufferSequence, typename Handler>
   void async_read_some(implementation_type& impl,
-      const MutableBufferSequence& buffers, Handler& handler)
+      const MutableBufferSequence& buffers, Handler handler)
   {
     // Allocate and construct an operation to wrap the handler.
     typedef descriptor_read_op<MutableBufferSequence, Handler> op;
@@ -259,7 +268,7 @@ public:
   // Wait until data can be read without blocking.
   template <typename Handler>
   void async_read_some(implementation_type& impl,
-      const null_buffers&, Handler& handler)
+      const null_buffers&, Handler handler)
   {
     // Allocate and construct an operation to wrap the handler.
     typedef reactive_null_buffers_op<Handler> op;

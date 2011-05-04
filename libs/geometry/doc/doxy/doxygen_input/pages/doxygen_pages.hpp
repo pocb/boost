@@ -1,7 +1,7 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
 //
-// Copyright Barend Gehrels 2007-2009, Geodan, Amsterdam, the Netherlands
-// Copyright Bruno Lalande 2008, 2009
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2011 Bruno Lalande, Paris, France.
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -359,7 +359,7 @@ code. Although there are many changes internally, the changes for users should b
 - all algorithms accepting linestrings are now modified to get the linestring itself. In the previous version
   .begin(), end() had to be specified, This is not necessary anymore, because the Boost Range Library is used
   internally, and tag dispatching is used to distinguish different geometries
-- the "grow" utility is now splitted into buffer (growing a box with a value was in fact a buffer) and a combine.
+- the "grow" utility is now splitted into buffer (growing a box with a value was in fact a buffer) and a expand.
 - there was a generic "get" function with a const ref and a non const ref. This is splitted into "get" and "set"
 - there might be more changes, please contact if anything is unclear
 

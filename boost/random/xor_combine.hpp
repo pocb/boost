@@ -126,14 +126,12 @@ public:
     void generate(Iter first, Iter last)
     { detail::generate_from_int(*this, first, last); }
 
-#ifndef BOOST_NO_LONG_LONG
     /** Advances the state of the generator by @c z. */
-    void discard(boost::ulong_long_type z)
+    void discard(boost::uintmax_t z)
     {
         _rng1.discard(z);
         _rng2.discard(z);
     }
-#endif
 
     /** Returns the smallest value that the generator can produce. */
     static result_type min BOOST_PREVENT_MACRO_SUBSTITUTION () { return (std::min)((URNG1::min)(), (URNG2::min)()); }
@@ -145,7 +143,7 @@ public:
      */
     BOOST_RANDOM_DETAIL_OSTREAM_OPERATOR(os, xor_combine_engine, s)
     {
-        os << s._rng1 << " " << s._rng2;
+        os << s._rng1 << ' ' << s._rng2;
         return os;
     }
     

@@ -1,6 +1,7 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
-//
-// Copyright Barend Gehrels 2010, Geodan, Amsterdam, the Netherlands.
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -17,7 +18,7 @@
 
 #include <boost/geometry/core/point_type.hpp>
 
-#include <boost/geometry/strategies/buffer_side.hpp>
+#include <boost/geometry/extensions/strategies/buffer_side.hpp>
 #include <boost/geometry/extensions/algorithms/buffer/line_line_intersection.hpp>
 
 
@@ -191,7 +192,7 @@ struct polygon_buffer
 #endif
             )
     {
-        boost::geometry::clear(buffered);
+        geometry::clear(buffered);
 
         typedef typename ring_type<PolygonInput>::type input_ring_type;
         typedef typename ring_type<PolygonOutput>::type output_ring_type;
@@ -206,7 +207,7 @@ struct polygon_buffer
 
         typename interior_return_type<Polygon const>::type rings
                     = interior_rings(polygon);
-        for (BOOST_AUTO(it, boost::begin(rings); it != boost::end(rings); ++it)
+        for (BOOST_AUTO_TPL(it, boost::begin(rings); it != boost::end(rings); ++it)
         {
             output_ring_type ring;
             policy::apply(*it, ring, distance, join_strategy

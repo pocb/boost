@@ -1,6 +1,7 @@
-// Boost.Geometry (aka GGL, Generic Geometry Library) test file
-//
-// Copyright Barend Gehrels 2007-2009, Geodan, Amsterdam, the Netherlands
+// Boost.Geometry (aka GGL, Generic Geometry Library) 
+// Unit Test
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -36,7 +37,7 @@
 
 
 template <typename OutputType, typename CalculationType, typename G1, typename G2>
-typename bg::area_result<G1>::type test_intersection(std::string const& caseid,
+typename bg::default_area_result<G1>::type test_intersection(std::string const& caseid,
         G1 const& g1, G2 const& g2,
         std::size_t expected_count = 0, std::size_t expected_point_count = 0,
         double expected_length_or_area = 0,
@@ -66,10 +67,10 @@ typename bg::area_result<G1>::type test_intersection(std::string const& caseid,
         bg::intersection(g1, g2, out);
     }
     std::vector<OutputType> clip;
-    bg::intersection_inserter<OutputType>(g1, g2, std::back_inserter(clip), strategy());
+    bg::detail::intersection::intersection_insert<OutputType>(g1, g2, std::back_inserter(clip), strategy());
 
 
-    typename bg::area_result<G1>::type length_or_area = 0;
+    typename bg::default_area_result<G1>::type length_or_area = 0;
     std::size_t n = 0;
     for (typename std::vector<OutputType>::iterator it = clip.begin();
             it != clip.end();
@@ -174,7 +175,7 @@ typename bg::area_result<G1>::type test_intersection(std::string const& caseid,
 }
 
 template <typename OutputType, typename G1, typename G2>
-typename bg::area_result<G1>::type test_one(std::string const& caseid,
+typename bg::default_area_result<G1>::type test_one(std::string const& caseid,
         std::string const& wkt1, std::string const& wkt2,
         std::size_t expected_count = 0, std::size_t expected_point_count = 0,
         double expected_length_or_area = 0,

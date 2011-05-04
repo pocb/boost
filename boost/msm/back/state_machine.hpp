@@ -67,6 +67,7 @@ BOOST_MPL_HAS_XXX_TRAIT_DEF(no_automatic_create)
 BOOST_MPL_HAS_XXX_TRAIT_DEF(non_forwarding_flag)
 BOOST_MPL_HAS_XXX_TRAIT_DEF(direct_entry)
 BOOST_MPL_HAS_XXX_TRAIT_DEF(initial_event)
+BOOST_MPL_HAS_XXX_TRAIT_DEF(final_event)
 BOOST_MPL_HAS_XXX_TRAIT_DEF(do_serialize)
 BOOST_MPL_HAS_XXX_TRAIT_DEF(history_policy)
 BOOST_MPL_HAS_XXX_TRAIT_DEF(fsm_check)
@@ -257,6 +258,7 @@ private:
     typedef HistoryPolicy               history_policy;
 
     struct InitEvent { };
+    struct ExitEvent { };
     // flag handling
     struct Flag_AND
     {
@@ -276,6 +278,12 @@ private:
         ::boost::mpl::identity<InitEvent>
     >::type fsm_initial_event;
 
+    // if the front-end fsm provides an exit_event typedef, replace ExitEvent by this one
+    typedef typename ::boost::mpl::eval_if< 
+        typename has_final_event<Derived>::type,
+        get_final_event<Derived>,
+        ::boost::mpl::identity<ExitEvent>
+    >::type fsm_final_event;
 
     template <class ExitPoint>
     struct exit_pt : public ExitPoint
@@ -1034,7 +1042,32 @@ private:
         // give a chance to handle an anonymous (eventless) transition
         handle_eventless_transitions_helper<library_sm> eventless_helper(this,true);
         eventless_helper.process_completion_event();
+    }
 
+    // start the state machine (calls entry of the initial state passing incomingEvent to on_entry's)
+    template <class Event>
+    void start(Event const& incomingEvent)
+    {
+        // call on_entry on this SM
+        (static_cast<Derived*>(this))->on_entry(incomingEvent,*this);
+        ::boost::mpl::for_each<initial_states, boost::msm::wrap<mpl::placeholders::_1> >
+            (call_init<Event>(incomingEvent,this));
+        // give a chance to handle an anonymous (eventless) transition
+        handle_eventless_transitions_helper<library_sm> eventless_helper(this,true);
+        eventless_helper.process_completion_event();
+    }
+
+    // stop the state machine (calls exit of the current state)
+    void stop()
+    {
+        do_exit(fsm_final_event(),*this);
+    }
+
+    // stop the state machine (calls exit of the current state passing finalEvent to on_exit's)
+    template <class Event>
+    void stop(Event const& finalEvent)
+    {
+        do_exit(finalEvent,*this);
     }
 
     // Main function used by clients of the derived FSM to make
@@ -1254,7 +1287,27 @@ private:
     {
         return m_history;
     }
-    // get a state
+    // get a state (const version)
+    // as a pointer
+    template <class State>
+    typename ::boost::enable_if<typename ::boost::is_pointer<State>::type,State >::type
+    get_state(::boost::msm::back::dummy<0> = 0) const
+    {
+        return const_cast<State >
+            (&
+                (::boost::fusion::at_key<
+                    typename ::boost::remove_const<typename ::boost::remove_pointer<State>::type>::type>(m_substate_list)));
+    }
+    // as a reference
+    template <class State>
+    typename ::boost::enable_if<typename ::boost::is_reference<State>::type,State >::type
+    get_state(::boost::msm::back::dummy<1> = 0) const
+    {
+        return const_cast<State >
+            ( ::boost::fusion::at_key<
+                typename ::boost::remove_const<typename ::boost::remove_reference<State>::type>::type>(m_substate_list) );
+    }
+    // get a state (non const version)
     // as a pointer
     template <class State>
     typename ::boost::enable_if<typename ::boost::is_pointer<State>::type,State >::type
@@ -1270,7 +1323,6 @@ private:
     {
         return ::boost::fusion::at_key<typename ::boost::remove_reference<State>::type>(m_substate_list);
     }
-
     // checks if a flag is active using the BinaryOp as folding function
     template <class Flag,class BinaryOp>
     bool is_flag_active() const
@@ -1682,7 +1734,7 @@ private:
         {
             // end of processing
             template<class Event>
-            static void process(Event const& evt,library_sm*,HandledEnum&){}
+            static void process(Event const& ,library_sm*,HandledEnum&){}
         };
         public:
         region_processing_helper(library_sm* self_,HandledEnum& result_)
@@ -2135,7 +2187,7 @@ BOOST_PP_REPEAT(BOOST_PP_ADD(BOOST_MSM_VISITOR_ARG_SIZE,1), MSM_VISITOR_ARGS_EXE
      };
      // start for states machines which are themselves embedded in other state machines (composites)
      template <class Event>
-     void start(Event const& incomingEvent)
+     void internal_start(Event const& incomingEvent)
      {
          region_start_helper< ::boost::mpl::int_<0> >::do_start(this,incomingEvent);
          // give a chance to handle an anonymous (eventless) transition
@@ -2173,7 +2225,7 @@ BOOST_PP_REPEAT(BOOST_PP_ADD(BOOST_MSM_VISITOR_ARG_SIZE,1), MSM_VISITOR_ARGS_EXE
              operator()(EventType const& evt,FsmType& fsm, ::boost::msm::back::dummy<0> = 0)
          {
              (static_cast<Derived*>(self))->on_entry(evt,fsm);
-             self->start(evt);
+             self->internal_start(evt);
          }
 
          // this variant is for the direct entry case (just one entry, not a sequence of entries)
@@ -2195,7 +2247,7 @@ BOOST_PP_REPEAT(BOOST_PP_ADD(BOOST_MSM_VISITOR_ARG_SIZE,1), MSM_VISITOR_ARGS_EXE
              BOOST_STATIC_ASSERT(find_region_id<typename EventType::active_state::wrapped_entry>::region_index <= nr_regions::value);
              // just set the correct zone, the others will be default/history initialized
              self->m_states[find_region_id<typename EventType::active_state::wrapped_entry>::region_index] = state_id;
-             self->start(evt.m_event);
+             self->internal_start(evt.m_event);
          }
 
          // this variant is for the fork entry case (a sequence on entries)
@@ -2216,7 +2268,7 @@ BOOST_PP_REPEAT(BOOST_PP_ADD(BOOST_MSM_VISITOR_ARG_SIZE,1), MSM_VISITOR_ARGS_EXE
                                     ::boost::msm::wrap< ::boost::mpl::placeholders::_1> >
                                                         (fork_helper<EventType>(self,evt));
              // set the correct zones, the others (if any) will be default/history initialized
-             self->start(evt.m_event);
+             self->internal_start(evt.m_event);
          }
 
          // this variant is for the pseudo state entry case
@@ -2231,7 +2283,7 @@ BOOST_PP_REPEAT(BOOST_PP_ADD(BOOST_MSM_VISITOR_ARG_SIZE,1), MSM_VISITOR_ARGS_EXE
              int state_id = get_state_id<stt,typename EventType::active_state::wrapped_entry>::value;
              // given region starts with the entry pseudo state as active state
              self->m_states[find_region_id<typename EventType::active_state::wrapped_entry>::region_index] = state_id;
-             self->start(evt.m_event);
+             self->internal_start(evt.m_event);
              // and we process the transition in the zone of the newly active state
              // (entry pseudo states are, according to UML, a state connecting 1 transition outside to 1 inside
              self->process_event(evt.m_event);

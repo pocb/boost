@@ -1,6 +1,7 @@
-// Boost.Geometry (aka GGL, Generic Geometry Library) test file
-//
-// Copyright Barend Gehrels 2010, Geodan, Amsterdam, the Netherlands
+// Boost.Geometry (aka GGL, Generic Geometry Library) 
+// Unit Test
+
+// Copyright (c) 2010-2011 Barend Gehrels, Amsterdam, the Netherlands.
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -111,13 +112,13 @@ void test_distance(Geometry1 const& geometry1,
             Geometry2 const& geometry2,
             long double expected_distance)
 {
-    typename bg::distance_result<Geometry1>::type distance = bg::distance(geometry1, geometry2);
+    typename bg::default_distance_result<Geometry1>::type distance = bg::distance(geometry1, geometry2);
 
 #ifdef GEOMETRY_TEST_DEBUG
     std::ostringstream out;
     out << typeid(typename bg::coordinate_type<Geometry1>::type).name()
         << std::endl
-        << typeid(typename bg::distance_result<Geometry1>::type).name()
+        << typeid(typename bg::default_distance_result<Geometry1>::type).name()
         << std::endl
         << "distance : " << bg::distance(geometry1, geometry2)
         << std::endl;

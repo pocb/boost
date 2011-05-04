@@ -1,6 +1,8 @@
-// Boost.Geometry (aka GGL, Generic Geometry Library) test file
-//
-// Copyright Barend Gehrels 2009, Geodan, Amsterdam, the Netherlands
+// Boost.Geometry (aka GGL, Generic Geometry Library)
+// Unit Test
+
+// Copyright (c) 2009-2011 Barend Gehrels, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -105,7 +107,7 @@ bool test_recursive_boxes(MultiPolygon& result, int& index,
     }
 
     MultiPolygon mp;
-    bg::union_inserter
+    bg::detail::union_::union_insert
         <
             polygon
         >(p, q, std::back_inserter(mp));

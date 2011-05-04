@@ -1,7 +1,12 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
-//
-// Copyright Barend Gehrels 2007-2009, Geodan, Amsterdam, the Netherlands.
-// Copyright Bruno Lalande 2008, 2009
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2011 Bruno Lalande, Paris, France.
+// Copyright (c) 2009-2011 Mateusz Loskot, London, UK.
+
+// Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
+// (geolib/GGL), copyright (c) 1995-2010 Geodan, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -25,6 +30,8 @@
 #include <boost/geometry/core/interior_rings.hpp>
 #include <boost/geometry/core/point_order.hpp>
 #include <boost/geometry/core/ring_type.hpp>
+#include <boost/geometry/core/interior_rings.hpp>
+
 #include <boost/geometry/geometries/concepts/check.hpp>
 #include <boost/geometry/strategies/within.hpp>
 #include <boost/geometry/strategies/concepts/within_concept.hpp>
@@ -219,7 +226,7 @@ struct point_in_polygon
         {
             typename interior_return_type<Polygon const>::type rings
                         = interior_rings(poly);
-            for (BOOST_AUTO(it, boost::begin(rings));
+            for (BOOST_AUTO_TPL(it, boost::begin(rings));
                 it != boost::end(rings);
                 ++it)
             {
@@ -338,6 +345,15 @@ struct within<point_tag, polygon_tag, Point, Polygon, Strategy>
 \return true if geometry1 is completely contained within geometry2,
     else false
 \note The default strategy is used for within detection
+
+
+\qbk{[include reference/algorithms/within.qbk]}
+
+\qbk{
+[heading Example]
+[within]
+[within_output]
+}
  */
 template<typename Geometry1, typename Geometry2>
 inline bool within(Geometry1 const& geometry1, Geometry2 const& geometry2)
@@ -351,7 +367,7 @@ inline bool within(Geometry1 const& geometry1, Geometry2 const& geometry2)
     typedef typename strategy::within::services::default_strategy
         <
             typename tag<Geometry1>::type,
-            typename tag<Geometry2>::type,
+            typename tag_cast<typename tag<Geometry2>::type, areal_tag>::type,
             typename cs_tag<point_type1>::type,
             typename cs_tag<point_type2>::type,
             point_type1,
@@ -383,11 +399,17 @@ inline bool within(Geometry1 const& geometry1, Geometry2 const& geometry2)
     else false
 
 \qbk{distinguish,with strategy}
+\qbk{[include reference/algorithms/within.qbk]}
 \qbk{
 [heading Available Strategies]
 \* [link geometry.reference.strategies.strategy_within_winding Winding (coordinate system agnostic)]
 \* [link geometry.reference.strategies.strategy_within_franklin Franklin (cartesian)]
 \* [link geometry.reference.strategies.strategy_within_crossings_multiply Crossings Multiply (cartesian)]
+
+[heading Example]
+[within_strategy]
+[within_strategy_output]
+
 }
 */
 template<typename Geometry1, typename Geometry2, typename Strategy>

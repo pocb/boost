@@ -1,6 +1,10 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
-//
-// Copyright Barend Gehrels 2009, Geodan, the Netherlands.
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+
+// Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
+// (geolib/GGL), copyright (c) 1995-2010 Geodan, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -23,7 +27,7 @@
 
 #include <boost/geometry/policies/compare.hpp>
 
-#include <boost/geometry/util/for_each_range.hpp>
+#include <boost/geometry/algorithms/detail/for_each_range.hpp>
 #include <boost/geometry/views/reversible_view.hpp>
 
 
@@ -287,7 +291,7 @@ public:
                 geometry::less<point_type, 0>,
                 geometry::greater<point_type, 0>
             > extremes;
-        geometry::for_each_range(geometry, extremes);
+        geometry::detail::for_each_range(geometry, extremes);
 
         // Bounding left/right points
         // Second pass, now that extremes are found, assign all points
@@ -300,7 +304,7 @@ public:
                 typename strategy_side<cs_tag>::type
             > assigner(extremes.left, extremes.right);
 
-        geometry::for_each_range(geometry, assigner);
+        geometry::detail::for_each_range(geometry, assigner);
 
 
         // Sort both collections, first on x(, then on y)
@@ -382,7 +386,7 @@ private:
 
 
     template <iterate_direction Direction, typename OutputIterator>
-    static inline void output_range(container_type const& range, 
+    static inline void output_range(container_type const& range,
         OutputIterator out, bool skip_first)
     {
         typedef typename reversible_view<container_type const, Direction>::type view_type;

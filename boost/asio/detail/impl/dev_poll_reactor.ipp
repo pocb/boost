@@ -64,6 +64,8 @@ void dev_poll_reactor::shutdown_service()
     op_queue_[i].get_all_operations(ops);
 
   timer_queues_.get_all_timers(ops);
+
+  io_service_.abandon_operations(ops);
 } 
 
 // Helper class to re-register all descriptors with /dev/poll.
@@ -87,9 +89,9 @@ private:
   short events_;
 };
 
-void dev_poll_reactor::fork_service(boost::asio::io_service::fork_event event)
+void dev_poll_reactor::fork_service(boost::asio::io_service::fork_event fork_ev)
 {
-  if (event == boost::asio::io_service::fork_child)
+  if (fork_ev == boost::asio::io_service::fork_child)
   {
     detail::mutex::scoped_lock lock(mutex_);
 
@@ -152,6 +154,12 @@ int dev_poll_reactor::register_internal_descriptor(int op_type,
   interrupter_.interrupt();
 
   return 0;
+}
+
+void dev_poll_reactor::move_descriptor(socket_type,
+    dev_poll_reactor::per_descriptor_data&,
+    dev_poll_reactor::per_descriptor_data&)
+{
 }
 
 void dev_poll_reactor::start_op(int op_type, socket_type descriptor,

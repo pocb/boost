@@ -1,6 +1,8 @@
-// Boost.Geometry (aka GGL, Generic Geometry Library) test file
-//
-// Copyright Barend Gehrels 2007-2009, Geodan, Amsterdam, the Netherlands
+// Boost.Geometry (aka GGL, Generic Geometry Library)
+// Unit Test
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -43,10 +45,13 @@
 #endif
 
 
-#include <boost/geometry/geometries/adapted/c_array_cartesian.hpp>
-#include <boost/geometry/geometries/adapted/tuple_cartesian.hpp>
+#include <boost/geometry/geometries/adapted/c_array.hpp>
+#include <boost/geometry/geometries/adapted/boost_tuple.hpp>
 
 #include <test_common/test_point.hpp>
+
+BOOST_GEOMETRY_REGISTER_C_ARRAY_CS(cs::cartesian)
+BOOST_GEOMETRY_REGISTER_BOOST_TUPLE_CS(cs::cartesian)
 
 
 // ----------------------------------------------------------------------------
@@ -91,15 +96,18 @@ void test_all()
 
 int test_main(int, char* [])
 {
-/*    test_all<test::test_point>();
+    test_all<test::test_point>();
     test_all<boost::tuple<float, float> >();
     test_all<bg::model::point<int, 2, bg::cs::cartesian> >();
     test_all<bg::model::point<float, 2, bg::cs::cartesian> >();
     test_all<bg::model::point<double, 2, bg::cs::cartesian> >();
     test_all<bg::model::point<long double, 2, bg::cs::cartesian> >();
-*/
+
+    test_all<boost::tuple<float, float, float> >();
     test_all<bg::model::point<double, 3, bg::cs::cartesian> >();
-    //test_all<bg::model::point<long double, 3, bg::cs::cartesian> >();
+    test_all<bg::model::point<long double, 3, bg::cs::cartesian> >();
+
+    test_all<boost::tuple<float, float, float, float, float> >();
 
     return 0;
 }

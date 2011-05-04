@@ -11,6 +11,7 @@
 #include <boost/preprocessor/inc.hpp>
 #include <boost/preprocessor/dec.hpp>
 #include <boost/preprocessor/stringize.hpp>
+#include <boost/phoenix/version.hpp>
 #include <boost/phoenix/support/preprocessor/round.hpp>
 
 #if !defined(BOOST_PHOENIX_LIMIT)
@@ -18,6 +19,8 @@
 #elif (BOOST_PHOENIX_LIMIT < 5)
 # error "PHOENIX_LIMIT is set too low"
 #endif
+// for backwards compat.
+#define PHOENIX_LIMIT BOOST_PHOENIX_LIMIT
 
 #define BOOST_PHOENIX_LIMIT_STR BOOST_PP_STRINGIZE(BOOST_PHOENIX_PP_ROUND_UP(BOOST_PHOENIX_LIMIT))
 
@@ -107,6 +110,12 @@
 #   define BOOST_PROTO_MAX_LOGICAL_ARITY BOOST_PHOENIX_COMPOSITE_LIMIT
 #elif BOOST_PROTO_MAX_LOGICAL_ARITY < BOOST_PHOENIX_COMPOSITE_LIMIT
 #   error "BOOST_PROTO_MAX_LOGICAL_ARITY < BOOST_PHOENIX_COMPOSITE_LIMIT"
+#endif
+
+#if !defined(BOOST_RESULT_OF_NUM_ARGS)
+#   define BOOST_RESULT_OF_NUM_ARGS BOOST_PP_INC(BOOST_PHOENIX_COMPOSITE_LIMIT)
+#elif BOOST_RESULT_OF_NUM_ARGS < BOOST_PP_INC(BOOST_PHOENIX_COMPOSITE_LIMIT)
+#   error "BOOST_RESULT_OF_NUM_ARGS < BOOST_PHOENIX_COMPOSITE_LIMIT + 1"
 #endif
 
 // this include will set the limit for the proto expression arity

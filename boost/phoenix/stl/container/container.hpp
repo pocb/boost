@@ -14,7 +14,7 @@
 #include <boost/mpl/or.hpp>
 #include <boost/mpl/void.hpp>
 #include <boost/phoenix/stl/container/detail/container.hpp>
-#include <boost/phoenix/function/adapt_function.hpp>
+#include <boost/phoenix/function/adapt_callable.hpp>
 #include <boost/type_traits/is_const.hpp>
 
 namespace boost { namespace phoenix
@@ -94,7 +94,7 @@ namespace boost { namespace phoenix
               , typename C
               , typename Arg1
             >
-            struct result<This(C&, Arg1)>
+            struct result<This(C&, Arg1 const &)>
             {
                 typedef typename add_reference<C>::type type;
             };
@@ -106,8 +106,9 @@ namespace boost { namespace phoenix
               , typename Arg2
             >
             struct result<This(C&, Arg1, Arg2)>
-                : result<This(C&, Arg1)>
-            {};
+            {
+                typedef typename add_reference<C>::type type;
+            };
             
             template <
                 typename This
@@ -117,11 +118,12 @@ namespace boost { namespace phoenix
               , typename Arg3
             >
             struct result<This(C&, Arg1, Arg2, Arg3)>
-                : result<This(C&, Arg1)>
-            {};
+            {
+                typedef typename add_reference<C>::type type;
+            };
 
             template <typename C, typename Arg1>
-            C& operator()(C& c, Arg1 arg1) const
+            C& operator()(C& c, Arg1 const & arg1) const
             {
                 c.assign(arg1);
                 return c;
@@ -139,7 +141,8 @@ namespace boost { namespace phoenix
                 C& c
               , Arg1 arg1
               , Arg2 arg2
-              , Arg3 arg3) const
+              , Arg3 const & arg3
+            ) const
             {
                 return c.assign(arg1, arg2, arg3);
             }
@@ -291,12 +294,12 @@ namespace boost { namespace phoenix
                 //  returning a value. Oh well... :*
 
                 typedef
-                    boost::mpl::eval_if<
+                    boost::mpl::eval_if_c<
                         boost::is_same<
                             typename remove_reference<Arg1>::type
                           , typename iterator_of<C>::type
-                        >
-#if defined(BOOST_MSVC) && (BOOST_MSVC <= 1500)
+                        >::value
+#if defined(BOOST_MSVC)// && (BOOST_MSVC <= 1500)
                       , iterator_of<C>
 #else
                       , boost::mpl::identity<void>
@@ -306,8 +309,8 @@ namespace boost { namespace phoenix
                 map_erase_result;
 
                 typedef typename
-                    boost::mpl::eval_if<
-                        has_mapped_type<C>
+                    boost::mpl::eval_if_c<
+                        has_mapped_type<C>::value
                       , map_erase_result
                       , iterator_of<C>
                     >::type
@@ -349,34 +352,14 @@ namespace boost { namespace phoenix
             typename result_of::erase<C, Arg1>::type
             operator()(C& c, Arg1 arg1) const
             {
-                /*
-                std::cout << "\n";
-                std::cout << typeid( typename is_same<Arg1, typename iterator_of<C const>::type>::type ).name() << "\n";
-                std::cout << typeid( typename has_mapped_type<C>::type ).name() << "\n";
-                std::cout << typeid( typename result_of::erase<C, Arg1>::type ).name() << "\n";
-                std::cout << typeid( typename result_of::erase<C, Arg1>::map_erase_result::type ).name() << "\n";
-                std::cout << "\n";
-                std::cout << typeid( c.erase(arg1) ).name() << "\n";
-                */
                 return c.erase(arg1);
-                //c.erase(arg1);
             }
 
             template <typename C, typename Arg1, typename Arg2>
             typename result_of::erase<C, Arg1, Arg2>::type
             operator()(C& c, Arg1 arg1, Arg2 arg2) const
             {
-                /*
-                std::cout << "\nblubb\n";
-                std::cout << typeid( typename is_same<Arg1, typename iterator_of<C>::type>::type ).name() << "\n";
-                std::cout << typeid( typename has_mapped_type<C>::type ).name() << "\n";
-                std::cout << typeid( typename result_of::erase<C, Arg1, Arg2>::type ).name() << "\n";
-                //std::cout << typeid( typename result_of::erase<C, Arg1>::map_erase_result::type ).name() << "\n";
-                std::cout << "\n";
-                std::cout << typeid( c.erase(arg1, arg2) ).name() << "\n";
-                */
                 return c.erase(arg1, arg2);
-                //c.erase(arg1, arg2);
             }
         };
 
@@ -442,10 +425,11 @@ namespace boost { namespace phoenix
                 choice_1;
 
                 typedef
-                    boost::mpl::eval_if<
+                    boost::mpl::eval_if_c<
                         boost::mpl::and_<
                             boost::is_same<Arg3, mpl::void_>
-                          , boost::mpl::not_<boost::is_same<Arg1, Arg2> > >
+                          , boost::mpl::not_<boost::is_same<Arg1, Arg2> >
+                        >::value
                       , iterator_of<C>
                       , boost::mpl::identity<void>
                     >
@@ -454,8 +438,8 @@ namespace boost { namespace phoenix
             public:
 
                 typedef typename
-                    boost::mpl::eval_if<
-                        boost::is_same<Arg2, mpl::void_>
+                    boost::mpl::eval_if_c<
+                        boost::is_same<Arg2, mpl::void_>::value
                       , choice_1
                       , choice_2
                     >::type
@@ -495,7 +479,7 @@ namespace boost { namespace phoenix
               , typename C
               , typename Arg1
             >
-            struct result<This(C&, Arg1)>
+            struct result<This(C &, Arg1)>
                 : result_of::insert<C, Arg1>
             {};
             
@@ -505,7 +489,7 @@ namespace boost { namespace phoenix
               , typename Arg1
               , typename Arg2
             >
-            struct result<This(C&, Arg1, Arg2)>
+            struct result<This(C &, Arg1, Arg2)>
                 : result_of::insert<C, Arg1, Arg2>
             {};
             
@@ -516,7 +500,7 @@ namespace boost { namespace phoenix
               , typename Arg2
               , typename Arg3
             >
-            struct result<This(C&, Arg1, Arg2, Arg3)>
+            struct result<This(C &, Arg1, Arg2, Arg3)>
                 : result_of::insert<C, Arg1, Arg2, Arg3>
             {};
 
@@ -802,40 +786,40 @@ namespace boost { namespace phoenix
     //  The lazy functions themselves.
     //
     ///////////////////////////////////////////////////////////////////////////////
-    BOOST_PHOENIX_ADAPT_FUNCTION(assign, stl::assign, 2)
-    BOOST_PHOENIX_ADAPT_FUNCTION(assign, stl::assign, 3)
-    BOOST_PHOENIX_ADAPT_FUNCTION(assign, stl::assign, 4)
-    BOOST_PHOENIX_ADAPT_FUNCTION(at, stl::at, 2)
-    BOOST_PHOENIX_ADAPT_FUNCTION(back, stl::back, 1)
-    BOOST_PHOENIX_ADAPT_FUNCTION(begin, stl::begin, 1)
-    BOOST_PHOENIX_ADAPT_FUNCTION(capacity, stl::capacity, 1)
-    BOOST_PHOENIX_ADAPT_FUNCTION(clear, stl::clear, 1)
-    BOOST_PHOENIX_ADAPT_FUNCTION(empty, stl::empty, 1)
-    BOOST_PHOENIX_ADAPT_FUNCTION(end, stl::end, 1)
-    BOOST_PHOENIX_ADAPT_FUNCTION(erase, stl::erase, 2)
-    BOOST_PHOENIX_ADAPT_FUNCTION(erase, stl::erase, 3)
-    BOOST_PHOENIX_ADAPT_FUNCTION(front, stl::front, 1)
-    BOOST_PHOENIX_ADAPT_FUNCTION(get_allocator, stl::get_allocator, 1)
-    BOOST_PHOENIX_ADAPT_FUNCTION(insert, stl::insert, 2)
-    BOOST_PHOENIX_ADAPT_FUNCTION(insert, stl::insert, 3)
-    BOOST_PHOENIX_ADAPT_FUNCTION(insert, stl::insert, 4)
-    BOOST_PHOENIX_ADAPT_FUNCTION(key_comp, stl::key_comp, 1)
-    BOOST_PHOENIX_ADAPT_FUNCTION(max_size, stl::max_size, 1)
-    BOOST_PHOENIX_ADAPT_FUNCTION(pop_back, stl::pop_back, 1)
-    BOOST_PHOENIX_ADAPT_FUNCTION(pop_front, stl::pop_front, 1)
-    BOOST_PHOENIX_ADAPT_FUNCTION(push_back, stl::push_back, 2)
-    BOOST_PHOENIX_ADAPT_FUNCTION(push_front, stl::push_front, 2)
-    BOOST_PHOENIX_ADAPT_FUNCTION(rbegin, stl::rbegin, 1)
-    BOOST_PHOENIX_ADAPT_FUNCTION(rend, stl::rend, 1)
-    BOOST_PHOENIX_ADAPT_FUNCTION(reserve, stl::reserve, 2)
-    BOOST_PHOENIX_ADAPT_FUNCTION(resize, stl::resize, 2)
-    BOOST_PHOENIX_ADAPT_FUNCTION(resize, stl::resize, 3)
-    BOOST_PHOENIX_ADAPT_FUNCTION(size, stl::size, 1)
-    BOOST_PHOENIX_ADAPT_FUNCTION(splice, stl::splice, 2)
-    BOOST_PHOENIX_ADAPT_FUNCTION(splice, stl::splice, 3)
-    BOOST_PHOENIX_ADAPT_FUNCTION(splice, stl::splice, 4)
-    BOOST_PHOENIX_ADAPT_FUNCTION(splice, stl::splice, 5)
-    BOOST_PHOENIX_ADAPT_FUNCTION(value_comp, stl::value_comp, 1)
+    BOOST_PHOENIX_ADAPT_CALLABLE(assign, boost::phoenix::stl::assign, 2)
+    BOOST_PHOENIX_ADAPT_CALLABLE(assign, boost::phoenix::stl::assign, 3)
+    BOOST_PHOENIX_ADAPT_CALLABLE(assign, boost::phoenix::stl::assign, 4)
+    BOOST_PHOENIX_ADAPT_CALLABLE(at, stl::at, 2)
+    BOOST_PHOENIX_ADAPT_CALLABLE(back, stl::back, 1)
+    BOOST_PHOENIX_ADAPT_CALLABLE(begin, stl::begin, 1)
+    BOOST_PHOENIX_ADAPT_CALLABLE(capacity, stl::capacity, 1)
+    BOOST_PHOENIX_ADAPT_CALLABLE(clear, stl::clear, 1)
+    BOOST_PHOENIX_ADAPT_CALLABLE(empty, stl::empty, 1)
+    BOOST_PHOENIX_ADAPT_CALLABLE(end, stl::end, 1)
+    BOOST_PHOENIX_ADAPT_CALLABLE(erase, stl::erase, 2)
+    BOOST_PHOENIX_ADAPT_CALLABLE(erase, stl::erase, 3)
+    BOOST_PHOENIX_ADAPT_CALLABLE(front, stl::front, 1)
+    BOOST_PHOENIX_ADAPT_CALLABLE(get_allocator, stl::get_allocator, 1)
+    BOOST_PHOENIX_ADAPT_CALLABLE(insert, stl::insert, 2)
+    BOOST_PHOENIX_ADAPT_CALLABLE(insert, stl::insert, 3)
+    BOOST_PHOENIX_ADAPT_CALLABLE(insert, stl::insert, 4)
+    BOOST_PHOENIX_ADAPT_CALLABLE(key_comp, stl::key_comp, 1)
+    BOOST_PHOENIX_ADAPT_CALLABLE(max_size, stl::max_size, 1)
+    BOOST_PHOENIX_ADAPT_CALLABLE(pop_back, stl::pop_back, 1)
+    BOOST_PHOENIX_ADAPT_CALLABLE(pop_front, stl::pop_front, 1)
+    BOOST_PHOENIX_ADAPT_CALLABLE(push_back, stl::push_back, 2)
+    BOOST_PHOENIX_ADAPT_CALLABLE(push_front, stl::push_front, 2)
+    BOOST_PHOENIX_ADAPT_CALLABLE(rbegin, stl::rbegin, 1)
+    BOOST_PHOENIX_ADAPT_CALLABLE(rend, stl::rend, 1)
+    BOOST_PHOENIX_ADAPT_CALLABLE(reserve, stl::reserve, 2)
+    BOOST_PHOENIX_ADAPT_CALLABLE(resize, stl::resize, 2)
+    BOOST_PHOENIX_ADAPT_CALLABLE(resize, stl::resize, 3)
+    BOOST_PHOENIX_ADAPT_CALLABLE(size, stl::size, 1)
+    BOOST_PHOENIX_ADAPT_CALLABLE(splice, stl::splice, 2)
+    BOOST_PHOENIX_ADAPT_CALLABLE(splice, stl::splice, 3)
+    BOOST_PHOENIX_ADAPT_CALLABLE(splice, stl::splice, 4)
+    BOOST_PHOENIX_ADAPT_CALLABLE(splice, stl::splice, 5)
+    BOOST_PHOENIX_ADAPT_CALLABLE(value_comp, stl::value_comp, 1)
 
 }} // namespace boost::phoenix
 

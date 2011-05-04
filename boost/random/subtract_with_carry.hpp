@@ -25,6 +25,7 @@
 #include <boost/cstdint.hpp>
 #include <boost/static_assert.hpp>
 #include <boost/integer/static_log2.hpp>
+#include <boost/integer/integer_mask.hpp>
 #include <boost/detail/workaround.hpp>
 #include <boost/random/detail/config.hpp>
 #include <boost/random/detail/seed.hpp>
@@ -36,6 +37,64 @@
 
 namespace boost {
 namespace random {
+
+namespace detail {
+   
+struct subtract_with_carry_discard
+{
+    template<class Engine>
+    static void apply(Engine& eng, boost::uintmax_t z)
+    {
+        typedef typename Engine::result_type IntType;
+        const std::size_t short_lag = Engine::short_lag;
+        const std::size_t long_lag = Engine::long_lag;
+        std::size_t k = eng.k;
+        IntType carry = eng.carry;
+        if(k != 0) {
+            // increment k until it becomes 0.
+            if(k < short_lag) {
+                std::size_t limit = (short_lag - k) < z?
+                    short_lag : (k + static_cast<std::size_t>(z));
+                for(std::size_t j = k; j < limit; ++j) {
+                    carry = eng.do_update(j, j + long_lag - short_lag, carry);
+                }
+            }
+            std::size_t limit = (long_lag - k) < z?
+                long_lag : (k + static_cast<std::size_t>(z));
+            std::size_t start = (k < short_lag ? short_lag : k);
+            for(std::size_t j = start; j < limit; ++j) {
+                carry = eng.do_update(j, j - short_lag, carry);
+            }
+        }
+
+        k = ((z % long_lag) + k) % long_lag;
+
+        if(k < z) {
+            // main loop: update full blocks from k = 0 to long_lag
+            for(std::size_t i = 0; i < (z - k) / long_lag; ++i) {
+                for(std::size_t j = 0; j < short_lag; ++j) {
+                    carry = eng.do_update(j, j + long_lag - short_lag, carry);
+                }
+                for(std::size_t j = short_lag; j < long_lag; ++j) {
+                    carry = eng.do_update(j, j - short_lag, carry);
+                }
+            }
+
+            // Update the last partial block
+            std::size_t limit = short_lag < k? short_lag : k; 
+            for(std::size_t j = 0; j < limit; ++j) {
+                carry = eng.do_update(j, j + long_lag - short_lag, carry);
+            }
+            for(std::size_t j = short_lag; j < k; ++j) {
+                carry = eng.do_update(j, j - short_lag, carry);
+            }
+        }
+        eng.carry = carry;
+        eng.k = k;
+    }
+};
+
+}
 
 /**
  * Instantiations of @c subtract_with_carry_engine model a
@@ -75,7 +134,7 @@ public:
      * it with @c value.
      */
     BOOST_RANDOM_DETAIL_ARITHMETIC_CONSTRUCTOR(subtract_with_carry_engine,
-                                               uint32_t, value)
+                                               IntType, value)
     { seed(value); }
     /**
      * Constructs a new @c subtract_with_carry_engine and seeds
@@ -99,10 +158,10 @@ public:
     /** Seeds the generator with the default seed. */
     void seed() { seed(default_seed); }
     BOOST_RANDOM_DETAIL_ARITHMETIC_SEED(subtract_with_carry_engine,
-                                        uint32_t, value)
+                                        IntType, value)
     {
         typedef linear_congruential_engine<uint32_t,40014,0,2147483563> gen_t;
-        gen_t intgen(value);
+        gen_t intgen(static_cast<boost::uint32_t>(value));
         detail::generator_seed_seq<gen_t> gen(intgen);
         seed(gen);
     }
@@ -134,13 +193,7 @@ public:
     { return 0; }
     /** Returns the largest value that the generator can produce. */
     static result_type max BOOST_PREVENT_MACRO_SUBSTITUTION ()
-    {
-        // avoid "left shift count >= width of type" warning
-        result_type res = 0;
-        for(std::size_t j = 0; j < w; ++j)
-            res |= (static_cast<result_type>(1) << j);
-        return res;
-    }
+    { return boost::low_bits_mask_t<w>::sig_bits; }
 
     /** Returns the next value of the generator. */
     result_type operator()()
@@ -149,32 +202,19 @@ public:
             (k < short_lag)?
                 (k + long_lag - short_lag) :
                 (k - short_lag);
-        IntType delta;
-        if (x[short_index] >= x[k] + carry) {
-            // x(n) >= 0
-            delta =  x[short_index] - (x[k] + carry);
-            carry = 0;
-        } else {
-            // x(n) < 0
-            delta = modulus - x[k] - carry + x[short_index];
-            carry = 1;
-        }
-        x[k] = delta;
+        carry = do_update(k, short_index, carry);
+        IntType result = x[k];
         ++k;
         if(k >= long_lag)
             k = 0;
-        return delta;
+        return result;
     }
 
-#ifndef BOOST_NO_LONG_LONG
     /** Advances the state of the generator by @c z. */
-    void discard(boost::ulong_long_type z)
+    void discard(boost::uintmax_t z)
     {
-        for(boost::ulong_long_type j = 0; j < z; ++j) {
-            (*this)();
-        }
+        detail::subtract_with_carry_discard::apply(*this, z);
     }
-#endif
 
     /** Fills a range with random values. */
     template<class It>
@@ -185,8 +225,8 @@ public:
     BOOST_RANDOM_DETAIL_OSTREAM_OPERATOR(os, subtract_with_carry_engine, f)
     {
         for(unsigned int j = 0; j < f.long_lag; ++j)
-            os << f.compute(j) << " ";
-        os << f.carry << " ";
+            os << f.compute(j) << ' ';
+        os << f.carry;
         return os;
     }
 
@@ -224,6 +264,25 @@ private:
     IntType compute(unsigned int index) const
     {
         return x[(k+index) % long_lag];
+    }
+
+    friend struct detail::subtract_with_carry_discard;
+
+    IntType do_update(std::size_t current, std::size_t short_index, IntType carry)
+    {
+        IntType delta;
+        IntType temp = x[current] + carry;
+        if (x[short_index] >= temp) {
+            // x(n) >= 0
+            delta =  x[short_index] - temp;
+            carry = 0;
+        } else {
+            // x(n) < 0
+            delta = modulus - temp + x[short_index];
+            carry = 1;
+        }
+        x[current] = delta;
+        return carry;
     }
     /// \endcond
 
@@ -284,7 +343,7 @@ public:
     BOOST_STATIC_CONSTANT(std::size_t, word_size = w);
     BOOST_STATIC_CONSTANT(std::size_t, long_lag = r);
     BOOST_STATIC_CONSTANT(std::size_t, short_lag = s);
-    BOOST_STATIC_CONSTANT(uint32_t, default_seed = 19780503u);
+    BOOST_STATIC_CONSTANT(boost::uint32_t, default_seed = 19780503u);
 
     BOOST_STATIC_ASSERT(!std::numeric_limits<result_type>::is_integer);
 
@@ -292,7 +351,7 @@ public:
     subtract_with_carry_01_engine() { init_modulus(); seed(); }
     /** Creates a new subtract_with_carry_01_engine and seeds it with value. */
     BOOST_RANDOM_DETAIL_ARITHMETIC_CONSTRUCTOR(subtract_with_carry_01_engine,
-                                               uint32_t, value)
+                                               boost::uint32_t, value)
     { init_modulus(); seed(value); }
     /**
      * Creates a new \subtract_with_carry_01_engine and seeds with with values
@@ -330,7 +389,7 @@ public:
 
     /** Seeds the generator with @c value. */
     BOOST_RANDOM_DETAIL_ARITHMETIC_SEED(subtract_with_carry_01_engine,
-                                        uint32_t, value)
+                                        boost::uint32_t, value)
     {
         typedef linear_congruential_engine<uint32_t, 40014, 0, 2147483563> gen_t;
         gen_t intgen(value);
@@ -385,29 +444,17 @@ public:
             (k < short_lag) ?
                 (k + long_lag - short_lag) :
                 (k - short_lag);
-        RealType delta = x[short_index] - x[k] - carry;
-        if(delta < 0) {
-            delta += RealType(1);
-            carry = RealType(1)/_modulus;
-        } else {
-            carry = 0;
-        }
-        x[k] = delta;
+        carry = do_update(k, short_index, carry);
+        RealType result = x[k];
         ++k;
         if(k >= long_lag)
             k = 0;
-        return delta;
+        return result;
     }
 
-#ifndef BOOST_NO_LONG_LONG
     /** Advances the state of the generator by @c z. */
-    void discard(boost::ulong_long_type z)
-    {
-        for(boost::ulong_long_type j = 0; j < z; ++j) {
-            (*this)();
-        }
-    }
-#endif
+    void discard(boost::uintmax_t z)
+    { detail::subtract_with_carry_discard::apply(*this, z); }
 
     /** Fills a range with random values. */
     template<class Iter>
@@ -420,7 +467,7 @@ public:
         std::ios_base::fmtflags oldflags =
             os.flags(os.dec | os.fixed | os.left); 
         for(unsigned int j = 0; j < f.long_lag; ++j)
-            os << (f.compute(j) * f._modulus) << " ";
+            os << (f.compute(j) * f._modulus) << ' ';
         os << (f.carry * f._modulus);
         os.flags(oldflags);
         return os;
@@ -458,6 +505,21 @@ private:
     {
         return x[(k+index) % long_lag];
     }
+
+    friend struct detail::subtract_with_carry_discard;
+
+    RealType do_update(std::size_t current, std::size_t short_index, RealType carry)
+    {
+        RealType delta = x[short_index] - x[current] - carry;
+        if(delta < 0) {
+            delta += RealType(1);
+            carry = RealType(1)/_modulus;
+        } else {
+            carry = 0;
+        }
+        x[current] = delta;
+        return carry;
+    }
     /// \endcond
     std::size_t k;
     RealType carry;
@@ -494,7 +556,7 @@ public:
     BOOST_RANDOM_DETAIL_GENERATOR_CONSTRUCTOR(subtract_with_carry, Gen, gen)
     { seed(gen); }
     BOOST_RANDOM_DETAIL_ARITHMETIC_CONSTRUCTOR(subtract_with_carry,
-                                               uint32_t, val)
+                                               IntType, val)
     { seed(val); }
     template<class It>
     subtract_with_carry(It& first, It last) : base_type(first, last) {}
@@ -504,7 +566,7 @@ public:
         detail::generator_seed_seq<Gen> seq(gen);
         base_type::seed(seq);
     }
-    BOOST_RANDOM_DETAIL_ARITHMETIC_SEED(subtract_with_carry, uint32_t, val)
+    BOOST_RANDOM_DETAIL_ARITHMETIC_SEED(subtract_with_carry, IntType, val)
     { base_type::seed(val); }
     template<class It>
     void seed(It& first, It last) { base_type::seed(first, last); }

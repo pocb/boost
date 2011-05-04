@@ -1,6 +1,10 @@
-// Boost.Geometry (aka GGL, Generic Geometry Library) test file
-//
-// Copyright Barend Gehrels 2009-2010, Geodan, Amsterdam, the Netherlands
+// Boost.Geometry (aka GGL, Generic Geometry Library)
+
+// Copyright (c) 2009-2011 Barend Gehrels, Amsterdam, the Netherlands.
+
+// Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
+// (geolib/GGL), copyright (c) 1995-2010 Geodan, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -26,6 +30,7 @@
 #include <boost/geometry/core/tag_cast.hpp>
 
 #include <boost/geometry/algorithms/envelope.hpp>
+#include <boost/geometry/algorithms/expand.hpp>
 #include <boost/geometry/algorithms/transform.hpp>
 #include <boost/geometry/algorithms/num_points.hpp>
 #include <boost/geometry/strategies/transform.hpp>
@@ -260,8 +265,8 @@ public :
     {
         if (num_points(geometry) > 0)
         {
-            combine(m_bounding_box,
-                make_envelope
+            expand(m_bounding_box,
+                return_envelope
                     <
                         model::box<Point>
                     >(geometry));

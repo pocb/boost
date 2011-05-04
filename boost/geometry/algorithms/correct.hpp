@@ -1,7 +1,12 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
-//
-// Copyright Barend Gehrels 2007-2009, Geodan, Amsterdam, the Netherlands.
-// Copyright Bruno Lalande 2008, 2009
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2011 Bruno Lalande, Paris, France.
+// Copyright (c) 2009-2011 Mateusz Loskot, London, UK.
+
+// Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
+// (geolib/GGL), copyright (c) 1995-2010 Geodan, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -81,7 +86,7 @@ struct correct_box_loop<Box, DimensionCount, DimensionCount>
 };
 
 
-// correct an box: make min/max are correct
+// Correct a box: make min/max correct
 template <typename Box>
 struct correct_box
 {
@@ -89,7 +94,8 @@ struct correct_box
     static inline void apply(Box& box)
     {
         // Currently only for Cartesian coordinates
-        // TODO: adapt using strategies
+        // (or spherical without crossing dateline)
+        // Future version: adapt using strategies
         correct_box_loop
             <
                 Box, 0, dimension<Box>::type::value
@@ -98,7 +104,7 @@ struct correct_box
 };
 
 
-// close a linear_ring, if not closed
+// Close a ring, if not closed
 template <typename Ring, typename Predicate>
 struct correct_ring
 {
@@ -149,8 +155,8 @@ struct correct_ring
     }
 };
 
-// correct a polygon: normalizes all rings, sets outer linear_ring clockwise, sets all
-// inner rings counter clockwise
+// Correct a polygon: normalizes all rings, sets outer ring clockwise, sets all
+// inner rings counter clockwise (or vice versa depending on orientation)
 template <typename Polygon>
 struct correct_polygon
 {
@@ -167,7 +173,7 @@ struct correct_polygon
 
         typename interior_return_type<Polygon>::type rings
                     = interior_rings(poly);
-        for (BOOST_AUTO(it, boost::begin(rings)); it != boost::end(rings); ++it)
+        for (BOOST_AUTO_TPL(it, boost::begin(rings)); it != boost::end(rings); ++it)
         {
             correct_ring
                 <
@@ -181,6 +187,7 @@ struct correct_polygon
 
 }} // namespace detail::correct
 #endif // DOXYGEN_NO_DETAIL
+
 
 #ifndef DOXYGEN_NO_DISPATCH
 namespace dispatch
@@ -221,8 +228,8 @@ template <typename Ring>
 struct correct<ring_tag, Ring>
     : detail::correct::correct_ring
         <
-            Ring, 
-            std::less<typename coordinate_type<Ring>::type> 
+            Ring,
+            std::less<typename coordinate_type<Ring>::type>
         >
 {};
 
@@ -238,10 +245,15 @@ struct correct<polygon_tag, Polygon>
 
 /*!
 \brief Corrects a geometry
-\details Corrects a geometry
+\details Corrects a geometry: all rings which are wrongly oriented with respect
+    to their expected orientation are reversed. To all rings which do not have a
+    closing point and are typed as they should have one, the first point is
+    appended. Also boxes can be corrected.
 \ingroup correct
 \tparam Geometry \tparam_geometry
-\param geometry \param_geometry
+\param geometry \param_geometry which will be corrected if necessary
+
+\qbk{[include reference/algorithms/correct.qbk]}
 */
 template <typename Geometry>
 inline void correct(Geometry& geometry)

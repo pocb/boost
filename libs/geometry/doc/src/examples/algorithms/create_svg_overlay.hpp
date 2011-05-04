@@ -1,21 +1,27 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
-//
-// Copyright Barend Gehrels 2011, Geodan, Amsterdam, the Netherlands
+
+// Copyright (c) 2011 Barend Gehrels, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
-//
+
 // Code to create SVG for examples
+
 #ifndef CREATE_SVG_OVERLAY_HPP
 #define CREATE_SVG_OVERLAY_HPP
 
 #include <fstream>
 #include <boost/algorithm/string.hpp>
-#include <boost/geometry/extensions/io/svg/svg_mapper.hpp>
+
+#if defined(HAVE_SVG)
+#  include <boost/geometry/extensions/io/svg/svg_mapper.hpp>
+#endif
 
 template <typename Geometry, typename Range>
 void create_svg(std::string const& filename, Geometry const& a, Geometry const& b, Range const& range)
 {
+#if defined(HAVE_SVG)
     std::cout  << std::endl << "[$img/algorithms/" << boost::replace_all_copy(filename, ".svg", ".png") << "]" << std::endl << std::endl;
 
     typedef typename boost::geometry::point_type<Geometry>::type point_type;
@@ -33,9 +39,10 @@ void create_svg(std::string const& filename, Geometry const& a, Geometry const& 
         mapper.map(g, "opacity:0.8;fill:none;stroke:rgb(255,128,0);stroke-width:4;stroke-dasharray:1,7;stroke-linecap:round");
         std::ostringstream out;
         out << i++;
-        mapper.text(boost::geometry::make_centroid<point_type>(g), out.str(),
+        mapper.text(boost::geometry::return_centroid<point_type>(g), out.str(),
                     "fill:rgb(0,0,0);font-family:Arial;font-size:10px");
     }
+#endif    
 }
 
 // NOTE: convert manually from svg to png using Inkscape ctrl-shift-E

@@ -1,13 +1,18 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
-//
-// Copyright Barend Gehrels 2007-2009, Geodan, Amsterdam, the Netherlands.
-// Copyright Bruno Lalande 2008, 2009
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2011 Bruno Lalande, Paris, France.
+// Copyright (c) 2009-2011 Mateusz Loskot, London, UK.
+
+// Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
+// (geolib/GGL), copyright (c) 1995-2010 Geodan, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef BOOST_GEOMETRY_ALGORITHMS_CONVERT_HPP
-#define BOOST_GEOMETRY_ALGORITHMS_CONVERT_HPP
+#ifndef BOOST_GEOMETRY_ALGORITHMS_DETAIL_CONVERT_HPP
+#define BOOST_GEOMETRY_ALGORITHMS_DETAIL_CONVERT_HPP
 
 
 #include <cstddef>
@@ -15,9 +20,11 @@
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/range.hpp>
 
+#include <boost/geometry/arithmetic/arithmetic.hpp>
 #include <boost/geometry/algorithms/append.hpp>
-#include <boost/geometry/algorithms/assign.hpp>
+#include <boost/geometry/algorithms/clear.hpp>
 #include <boost/geometry/algorithms/for_each.hpp>
+#include <boost/geometry/algorithms/detail/assign_values.hpp>
 #include <boost/geometry/algorithms/detail/convert_point_to_point.hpp>
 
 #include <boost/geometry/core/cs.hpp>
@@ -28,7 +35,7 @@ namespace boost { namespace geometry
 {
 
 #ifndef DOXYGEN_NO_DETAIL
-namespace detail { namespace convert
+namespace detail { namespace conversion
 {
 
 template
@@ -70,7 +77,7 @@ struct point_to_box<Point, Box, Index, DimensionCount, DimensionCount>
 };
 
 
-}} // namespace detail::convert
+}} // namespace detail::conversion
 #endif // DOXYGEN_NO_DETAIL
 
 
@@ -112,7 +119,7 @@ template
     typename Geometry1, typename Geometry2
 >
 struct convert<point_tag, point_tag, DimensionCount, Geometry1, Geometry2>
-    : detail::convert::point_to_point<Geometry1, Geometry2, 0, DimensionCount>
+    : detail::conversion::point_to_point<Geometry1, Geometry2, 0, DimensionCount>
 {};
 
 
@@ -142,19 +149,19 @@ struct convert<box_tag, ring_tag, 2, Box, Ring>
         geometry::clear(ring);
         typename point_type<Box>::type point;
 
-        geometry::assign(point, get<min_corner, 0>(box), get<min_corner, 1>(box));
+        geometry::assign_values(point, get<min_corner, 0>(box), get<min_corner, 1>(box));
         geometry::append(ring, point);
 
-        geometry::assign(point, get<min_corner, 0>(box), get<max_corner, 1>(box));
+        geometry::assign_values(point, get<min_corner, 0>(box), get<max_corner, 1>(box));
         geometry::append(ring, point);
 
-        geometry::assign(point, get<max_corner, 0>(box), get<max_corner, 1>(box));
+        geometry::assign_values(point, get<max_corner, 0>(box), get<max_corner, 1>(box));
         geometry::append(ring, point);
 
-        geometry::assign(point, get<max_corner, 0>(box), get<min_corner, 1>(box));
+        geometry::assign_values(point, get<max_corner, 0>(box), get<min_corner, 1>(box));
         geometry::append(ring, point);
 
-        geometry::assign(point, get<min_corner, 0>(box), get<min_corner, 1>(box));
+        geometry::assign_values(point, get<min_corner, 0>(box), get<min_corner, 1>(box));
         geometry::append(ring, point);
     }
 };
@@ -181,11 +188,11 @@ struct convert<point_tag, box_tag, DimensionCount, Point, Box>
 {
     static inline void apply(Point const& point, Box& box)
     {
-        detail::convert::point_to_box
+        detail::conversion::point_to_box
             <
                 Point, Box, min_corner, 0, DimensionCount
             >::apply(point, box);
-        detail::convert::point_to_box
+        detail::conversion::point_to_box
             <
                 Point, Box, max_corner, 0, DimensionCount
             >::apply(point, box);
@@ -227,6 +234,7 @@ struct convert<polygon_tag, ring_tag, DimensionCount, Polygon, Ring>
 } // namespace dispatch
 #endif // DOXYGEN_NO_DISPATCH
 
+
 /*!
 \brief Converts one geometry to another geometry
 \details The convert algorithm converts one geometry, e.g. a BOX, to another geometry, e.g. a RING. This only
@@ -236,6 +244,8 @@ if it is possible and applicable.
 \tparam Geometry2 \tparam_geometry
 \param geometry1 \param_geometry (source)
 \param geometry2 \param_geometry (target)
+
+\qbk{[include reference/algorithms/convert.qbk]}
  */
 template <typename Geometry1, typename Geometry2>
 inline void convert(Geometry1 const& geometry1, Geometry2& geometry2)
@@ -256,4 +266,4 @@ inline void convert(Geometry1 const& geometry1, Geometry2& geometry2)
 }} // namespace boost::geometry
 
 
-#endif // BOOST_GEOMETRY_ALGORITHMS_CONVERT_HPP
+#endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_CONVERT_HPP

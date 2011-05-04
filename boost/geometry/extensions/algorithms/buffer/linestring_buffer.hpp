@@ -1,6 +1,7 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
-//
-// Copyright Barend Gehrels 2010, Geodan, Amsterdam, the Netherlands.
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -16,7 +17,7 @@
 
 #include <boost/geometry/core/point_type.hpp>
 
-#include <boost/geometry/strategies/buffer_side.hpp>
+#include <boost/geometry/extensions/strategies/buffer_side.hpp>
 
 #include <boost/geometry/extensions/algorithms/buffer/line_line_intersection.hpp>
 #include <boost/geometry/extensions/algorithms/buffer/intersecting_inserter.hpp>

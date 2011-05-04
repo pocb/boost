@@ -8,12 +8,10 @@
 #ifndef BOOST_PHOENIX_FUNCTION_FUNCTION_HPP
 #define BOOST_PHOENIX_FUNCTION_FUNCTION_HPP
 
-#include <boost/phoenix/core/limits.hpp>
-#include <boost/phoenix/core/meta_grammar.hpp>
-#include <boost/phoenix/core/expression.hpp>
-#include <boost/phoenix/core/call.hpp>
-#include <boost/phoenix/support/iterate.hpp>
-#include <boost/proto/tags.hpp>
+//#include <boost/phoenix/function/function_handling.hpp>
+#include <boost/phoenix/core/detail/function_eval.hpp>
+#include <boost/preprocessor/facilities/expand.hpp>
+#include <boost/preprocessor/logical/or.hpp>
 #include <boost/utility/result_of.hpp>
 
 namespace boost { namespace phoenix
@@ -21,49 +19,6 @@ namespace boost { namespace phoenix
     /////////////////////////////////////////////////////////////////////////////
     // Functions
     /////////////////////////////////////////////////////////////////////////////
-
-    namespace tag
-    {
-        typedef proto::tag::function function;
-    }
-
-    namespace expression
-    {
-
-        template <
-            typename F
-          , BOOST_PHOENIX_typename_A_void(BOOST_PHOENIX_LIMIT)
-          , typename Dummy = void
-        >
-        struct function;
-
-    #define BOOST_PHOENIX_DEFINE_FUNCTION_EXPRESSION(_, N, __)                  \
-        template <typename F, BOOST_PHOENIX_typename_A(N)>                      \
-        struct function<F, BOOST_PHOENIX_A(N)>                                  \
-            : expr<tag::function, F, BOOST_PHOENIX_A(N)>                        \
-        {};                                                                     \
-
-        BOOST_PP_REPEAT_FROM_TO(
-            1
-          , BOOST_PHOENIX_LIMIT
-          , BOOST_PHOENIX_DEFINE_FUNCTION_EXPRESSION
-          , _
-        )
-
-    #undef BOOST_PHOENIX_DEFINE_FUNCTION_EXPRESSION
-    }
-
-    namespace rule
-    {
-        struct function
-            : expression::function<proto::vararg<meta_grammar> >
-        {};
-    }
-
-    template <typename Dummy>
-    struct meta_grammar::case_<proto::tag::function, Dummy>
-        : enable_rule<rule::function, Dummy>
-    {};
 
     // functor which returns our lazy function call extension
     template<typename F>
@@ -78,10 +33,10 @@ namespace boost { namespace phoenix
         template <typename Sig>
         struct result;
 
-        typename expression::function<F>::type const
+        typename detail::expression::function_eval<F>::type const
         operator()() const
         {
-            return expression::function<F>::make(f);
+            return detail::expression::function_eval<F>::make(f);
         }
 
         // Bring in the rest
@@ -89,12 +44,11 @@ namespace boost { namespace phoenix
 
         F f;
     };
-
 }
 
     template<typename F>
     struct result_of<phoenix::function<F>()>
-      : phoenix::expression::function<F>
+      : phoenix::detail::expression::function_eval<F>
     {};
 
 }

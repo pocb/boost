@@ -10,7 +10,7 @@
 #pragma once
 #endif
 
-#include <limits>
+#include <boost/limits.hpp>
 #include <boost/config.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/utility/enable_if.hpp>
@@ -22,6 +22,7 @@
 #include <boost/spirit/home/support/char_class.hpp>
 #include <boost/spirit/home/support/container.hpp>
 #include <boost/spirit/home/support/detail/get_encoding.hpp>
+#include <boost/spirit/home/support/detail/is_spirit_tag.hpp>
 #include <boost/spirit/home/karma/meta_compiler.hpp>
 #include <boost/spirit/home/karma/delimit_out.hpp>
 #include <boost/spirit/home/karma/auxiliary/lazy.hpp>
@@ -39,7 +40,10 @@ namespace boost { namespace spirit
     namespace tag
     {
         template <typename T, unsigned Radix>
-        struct uint_generator {};
+        struct uint_generator 
+        {
+            BOOST_SPIRIT_IS_TAG()
+        };
     }
 
     namespace karma
@@ -250,8 +254,7 @@ namespace boost { namespace spirit { namespace karma
 
         // check template Attribute 'Radix' for validity
         BOOST_SPIRIT_ASSERT_MSG(
-            Radix == 2 || Radix == 8 || Radix == 10 || Radix == 16,
-            not_supported_radix, ());
+            Radix >= 2 && Radix <= 36, not_supported_radix, ());
 
         BOOST_SPIRIT_ASSERT_MSG(
             // the following is a workaround for STLPort, where the simpler
@@ -316,8 +319,7 @@ namespace boost { namespace spirit { namespace karma
 
         // check template Attribute 'Radix' for validity
         BOOST_SPIRIT_ASSERT_MSG(
-            Radix == 2 || Radix == 8 || Radix == 10 || Radix == 16,
-            not_supported_radix, ());
+            Radix >= 2 && Radix <= 36, not_supported_radix, ());
 
         BOOST_SPIRIT_ASSERT_MSG(
             // the following is a workaround for STLPort, where the simpler

@@ -1,7 +1,13 @@
-// Boost.Geometry (aka GGL, Generic Geometry Library) test file
-//
-// Copyright Barend Gehrels 2007-2009, Geodan, Amsterdam, the Netherlands
-// Copyright Bruno Lalande 2008, 2009
+// Boost.Geometry (aka GGL, Generic Geometry Library)
+// Unit Test
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2011 Bruno Lalande, Paris, France.
+// Copyright (c) 2009-2011 Mateusz Loskot, London, UK.
+
+// Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
+// (geolib/GGL), copyright (c) 1995-2010 Geodan, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -24,8 +30,8 @@
 
 
 #include <boost/geometry/geometries/point.hpp>
-#include <boost/geometry/geometries/adapted/c_array_cartesian.hpp>
-#include <boost/geometry/geometries/adapted/tuple_cartesian.hpp>
+#include <boost/geometry/geometries/adapted/c_array.hpp>
+#include <boost/geometry/geometries/adapted/boost_tuple.hpp>
 
 #include <test_common/test_point.hpp>
 
@@ -33,15 +39,17 @@
 #  include <boost/geometry/extensions/contrib/ttmath_stub.hpp>
 #endif
 
+BOOST_GEOMETRY_REGISTER_C_ARRAY_CS(cs::cartesian)
+BOOST_GEOMETRY_REGISTER_BOOST_TUPLE_CS(cs::cartesian)
 
 
 template <typename P1, typename P2>
 void test_null_distance_3d()
 {
     P1 p1;
-    bg::assign(p1, 1, 2, 3);
+    bg::assign_values(p1, 1, 2, 3);
     P2 p2;
-    bg::assign(p2, 1, 2, 3);
+    bg::assign_values(p2, 1, 2, 3);
 
     typedef bg::strategy::distance::pythagoras<P1, P2> pythagoras_type;
     typedef typename bg::strategy::distance::services::return_type<pythagoras_type>::type return_type;
@@ -56,9 +64,9 @@ template <typename P1, typename P2>
 void test_axis_3d()
 {
     P1 p1;
-    bg::assign(p1, 0, 0, 0);
+    bg::assign_values(p1, 0, 0, 0);
     P2 p2;
-    bg::assign(p2, 1, 0, 0);
+    bg::assign_values(p2, 1, 0, 0);
 
     typedef bg::strategy::distance::pythagoras<P1, P2> pythagoras_type;
     typedef typename bg::strategy::distance::services::return_type<pythagoras_type>::type return_type;
@@ -68,11 +76,11 @@ void test_axis_3d()
     return_type result = pythagoras.apply(p1, p2);
     BOOST_CHECK_EQUAL(result, return_type(1));
 
-    bg::assign(p2, 0, 1, 0);
+    bg::assign_values(p2, 0, 1, 0);
     result = pythagoras.apply(p1, p2);
     BOOST_CHECK_EQUAL(result, return_type(1));
 
-    bg::assign(p2, 0, 0, 1);
+    bg::assign_values(p2, 0, 0, 1);
     result = pythagoras.apply(p1, p2);
     BOOST_CHECK_CLOSE(result, return_type(1), 0.001);
 }
@@ -81,9 +89,9 @@ template <typename P1, typename P2>
 void test_arbitrary_3d()
 {
     P1 p1;
-    bg::assign(p1, 1, 2, 3);
+    bg::assign_values(p1, 1, 2, 3);
     P2 p2;
-    bg::assign(p2, 9, 8, 7);
+    bg::assign_values(p2, 9, 8, 7);
 
     {
         typedef bg::strategy::distance::pythagoras<P1, P2> strategy_type;
@@ -119,10 +127,10 @@ void test_services()
 
 
     P1 p1;
-    bg::assign(p1, 1, 2, 3);
+    bg::assign_values(p1, 1, 2, 3);
 
     P2 p2;
-    bg::assign(p2, 4, 5, 6);
+    bg::assign_values(p2, 4, 5, 6);
 
     double const sqr_expected = 3*3 + 3*3 + 3*3; // 27
     double const expected = sqrt(sqr_expected); // sqrt(27)=5.1961524227
@@ -195,8 +203,8 @@ void test_big_2d_with(AssignType const& x1, AssignType const& y1,
 
 
     point_type p1, p2;
-    bg::assign(p1, x1, y1);
-    bg::assign(p2, x2, y2);
+    bg::assign_values(p1, x1, y1);
+    bg::assign_values(p2, x2, y2);
     return_type d = pythagoras.apply(p1, p2);
 
     /***
@@ -252,8 +260,8 @@ void time_compare_s(int const n)
 {
     boost::timer t;
     P p1, p2;
-    bg::assign(p1, 1, 1);
-    bg::assign(p2, 2, 2);
+    bg::assign_values(p1, 1, 1);
+    bg::assign_values(p2, 2, 2);
     Strategy strategy;
     typename bg::strategy::distance::services::return_type<Strategy>::type s = 0;
     for (int i = 0; i < n; i++)

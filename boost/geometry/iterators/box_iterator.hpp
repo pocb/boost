@@ -1,6 +1,12 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
-//
-// Copyright Barend Gehrels 2010, Geodan, Amsterdam, the Netherlands.
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2011 Bruno Lalande, Paris, France.
+// Copyright (c) 2009-2011 Mateusz Loskot, London, UK.
+
+// Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
+// (geolib/GGL), copyright (c) 1995-2010 Geodan, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -35,6 +41,13 @@ struct box_iterator
         boost::random_access_traversal_tag
     >
 {
+    // Default constructor is required to check concept of Range
+    inline box_iterator()
+        : m_index(-1)
+        , m_box_address(NULL)
+    {
+    }
+    
     explicit inline box_iterator(Box const& box)
         : m_index(0)
         , m_box_address(&box)
@@ -50,6 +63,14 @@ struct box_iterator
         init(box);
     }
 
+    // Operator= is required to check concept of Range
+    inline box_iterator<Box>& operator=(box_iterator<Box> const& source)
+    {
+        m_index = source.m_index;
+        m_box_address = source.m_box_address;
+        return *this;
+    }
+    
     typedef std::ptrdiff_t difference_type;
 
 private:
@@ -89,15 +110,13 @@ private:
 
     inline void init(Box const& box)
     {
-        // asb -> lower_left, lower_right, upper_left, upper_right
-        // we want: clockwise
-        assign_box_corners(box, m_points[0], m_points[3], m_points[1], m_points[2]);
+        detail::assign_box_corners_oriented<false>(box, m_points);
     }
 
     // Copy points here - box might define them otherwise
     point_type m_points[4];
     int m_index;
-    Box const* const m_box_address;
+    Box const* m_box_address;
 };
 
 

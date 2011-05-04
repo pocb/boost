@@ -9,6 +9,7 @@
 
 #include <boost/phoenix/version.hpp>
 #include <boost/phoenix/function/function.hpp>
+#include <boost/phoenix/function/adapt_callable.hpp>
 #include <boost/phoenix/function/adapt_function.hpp>
 
 #endif

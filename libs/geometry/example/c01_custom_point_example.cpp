@@ -1,7 +1,9 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
-//
-// Copyright Barend Gehrels 2007-2009, Geodan, Amsterdam, the Netherlands
-// Copyright Bruno Lalande 2008, 2009
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2011 Bruno Lalande, Paris, France.
+// Copyright (c) 2009-2011 Mateusz Loskot, London, UK.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -106,8 +108,8 @@ int main()
 
     my_array_point a1 = {{0}};
     my_array_point a2 = {{0}};
-    boost::geometry::assign(a1, 1, 2, 3);
-    boost::geometry::assign(a2, 3, 2, 1);
+    boost::geometry::assign_values(a1, 1, 2, 3);
+    boost::geometry::assign_values(a2, 3, 2, 1);
 
     std::cout << "color distance "
         << boost::geometry::dsv(a1) << " to "
@@ -130,8 +132,8 @@ int main()
 
     my_class_rw crw1;
     my_class_rw crw2;
-    boost::geometry::assign(crw1, 1, 2);
-    boost::geometry::assign(crw2, 3, 4);
+    boost::geometry::assign_values(crw1, 1, 2);
+    boost::geometry::assign_values(crw2, 3, 4);
     std::cout << "class r/w distance "
         << boost::geometry::dsv(crw1) << " to "
         << boost::geometry::dsv(crw2) << " is "
@@ -139,8 +141,8 @@ int main()
 
     my_class_gs cgs1;
     my_class_gs cgs2;
-    boost::geometry::assign(cgs1, 1, 2);
-    boost::geometry::assign(cgs2, 3, 4);
+    boost::geometry::assign_values(cgs1, 1, 2);
+    boost::geometry::assign_values(cgs2, 3, 4);
     std::cout << "class g/s distance "
         << boost::geometry::dsv(crw1) << " to "
         << boost::geometry::dsv(crw2) << " is "

@@ -46,35 +46,107 @@
 # define BOOST_ASIO_DECL
 #endif // !defined(BOOST_ASIO_DECL)
 
-// Support move construction on compilers known to allow it.
-#if defined(__GNUC__)
-# if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 5)) || (__GNUC__ > 4)
-#  if defined(__GXX_EXPERIMENTAL_CXX0X__)
-#   define BOOST_ASIO_MOVE_CAST(type) static_cast<type&&>
-#  endif // defined(__GXX_EXPERIMENTAL_CXX0X__)
-# endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 5)) || (__GNUC__ > 4)
-#endif // defined(__GNUC__)
-#if defined(BOOST_MSVC)
-# if (_MSC_VER >= 1600)
-#  define BOOST_ASIO_MOVE_CAST(type) static_cast<type&&>
-# endif // (_MSC_VER >= 1600)
-#endif // defined(BOOST_MSVC)
+// Support move construction and assignment on compilers known to allow it.
+#if !defined(BOOST_ASIO_DISABLE_MOVE)
+# if defined(__GNUC__)
+#  if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 5)) || (__GNUC__ > 4)
+#   if defined(__GXX_EXPERIMENTAL_CXX0X__)
+#    define BOOST_ASIO_HAS_MOVE
+#    define BOOST_ASIO_MOVE_ARG(type) type&&
+#    define BOOST_ASIO_MOVE_CAST(type) static_cast<type&&>
+#   endif // defined(__GXX_EXPERIMENTAL_CXX0X__)
+#  endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 5)) || (__GNUC__ > 4)
+# endif // defined(__GNUC__)
+#endif // !defined(BOOST_ASIO_DISABLE_MOVE)
 
 // If BOOST_ASIO_MOVE_CAST isn't defined yet use a C++03 compatible version.
+// Note that older g++ and MSVC versions don't like it when you pass a
+// non-member function through a const reference, so for most compilers we'll
+// play it safe and stick with the old approach of passing the handler by
+// value.
 #if !defined(BOOST_ASIO_MOVE_CAST)
+# if defined(__GNUC__)
+#  if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 1)) || (__GNUC__ > 4)
+#   define BOOST_ASIO_MOVE_ARG(type) const type&
+#  else // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 1)) || (__GNUC__ > 4)
+#   define BOOST_ASIO_MOVE_ARG(type) type
+#  endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 1)) || (__GNUC__ > 4)
+# elif defined(BOOST_MSVC)
+#  if (_MSC_VER >= 1400)
+#   define BOOST_ASIO_MOVE_ARG(type) const type&
+#  else // (_MSC_VER >= 1400)
+#   define BOOST_ASIO_MOVE_ARG(type) type
+#  endif // (_MSC_VER >= 1400)
+# else
+#  define BOOST_ASIO_MOVE_ARG(type) type
+# endif
 # define BOOST_ASIO_MOVE_CAST(type) static_cast<const type&>
 #endif // !defined_BOOST_ASIO_MOVE_CAST
+
+// Support variadic templates on compilers known to allow it.
+#if !defined(BOOST_ASIO_DISABLE_VARIADIC_TEMPLATES)
+# if defined(__GNUC__)
+#  if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 3)) || (__GNUC__ > 4)
+#   if defined(__GXX_EXPERIMENTAL_CXX0X__)
+#    define BOOST_ASIO_HAS_VARIADIC_TEMPLATES
+#   endif // defined(__GXX_EXPERIMENTAL_CXX0X__)
+#  endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 3)) || (__GNUC__ > 4)
+# endif // defined(__GNUC__)
+#endif // !defined(BOOST_ASIO_DISABLE_VARIADIC_TEMPLATES)
 
 // Standard library support for system errors.
 #if !defined(BOOST_ASIO_DISABLE_STD_SYSTEM_ERROR)
 # if defined(__GNUC__)
-#  if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 5)) || (__GNUC__ > 4)
+#  if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4)
 #   if defined(__GXX_EXPERIMENTAL_CXX0X__)
 #    define BOOST_ASIO_HAS_STD_SYSTEM_ERROR
 #   endif // defined(__GXX_EXPERIMENTAL_CXX0X__)
-#  endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 5)) || (__GNUC__ > 4)
+#  endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4)
 # endif // defined(__GNUC__)
 #endif // !defined(BOOST_ASIO_DISABLE_STD_SYSTEM_ERROR)
+
+// Standard library support for arrays.
+#if !defined(BOOST_ASIO_DISABLE_STD_ARRAY)
+# if defined(__GNUC__)
+#  if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 3)) || (__GNUC__ > 4)
+#   if defined(__GXX_EXPERIMENTAL_CXX0X__)
+#    define BOOST_ASIO_HAS_STD_ARRAY
+#   endif // defined(__GXX_EXPERIMENTAL_CXX0X__)
+#  endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 3)) || (__GNUC__ > 4)
+# endif // defined(__GNUC__)
+# if defined(BOOST_MSVC)
+#  if (_MSC_VER >= 1600)
+#   define BOOST_ASIO_HAS_STD_ARRAY
+#  endif // (_MSC_VER >= 1600)
+# endif // defined(BOOST_MSVC)
+#endif // !defined(BOOST_ASIO_DISABLE_STD_ARRAY)
+
+// Standard library support for shared_ptr and weak_ptr.
+#if !defined(BOOST_ASIO_DISABLE_STD_SHARED_PTR)
+# if defined(__GNUC__)
+#  if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 3)) || (__GNUC__ > 4)
+#   if defined(__GXX_EXPERIMENTAL_CXX0X__)
+#    define BOOST_ASIO_HAS_STD_SHARED_PTR
+#   endif // defined(__GXX_EXPERIMENTAL_CXX0X__)
+#  endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 3)) || (__GNUC__ > 4)
+# endif // defined(__GNUC__)
+# if defined(BOOST_MSVC)
+#  if (_MSC_VER >= 1600)
+#   define BOOST_ASIO_HAS_STD_SHARED_PTR
+#  endif // (_MSC_VER >= 1600)
+# endif // defined(BOOST_MSVC)
+#endif // !defined(BOOST_ASIO_DISABLE_STD_SHARED_PTR)
+
+// Standard library support for atomic operations.
+#if !defined(BOOST_ASIO_DISABLE_STD_ATOMIC)
+# if defined(__GNUC__)
+#  if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 5)) || (__GNUC__ > 4)
+#   if defined(__GXX_EXPERIMENTAL_CXX0X__)
+#    define BOOST_ASIO_HAS_STD_ATOMIC
+#   endif // defined(__GXX_EXPERIMENTAL_CXX0X__)
+#  endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 5)) || (__GNUC__ > 4)
+# endif // defined(__GNUC__)
+#endif // !defined(BOOST_ASIO_DISABLE_STD_ATOMIC)
 
 // Windows: target OS version.
 #if defined(BOOST_WINDOWS) || defined(__CYGWIN__)
