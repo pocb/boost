@@ -17,6 +17,7 @@ asio                  Chris Kohlhoff <chris -at- kohlhoff.com>
 assign                Thorsten Ottosen <nesotto -at- cs.auc.dk>
 bimap                 Matias Capeletto <matias.capeletto -at- gmail.com>
 bind                  Peter Dimov <pdimov -at- mmltd.net>
+chrono                Vicente J. Botet Escriba <vicente.botet -at- wanadoo.fr>
 circular_buffer       Jan Gaspar <jano_gaspar -at- yahoo.com>
 concept_check         Jeremy Siek <jeremy.siek -at- gmail.com>
 config                John Maddock <john -at- johnmaddock.co.uk>
@@ -60,6 +61,7 @@ numeric/ublas         Michael Stevens <michael -at- michael-stevens.de>
 optional              Fernando Cacciola <fernando_cacciola -at- ciudad.com.ar>
 operators             Daniel Frey <d.frey -at- gmx.de>
 parameter             David Abrahams <dave -at- boost-consulting.com>, Daniel Wallin <daniel -at- boostpro.com>
+phoenix               Joel de Guzman <joel -at- boost-consulting.com>, Thomas Heller <thom.heller -at- gmail.com>
 polygon               Lucanus Simonson <lucanus.j.simonson -at- intel.com>
 pool                  Stephen Cleary <scleary -at- jerviswebb.com>
 preprocessor          Paul Mensonides <pmenso57 -at- comcast.net>
@@ -71,6 +73,7 @@ ptr_container         Thorsten Ottosen <nesotto -at- cs.auc.dk>
 python                David Abrahams <dave -at- boost-consulting.com>
 random                Jens Maurer <Jens.Maurer -at- gmx.net>
 range                 Neil Groves <neilgroves -at- googlemail.com>
+ratio                 Vicente J. Botet Escriba <vicente.botet -at- wanadoo.fr>
 rational              Jonathan Turkanis <turkanis -at- coderage.com>
 regex                 John Maddock <john -at- johnmaddock.co.uk>
 scope_exit            Alexander Nasonov <alexander.nasonov -at- gmail.com>

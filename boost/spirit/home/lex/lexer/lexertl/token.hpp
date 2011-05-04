@@ -18,6 +18,7 @@
 #include <boost/spirit/home/support/detail/lexer/generator.hpp>
 #include <boost/spirit/home/support/detail/lexer/rules.hpp>
 #include <boost/spirit/home/support/detail/lexer/consts.hpp>
+#include <boost/spirit/home/support/utree/utree_traits_fwd.hpp>
 #include <boost/fusion/include/vector.hpp>
 #include <boost/fusion/include/at.hpp>
 #include <boost/fusion/include/value_at.hpp>
@@ -478,7 +479,8 @@ namespace boost { namespace spirit { namespace traits
 
                 typedef lex::lexertl::token<
                     Iterator, AttributeTypes, HasState, Idtype> token_type;
-                const_cast<token_type&>(t).value() = attr;   // re-assign value
+                spirit::traits::assign_to(
+                    attr, const_cast<token_type&>(t).value());   // re-assign value
             }
             else {
             // reuse the already assigned value

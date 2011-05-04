@@ -55,12 +55,14 @@ run-tests libs :
     any/test                    # test-suite any
     bimap/test                  # test-suite bimap
     bind/test                   # test-suite bind
+    chrono/test                 # test-suite chrono
     circular_buffer/test        # test-suite circular_buffer
     concept_check               # test-suite concept_check
     config/test                 # test-suite config
     conversion/test             # test-suite conversion
     crc/test                    # test-suite crc
     date_time/test              # test-suite date_time
+    detail/test                 # test-suite detail
     disjoint_sets               # test-suite disjoint_sets
     dynamic_bitset              # test-suite dynamic_bitset
     exception/test
@@ -100,6 +102,7 @@ run-tests libs :
     multi_index/test            # test-suite multi_index
     optional/test               # test-suite optional
     parameter/test              # test-suite parameter
+    phoenix/test                # test-suite phoenix
     polygon/test                # test-suite polygon
     pool/test                   # test-suite pool
     preprocessor/test           # test-suite preprocessor
@@ -111,6 +114,7 @@ run-tests libs :
     python/test                 # test-suite python
     random/test                 # test-suite random
     range/test                  # test-suite range
+    ratio/test                  # test-suite ratio
     rational/test               # test-suite rational
     regex/test                  # test-suite regex
     regex/example               # test-suite regex-examples
@@ -121,6 +125,7 @@ run-tests libs :
     smart_ptr/test              # test-suite smart_ptr
     spirit/classic/test         # test-suite classic spirit
     spirit/test                 # test-suite spirit_v2
+    spirit/repository/test      # test-suite spirit_v2 repository
     statechart/test             # test-suite statechart
     static_assert               # test-suite static_assert
     system/test                 # test-suite system

@@ -129,9 +129,13 @@
 #endif
 
 #if defined(_WIN32_WCE) || defined(UNDER_CE)
-#  define BOOST_NO_THREADEX
-#  define BOOST_NO_GETSYSTEMTIMEASFILETIME
 #  define BOOST_NO_SWPRINTF
+#endif
+
+// we have ThreadEx or GetSystemTimeAsFileTime unless we're running WindowsCE
+#if !defined(_WIN32_WCE) && !defined(UNDER_CE)
+#  define BOOST_HAS_THREADEX
+#  define BOOST_HAS_GETSYSTEMTIMEASFILETIME
 #endif
 
 //   
@@ -179,6 +183,7 @@
 #define BOOST_NO_RVALUE_REFERENCES
 #define BOOST_NO_STATIC_ASSERT
 #define BOOST_NO_NULLPTR
+#define BOOST_NO_DECLTYPE
 #endif // _MSC_VER < 1600
 
 #if _MSC_VER >= 1600
@@ -188,10 +193,8 @@
 // C++0x features not supported by any versions
 #define BOOST_NO_CHAR16_T
 #define BOOST_NO_CHAR32_T
-#define BOOST_NO_CONCEPTS
 #define BOOST_NO_CONSTEXPR
 #define BOOST_NO_DEFAULTED_FUNCTIONS
-#define BOOST_NO_DECLTYPE
 #define BOOST_NO_DELETED_FUNCTIONS
 #define BOOST_NO_EXPLICIT_CONVERSION_OPERATORS
 #define BOOST_NO_FUNCTION_TEMPLATE_DEFAULT_ARGS
