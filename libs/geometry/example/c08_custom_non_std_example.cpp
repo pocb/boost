@@ -215,6 +215,7 @@ template<> struct resize<my_polygon>
 
 // 4) register with Boost.Geometry
 BOOST_GEOMETRY_REGISTER_POINT_2D(my_point, double, cs::cartesian, x, y)
+
 BOOST_GEOMETRY_REGISTER_RING(my_polygon)
 
 
@@ -236,7 +237,7 @@ void walk_using_iterator(my_polygon const& polygon)
 
 void walk_using_range(my_polygon const& polygon)
 {
-    for (boost::range_iterator<const my_polygon>::type it
+    for (boost::range_iterator<my_polygon const>::type it
             = boost::begin(polygon);
         it != boost::end(polygon);
         ++it)

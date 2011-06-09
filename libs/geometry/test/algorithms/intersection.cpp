@@ -23,11 +23,15 @@
 #include <algorithms/test_intersection.hpp>
 #include <algorithms/test_overlay.hpp>
 
-#include <boost/geometry/geometries/adapted/std_as_linestring.hpp>
+#include <boost/geometry/geometries/point_xy.hpp>
+#include <boost/geometry/geometries/register/linestring.hpp>
 
 #include <test_common/test_point.hpp>
 #include <test_common/with_pointer.hpp>
 #include <test_geometries/custom_segment.hpp>
+
+BOOST_GEOMETRY_REGISTER_LINESTRING_TEMPLATED(std::vector)
+
 
 static std::string pie_2_3_23_0[2] =
 {
@@ -350,10 +354,31 @@ void test_pointer_version()
 }
 
 
+template <typename P>
+void test_exception()
+{
+    typedef bg::model::polygon<P> polygon;
 
+    try
+    {
+        // Define polygon with a spike (= invalid)
+        std::string spike = "POLYGON((0 0,0 4,2 4,2 6,2 4,4 4,4 0,0 0))";
+
+        test_one<polygon, polygon, polygon>("with_spike",
+            simplex_normal[0], spike,
+            0, 0, 0);
+    }
+    catch(bg::overlay_invalid_input_exception const& )
+    {
+        return;
+    }
+    BOOST_CHECK_MESSAGE(false, "No exception thrown");
+}
 
 int test_main(int, char* [])
 {
+    test_exception<bg::model::d2::point_xy<double> >();
+
     test_all<bg::model::d2::point_xy<double> >();
 
 #if ! defined(BOOST_GEOMETRY_TEST_ONLY_ONE_TYPE)

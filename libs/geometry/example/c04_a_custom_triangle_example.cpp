@@ -16,6 +16,7 @@
 
 #include <boost/geometry/algorithms/area.hpp>
 #include <boost/geometry/algorithms/centroid.hpp>
+#include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/geometry/geometries/register/ring.hpp>
 #include <boost/geometry/strategies/strategies.hpp>
 #include <boost/geometry/util/write_dsv.hpp>
@@ -30,6 +31,7 @@ struct triangle : public boost::array<boost::geometry::model::d2::point_xy<doubl
 };
 
 
+// Register triangle as a ring
 BOOST_GEOMETRY_REGISTER_RING(triangle)
 
 

@@ -19,16 +19,30 @@
 #include <algorithms/test_distance.hpp>
 
 #include <boost/mpl/if.hpp>
+#include <boost/array.hpp>
 
 #include <boost/geometry/geometries/geometries.hpp>
-#include <boost/geometry/geometries/adapted/boost_array_as_linestring.hpp>
-#include <boost/geometry/geometries/adapted/c_array_cartesian.hpp>
-#include <boost/geometry/geometries/adapted/tuple_cartesian.hpp>
+#include <boost/geometry/geometries/point_xy.hpp>
+#include <boost/geometry/geometries/adapted/c_array.hpp>
+#include <boost/geometry/geometries/adapted/boost_tuple.hpp>
 
 #include <test_common/test_point.hpp>
 #include <test_geometries/custom_segment.hpp>
 #include <test_geometries/wrapped_boost_array.hpp>
 
+BOOST_GEOMETRY_REGISTER_C_ARRAY_CS(cs::cartesian)
+BOOST_GEOMETRY_REGISTER_BOOST_TUPLE_CS(cs::cartesian)
+
+// Register boost array as a linestring
+namespace boost { namespace geometry { namespace traits
+{
+template <typename Point, std::size_t PointCount>
+struct tag< boost::array<Point, PointCount> >
+{
+    typedef linestring_tag type;
+};
+
+}}}
 
 template <typename P>
 void test_distance_point()

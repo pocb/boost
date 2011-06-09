@@ -13,8 +13,10 @@
 #include <iostream>
 
 
-#include <boost/geometry/geometry.hpp>
-#include <boost/geometry/geometries/geometries.hpp>
+#include <boost/geometry.hpp>
+#include <boost/geometry/geometries/box.hpp>
+#include <boost/geometry/geometries/point_xy.hpp>
+#include <boost/geometry/geometries/ring.hpp>
 
 #include <boost/assign.hpp>
 

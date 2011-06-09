@@ -13,8 +13,8 @@
 #include <iostream>
 #include <iomanip>
 
-#include <boost/geometry/geometry.hpp>
-#include <boost/geometry/geometries/geometries.hpp>
+#include <boost/geometry.hpp>
+#include <boost/geometry/geometries/point_xy.hpp>
 
 #if defined(HAVE_TTMATH)
 #  include <boost/geometry/extensions/contrib/ttmath_stub.hpp>

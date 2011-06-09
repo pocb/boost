@@ -73,7 +73,6 @@ template<> struct interior_mutable_type<my_polygon>
     typedef boost::array<my_ring, 2>& type;
 };
 
-
 template<> struct exterior_ring<my_polygon>
 {
     static my_ring& get(my_polygon& p)

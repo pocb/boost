@@ -24,6 +24,7 @@
 #include <boost/graph/dijkstra_shortest_paths.hpp>
 
 #include <boost/geometry/geometry.hpp>
+#include <boost/geometry/geometries/linestring.hpp>
 #include <boost/geometry/domains/gis/io/wkt/read_wkt.hpp>
 
 
@@ -266,7 +267,7 @@ int main()
     // (geographic calculations are in an extension; for sample it makes no difference)
     typedef boost::geometry::model::point
         <
-            double, 2, boost::geometry::cs::spherical<boost::geometry::degree>
+            double, 2, boost::geometry::cs::spherical_equatorial<boost::geometry::degree>
         > point_type;
 
     typedef boost::geometry::model::linestring<point_type> line_type;

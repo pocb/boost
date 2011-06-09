@@ -8,10 +8,9 @@
 #define BOOST_PHOENIX_CORE_DETAIL_MEMBER_VARIABLE_HPP
 
 #include <boost/proto/detail/decltype.hpp>
+#include <boost/type_traits/remove_pointer.hpp>
 
 namespace boost { namespace phoenix { namespace detail {
-
-        BOOST_PROTO_USE_GET_POINTER();
 
         template <typename RT, typename MP>
         struct member_variable
@@ -45,6 +44,17 @@ namespace boost { namespace phoenix { namespace detail {
             template <typename Class>
             RT& operator()(Class& obj) const
             {
+                BOOST_PROTO_USE_GET_POINTER();
+
+                typedef typename proto::detail::classtypeof<MP>::type class_type;
+                return (BOOST_PROTO_GET_POINTER(class_type, obj)->*mp);
+            }
+
+            template <typename Class>
+            RT const& operator()(Class const& obj) const
+            {
+                BOOST_PROTO_USE_GET_POINTER();
+
                 typedef typename proto::detail::classtypeof<MP>::type class_type;
                 return (BOOST_PROTO_GET_POINTER(class_type, obj)->*mp);
             }
@@ -53,13 +63,6 @@ namespace boost { namespace phoenix { namespace detail {
             RT& operator()(Class* obj) const
             {
                 return obj->*mp;
-            }
-
-            template <typename Class>
-            RT const& operator()(Class const& obj) const
-            {
-                typedef typename proto::detail::classtypeof<MP>::type class_type;
-                return (BOOST_PROTO_GET_POINTER(class_type, obj)->*mp);
             }
 
             template <typename Class>

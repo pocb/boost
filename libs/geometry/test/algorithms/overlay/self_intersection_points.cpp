@@ -24,6 +24,8 @@
 //#include <boost/geometry/algorithms/detail/overlay/self_intersection_points.hpp>
 #include <boost/geometry/algorithms/detail/overlay/self_turn_points.hpp>
 
+#include <boost/geometry/geometries/point_xy.hpp>
+
 #include <boost/geometry/strategies/strategies.hpp>
 
 #include <boost/geometry/domains/gis/io/wkt/read_wkt.hpp>
@@ -53,7 +55,7 @@ struct test_self_intersection_points
         ///bg::get_intersection_points(geometry, turns);
 
         bg::detail::get_turns::no_interrupt_policy policy;
-        bg::get_turns
+        bg::self_turns
             <
                 bg::detail::overlay::assign_null_policy
             >(geometry, turns, policy);

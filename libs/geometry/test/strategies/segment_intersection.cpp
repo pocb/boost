@@ -38,8 +38,9 @@
 
 #include <boost/geometry/geometries/point.hpp>
 #include <boost/geometry/geometries/segment.hpp>
-#include <boost/geometry/geometries/adapted/tuple_cartesian.hpp>
+#include <boost/geometry/geometries/adapted/boost_tuple.hpp>
 
+BOOST_GEOMETRY_REGISTER_BOOST_TUPLE_CS(cs::cartesian);
 
 
 template <typename R>
@@ -90,7 +91,7 @@ static void test_segment_intersection(int caseno,
 #endif
 
     typedef typename bg::coordinate_type<P>::type coordinate_type;
-    typedef segment<const P> segment_type;
+    typedef bg::model::referring_segment<const P> segment_type;
 
     P p1, p2, p3, p4;
     bg::assign_values(p1, x1, y1);

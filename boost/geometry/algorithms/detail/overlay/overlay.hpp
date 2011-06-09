@@ -25,11 +25,11 @@
 #include <boost/geometry/algorithms/detail/overlay/traversal_info.hpp>
 #include <boost/geometry/algorithms/detail/overlay/turn_info.hpp>
 
+#include <boost/geometry/algorithms/detail/has_self_intersections.hpp>
+
 
 #include <boost/geometry/algorithms/num_points.hpp>
 #include <boost/geometry/algorithms/reverse.hpp>
-
-#include <boost/geometry/iterators/range_type.hpp>
 
 #include <boost/geometry/algorithms/detail/overlay/add_rings.hpp>
 #include <boost/geometry/algorithms/detail/overlay/assign_parents.hpp>
@@ -104,8 +104,10 @@ inline OutputIterator return_if_one_input_is_empty(Geometry1 const& geometry1,
             Geometry2 const& geometry2,
             OutputIterator out)
 {
-    typedef typename geometry::range_type<GeometryOut>::type ring_type;
-    typedef std::deque<ring_type> ring_container_type;
+    typedef std::deque
+        <
+            typename geometry::ring_type<GeometryOut>::type
+        > ring_container_type;
 
     typedef ring_properties<typename geometry::point_type<Geometry1>::type> properties;
 
@@ -153,12 +155,10 @@ struct overlay
         typedef detail::overlay::traversal_turn_info<point_type> turn_info;
         typedef std::deque<turn_info> container_type;
 
-        // "Use" rangetype for ringtype:
-        // -> for polygon, it is the type of the exterior ring.
-        // -> for ring, it is the ring itself.
-        // -> for multi-polygon, it is also the type of the ring.
-        typedef typename geometry::range_type<GeometryOut>::type ring_type;
-        typedef std::deque<ring_type> ring_container_type;
+        typedef std::deque
+            <
+                typename geometry::ring_type<GeometryOut>::type
+            > ring_container_type;
 
         if (geometry::num_points(geometry1) == 0
             || geometry::num_points(geometry2) == 0)
@@ -168,6 +168,9 @@ struct overlay
                     GeometryOut, Direction, ReverseOut
                 >(geometry1, geometry2, out);
         }
+        
+        has_self_intersections(geometry1);
+        has_self_intersections(geometry2);
 
         container_type turn_points;
 

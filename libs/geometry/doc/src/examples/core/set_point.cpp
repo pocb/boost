@@ -11,7 +11,9 @@
 //` Set the coordinate of a point
 
 #include <iostream>
-#include <boost/geometry/geometry.hpp>
+
+#include <boost/geometry.hpp>
+#include <boost/geometry/geometries/point_xy.hpp>
 
 namespace bg = boost::geometry;
 

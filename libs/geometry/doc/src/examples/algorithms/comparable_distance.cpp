@@ -12,7 +12,8 @@
 
 #include <iostream>
 
-#include <boost/geometry/geometry.hpp>
+#include <boost/geometry.hpp>
+#include <boost/geometry/geometries/point_xy.hpp>
 
 #include <boost/numeric/conversion/bounds.hpp>
 #include <boost/foreach.hpp>

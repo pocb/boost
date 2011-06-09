@@ -17,12 +17,12 @@
 
 #include <boost/geometry/algorithms/area.hpp>
 #include <boost/geometry/algorithms/centroid.hpp>
-#include <boost/geometry/geometries/adapted/tuple.hpp>
-#include <boost/geometry/geometries/adapted/tuple_cartesian.hpp>
+#include <boost/geometry/geometries/adapted/boost_tuple.hpp>
 #include <boost/geometry/geometries/register/ring.hpp>
 #include <boost/geometry/strategies/strategies.hpp>
 #include <boost/geometry/util/write_dsv.hpp>
 
+BOOST_GEOMETRY_REGISTER_BOOST_TUPLE_CS(cs::cartesian)
 
 
 template <typename P>
@@ -30,8 +30,9 @@ struct triangle : public boost::array<P, 3>
 {
 };
 
-// Register triangle<P>
-BOOST_GEOMETRY_REGISTER_RING_TEMPLATIZED(triangle)
+
+// Register triangle<P> as a ring
+BOOST_GEOMETRY_REGISTER_RING_TEMPLATED(triangle)
 
 
 namespace boost { namespace geometry { namespace dispatch {

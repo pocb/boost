@@ -11,7 +11,9 @@
     //` The following simple example shows the calculation of the length of a linestring containing three points
 
 #include <iostream>
-#include <boost/geometry/geometry.hpp>
+#include <boost/geometry.hpp>
+#include <boost/geometry/geometries/linestring.hpp>
+#include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/geometry/domains/gis/io/wkt/wkt.hpp>
 
 
