@@ -17,7 +17,7 @@ However, as of today (June 2011), that framework does not allow
 easily building Boost for Linux distributions.
 
 [A clone also exists on Gitorious, where CMake-related work was formely done:
-http://gitorious.org/boost/cmake.git]
+http://gitorious.org/boost/cmake]
 
 Upstream work is synchronised thanks to the Ryppl's hosted Git clone:
 https://github.com/ryppl/boost-svn/tree/trunk
