@@ -11,7 +11,10 @@
 //` Calculate the area of a polygon
 
 #include <iostream>
+
 #include <boost/geometry.hpp>
+#include <boost/geometry/geometries/point_xy.hpp>
+#include <boost/geometry/geometries/polygon.hpp>
 #include <boost/geometry/domains/gis/io/wkt/wkt.hpp>
 
 namespace bg = boost::geometry; /*< Convenient namespace alias >*/
@@ -24,8 +27,8 @@ int main()
     double area = bg::area(poly);
     std::cout << "Area: " << area << std::endl;
 
-    // Calculate the area of a spherical polygon
-    bg::model::polygon<bg::model::point<float, 2, bg::cs::spherical<bg::degree> > > sph_poly;
+    // Calculate the area of a spherical equatorial polygon
+    bg::model::polygon<bg::model::point<float, 2, bg::cs::spherical_equatorial<bg::degree> > > sph_poly;
     bg::read_wkt("POLYGON((0 0,0 45,45 0,0 0))", sph_poly);
     area = bg::area(sph_poly);
     std::cout << "Area: " << area << std::endl;

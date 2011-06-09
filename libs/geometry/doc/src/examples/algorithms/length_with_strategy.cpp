@@ -12,11 +12,12 @@
 
 #include <iostream>
 #include <boost/geometry.hpp>
+#include <boost/geometry/geometries/linestring.hpp>
 
 int main()
 {
     using namespace boost::geometry;
-    typedef model::point<float, 2, cs::spherical<degree> > P;
+    typedef model::point<float, 2, cs::spherical_equatorial<degree> > P;
     model::linestring<P> line;
     line.push_back(P(2, 41));
     line.push_back(P(2, 48));

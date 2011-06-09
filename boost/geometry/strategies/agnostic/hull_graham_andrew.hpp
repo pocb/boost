@@ -23,7 +23,7 @@
 #include <boost/geometry/core/point_type.hpp>
 #include <boost/geometry/strategies/convex_hull.hpp>
 
-#include <boost/geometry/iterators/range_type.hpp>
+#include <boost/geometry/views/detail/range_type.hpp>
 
 #include <boost/geometry/policies/compare.hpp>
 
@@ -277,7 +277,7 @@ public:
         // This makes use of the geometry::less/greater predicates with the optional
         // direction template parameter to indicate x direction
 
-        typedef typename range_type<InputGeometry>::type range_type;
+        typedef typename geometry::detail::range_type<InputGeometry>::type range_type;
 
         typedef typename boost::range_iterator
             <
@@ -301,7 +301,7 @@ public:
                 range_type,
                 range_iterator,
                 container_type,
-                typename strategy_side<cs_tag>::type
+                typename strategy::side::services::default_strategy<cs_tag>::type
             > assigner(extremes.left, extremes.right);
 
         geometry::detail::for_each_range(geometry, assigner);
@@ -358,7 +358,7 @@ private:
     template <int Factor>
     static inline void add_to_hull(point_type const& p, container_type& output)
     {
-        typedef typename strategy_side<cs_tag>::type side;
+        typedef typename strategy::side::services::default_strategy<cs_tag>::type side;
 
         output.push_back(p);
         register std::size_t output_size = output.size();

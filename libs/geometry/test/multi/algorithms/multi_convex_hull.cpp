@@ -19,13 +19,14 @@
 #include <algorithms/test_convex_hull.hpp>
 
 #include <boost/geometry/geometries/geometries.hpp>
+#include <boost/geometry/geometries/point_xy.hpp>
 
 #include <boost/geometry/domains/gis/io/wkt/read_wkt.hpp>
 
 #include <boost/geometry/multi/core/point_order.hpp>
 #include <boost/geometry/multi/core/point_type.hpp>
 
-#include <boost/geometry/multi/iterators/range_type.hpp>
+#include <boost/geometry/multi/views/detail/range_type.hpp>
 
 #include <boost/geometry/multi/algorithms/num_points.hpp>
 #include <boost/geometry/multi/algorithms/detail/for_each_range.hpp>

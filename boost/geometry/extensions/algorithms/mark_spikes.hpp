@@ -31,6 +31,8 @@
 #include <boost/geometry/algorithms/distance.hpp>
 #include <boost/geometry/algorithms/perimeter.hpp>
 
+#include <boost/geometry/geometries/box.hpp>
+
 
 /*
 Mark spikes in a ring/polygon.
@@ -157,7 +159,7 @@ struct range_mark_spikes
 {
     typedef typename point_type<Range>::type point_type;
 
-    typedef typename strategy_side
+    typedef typename strategy::side::services::default_strategy
     <
         typename cs_tag<Range>::type
     >::type side_strategy_type;

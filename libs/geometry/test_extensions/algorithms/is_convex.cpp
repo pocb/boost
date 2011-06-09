@@ -30,6 +30,7 @@
 #include <boost/geometry/strategies/strategies.hpp>
 
 #include <boost/geometry/geometries/geometries.hpp>
+#include <boost/geometry/geometries/point_xy.hpp>
 
 #include <boost/geometry/util/as_range.hpp>
 #include <boost/geometry/domains/gis/io/wkt/stream_wkt.hpp>
@@ -45,7 +46,7 @@ void test_geometry(std::string const& wkt,
     bg::read_wkt(wkt, geometry);
 
     typedef typename bg::point_type<Geometry>::type P;
-    typename bg::strategy_side
+    typename bg::strategy::side::services::default_strategy
         <
             typename bg::cs_tag<P>::type
         >::type side;

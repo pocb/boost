@@ -30,6 +30,7 @@ class discrete_interval
 public:
     typedef discrete_interval<DomainT,Compare> type;
     typedef DomainT domain_type;
+    typedef ICL_COMPARE_DOMAIN(Compare,DomainT) domain_compare;
     typedef typename bounded_value<DomainT>::type bounded_domain_type;
 
 public:
@@ -158,7 +159,7 @@ struct type_to_string<icl::discrete_interval<DomainT,Compare> >
 template<class DomainT> 
 struct value_size<icl::discrete_interval<DomainT> >
 {
-    static std::size_t apply(const icl::discrete_interval<DomainT>& value) 
+    static std::size_t apply(const icl::discrete_interval<DomainT>&) 
     { return 2; }
 };
 

@@ -17,7 +17,7 @@
 
 #include <algorithms/test_simplify.hpp>
 #include <boost/geometry/geometries/geometries.hpp>
-
+#include <boost/geometry/geometries/point_xy.hpp>
 
 #include <test_geometries/wrapped_boost_array.hpp>
 #include <test_common/test_point.hpp>
@@ -96,11 +96,11 @@ int test_main(int, char* [])
     test_all<bg::model::d2::point_xy<float> >();
     test_all<bg::model::d2::point_xy<double> >();
 
-    test_spherical<bg::model::point<double, 2, bg::cs::spherical<bg::degree> > >();
+    test_spherical<bg::model::point<double, 2, bg::cs::spherical_equatorial<bg::degree> > >();
 
 #if defined(HAVE_TTMATH)
     test_all<bg::model::d2::point_xy<ttmath_big> >();
-    test_spherical<bg::model::point<ttmath_big, 2, bg::cs::spherical<bg::degree> > >();
+    test_spherical<bg::model::point<ttmath_big, 2, bg::cs::spherical_equatorial<bg::degree> > >();
 #endif
 
     return 0;

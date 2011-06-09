@@ -49,7 +49,8 @@ public:
         // Only for discrete types this ctor creates an interval containing 
         // a single element only.
         BOOST_STATIC_ASSERT((icl::is_discrete<DomainT>::value));
-        BOOST_ASSERT((numeric_minimum<DomainT, is_numeric<DomainT>::value >::is_less_than(val) )); 
+        BOOST_ASSERT((numeric_minimum<DomainT, domain_compare, is_numeric<DomainT>::value >
+                                     ::is_less_than(val) )); 
     }
 
     /** Interval from <tt>low</tt> to <tt>up</tt> with bounds <tt>bounds</tt> */
@@ -108,7 +109,7 @@ struct type_to_string<icl::left_open_interval<DomainT,Compare> >
 template<class DomainT, ICL_COMPARE Compare> 
 struct value_size<icl::left_open_interval<DomainT,Compare> >
 {
-    static std::size_t apply(const icl::left_open_interval<DomainT>& value) 
+    static std::size_t apply(const icl::left_open_interval<DomainT>&) 
     { return 2; }
 };
 

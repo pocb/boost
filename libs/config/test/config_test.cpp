@@ -1,4 +1,4 @@
-//  This file was automatically generated on Tue Mar 15 12:25:21 2011
+//  This file was automatically generated on Wed Jun  1 21:44:56 2011
 //  by libs/config/tools/generate.cpp
 //  Copyright John Maddock 2002-4.
 //  Use, modification and distribution are subject to the 
@@ -197,6 +197,11 @@ namespace boost_no_cwctype = empty_boost;
 #else
 namespace boost_no_decltype = empty_boost;
 #endif
+#ifndef BOOST_NO_DECLTYPE_N3276
+#include "boost_no_decltype_n3276.ipp"
+#else
+namespace boost_no_decltype_n3276 = empty_boost;
+#endif
 #ifndef BOOST_DEDUCED_TYPENAME
 #include "boost_no_ded_typename.ipp"
 #else
@@ -366,6 +371,11 @@ namespace boost_no_pointer_to_member_template_parameters = empty_boost;
 #include "boost_no_nested_friendship.ipp"
 #else
 namespace boost_no_nested_friendship = empty_boost;
+#endif
+#ifndef BOOST_NO_NOEXCEPT
+#include "boost_no_noexcept.ipp"
+#else
+namespace boost_no_noexcept = empty_boost;
 #endif
 #ifndef BOOST_NO_NULLPTR
 #include "boost_no_nullptr.ipp"
@@ -551,6 +561,11 @@ namespace boost_no_typename_with_ctor = empty_boost;
 #include "boost_no_unicode_literals.ipp"
 #else
 namespace boost_no_unicode_literals = empty_boost;
+#endif
+#ifndef BOOST_NO_UNIFIED_INITIALIZATION_SYNTAX
+#include "boost_no_unified_init.ipp"
+#else
+namespace boost_no_unified_initialization_syntax = empty_boost;
 #endif
 #ifndef BOOST_FUNCTION_SCOPE_USING_DECLARATION_BREAKS_ADL
 #include "boost_no_using_breaks_adl.ipp"
@@ -1266,6 +1281,11 @@ int main( int, char *[] )
       std::cerr << "Failed test for BOOST_NO_DECLTYPE at: " << __FILE__ << ":" << __LINE__ << std::endl;
       ++error_count;
    }
+   if(0 != boost_no_decltype_n3276::test())
+   {
+      std::cerr << "Failed test for BOOST_NO_DECLTYPE_N3276 at: " << __FILE__ << ":" << __LINE__ << std::endl;
+      ++error_count;
+   }
    if(0 != boost_deduced_typename::test())
    {
       std::cerr << "Failed test for BOOST_DEDUCED_TYPENAME at: " << __FILE__ << ":" << __LINE__ << std::endl;
@@ -1434,6 +1454,11 @@ int main( int, char *[] )
    if(0 != boost_no_nested_friendship::test())
    {
       std::cerr << "Failed test for BOOST_NO_NESTED_FRIENDSHIP at: " << __FILE__ << ":" << __LINE__ << std::endl;
+      ++error_count;
+   }
+   if(0 != boost_no_noexcept::test())
+   {
+      std::cerr << "Failed test for BOOST_NO_NOEXCEPT at: " << __FILE__ << ":" << __LINE__ << std::endl;
       ++error_count;
    }
    if(0 != boost_no_nullptr::test())
@@ -1619,6 +1644,11 @@ int main( int, char *[] )
    if(0 != boost_no_unicode_literals::test())
    {
       std::cerr << "Failed test for BOOST_NO_UNICODE_LITERALS at: " << __FILE__ << ":" << __LINE__ << std::endl;
+      ++error_count;
+   }
+   if(0 != boost_no_unified_initialization_syntax::test())
+   {
+      std::cerr << "Failed test for BOOST_NO_UNIFIED_INITIALIZATION_SYNTAX at: " << __FILE__ << ":" << __LINE__ << std::endl;
       ++error_count;
    }
    if(0 != boost_function_scope_using_declaration_breaks_adl::test())

@@ -17,8 +17,6 @@
 #include <numeric>
 #include <utility>
 
-#define BOOST_MPL_CFG_NO_PREPROCESSED_HEADERS
-
 #include <boost/mpl/contains.hpp>
 #include <boost/mpl/deref.hpp>
 #include <boost/mpl/assert.hpp>
@@ -49,6 +47,7 @@
 
 #include <boost/parameter.hpp>
 
+#include <boost/msm/active_state_switching_policies.hpp>
 #include <boost/msm/row_tags.hpp>
 #include <boost/msm/back/fold_to_list.hpp>
 #include <boost/msm/back/metafunctions.hpp>
@@ -86,6 +85,7 @@ struct direct_entry_event
 {
     typedef int direct_entry;
     typedef StateType active_state;
+    typedef Event contained_event;
 
     direct_entry_event(Event const& evt):m_event(evt){}
     Event const& m_event;
@@ -172,6 +172,13 @@ private:
         template In<deferred_fct>::type             deferred_events_queue_t;
     typedef typename QueueContainerPolicy::
         template In<transition_fct>::type           events_queue_t;
+
+    typedef typename boost::mpl::eval_if<
+        typename is_active_state_switch_policy<Derived>::type,
+        get_active_state_switch_policy<Derived>,
+        // default
+        ::boost::mpl::identity<active_state_switch_after_entry>
+    >::type active_state_switching;
 
     typedef bool (*flag_handler)(library_sm const&);
 
@@ -420,21 +427,24 @@ private:
                 // guard rejected the event, we stay in the current one
                 return HANDLED_GUARD_REJECT;
             }
+            fsm.m_states[region_index] = active_state_switching::after_guard(current_state,next_state);
 
             // the guard condition has already been checked
             execute_exit<current_state_type>
                 (::boost::fusion::at_key<current_state_type>(fsm.m_substate_list),evt,fsm);
+            fsm.m_states[region_index] = active_state_switching::after_exit(current_state,next_state);
 
             // then call the action method
             HandledEnum res = ROW::action_call(fsm,evt,
                              ::boost::fusion::at_key<current_state_type>(fsm.m_substate_list),
                              ::boost::fusion::at_key<next_state_type>(fsm.m_substate_list),
                              fsm.m_substate_list);
+            fsm.m_states[region_index] = active_state_switching::after_action(current_state,next_state);
 
             // and finally the entry method of the new current state
             convert_event_and_execute_entry<next_state_type,T2>
                 (::boost::fusion::at_key<next_state_type>(fsm.m_substate_list),evt,fsm);
-            fsm.m_states[region_index]=next_state;
+            fsm.m_states[region_index] = active_state_switching::after_entry(current_state,next_state);
             return res;
         }
     };
@@ -496,15 +506,18 @@ private:
                 // guard rejected the event, we stay in the current one
                 return HANDLED_GUARD_REJECT;
             }
+            fsm.m_states[region_index] = active_state_switching::after_guard(current_state,next_state);
+
             // the guard condition has already been checked
             execute_exit<current_state_type>
                 (::boost::fusion::at_key<current_state_type>(fsm.m_substate_list),evt,fsm);
+            fsm.m_states[region_index] = active_state_switching::after_exit(current_state,next_state);
+            fsm.m_states[region_index] = active_state_switching::after_action(current_state,next_state);
 
             // and finally the entry method of the new current state
             convert_event_and_execute_entry<next_state_type,T2>
                 (::boost::fusion::at_key<next_state_type>(fsm.m_substate_list),evt,fsm);
-
-            fsm.m_states[region_index]=next_state;
+            fsm.m_states[region_index] = active_state_switching::after_entry(current_state,next_state);
             return HANDLED_TRUE;
         }
     };
@@ -552,22 +565,25 @@ private:
             {
                 return HANDLED_FALSE;
             }
+            fsm.m_states[region_index] = active_state_switching::after_guard(current_state,next_state);
+
             // no need to check the guard condition
             // first call the exit method of the current state
             execute_exit<current_state_type>
                 (::boost::fusion::at_key<current_state_type>(fsm.m_substate_list),evt,fsm);
+            fsm.m_states[region_index] = active_state_switching::after_exit(current_state,next_state);
 
             // then call the action method
             HandledEnum res = ROW::action_call(fsm,evt,
                             ::boost::fusion::at_key<current_state_type>(fsm.m_substate_list),
                             ::boost::fusion::at_key<next_state_type>(fsm.m_substate_list),
                             fsm.m_substate_list);
+            fsm.m_states[region_index] = active_state_switching::after_action(current_state,next_state);
 
             // and finally the entry method of the new current state
             convert_event_and_execute_entry<next_state_type,T2>
                 (::boost::fusion::at_key<next_state_type>(fsm.m_substate_list),evt,fsm);
-
-            fsm.m_states[region_index]=next_state;
+            fsm.m_states[region_index] = active_state_switching::after_entry(current_state,next_state);
             return res;
         }
     };
@@ -615,15 +631,19 @@ private:
             {
                 return HANDLED_FALSE;
             }
+            fsm.m_states[region_index] = active_state_switching::after_guard(current_state,next_state);
+
             // first call the exit method of the current state
             execute_exit<current_state_type>
                 (::boost::fusion::at_key<current_state_type>(fsm.m_substate_list),evt,fsm);
+            fsm.m_states[region_index] = active_state_switching::after_exit(current_state,next_state);
+            fsm.m_states[region_index] = active_state_switching::after_action(current_state,next_state);
+
 
             // and finally the entry method of the new current state
             convert_event_and_execute_entry<next_state_type,T2>
                 (::boost::fusion::at_key<next_state_type>(fsm.m_substate_list),evt,fsm);
-
-            fsm.m_states[region_index]=next_state;
+            fsm.m_states[region_index] = active_state_switching::after_entry(current_state,next_state);
             return HANDLED_TRUE;
         }
     };
@@ -776,7 +796,7 @@ private:
             return false;
         }
         // Take the transition action and return the next state.
-        static HandledEnum execute(library_sm& fsm, int , int state, transition_event const& evt)
+        static HandledEnum execute(library_sm& fsm, int , int , transition_event const& evt)
         {
             if (!check_guard(fsm,evt))
             {
@@ -1098,7 +1118,7 @@ private:
                 (evt,::boost::mpl::bool_<is_no_exception_thrown<library_sm>::type::value>());
             if (handled)
             {
-                ret_handled = HANDLED_TRUE;
+                ret_handled = handled;
             }
 
             // process completion transitions BEFORE any other event in the pool (UML Standard 2.3 §15.3.14)
@@ -1454,8 +1474,8 @@ private:
                         (init_states(m_states));
          m_history.set_initial_states(m_states);
          // create states
-         fill_states(this);
          set_states(expr);
+         fill_states(this);
      }
      // Construct with the default initial states and some default argument(s)
 #define MSM_CONSTRUCTOR_HELPER_EXECUTE_SUB(z, n, unused) ARG ## n t ## n
@@ -1498,8 +1518,8 @@ private:
          ::boost::mpl::for_each< seq_initial_states, ::boost::msm::wrap<mpl::placeholders::_1> > \
                         (init_states(m_states));                                    \
          m_history.set_initial_states(m_states);                                    \
-         fill_states(this);                                                         \
          set_states(expr);                                                          \
+         fill_states(this);                                                         \
      }
 
      BOOST_PP_REPEAT_FROM_TO(1,BOOST_PP_ADD(BOOST_MSM_CONSTRUCTOR_ARG_SIZE,1), MSM_CONSTRUCTOR_HELPER_EXECUTE, ~)
@@ -2416,6 +2436,22 @@ BOOST_PP_REPEAT(BOOST_PP_ADD(BOOST_MSM_VISITOR_ARG_SIZE,1), MSM_VISITOR_ARGS_EXE
     {
         // nothing to process
     }
+    // helper function. In cases where the event is wrapped (target is a direct entry states)
+    // we want to send only the real event to on_entry, not the wrapper.
+    template <class EventType>
+    static 
+    typename boost::enable_if<typename has_direct_entry<EventType>::type,typename EventType::contained_event const& >::type
+    remove_direct_entry_event_wrapper(EventType const& evt,boost::msm::back::dummy<0> = 0)
+    {
+        return evt.m_event;
+    }
+    template <class EventType>
+    static typename boost::disable_if<typename has_direct_entry<EventType>::type,EventType const& >::type
+    remove_direct_entry_event_wrapper(EventType const& evt,boost::msm::back::dummy<1> = 0)
+    {
+        // identity. No wrapper
+        return evt;
+    }
     // calls the entry/exit or on_entry/on_exit depending on the state type
     // (avoids calling virtually)
     // variant for FSMs
@@ -2436,7 +2472,7 @@ BOOST_PP_REPEAT(BOOST_PP_ADD(BOOST_MSM_VISITOR_ARG_SIZE,1), MSM_VISITOR_ARGS_EXE
     execute_entry(StateType& astate,EventType const& evt,FsmType& fsm, ::boost::msm::back::dummy<1> = 0)
     {
         // simple call to on_entry
-        astate.on_entry(evt,fsm);
+        astate.on_entry(remove_direct_entry_event_wrapper(evt),fsm);
     }
     // variant for exit pseudo states
     template <class StateType,class EventType,class FsmType>

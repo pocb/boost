@@ -9,12 +9,14 @@
 #define BOOST_PHOENIX_STATEMENT_SWITCH_HPP
 
 #include <boost/phoenix/core/limits.hpp>
+#include <boost/fusion/iterator/advance.hpp>
 #include <boost/phoenix/core/call.hpp>
 #include <boost/phoenix/core/expression.hpp>
 #include <boost/phoenix/core/meta_grammar.hpp>
 #include <boost/phoenix/core/is_nullary.hpp>
 #include <boost/phoenix/support/iterate.hpp>
 #include <boost/proto/make_expr.hpp>
+#include <boost/proto/fusion.hpp>
 
 BOOST_PHOENIX_DEFINE_EXPRESSION(
     (boost)(phoenix)(switch_case)
@@ -196,14 +198,17 @@ namespace boost { namespace phoenix {
     inline
     typename proto::result_of::make_expr<
         tag::switch_case
-      , default_domain_with_basic_expr
+      , proto::basic_default_domain
       , mpl::int_<N>
       , A
     >::type const
     case_(A const & a)
     {
         return
-            proto::make_expr<tag::switch_case, default_domain_with_basic_expr>(
+            proto::make_expr<
+                tag::switch_case
+              , proto::basic_default_domain
+            >(
                 mpl::int_<N>()
               , a
             );
@@ -213,14 +218,15 @@ namespace boost { namespace phoenix {
     inline
     typename proto::result_of::make_expr<
         tag::switch_default_case
-      , default_domain_with_basic_expr
+      , proto::basic_default_domain
       , A
     >::type const
     default_(A const& a)
     {
         return
             proto::make_expr<
-                tag::switch_default_case, default_domain_with_basic_expr
+                tag::switch_default_case
+              , proto::basic_default_domain
             >(a);
     }
 

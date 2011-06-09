@@ -13,6 +13,10 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+///////////////////////////////////////////////////////////////////////////////
+// Define this to enable debugging
+//#define BOOST_SPIRIT_QI_DEBUG
+
 #include "function.hpp"
 #include "skipper.hpp"
 #include "vm.hpp"
@@ -86,7 +90,7 @@ int main(int argc, char **argv)
             if (p->nargs() != nargs)
             {
                 std::cerr << "Error: main function requires " << p->nargs() << " arguments." << std::endl;
-                std::cerr << nargs << "supplied." << std::endl;
+                std::cerr << nargs << " supplied." << std::endl;
                 return 1;
             }
 

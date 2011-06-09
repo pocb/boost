@@ -212,8 +212,14 @@
 //
 #if __GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 6) || !defined(__GXX_EXPERIMENTAL_CXX0X__)
 #define BOOST_NO_CONSTEXPR
+#define BOOST_NO_NOEXCEPT
 #define BOOST_NO_NULLPTR
+#define BOOST_NO_UNIFIED_INITIALIZATION_SYNTAX
 #endif
+
+// C++0x features not supported at all yet
+//
+#define BOOST_NO_DECLTYPE_N3276
 
 #ifndef BOOST_COMPILER
 #  define BOOST_COMPILER "GNU C++ version " __VERSION__

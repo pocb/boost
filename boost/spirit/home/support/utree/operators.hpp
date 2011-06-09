@@ -1,6 +1,7 @@
 /*=============================================================================
     Copyright (c) 2001-2011 Joel de Guzman
     Copyright (c) 2001-2011 Hartmut Kaiser
+    Copyright (c)      2011 Bryce Lelbach
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -15,7 +16,10 @@
 #endif
 
 #include <exception>
-#include <ios>
+#if !defined(BOOST_SPIRIT_DISABLE_UTREE_IO)
+  #include <ios>
+  #include <boost/io/ios_state.hpp>
+#endif
 #include <boost/spirit/home/support/utree/utree.hpp>
 #include <boost/preprocessor/cat.hpp>
 #include <boost/throw_exception.hpp>
@@ -32,12 +36,12 @@ namespace boost { namespace spirit
     bool operator<=(utree const& a, utree const& b);
     bool operator>=(utree const& a, utree const& b);
 
-    // Input and output
+#if !defined(BOOST_SPIRIT_DISABLE_UTREE_IO)
+    // output
     std::ostream& operator<<(std::ostream& out, utree const& x);
-    std::istream& operator>>(std::istream& in, utree& x);
-
     std::ostream& operator<<(std::ostream& out, utree::invalid_type const& x);
     std::ostream& operator<<(std::ostream& out, utree::nil_type const& x);
+#endif
 
     // Logical operators
     utree operator&&(utree const& a, utree const& b);
@@ -190,6 +194,7 @@ namespace boost { namespace spirit
         }
     };
 
+#if !defined(BOOST_SPIRIT_DISABLE_UTREE_IO)
     struct utree_print
     {
         typedef void result_type;
@@ -220,6 +225,7 @@ namespace boost { namespace spirit
 
         void operator()(binary_range_type const& b) const
         {
+            boost::io::ios_all_saver saver(out);
             out << "#";
             out.width(2);
             out.fill('0');
@@ -227,7 +233,7 @@ namespace boost { namespace spirit
             typedef binary_range_type::const_iterator iterator;
             for (iterator i = b.begin(); i != b.end(); ++i)
                 out << std::hex << int((unsigned char)*i);
-            out << std::dec << "# ";
+            out << "# ";
         }
 
         void operator()(utf8_string_range_type const& str) const
@@ -271,6 +277,7 @@ namespace boost { namespace spirit
             return (*this)("<function>");
         }
     };
+#endif
 
     template <typename Base>
     struct logical_function
@@ -494,6 +501,7 @@ namespace boost { namespace spirit
         return !(a < b);
     }
 
+#if !defined(BOOST_SPIRIT_DISABLE_UTREE_IO)
     inline std::ostream& operator<<(std::ostream& out, utree const& x)
     {
         utree::visit(x, utree_print(out));
@@ -509,6 +517,7 @@ namespace boost { namespace spirit
     {
         return out;
     }
+#endif
 
     BOOST_SPIRIT_UTREE_CREATE_LOGICAL_FUNCTION(and_, a&&b)
     BOOST_SPIRIT_UTREE_CREATE_LOGICAL_FUNCTION(or_, a||b)
