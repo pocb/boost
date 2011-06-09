@@ -10,7 +10,11 @@ is then added on top of the official Boost release, thanks to a
 dedicated patch.
 
 That CMake framework (and patch) is hosted and maintained on GitHub,
-in the following Git repository: https://github.com/boost-lib/boost-cmake
+in the following Git repository: https://github.com/pocb/boost
+POCB stands for Plain Old CMake-ified Boost, as opposed to the new Ryppl
+initiative towards a modularised Boost, also using extensively CMake.
+However, as of today (June 2011), that framework does not allow
+easily building Boost for Linux distributions.
 
 [A clone also exists on Gitorious, where CMake-related work was formely done:
 http://gitorious.org/boost/cmake.git]
@@ -36,5 +40,5 @@ CMake-ification of modularised Boost. If you would like to contribute,
 do not hesitate to subscribe to the Ryppl mailing list:
 http://groups.google.com/group/ryppl-dev/subscribe
 
-Denis Arnaud (January 2011)
+Denis Arnaud (June 2011)
 
