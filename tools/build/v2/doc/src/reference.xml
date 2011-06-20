@@ -119,6 +119,14 @@ boost-build build-system ;
       </varlistentry>
 
       <varlistentry>
+        <term><literal>preprocessed</literal></term>
+        <indexterm><primary>preprocessed</primary></indexterm>
+
+        <listitem><para>Creates an preprocessed source file. The arguments follow the
+        <link linkend="bbv2.main-target-rule-syntax">common syntax</link>.</para></listitem>
+      </varlistentry>
+
+      <varlistentry>
         <term><literal>glob</literal></term>
 
         <listitem><para>The <code>glob</code> rule takes a list shell pattern
@@ -266,6 +274,7 @@ path-constant DATA : data/a.txt ;
 
     <variablelist>
       <varlistentry><term><literal>variant</literal></term>
+        <indexterm><primary>variant</primary></indexterm>
 
         <listitem>
           <para>
@@ -321,6 +330,7 @@ path-constant DATA : data/a.txt ;
 
       <varlistentry id="bbv2.overview.builtins.features.link">
         <term><literal>link</literal></term>
+        <indexterm><primary>link</primary></indexterm>
 
         <listitem>
 
@@ -356,6 +366,7 @@ path-constant DATA : data/a.txt ;
 
       <varlistentry>
         <term><literal>threading</literal></term>
+        <indexterm><primary>threading</primary></indexterm>
 
         <listitem>
 
@@ -373,7 +384,9 @@ path-constant DATA : data/a.txt ;
         </listitem>
       </varlistentry>
 
-      <varlistentry><term><literal>source</literal></term>
+      <varlistentry>
+        <term><literal>source</literal></term>
+        <indexterm><primary>source</primary></indexterm>
 
         <listitem>
           <simpara>
@@ -388,7 +401,9 @@ path-constant DATA : data/a.txt ;
         </listitem>
       </varlistentry>
 
-      <varlistentry><term><literal>library</literal></term>
+      <varlistentry>
+        <term><literal>library</literal></term>
+        <indexterm><primary>library</primary></indexterm>
 
         <listitem>
           <simpara>
@@ -404,6 +419,7 @@ path-constant DATA : data/a.txt ;
 
       <varlistentry><term><anchor id="bbv2.builtin.features.dependency"/>
           <literal>dependency</literal></term>
+          <indexterm><primary>dependency</primary></indexterm>
 
         <listitem>
           <simpara>
@@ -442,6 +458,7 @@ path-constant DATA : data/a.txt ;
 
       <varlistentry><term><anchor id="bbv2.builtin.features.use"/>
           <literal>use</literal></term>
+          <indexterm><primary>use</primary></indexterm>
 
         <listitem>
           <simpara>
@@ -460,8 +477,10 @@ path-constant DATA : data/a.txt ;
         </listitem>
       </varlistentry>
 
-      <varlistentry><term><anchor id="bbv2.reference.features.dll-path"/>
-      <literal>dll-path</literal></term>
+      <varlistentry>
+        <term><anchor id="bbv2.reference.features.dll-path"/>
+        <literal>dll-path</literal></term>
+        <indexterm><primary>dll-path</primary></indexterm>
 
         <listitem>
           <simpara>
@@ -473,7 +492,9 @@ path-constant DATA : data/a.txt ;
           </simpara>
         </listitem></varlistentry>
 
-      <varlistentry><term><literal>hardcode-dll-paths</literal></term>
+      <varlistentry>
+        <term><literal>hardcode-dll-paths</literal></term>
+        <indexterm><primary>hardcode-dll-paths</primary></indexterm>
 
         <listitem>
           <simpara>
@@ -514,6 +535,7 @@ path-constant DATA : data/a.txt ;
 
       <varlistentry>
         <term><literal>include</literal></term>
+        <indexterm><primary>include</primary></indexterm>
 
         <listitem>
           <simpara>
@@ -522,6 +544,21 @@ path-constant DATA : data/a.txt ;
           </simpara>
         </listitem>
       </varlistentry>
+
+      <varlistentry>
+        <term><literal>define</literal></term>
+        <indexterm><primary>define</primary></indexterm>
+
+        <listitem>
+          <simpara>
+            Specifies an preprocessor symbol that should be defined on the command
+            line. You may either specify just the symbol, which will be defined
+            without any value, or both the symbol and the value, separated by
+            equal sign.
+          </simpara>
+        </listitem>
+      </varlistentry>
+
 
       <varlistentry><term><literal>warnings</literal></term>
         <listitem>
