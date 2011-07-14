@@ -8,19 +8,20 @@
 # This file was automatically generated from the original CMakeLists.txt file
 # Add a variable to hold the headers for the library
 set (lib_headers
-    proto
+    chrono.hpp
+    chrono
 )
 
 # Add a library target to the build system
 boost_library_project(
-  proto
-  #  SRCDIRS 
-  TESTDIRS test
+  chrono
+  SRCDIRS  src
+  TESTDIRS  test
   HEADERS ${lib_headers}
-  DOCDIRS doc
-  DESCRIPTION  "Expression template library and compiler construction toolkit for domain-specific embedded languages."
-  MODULARIZED 
-  AUTHORS  "Eric Niebler <eric -at- boost-consulting.com>"
+  #  DOCDIRS 
+  DESCRIPTION  "Useful time utilities."
+  MODULARIZED
+  AUTHORS  "Vicente J. Botet Escribá <vicente.botet - at - wanadoo.fr>"
   #  MAINTAINERS 
 )
 
