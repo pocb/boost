@@ -41,6 +41,19 @@ void test_all()
     test_geometry<box_type, box_type>("BOX(1 1,2 2)", "BOX(0 0,3 3)", true);
     test_geometry<box_type, box_type>("BOX(0 0,3 3)", "BOX(1 1,2 2)", false);
 
+    test_within_code<P, box_type>("POINT(1 1)", "BOX(0 0,2 2)", 1);
+    test_within_code<P, box_type>("POINT(1 0)", "BOX(0 0,2 2)", 0);
+    test_within_code<P, box_type>("POINT(0 1)", "BOX(0 0,2 2)", 0);
+    test_within_code<P, box_type>("POINT(0 3)", "BOX(0 0,2 2)", -1);
+    test_within_code<P, box_type>("POINT(3 3)", "BOX(0 0,2 2)", -1);
+
+    test_within_code<box_type, box_type>("BOX(1 1,2 2)", "BOX(0 0,3 3)", 1);
+    test_within_code<box_type, box_type>("BOX(0 1,2 2)", "BOX(0 0,3 3)", 0);
+    test_within_code<box_type, box_type>("BOX(1 0,2 2)", "BOX(0 0,3 3)", 0);
+    test_within_code<box_type, box_type>("BOX(1 1,2 3)", "BOX(0 0,3 3)", 0);
+    test_within_code<box_type, box_type>("BOX(1 1,3 2)", "BOX(0 0,3 3)", 0);
+    test_within_code<box_type, box_type>("BOX(1 1,3 4)", "BOX(0 0,3 3)", -1);
+
 
     // Mixed point types
     test_geometry
@@ -108,9 +121,39 @@ void test_spherical()
     BOOST_CHECK_EQUAL(bg::within(Point(6.0, 51.0), triangle), false);
 }
 
+void test_mixed()
+{
+    typedef boost::geometry::model::d2::point_xy<double> point_type1;
+    typedef boost::geometry::model::point<double, 2, boost::geometry::cs::cartesian> point_type2;
+
+    typedef boost::geometry::model::polygon<point_type1> polygon_type1;
+    typedef boost::geometry::model::polygon<point_type2> polygon_type2;
+    typedef boost::geometry::model::box<point_type1> box_type1;
+    typedef boost::geometry::model::box<point_type2> box_type2;
+
+    polygon_type1 poly1;
+    boost::geometry::read_wkt("POLYGON((0 0,0 5,5 5,5 0,0 0))", poly1);
+    polygon_type2 poly2;
+    boost::geometry::read_wkt("POLYGON((0 0,0 5,5 5,5 0,0 0))", poly2);
+    
+    box_type1 box1(point_type1(1, 1), point_type1(4, 4));
+    box_type2 box2(point_type2(0, 0), point_type2(5, 5));
+
+    point_type1 p1(3, 3);
+    point_type2 p2(3, 3);
+
+    BOOST_CHECK_EQUAL(bg::within(p1, poly2), true);
+    BOOST_CHECK_EQUAL(bg::within(p2, poly1), true);
+    BOOST_CHECK_EQUAL(bg::within(p2, box1), true);
+    BOOST_CHECK_EQUAL(bg::within(p1, box2), true);
+    BOOST_CHECK_EQUAL(bg::within(box1, box2), true);
+}
+
 
 int test_main( int , char* [] )
 {
+    test_mixed();
+
     test_all<bg::model::d2::point_xy<int> >();
     test_all<bg::model::d2::point_xy<double> >();
 
