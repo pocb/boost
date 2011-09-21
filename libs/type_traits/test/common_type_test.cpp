@@ -103,5 +103,108 @@ TT_TEST_BEGIN(common_type)
     assignation_3<C2, C1C2, C1>();
     assignation_3<C1C2, C2, C1>();
     //assignation_3<C1, C2, C1C2>(); // fails because the common type is the third
+
+    BOOST_CHECK_TYPE(tt::common_type<int>::type, int);
+    BOOST_CHECK_TYPE(tt::common_type<char>::type, char);
+    
+    BOOST_CHECK_TYPE3(tt::common_type<char, char>::type, char);
+    BOOST_CHECK_TYPE3(tt::common_type<char, unsigned char>::type, int);
+    BOOST_CHECK_TYPE3(tt::common_type<char, short>::type, int);
+    BOOST_CHECK_TYPE3(tt::common_type<char, unsigned short>::type, int);
+    BOOST_CHECK_TYPE3(tt::common_type<char, int>::type, int);
+    BOOST_CHECK_TYPE3(tt::common_type<char, unsigned int>::type, unsigned int);
+#ifndef BOOST_NO_LONG_LONG
+    BOOST_CHECK_TYPE3(tt::common_type<char, boost::long_long_type>::type, boost::long_long_type);
+    BOOST_CHECK_TYPE3(tt::common_type<char, boost::ulong_long_type>::type, boost::ulong_long_type);
+#endif
+    BOOST_CHECK_TYPE3(tt::common_type<char, double>::type, double);
+
+    BOOST_CHECK_TYPE3(tt::common_type<unsigned char, char>::type, int);
+    BOOST_CHECK_TYPE3(tt::common_type<unsigned char, unsigned char>::type, unsigned char);
+    BOOST_CHECK_TYPE3(tt::common_type<unsigned char, short>::type, int);
+    BOOST_CHECK_TYPE3(tt::common_type<unsigned char, unsigned short>::type, int);
+    BOOST_CHECK_TYPE3(tt::common_type<unsigned char, int>::type, int);
+    BOOST_CHECK_TYPE3(tt::common_type<unsigned char, unsigned int>::type, unsigned int);
+#ifndef BOOST_NO_LONG_LONG
+    BOOST_CHECK_TYPE3(tt::common_type<unsigned char, boost::long_long_type>::type, boost::long_long_type);
+    BOOST_CHECK_TYPE3(tt::common_type<unsigned char, boost::ulong_long_type>::type, boost::ulong_long_type);
+#endif
+    BOOST_CHECK_TYPE3(tt::common_type<unsigned char, double>::type, double);
+    
+    BOOST_CHECK_TYPE3(tt::common_type<short, char>::type, int);
+    BOOST_CHECK_TYPE3(tt::common_type<short, unsigned char>::type, int);
+    BOOST_CHECK_TYPE3(tt::common_type<short, short>::type, short);
+    BOOST_CHECK_TYPE3(tt::common_type<short, unsigned short>::type, int);
+    BOOST_CHECK_TYPE3(tt::common_type<short, int>::type, int);
+    BOOST_CHECK_TYPE3(tt::common_type<short, unsigned int>::type, unsigned int);
+#ifndef BOOST_NO_LONG_LONG
+    BOOST_CHECK_TYPE3(tt::common_type<short, boost::long_long_type>::type, boost::long_long_type);
+    BOOST_CHECK_TYPE3(tt::common_type<short, boost::ulong_long_type>::type, boost::ulong_long_type);
+#endif
+    BOOST_CHECK_TYPE3(tt::common_type<short, double>::type, double);
+
+    BOOST_CHECK_TYPE3(tt::common_type<unsigned short, char>::type, int);
+    BOOST_CHECK_TYPE3(tt::common_type<unsigned short, unsigned char>::type, int);
+    BOOST_CHECK_TYPE3(tt::common_type<unsigned short, short>::type, int);
+    BOOST_CHECK_TYPE3(tt::common_type<unsigned short, unsigned short>::type, unsigned short);
+    BOOST_CHECK_TYPE3(tt::common_type<unsigned short, int>::type, int);
+    BOOST_CHECK_TYPE3(tt::common_type<unsigned short, unsigned int>::type, unsigned int);
+#ifndef BOOST_NO_LONG_LONG
+    BOOST_CHECK_TYPE3(tt::common_type<unsigned short, boost::long_long_type>::type, boost::long_long_type);
+    BOOST_CHECK_TYPE3(tt::common_type<unsigned short, boost::ulong_long_type>::type, boost::ulong_long_type);
+#endif
+    BOOST_CHECK_TYPE3(tt::common_type<unsigned short, double>::type, double);
+
+    BOOST_CHECK_TYPE3(tt::common_type<int, char>::type, int);
+    BOOST_CHECK_TYPE3(tt::common_type<int, unsigned char>::type, int);
+    BOOST_CHECK_TYPE3(tt::common_type<int, short>::type, int);
+    BOOST_CHECK_TYPE3(tt::common_type<int, unsigned short>::type, int);
+    BOOST_CHECK_TYPE3(tt::common_type<int, int>::type, int);
+    BOOST_CHECK_TYPE3(tt::common_type<int, unsigned int>::type, unsigned int);
+#ifndef BOOST_NO_LONG_LONG
+    BOOST_CHECK_TYPE3(tt::common_type<int, boost::long_long_type>::type, boost::long_long_type);
+    BOOST_CHECK_TYPE3(tt::common_type<int, boost::ulong_long_type>::type, boost::ulong_long_type);
+#endif
+    BOOST_CHECK_TYPE3(tt::common_type<int, double>::type, double);
+
+    BOOST_CHECK_TYPE3(tt::common_type<unsigned int, char>::type, unsigned int);
+    BOOST_CHECK_TYPE3(tt::common_type<unsigned int, unsigned char>::type, unsigned int);
+    BOOST_CHECK_TYPE3(tt::common_type<unsigned int, short>::type, unsigned int);
+    BOOST_CHECK_TYPE3(tt::common_type<unsigned int, unsigned short>::type, unsigned int);
+    BOOST_CHECK_TYPE3(tt::common_type<unsigned int, int>::type, unsigned int);
+    BOOST_CHECK_TYPE3(tt::common_type<unsigned int, unsigned int>::type, unsigned int);
+#ifndef BOOST_NO_LONG_LONG
+    BOOST_CHECK_TYPE3(tt::common_type<unsigned int, boost::long_long_type>::type, boost::long_long_type);
+    BOOST_CHECK_TYPE3(tt::common_type<unsigned int, boost::ulong_long_type>::type, boost::ulong_long_type);
+#endif
+    BOOST_CHECK_TYPE3(tt::common_type<unsigned int, double>::type, double);
+
+#ifndef BOOST_NO_LONG_LONG
+    BOOST_CHECK_TYPE3(tt::common_type<boost::long_long_type, char>::type, boost::long_long_type);
+    BOOST_CHECK_TYPE3(tt::common_type<boost::long_long_type, unsigned char>::type, boost::long_long_type);
+    BOOST_CHECK_TYPE3(tt::common_type<boost::long_long_type, short>::type, boost::long_long_type);
+    BOOST_CHECK_TYPE3(tt::common_type<boost::long_long_type, unsigned short>::type, boost::long_long_type);
+    BOOST_CHECK_TYPE3(tt::common_type<boost::long_long_type, int>::type, boost::long_long_type);
+    BOOST_CHECK_TYPE3(tt::common_type<boost::long_long_type, unsigned int>::type, boost::long_long_type);
+    BOOST_CHECK_TYPE3(tt::common_type<boost::long_long_type, boost::long_long_type>::type, boost::long_long_type);
+    BOOST_CHECK_TYPE3(tt::common_type<boost::long_long_type, boost::ulong_long_type>::type, boost::ulong_long_type);
+    BOOST_CHECK_TYPE3(tt::common_type<boost::long_long_type, double>::type, double);
+#endif
+    BOOST_CHECK_TYPE3(tt::common_type<double, char>::type, double);
+    BOOST_CHECK_TYPE3(tt::common_type<double, unsigned char>::type, double);
+    BOOST_CHECK_TYPE3(tt::common_type<double, short>::type, double);
+    BOOST_CHECK_TYPE3(tt::common_type<double, unsigned short>::type, double);
+    BOOST_CHECK_TYPE3(tt::common_type<double, int>::type, double);
+    BOOST_CHECK_TYPE3(tt::common_type<double, unsigned int>::type, double);
+#ifndef BOOST_NO_LONG_LONG
+    BOOST_CHECK_TYPE3(tt::common_type<double, boost::long_long_type>::type, double);
+    BOOST_CHECK_TYPE3(tt::common_type<double, boost::ulong_long_type>::type, double);
+#endif
+    BOOST_CHECK_TYPE3(tt::common_type<double, double>::type, double);
+    
+    BOOST_CHECK_TYPE4(tt::common_type<double, char, int>::type, double);
+#ifndef BOOST_NO_LONG_LONG
+    BOOST_CHECK_TYPE4(tt::common_type<unsigned, char, boost::long_long_type>::type, boost::long_long_type);
+#endif
 }
 TT_TEST_END

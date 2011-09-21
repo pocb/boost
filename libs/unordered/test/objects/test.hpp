@@ -9,24 +9,24 @@
 #include <boost/config.hpp>
 #include <boost/limits.hpp>
 #include <cstddef>
-#include <iostream>
 #include "../helpers/fwd.hpp"
 #include "../helpers/count.hpp"
 #include "../helpers/memory.hpp"
-#include <map>
 
 namespace test
 {
     // Note that the default hash function will work for any equal_to (but not
     // very well).
     class object;
+    class implicitly_convertible;
     class hash;
     class less;
     class equal_to;
     template <class T> class allocator;
     object generate(object const*);
-
-    class object : globally_counted_object
+    implicitly_convertible generate(implicitly_convertible const*);
+    
+    class object : private globally_counted_object
     {
         friend class hash;
         friend class equal_to;
@@ -59,6 +59,31 @@ namespace test
         }
 
         friend std::ostream& operator<<(std::ostream& out, object const& o)
+        {
+            return out<<"("<<o.tag1_<<","<<o.tag2_<<")";
+        }
+    };
+
+    class implicitly_convertible : private globally_counted_object
+    {
+        int tag1_, tag2_;
+    public:
+
+        explicit implicitly_convertible(int t1 = 0, int t2 = 0)
+            : tag1_(t1), tag2_(t2)
+            {}
+
+        operator object() const
+        {
+            return object(tag1_, tag2_);
+        }
+
+        friend implicitly_convertible generate(implicitly_convertible const*) {
+            int* x = 0;
+            return implicitly_convertible(generate(x), generate(x));
+        }
+
+        friend std::ostream& operator<<(std::ostream& out, implicitly_convertible const& o)
         {
             return out<<"("<<o.tag1_<<","<<o.tag2_<<")";
         }
@@ -158,18 +183,6 @@ namespace test
         }
     };
 
-    namespace detail
-    {
-        // This won't be a problem as I'm only using a single compile unit
-        // in each test (this is actually require by the minimal test
-        // framework).
-        // 
-        // boostinspect:nounnamed
-        namespace {
-            test::detail::memory_tracker<std::allocator<int> > tracker;
-        }
-    }
-
     template <class T>
     class allocator
     {
@@ -241,19 +254,19 @@ namespace test
             ::operator delete((void*) p);
         }
 
-        void construct(pointer p, T const& t) {
+        void construct(T* p, T const& t) {
             detail::tracker.track_construct((void*) p, sizeof(T), tag_);
             new(p) T(t);
         }
 
-#if defined(BOOST_UNORDERED_STD_FORWARD)
-        template<class... Args> void construct(pointer p, Args&&... args) {
+#if defined(BOOST_UNORDERED_STD_FORWARD_MOVE)
+        template<class... Args> void construct(T* p, Args&&... args) {
             detail::tracker.track_construct((void*) p, sizeof(T), tag_);
             new(p) T(std::forward<Args>(args)...);
         }
 #endif
 
-        void destroy(pointer p) {
+        void destroy(T* p) {
             detail::tracker.track_destroy((void*) p, sizeof(T), tag_);
             p->~T();
         }
@@ -271,6 +284,13 @@ namespace test
         {
             return tag_ != x.tag_;
         }
+
+        enum {
+            is_select_on_copy = false,
+            is_propagate_on_swap = false,
+            is_propagate_on_assign = false,
+            is_propagate_on_move = false
+        };
     };
 
     template <class T>
@@ -279,44 +299,6 @@ namespace test
     {
         return x == y;
     }
-
-#if BOOST_WORKAROUND(__GNUC__, < 3)
-    void swap(test::object& x, test::object& y) {
-        test::object tmp;
-        tmp = x;
-        x = y;
-        y = tmp;
-    }
-
-    void swap(test::hash& x, test::hash& y) {
-        test::hash tmp;
-        tmp = x;
-        x = y;
-        y = tmp;
-    }
-
-    void swap(test::less& x, test::less& y) {
-        test::less tmp;
-        tmp = x;
-        x = y;
-        y = tmp;
-    }
-
-    void swap(test::equal_to& x, test::equal_to& y) {
-        test::equal_to tmp;
-        tmp = x;
-        x = y;
-        y = tmp;
-    }
-
-    template <class T>
-    void swap(test::allocator<T>& x, test::allocator<T>& y) {
-        test::allocator<T> tmp;
-        tmp = x;
-        x = y;
-        y = tmp;
-    }
-#endif
 }
 
 #endif

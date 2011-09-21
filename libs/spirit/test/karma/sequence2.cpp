@@ -1,4 +1,4 @@
-//  Copyright (c) 2001-2010 Hartmut Kaiser
+//  Copyright (c) 2001-2011 Hartmut Kaiser
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -34,8 +34,13 @@ using namespace spirit_test;
 struct seqsize_impl
 {
     template <typename Sequence>
-    struct result 
+    struct result
       : boost::fusion::result_of::size<Sequence>
+    {};
+
+    template <typename This, typename Sequence>
+    struct result<This(Sequence)>
+        : result<typename boost::proto::detail::uncvref<Sequence>::type>
     {};
 
     template <typename Sequence>
@@ -55,7 +60,6 @@ int main()
     using namespace boost::spirit::ascii;
     namespace fusion = boost::fusion;
 
-    
     {
         std::list<int> v;
         v.push_back(1);

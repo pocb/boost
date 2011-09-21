@@ -1,4 +1,4 @@
-//  Copyright (c) 2001-2010 Hartmut Kaiser
+//  Copyright (c) 2001-2011 Hartmut Kaiser
 // 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying 
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -48,6 +48,15 @@ int main()
         BOOST_TEST(test("abcdefgh", lower[repeat(8)[char_]], str));
         BOOST_TEST(test_delimited("A B C D E F G H ", upper[repeat(8)[char_]], str, space));
     }
+
+   {
+       std::string s1 = "aaaaa";
+       BOOST_TEST(test("aaaaa", char_ << repeat(2)[char_ << char_], s1));
+       s1 = "aaa";
+       BOOST_TEST(test("aaa", char_ << repeat(1, 2)[char_ << char_], s1));
+       s1 = "aa";
+       BOOST_TEST(!test("", char_ << repeat(1)[char_ << char_], s1));
+   }
 
     { // actions
         namespace phx = boost::phoenix;

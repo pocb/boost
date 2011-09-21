@@ -18,6 +18,8 @@ boostbook doc
     <dependency>../libs/accumulators/doc//statsdoc.xml
     <dependency>../libs/accumulators/doc//opdoc.xml
     <dependency>../libs/accumulators/doc//accumulators
+    <dependency>../libs/conversion/doc//lexical_cast
+    <dependency>../libs/chrono/doc//chrono
     <dependency>../libs/program_options/doc//autodoc.xml
     <dependency>../libs/algorithm/string/doc//autodoc.xml
     <dependency>../libs/logic/doc//reference.xml
@@ -32,6 +34,7 @@ boostbook doc
     <dependency>../libs/property_tree/doc//property_tree
     #<dependency>../libs/proto/doc//protodoc.xml
     <dependency>../libs/proto/doc//proto
+    <dependency>../libs/ratio/doc//ratio
     <dependency>../libs/typeof/doc//typeof
     <dependency>../libs/xpressive/doc//autodoc.xml
     <dependency>../libs/xpressive/doc//xpressive
@@ -45,6 +48,10 @@ boostbook doc
     <dependency>../libs/interprocess/doc//interprocess
     <dependency>../libs/intrusive/doc//autodoc.xml
     <dependency>../libs/intrusive/doc//intrusive
+    <dependency>../libs/move/doc//autodoc.xml
+    <dependency>../libs/move/doc//move
+    <dependency>../libs/container/doc//autodoc.xml
+    <dependency>../libs/container/doc//container
     <dependency>../libs/units/doc//units
     <dependency>../libs/unordered/doc//unordered
     <dependency>../libs/thread/doc//thread
@@ -55,6 +62,8 @@ boostbook doc
     ## Add path references to the QuickBook generated docs...
 
     <implicit-dependency>../libs/accumulators/doc//accumulators
+    <implicit-dependency>../libs/chrono/doc//chrono
+    <implicit-dependency>../libs/conversion/doc//lexical_cast
     <implicit-dependency>../libs/functional/hash/doc//hash
     #<implicit-dependency>../libs/type_traits/doc//type_traits
     <implicit-dependency>../libs/static_assert/doc//static_assert
@@ -62,13 +71,16 @@ boostbook doc
     <implicit-dependency>../libs/foreach/doc//foreach
     <implicit-dependency>../libs/property_tree/doc//property_tree
     <implicit-dependency>../libs/proto/doc//proto
+    <implicit-dependency>../libs/ratio/doc//ratio
     <implicit-dependency>../libs/typeof/doc//typeof
     <implicit-dependency>../libs/xpressive/doc//xpressive
     <implicit-dependency>../tools/build/v2/doc//jam_docs
     <implicit-dependency>../tools/quickbook/doc//quickbook
     <implicit-dependency>../libs/mpi/doc//mpi
+    <implicit-dependency>../libs/container/doc//container
     <implicit-dependency>../libs/interprocess/doc//interprocess
     <implicit-dependency>../libs/intrusive/doc//intrusive
+    <implicit-dependency>../libs/move/doc//move
     <implicit-dependency>../libs/units/doc//units
     <implicit-dependency>../libs/unordered/doc//unordered
     <implicit-dependency>../libs/thread/doc//thread

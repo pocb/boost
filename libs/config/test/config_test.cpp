@@ -1,4 +1,4 @@
-//  This file was automatically generated on Sat Sep 25 16:53:42 2010
+//  This file was automatically generated on Wed Jun  1 21:44:56 2011
 //  by libs/config/tools/generate.cpp
 //  Copyright John Maddock 2002-4.
 //  Use, modification and distribution are subject to the 
@@ -37,20 +37,10 @@ namespace boost_no_0x_hdr_chrono = empty_boost;
 #else
 namespace boost_no_0x_hdr_codecvt = empty_boost;
 #endif
-#ifndef BOOST_NO_0X_HDR_CONCEPTS
-#include "boost_no_0x_hdr_concepts.ipp"
-#else
-namespace boost_no_0x_hdr_concepts = empty_boost;
-#endif
 #ifndef BOOST_NO_0X_HDR_CONDITION_VARIABLE
 #include "boost_no_0x_hdr_condition_variable.ipp"
 #else
 namespace boost_no_0x_hdr_condition_variable = empty_boost;
-#endif
-#ifndef BOOST_NO_0X_HDR_CONTAINER_CONCEPTS
-#include "boost_no_0x_hdr_container_concepts.ipp"
-#else
-namespace boost_no_0x_hdr_container_concepts = empty_boost;
 #endif
 #ifndef BOOST_NO_0X_HDR_FORWARD_LIST
 #include "boost_no_0x_hdr_forward_list.ipp"
@@ -66,16 +56,6 @@ namespace boost_no_0x_hdr_future = empty_boost;
 #include "boost_no_0x_hdr_initializer_list.ipp"
 #else
 namespace boost_no_0x_hdr_initializer_list = empty_boost;
-#endif
-#ifndef BOOST_NO_0X_HDR_ITERATOR_CONCEPTS
-#include "boost_no_0x_hdr_iterator_concepts.ipp"
-#else
-namespace boost_no_0x_hdr_iterator_concepts = empty_boost;
-#endif
-#ifndef BOOST_NO_0X_HDR_MEMORY_CONCEPTS
-#include "boost_no_0x_hdr_memory_concepts.ipp"
-#else
-namespace boost_no_0x_hdr_memory_concepts = empty_boost;
 #endif
 #ifndef BOOST_NO_0X_HDR_MUTEX
 #include "boost_no_0x_hdr_mutex.ipp"
@@ -182,11 +162,6 @@ namespace boost_no_char32_t = empty_boost;
 #else
 namespace boost_no_complete_value_initialization = empty_boost;
 #endif
-#ifndef BOOST_NO_CONCEPTS
-#include "boost_no_concepts.ipp"
-#else
-namespace boost_no_concepts = empty_boost;
-#endif
 #ifndef BOOST_NO_CONSTEXPR
 #include "boost_no_constexpr.ipp"
 #else
@@ -221,6 +196,11 @@ namespace boost_no_cwctype = empty_boost;
 #include "boost_no_decltype.ipp"
 #else
 namespace boost_no_decltype = empty_boost;
+#endif
+#ifndef BOOST_NO_DECLTYPE_N3276
+#include "boost_no_decltype_n3276.ipp"
+#else
+namespace boost_no_decltype_n3276 = empty_boost;
 #endif
 #ifndef BOOST_DEDUCED_TYPENAME
 #include "boost_no_ded_typename.ipp"
@@ -271,6 +251,11 @@ namespace boost_no_explicit_function_template_arguments = empty_boost;
 #include "boost_no_extern_template.ipp"
 #else
 namespace boost_no_extern_template = empty_boost;
+#endif
+#ifndef BOOST_NO_FENV_H
+#include "boost_no_fenv_h.ipp"
+#else
+namespace boost_no_fenv_h = empty_boost;
 #endif
 #ifndef BOOST_NO_FUNCTION_TEMPLATE_DEFAULT_ARGS
 #include "boost_no_function_template_default_args.ipp"
@@ -386,6 +371,11 @@ namespace boost_no_pointer_to_member_template_parameters = empty_boost;
 #include "boost_no_nested_friendship.ipp"
 #else
 namespace boost_no_nested_friendship = empty_boost;
+#endif
+#ifndef BOOST_NO_NOEXCEPT
+#include "boost_no_noexcept.ipp"
+#else
+namespace boost_no_noexcept = empty_boost;
 #endif
 #ifndef BOOST_NO_NULLPTR
 #include "boost_no_nullptr.ipp"
@@ -572,6 +562,11 @@ namespace boost_no_typename_with_ctor = empty_boost;
 #else
 namespace boost_no_unicode_literals = empty_boost;
 #endif
+#ifndef BOOST_NO_UNIFIED_INITIALIZATION_SYNTAX
+#include "boost_no_unified_init.ipp"
+#else
+namespace boost_no_unified_initialization_syntax = empty_boost;
+#endif
 #ifndef BOOST_FUNCTION_SCOPE_USING_DECLARATION_BREAKS_ADL
 #include "boost_no_using_breaks_adl.ipp"
 #else
@@ -622,11 +617,6 @@ namespace boost_has_bethreads = empty_boost;
 #include "boost_has_clock_gettime.ipp"
 #else
 namespace boost_has_clock_gettime = empty_boost;
-#endif
-#ifdef BOOST_HAS_CONCEPTS
-#include "boost_has_concepts.ipp"
-#else
-namespace boost_has_concepts = empty_boost;
 #endif
 #ifdef BOOST_HAS_DIRENT_H
 #include "boost_has_dirent_h.ipp"
@@ -881,11 +871,6 @@ int main( int, char *[] )
       std::cerr << "Failed test for BOOST_HAS_CLOCK_GETTIME at: " << __FILE__ << ":" << __LINE__ << std::endl;
       ++error_count;
    }
-   if(0 != boost_has_concepts::test())
-   {
-      std::cerr << "Failed test for BOOST_HAS_CONCEPTS at: " << __FILE__ << ":" << __LINE__ << std::endl;
-      ++error_count;
-   }
    if(0 != boost_has_dirent_h::test())
    {
       std::cerr << "Failed test for BOOST_HAS_DIRENT_H at: " << __FILE__ << ":" << __LINE__ << std::endl;
@@ -1136,19 +1121,9 @@ int main( int, char *[] )
       std::cerr << "Failed test for BOOST_NO_0X_HDR_CODECVT at: " << __FILE__ << ":" << __LINE__ << std::endl;
       ++error_count;
    }
-   if(0 != boost_no_0x_hdr_concepts::test())
-   {
-      std::cerr << "Failed test for BOOST_NO_0X_HDR_CONCEPTS at: " << __FILE__ << ":" << __LINE__ << std::endl;
-      ++error_count;
-   }
    if(0 != boost_no_0x_hdr_condition_variable::test())
    {
       std::cerr << "Failed test for BOOST_NO_0X_HDR_CONDITION_VARIABLE at: " << __FILE__ << ":" << __LINE__ << std::endl;
-      ++error_count;
-   }
-   if(0 != boost_no_0x_hdr_container_concepts::test())
-   {
-      std::cerr << "Failed test for BOOST_NO_0X_HDR_CONTAINER_CONCEPTS at: " << __FILE__ << ":" << __LINE__ << std::endl;
       ++error_count;
    }
    if(0 != boost_no_0x_hdr_forward_list::test())
@@ -1164,16 +1139,6 @@ int main( int, char *[] )
    if(0 != boost_no_0x_hdr_initializer_list::test())
    {
       std::cerr << "Failed test for BOOST_NO_0X_HDR_INITIALIZER_LIST at: " << __FILE__ << ":" << __LINE__ << std::endl;
-      ++error_count;
-   }
-   if(0 != boost_no_0x_hdr_iterator_concepts::test())
-   {
-      std::cerr << "Failed test for BOOST_NO_0X_HDR_ITERATOR_CONCEPTS at: " << __FILE__ << ":" << __LINE__ << std::endl;
-      ++error_count;
-   }
-   if(0 != boost_no_0x_hdr_memory_concepts::test())
-   {
-      std::cerr << "Failed test for BOOST_NO_0X_HDR_MEMORY_CONCEPTS at: " << __FILE__ << ":" << __LINE__ << std::endl;
       ++error_count;
    }
    if(0 != boost_no_0x_hdr_mutex::test())
@@ -1281,11 +1246,6 @@ int main( int, char *[] )
       std::cerr << "Failed test for BOOST_NO_COMPLETE_VALUE_INITIALIZATION at: " << __FILE__ << ":" << __LINE__ << std::endl;
       ++error_count;
    }
-   if(0 != boost_no_concepts::test())
-   {
-      std::cerr << "Failed test for BOOST_NO_CONCEPTS at: " << __FILE__ << ":" << __LINE__ << std::endl;
-      ++error_count;
-   }
    if(0 != boost_no_constexpr::test())
    {
       std::cerr << "Failed test for BOOST_NO_CONSTEXPR at: " << __FILE__ << ":" << __LINE__ << std::endl;
@@ -1319,6 +1279,11 @@ int main( int, char *[] )
    if(0 != boost_no_decltype::test())
    {
       std::cerr << "Failed test for BOOST_NO_DECLTYPE at: " << __FILE__ << ":" << __LINE__ << std::endl;
+      ++error_count;
+   }
+   if(0 != boost_no_decltype_n3276::test())
+   {
+      std::cerr << "Failed test for BOOST_NO_DECLTYPE_N3276 at: " << __FILE__ << ":" << __LINE__ << std::endl;
       ++error_count;
    }
    if(0 != boost_deduced_typename::test())
@@ -1369,6 +1334,11 @@ int main( int, char *[] )
    if(0 != boost_no_extern_template::test())
    {
       std::cerr << "Failed test for BOOST_NO_EXTERN_TEMPLATE at: " << __FILE__ << ":" << __LINE__ << std::endl;
+      ++error_count;
+   }
+   if(0 != boost_no_fenv_h::test())
+   {
+      std::cerr << "Failed test for BOOST_NO_FENV_H at: " << __FILE__ << ":" << __LINE__ << std::endl;
       ++error_count;
    }
    if(0 != boost_no_function_template_default_args::test())
@@ -1484,6 +1454,11 @@ int main( int, char *[] )
    if(0 != boost_no_nested_friendship::test())
    {
       std::cerr << "Failed test for BOOST_NO_NESTED_FRIENDSHIP at: " << __FILE__ << ":" << __LINE__ << std::endl;
+      ++error_count;
+   }
+   if(0 != boost_no_noexcept::test())
+   {
+      std::cerr << "Failed test for BOOST_NO_NOEXCEPT at: " << __FILE__ << ":" << __LINE__ << std::endl;
       ++error_count;
    }
    if(0 != boost_no_nullptr::test())
@@ -1669,6 +1644,11 @@ int main( int, char *[] )
    if(0 != boost_no_unicode_literals::test())
    {
       std::cerr << "Failed test for BOOST_NO_UNICODE_LITERALS at: " << __FILE__ << ":" << __LINE__ << std::endl;
+      ++error_count;
+   }
+   if(0 != boost_no_unified_initialization_syntax::test())
+   {
+      std::cerr << "Failed test for BOOST_NO_UNIFIED_INITIALIZATION_SYNTAX at: " << __FILE__ << ":" << __LINE__ << std::endl;
       ++error_count;
    }
    if(0 != boost_function_scope_using_declaration_breaks_adl::test())

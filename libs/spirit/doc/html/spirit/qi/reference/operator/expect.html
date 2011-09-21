@@ -4,7 +4,7 @@
 <title>Expectation Parser (a &gt; b)</title>
 <link rel="stylesheet" href="../../../../../../../../doc/src/boostbook.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.75.0">
-<link rel="home" href="../../../../index.html" title="Spirit 2.4.2">
+<link rel="home" href="../../../../index.html" title="Spirit 2.6">
 <link rel="up" href="../operator.html" title="Parser Operators">
 <link rel="prev" href="difference.html" title="Difference Parser (a - b)">
 <link rel="next" href="kleene.html" title="Kleene Parser (*a)">
@@ -29,9 +29,28 @@
           <span class="identifier">b</span></code>)</a>
 </h5></div></div></div>
 <a name="spirit.qi.reference.operator.expect.description"></a><h6>
-<a name="id1021282"></a>
+<a name="spirit.qi.reference.operator.expect.description-heading"></a>
             <a class="link" href="expect.html#spirit.qi.reference.operator.expect.description">Description</a>
           </h6>
+<p>
+            There are occasions in which it is expected that the input must match
+            a particular parser or the input is invalid. Such cases generally arise
+            after matching a portion of a grammar, such that the context is fully
+            known. In such a situation, failure to match should result in an exception.
+            For example, when parsing an e-mail address, after matching a name and
+            "@" there must be a domain name or the address is invalid.
+          </p>
+<p>
+            The expectation operator (&gt;) requires that the following parser match
+            the input or an exception is emitted. Using on_error(), that exception
+            can be handled by calling a handler with the context at which the parsing
+            failed can be reported.
+          </p>
+<p>
+            By contrast, the follows operator (&gt;&gt;) does not require that the
+            following parser match the input, which allows for backtracking or simply
+            returning false from the parse() function with no exceptions.
+          </p>
 <p>
             Like the <a class="link" href="sequence.html" title="Sequence Parser (a &gt;&gt; b)">Sequence</a>,
             the expectation operator, <code class="computeroutput"><span class="identifier">a</span>
@@ -49,7 +68,7 @@
             (all operands except the first) fail to match.
           </p>
 <a name="spirit.qi.reference.operator.expect.header"></a><h6>
-<a name="id1021408"></a>
+<a name="spirit.qi.reference.operator.expect.header-heading"></a>
             <a class="link" href="expect.html#spirit.qi.reference.operator.expect.header">Header</a>
           </h6>
 <pre class="programlisting"><span class="comment">// forwards to &lt;boost/spirit/home/qi/operator/expect.hpp&gt;
@@ -59,7 +78,7 @@
             Also, see <a class="link" href="../../../structure/include.html" title="Include">Include Structure</a>.
           </p>
 <a name="spirit.qi.reference.operator.expect.model_of"></a><h6>
-<a name="id1021483"></a>
+<a name="spirit.qi.reference.operator.expect.model_of-heading"></a>
             <a class="link" href="expect.html#spirit.qi.reference.operator.expect.model_of">Model of</a>
           </h6>
 <div class="blockquote"><blockquote class="blockquote"><p>
@@ -79,7 +98,7 @@
 </dl>
 </div>
 <a name="spirit.qi.reference.operator.expect.expectation_failure"></a><h6>
-<a name="id1021585"></a>
+<a name="spirit.qi.reference.operator.expect.expectation_failure-heading"></a>
             <a class="link" href="expect.html#spirit.qi.reference.operator.expect.expectation_failure">Expectation
             Failure</a>
           </h6>
@@ -95,7 +114,7 @@
 </span><span class="special">};</span>
 </pre>
 <a name="spirit.qi.reference.operator.expect.expression_semantics"></a><h6>
-<a name="id1021739"></a>
+<a name="spirit.qi.reference.operator.expect.expression_semantics-heading"></a>
             <a class="link" href="expect.html#spirit.qi.reference.operator.expect.expression_semantics">Expression
             Semantics</a>
           </h6>
@@ -136,7 +155,7 @@
 </tr></tbody>
 </table></div>
 <a name="spirit.qi.reference.operator.expect.attributes"></a><h6>
-<a name="id1021885"></a>
+<a name="spirit.qi.reference.operator.expect.attributes-heading"></a>
             <a class="link" href="expect.html#spirit.qi.reference.operator.expect.attributes">Attributes</a>
           </h6>
 <p>
@@ -186,7 +205,7 @@
 </tr></tbody>
 </table></div>
 <a name="spirit.qi.reference.operator.expect.complexity"></a><h6>
-<a name="id1022569"></a>
+<a name="spirit.qi.reference.operator.expect.complexity-heading"></a>
             <a class="link" href="expect.html#spirit.qi.reference.operator.expect.complexity">Complexity</a>
           </h6>
 <div class="blockquote"><blockquote class="blockquote"><p>
@@ -195,7 +214,7 @@
               operator itself is O(N), where N is the number of elements in the sequence.
             </p></blockquote></div>
 <a name="spirit.qi.reference.operator.expect.example"></a><h6>
-<a name="id1022590"></a>
+<a name="spirit.qi.reference.operator.expect.example-heading"></a>
             <a class="link" href="expect.html#spirit.qi.reference.operator.expect.example">Example</a>
           </h6>
 <div class="note"><table border="0" summary="Note">

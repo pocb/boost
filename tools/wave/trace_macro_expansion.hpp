@@ -17,6 +17,7 @@
 #include <ostream>
 #include <string>
 #include <stack>
+#include <set>
 
 #include <boost/assert.hpp>
 #include <boost/config.hpp>
@@ -161,8 +162,6 @@ public:
         default_outfile(default_outfile_),
         emit_relative_filenames(false)
     {
-        using namespace std;    // some systems have time in namespace std
-        time(&started_at);
     }
     ~trace_macro_expansion()
     {
@@ -184,6 +183,12 @@ public:
     bool enable_relative_names_in_line_directives() const
     {
         return emit_relative_filenames;
+    }
+
+    // add a macro name, which should not be expanded at all (left untouched)
+    void add_noexpandmacro(std::string const& name)
+    {
+        noexpandmacros.insert(name);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -213,6 +218,11 @@ public:
     //  invocation (starting with the opening parenthesis and ending after the
     //  closing one).
     //
+    //  The return value defines whether the corresponding macro will be 
+    //  expanded (return false) or will be copied to the output (return true).
+    //  Note: the whole argument list is copied unchanged to the output as well
+    //        without any further processing.
+    //
     ///////////////////////////////////////////////////////////////////////////
 #if BOOST_WAVE_USE_DEPRECIATED_PREPROCESSING_HOOKS != 0
     // old signature
@@ -237,8 +247,15 @@ public:
         TokenT const &macrocall, std::vector<ContainerT> const &arguments,
         IteratorT const& seqstart, IteratorT const& seqend) 
     {
-        if (enabled_macro_counting())
-            count_invocation(macrodef.get_value().c_str());
+        if (enabled_macro_counting() || !noexpandmacros.empty()) {
+            std::string name (macrodef.get_value().c_str());
+
+            if (noexpandmacros.find(name.c_str()) != noexpandmacros.end())
+                return true;    // do not expand this macro
+
+            if (enabled_macro_counting())
+                count_invocation(name.c_str());
+        }
 
         if (!enabled_macro_tracing()) 
             return false;
@@ -356,8 +373,15 @@ public:
         TokenT const &macrodef, ContainerT const &definition, 
         TokenT const &macrocall)
     {
-        if (enabled_macro_counting())
-            count_invocation(macrodef.get_value().c_str());
+        if (enabled_macro_counting() || !noexpandmacros.empty()) {
+            std::string name (macrodef.get_value().c_str());
+
+            if (noexpandmacros.find(name.c_str()) != noexpandmacros.end())
+                return true;    // do not expand this macro
+
+            if (enabled_macro_counting())
+                count_invocation(name.c_str());
+        }
 
         if (!enabled_macro_tracing()) 
             return false;
@@ -1021,10 +1045,13 @@ protected:
         // ensure all directories for this file do exist
         fs::create_directories(boost::wave::util::branch_path(fpath));
 
-        // figure out, whether the file to open was last accessed by us
+        // figure out, whether the file has been written to by us, if yes, we
+        // append any output to this file, otherwise we overwrite it
         std::ios::openmode mode = std::ios::out;
-        if (fs::exists(fpath) && fs::last_write_time(fpath) >= started_at)
+        if (fs::exists(fpath) && written_by_us.find(fpath) != written_by_us.end())
             mode = (std::ios::openmode)(std::ios::out | std::ios::app);
+
+        written_by_us.insert(fpath);
 
         // close the current file
         if (outputstrm.is_open())
@@ -1144,10 +1171,71 @@ protected:
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    // join all adjacent string tokens into the first one
+    template <typename StringT>
+    StringT unlit(StringT const& str)
+    {
+        return str.substr(1, str.size()-2);
+    }
+
+    template <typename StringT>
+    StringT merge_string_lits(StringT const& lhs, StringT const& rhs)
+    {
+        StringT result ("\"");
+
+        result += unlit(lhs);
+        result += unlit(rhs);
+        result += "\"";
+        return result;
+    }
+
+    template <typename ContextT, typename ContainerT>
+    void join_adjacent_string_tokens(ContextT &ctx, ContainerT const& values,
+        ContainerT& joined_values)
+    {
+        using namespace boost::wave;
+
+        typedef typename ContextT::token_type token_type;
+        typedef typename token_type::string_type string_type;
+        typedef typename ContainerT::const_iterator const_iterator;
+        typedef typename ContainerT::iterator iterator;
+
+        token_type* current = 0;
+
+        const_iterator end = values.end();
+        for (const_iterator it = values.begin(); it != end; ++it) {
+            token_id id(*it);
+
+            if (id == T_STRINGLIT) {
+                if (!current) {
+                    joined_values.push_back(*it);
+                    current = &joined_values.back();
+                }
+                else {
+                    current->set_value(merge_string_lits(
+                        current->get_value(), (*it).get_value()));
+                }
+            }
+            else if (current) {
+                typedef util::impl::next_token<const_iterator> next_token_type;
+                token_id next_id (next_token_type::peek(it, end, true));
+
+                if (next_id != T_STRINGLIT) {
+                    current = 0;
+                    joined_values.push_back(*it);
+                }
+            }
+            else {
+                joined_values.push_back(*it);
+            }
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     //  interpret the pragma wave option() directives
     template <typename ContextT, typename ContainerT>
     bool 
-    interpret_pragma_option(ContextT &ctx, ContainerT const &values, 
+    interpret_pragma_option(ContextT &ctx, ContainerT const &cvalues, 
         typename ContextT::token_type const &act_token)
     {
         using namespace boost::wave;
@@ -1155,6 +1243,9 @@ protected:
         typedef typename ContextT::token_type token_type;
         typedef typename token_type::string_type string_type;
         typedef typename ContainerT::const_iterator const_iterator;
+
+        ContainerT values;
+        join_adjacent_string_tokens(ctx, cvalues, values);
 
         const_iterator end = values.end();
         for (const_iterator it = values.begin(); it != end; /**/) {
@@ -1371,7 +1462,7 @@ private:
     boost::filesystem::path current_outfile;    // name of the current output file 
 
     stop_watch elapsed_time;        // trace timings
-    std::time_t started_at;         // time, this process was started at
+    std::set<boost::filesystem::path> written_by_us;    // all files we have written to
 
     typedef std::pair<bool, boost::filesystem::path> output_option_type;
     std::stack<output_option_type> output_options;  // output option stack
@@ -1380,6 +1471,8 @@ private:
 
     std::map<std::string, std::size_t> counts;    // macro invocation counts
     bool emit_relative_filenames;   // emit relative names in #line directives
+
+    std::set<std::string> noexpandmacros;   // list of macros not to expand
 };
 
 #undef BOOST_WAVE_GETSTRING
