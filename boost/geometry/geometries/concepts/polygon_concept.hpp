@@ -1,7 +1,12 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
-//
-// Copyright Barend Gehrels 2007-2009, Geodan, Amsterdam, the Netherlands.
-// Copyright Bruno Lalande 2008, 2009
+
+// Copyright (c) 2008-2011 Bruno Lalande, Paris, France.
+// Copyright (c) 2008-2011 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2009-2011 Mateusz Loskot, London, UK.
+
+// Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
+// (geolib/GGL), copyright (c) 1995-2010 Geodan, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -52,7 +57,7 @@ class Polygon
     {
         static inline void apply()
         {
-            polygon_type* poly;
+            polygon_type* poly = 0;
             polygon_type const* cpoly = poly;
 
             ring_mutable_type e = traits::exterior_ring<PolygonType>::get(*poly);
@@ -105,7 +110,7 @@ class ConstPolygon
     {
         static inline void apply()
         {
-            const_polygon_type const* cpoly;
+            const_polygon_type const* cpoly = 0;
 
             ring_const_type ce = traits::exterior_ring<const_polygon_type>::get(*cpoly);
             interior_const_type ci = traits::interior_rings<const_polygon_type>::get(*cpoly);

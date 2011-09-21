@@ -85,11 +85,13 @@ void epoll_reactor::shutdown_service()
   }
 
   timer_queues_.get_all_timers(ops);
+
+  io_service_.abandon_operations(ops);
 }
 
-void epoll_reactor::fork_service(boost::asio::io_service::fork_event event)
+void epoll_reactor::fork_service(boost::asio::io_service::fork_event fork_ev)
 {
-  if (event == boost::asio::io_service::fork_child)
+  if (fork_ev == boost::asio::io_service::fork_child)
   {
     if (epoll_fd_ != -1)
       ::close(epoll_fd_);
@@ -185,6 +187,14 @@ int epoll_reactor::register_internal_descriptor(
     return errno;
 
   return 0;
+}
+
+void epoll_reactor::move_descriptor(socket_type,
+    epoll_reactor::per_descriptor_data& target_descriptor_data,
+    epoll_reactor::per_descriptor_data& source_descriptor_data)
+{
+  target_descriptor_data = source_descriptor_data;
+  source_descriptor_data = 0;
 }
 
 void epoll_reactor::start_op(int op_type, socket_type descriptor,

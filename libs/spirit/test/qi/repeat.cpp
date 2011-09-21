@@ -1,5 +1,5 @@
 /*=============================================================================
-    Copyright (c) 2001-2010 Joel de Guzman
+    Copyright (c) 2001-2011 Joel de Guzman
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -238,6 +238,7 @@ main()
         BOOST_TEST(!test("aaaaaa", repeat(3, val(5))[char_]));
         BOOST_TEST(!test("aa", repeat(val(3), 5)[char_]));
 
+//#warning "testcase commented out"
         BOOST_TEST(test("aaa", repeat(val(3), inf)[char_]));
         BOOST_TEST(test("aaaaa", repeat(3, val(inf))[char_]));
         BOOST_TEST(test("aaaaaa", repeat(val(3), inf)[char_]));

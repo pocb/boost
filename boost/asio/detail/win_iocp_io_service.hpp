@@ -20,10 +20,10 @@
 #if defined(BOOST_ASIO_HAS_IOCP)
 
 #include <boost/limits.hpp>
-#include <boost/scoped_ptr.hpp>
 #include <boost/asio/io_service.hpp>
 #include <boost/asio/detail/mutex.hpp>
 #include <boost/asio/detail/op_queue.hpp>
+#include <boost/asio/detail/scoped_ptr.hpp>
 #include <boost/asio/detail/socket_types.hpp>
 #include <boost/asio/detail/timer_op.hpp>
 #include <boost/asio/detail/timer_queue_base.hpp>
@@ -104,11 +104,11 @@ public:
 
   // Request invocation of the given handler.
   template <typename Handler>
-  void dispatch(Handler& handler);
+  void dispatch(Handler handler);
 
   // Request invocation of the given handler and return immediately.
   template <typename Handler>
-  void post(Handler& handler);
+  void post(Handler handler);
 
   // Request invocation of the given operation and return immediately. Assumes
   // that work_started() has not yet been called for the operation.
@@ -126,6 +126,10 @@ public:
   // that work_started() was previously called for the operations.
   BOOST_ASIO_DECL void post_deferred_completions(
       op_queue<win_iocp_operation>& ops);
+
+  // Process unfinished operations as part of a shutdown_service operation.
+  // Assumes that work_started() was previously called for the operations.
+  BOOST_ASIO_DECL void abandon_operations(op_queue<operation>& ops);
 
   // Called after starting an overlapped I/O operation that did not complete
   // immediately. The caller must have already called work_started() prior to
@@ -241,7 +245,7 @@ private:
   friend struct timer_thread_function;
 
   // Background thread used for processing timeouts.
-  boost::scoped_ptr<thread> timer_thread_;
+  scoped_ptr<thread> timer_thread_;
 
   // A waitable timer object used for waiting for timeouts.
   auto_handle waitable_timer_;

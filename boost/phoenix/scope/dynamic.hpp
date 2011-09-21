@@ -22,50 +22,50 @@
 #include <boost/preprocessor/punctuation/comma.hpp>
 #include <boost/type_traits/remove_pointer.hpp>
 
-#define BOOST_BOOST_PHOENIX_DYNAMIC_TEMPLATE_PARAMS(R, DATA, I, ELEM)                 \
+#define BOOST_PHOENIX_DYNAMIC_TEMPLATE_PARAMS(R, DATA, I, ELEM)                 \
       BOOST_PP_COMMA_IF(I) BOOST_PP_TUPLE_ELEM(2, 0, ELEM)                      \
 /**/
 
-#define BOOST_BOOST_PHOENIX_DYNAMIC_CTOR_INIT(R, DATA, I, ELEM)                       \
+#define BOOST_PHOENIX_DYNAMIC_CTOR_INIT(R, DATA, I, ELEM)                       \
     BOOST_PP_COMMA_IF(I) BOOST_PP_TUPLE_ELEM(2, 1, ELEM)(init<I>(this))         \
 /**/
 
-#define BOOST_BOOST_PHOENIX_DYNAMIC_MEMBER(R, DATA, I, ELEM)                          \
+#define BOOST_PHOENIX_DYNAMIC_MEMBER(R, DATA, I, ELEM)                          \
     BOOST_PP_CAT(member, BOOST_PP_INC(I)) BOOST_PP_TUPLE_ELEM(2, 1, ELEM);      \
 /**/
 
-#define BOOST_BOOST_PHOENIX_DYNAMIC_FILLER_0(X, Y)                                    \
-    ((X, Y)) BOOST_BOOST_PHOENIX_DYNAMIC_FILLER_1                                     \
+#define BOOST_PHOENIX_DYNAMIC_FILLER_0(X, Y)                                    \
+    ((X, Y)) BOOST_PHOENIX_DYNAMIC_FILLER_1                                     \
 /**/
 
-#define BOOST_BOOST_PHOENIX_DYNAMIC_FILLER_1(X, Y)                                    \
-    ((X, Y)) BOOST_BOOST_PHOENIX_DYNAMIC_FILLER_0                                     \
+#define BOOST_PHOENIX_DYNAMIC_FILLER_1(X, Y)                                    \
+    ((X, Y)) BOOST_PHOENIX_DYNAMIC_FILLER_0                                     \
 /**/
 
-#define BOOST_BOOST_PHOENIX_DYNAMIC_FILLER_0_END
-#define BOOST_BOOST_PHOENIX_DYNAMIC_FILLER_1_END
+#define BOOST_PHOENIX_DYNAMIC_FILLER_0_END
+#define BOOST_PHOENIX_DYNAMIC_FILLER_1_END
 
-#define BOOST_BOOST_PHOENIX_DYNAMIC_BASE(NAME, MEMBER)                                \
+#define BOOST_PHOENIX_DYNAMIC_BASE(NAME, MEMBER)                                \
 struct NAME                                                                     \
     : ::boost::phoenix::dynamic<                                                \
         BOOST_PP_SEQ_FOR_EACH_I(                                                \
-                BOOST_BOOST_PHOENIX_DYNAMIC_TEMPLATE_PARAMS                           \
+                BOOST_PHOENIX_DYNAMIC_TEMPLATE_PARAMS                           \
               , _                                                               \
               , MEMBER)                                                         \
     >                                                                           \
 {                                                                               \
     NAME()                                                                      \
-        : BOOST_PP_SEQ_FOR_EACH_I(BOOST_BOOST_PHOENIX_DYNAMIC_CTOR_INIT, _, MEMBER)   \
+        : BOOST_PP_SEQ_FOR_EACH_I(BOOST_PHOENIX_DYNAMIC_CTOR_INIT, _, MEMBER)   \
     {}                                                                          \
                                                                                 \
-    BOOST_PP_SEQ_FOR_EACH_I(BOOST_BOOST_PHOENIX_DYNAMIC_MEMBER, _, MEMBER)            \
+    BOOST_PP_SEQ_FOR_EACH_I(BOOST_PHOENIX_DYNAMIC_MEMBER, _, MEMBER)            \
 }                                                                               \
 /**/
 
-#define BOOST_BOOST_PHOENIX_DYNAMIC(NAME, MEMBER)                                     \
-    BOOST_BOOST_PHOENIX_DYNAMIC_BASE(                                                 \
+#define BOOST_PHOENIX_DYNAMIC(NAME, MEMBER)                                     \
+    BOOST_PHOENIX_DYNAMIC_BASE(                                                 \
         NAME                                                                    \
-      , BOOST_PP_CAT(BOOST_BOOST_PHOENIX_DYNAMIC_FILLER_0 MEMBER,_END)                \
+      , BOOST_PP_CAT(BOOST_PHOENIX_DYNAMIC_FILLER_0 MEMBER,_END)                \
     )                                                                           \
 /**/
 
@@ -118,12 +118,14 @@ namespace boost { namespace phoenix
         template <typename Sig>
         struct result;
 
-        template <typename This, typename Context, typename N, typename Scope>
-        struct result<This(Context, N, Scope)>
+        template <typename This, typename N, typename Scope, typename Context>
+        struct result<This(N, Scope, Context)>
         {
             typedef
                 typename boost::remove_pointer<
-                    typename proto::detail::uncvref<typename proto::result_of::value<Scope>::type>::type
+                    typename proto::detail::uncvref<
+                        typename proto::result_of::value<Scope>::type
+                    >::type
                 >::type
                 scope_type;
             typedef 
@@ -133,17 +135,26 @@ namespace boost { namespace phoenix
             typedef
                 typename fusion::result_of::at_c<
                     tuple_type
-                  , proto::detail::uncvref<typename proto::result_of::value<N>::type>::type::value
+                  , proto::detail::uncvref<
+                        typename proto::result_of::value<N>::type
+                    >::type::value
                 >::type
                 type;
 
         };
 
-        template <typename Context, typename N, typename Scope>
-        typename result<dynamic_member_eval(Context, N, Scope)>::type
-        operator()(Context const&, N, Scope s) const
+        template <typename N, typename Scope, typename Context>
+        typename result<dynamic_member_eval(N, Scope, Context)>::type
+        operator()(N, Scope s, Context &) const
         {
-            return fusion::at_c<proto::detail::uncvref<typename proto::result_of::value<N>::type>::type::value>(proto::value(s)->frame->data());
+            return
+                fusion::at_c<
+                    proto::detail::uncvref<
+                        typename proto::result_of::value<N>::type
+                    >::type::value
+                >(
+                    proto::value(s)->frame->data()
+                );
         }
     };
 

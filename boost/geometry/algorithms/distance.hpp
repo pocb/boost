@@ -1,7 +1,12 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
-//
-// Copyright Barend Gehrels 2007-2009, Geodan, Amsterdam, the Netherlands.
-// Copyright Bruno Lalande 2008, 2009
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2011 Bruno Lalande, Paris, France.
+// Copyright (c) 2009-2011 Mateusz Loskot, London, UK.
+
+// Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
+// (geolib/GGL), copyright (c) 1995-2010 Geodan, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -27,7 +32,7 @@
 #include <boost/geometry/geometries/concepts/check.hpp>
 
 #include <boost/geometry/strategies/distance.hpp>
-#include <boost/geometry/strategies/distance_result.hpp>
+#include <boost/geometry/strategies/default_distance_result.hpp>
 #include <boost/geometry/algorithms/assign.hpp>
 #include <boost/geometry/algorithms/within.hpp>
 
@@ -73,8 +78,8 @@ struct point_to_segment
             >::type segment_strategy;
 
         typename point_type<Segment>::type p[2];
-        geometry::assign_point_from_index<0>(segment, p[0]);
-        geometry::assign_point_from_index<1>(segment, p[1]);
+        geometry::detail::assign_point_from_index<0>(segment, p[0]);
+        geometry::detail::assign_point_from_index<1>(segment, p[1]);
         return segment_strategy.apply(point, p[0], p[1]);
     }
 };
@@ -211,7 +216,7 @@ struct point_to_polygon
 
         typename interior_return_type<Polygon const>::type rings
                     = interior_rings(polygon);
-        for (BOOST_AUTO(it, boost::begin(rings)); it != boost::end(rings); ++it)
+        for (BOOST_AUTO_TPL(it, boost::begin(rings)); it != boost::end(rings); ++it)
         {
             distance_containment dcr = per_ring::apply(point,
                             *it, pp_strategy, ps_strategy);
@@ -412,15 +417,11 @@ struct distance
     static inline typename return_type<Strategy>::type apply(Point const& point,
                 Segment const& segment, Strategy const& strategy)
     {
-        // TODO: We cannot use .first and .second here.
-        // Segment strategy does not operate on segment (anymore), because:
-        // all strategies do not operate on segments anymore, because
-        // it turned out to be inconvenient (wrapping up things in segments);
-        // The SIDE strategy must operate on three different point types,
-        // and that might be for distance segment strategy as well
-        // (though not very probable).
-
-        return strategy.apply(point, segment.first, segment.second);
+        
+        typename point_type<Segment>::type p[2];
+        geometry::detail::assign_point_from_index<0>(segment, p[0]);
+        geometry::detail::assign_point_from_index<1>(segment, p[1]);
+        return strategy.apply(point, p[0], p[1]);
     }
 };
 
@@ -522,15 +523,17 @@ inline typename strategy::distance::services::return_type<Strategy>::type distan
 /*!
 \brief \brief_calc2{distance}
 \ingroup distance
-\details The default strategy is used, belonging to the corresponding coordinate system of the geometries
+\details The default strategy is used, corresponding to the coordinate system of the geometries
 \tparam Geometry1 \tparam_geometry
 \tparam Geometry2 \tparam_geometry
 \param geometry1 \param_geometry
 \param geometry2 \param_geometry
 \return \return_calc{distance}
+
+\qbk{[include reference/algorithms/distance.qbk]}
  */
 template <typename Geometry1, typename Geometry2>
-inline typename distance_result<Geometry1, Geometry2>::type distance(
+inline typename default_distance_result<Geometry1, Geometry2>::type distance(
                 Geometry1 const& geometry1, Geometry2 const& geometry2)
 {
     concept::check<Geometry1 const>();

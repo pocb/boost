@@ -1,7 +1,13 @@
-// Boost.Geometry (aka GGL, Generic Geometry Library) test file
-//
-// Copyright Barend Gehrels 2007-2009, Geodan, Amsterdam, the Netherlands
-// Copyright Bruno Lalande 2008, 2009
+// Boost.Geometry (aka GGL, Generic Geometry Library)
+// Unit Test
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2011 Bruno Lalande, Paris, France.
+// Copyright (c) 2009-2011 Mateusz Loskot, London, UK.
+
+// Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
+// (geolib/GGL), copyright (c) 1995-2010 Geodan, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -58,13 +64,13 @@ static void test_segment_intersection(std::string const& case_id,
 //#endif
 
     typedef typename bg::coordinate_type<P>::type coordinate_type;
-    typedef bg::segment<const P> segment_type;
+    typedef bg::model::referring_segment<const P> segment_type;
 
     P p1, p2, p3, p4;
-    bg::assign(p1, x1, y1);
-    bg::assign(p2, x2, y2);
-    bg::assign(p3, x3, y3);
-    bg::assign(p4, x4, y4);
+    bg::assign_values(p1, x1, y1);
+    bg::assign_values(p2, x2, y2);
+    bg::assign_values(p3, x3, y3);
+    bg::assign_values(p4, x4, y4);
 
     segment_type s12(p1,p2);
     segment_type s34(p3,p4);

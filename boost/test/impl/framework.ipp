@@ -28,6 +28,11 @@
 #include <boost/test/results_reporter.hpp>
 #include <boost/test/test_tools.hpp>
 
+#if !defined(__BORLANDC__) && !BOOST_WORKAROUND( BOOST_MSVC, < 1300 ) && !BOOST_WORKAROUND( __SUNPRO_CC, < 0x5100 )
+#define BOOST_TEST_SUPPORT_RUN_BY_NAME
+#include <boost/test/utils/iterator/token_iterator.hpp>
+#endif
+
 #include <boost/test/detail/unit_test_parameters.hpp>
 #include <boost/test/detail/global_typedef.hpp>
 
@@ -35,6 +40,7 @@
 
 // Boost
 #include <boost/timer.hpp>
+#include <boost/bind.hpp>
 
 // STL
 #include <map>
@@ -55,7 +61,7 @@ namespace boost {
 namespace unit_test {
 
 // ************************************************************************** //
-// **************            test_start calls wrapper          ************** //
+// **************           test_start calls wrapper           ************** //
 // ************************************************************************** //
 
 namespace ut_detail {
@@ -102,7 +108,198 @@ struct test_init_caller {
     init_unit_test_func m_init_func;
 };
 
-}
+// ************************************************************************** //
+// **************                  tu_enabler                  ************** //
+// ************************************************************************** //
+
+struct tu_enabler : public test_tree_visitor {
+    explicit        tu_enabler( bool on_off ) : m_on_off( on_off ) {}
+private:
+    virtual void    visit( test_case const& tc )                { tc.p_enabled.value = m_on_off; }
+    virtual bool    test_suite_start( test_suite const& ts )    { ts.p_enabled.value = m_on_off; return true; }
+
+    // Data members
+    bool            m_on_off;
+};
+
+// ************************************************************************** //
+// **************                  name_filter                 ************** //
+// ************************************************************************** //
+
+typedef std::list<std::pair<test_unit_id,bool> > tu_enable_list;
+
+class name_filter : public test_tree_visitor {
+    struct component {
+        component( const_string name ) // has to be implicit
+        {
+            if( name == "*" )
+                m_kind  = SFK_ALL;
+            else if( first_char( name ) == '*' && last_char( name ) == '*' ) {
+                m_kind  = SFK_SUBSTR;
+                m_name  = name.substr( 1, name.size()-1 );
+            }
+            else if( first_char( name ) == '*' ) {
+                m_kind  = SFK_TRAILING;
+                m_name  = name.substr( 1 );
+            }
+            else if( last_char( name ) == '*' ) {
+                m_kind  = SFK_LEADING;
+                m_name  = name.substr( 0, name.size()-1 );
+            }
+            else {
+                m_kind  = SFK_MATCH;
+                m_name  = name;
+            }
+        };
+
+        bool            pass( test_unit const& tu ) const
+        {
+            const_string name( tu.p_name );
+    
+            switch( m_kind ) {
+            default:
+            case SFK_ALL:
+                return true;
+            case SFK_LEADING:
+                return name.substr( 0, m_name.size() ) == m_name;
+            case SFK_TRAILING:
+                return name.size() >= m_name.size() && name.substr( name.size() - m_name.size() ) == m_name;
+            case SFK_SUBSTR:
+                return name.find( m_name ) != const_string::npos;
+            case SFK_MATCH:
+                return m_name == tu.p_name.get();
+            }
+        }
+        enum kind { SFK_ALL, SFK_LEADING, SFK_TRAILING, SFK_SUBSTR, SFK_MATCH };
+
+        kind            m_kind;
+        const_string    m_name;
+    };
+
+public:
+    // Constructor
+    name_filter( tu_enable_list& tu_to_enable, const_string tc_to_run ) : m_tu_to_enable( tu_to_enable ), m_depth( 0 )
+    {
+#ifdef BOOST_TEST_SUPPORT_RUN_BY_NAME
+        string_token_iterator tit( tc_to_run, (dropped_delimeters = "/", kept_delimeters = dt_none) );
+
+        while( tit != string_token_iterator() ) {
+            m_components.push_back( std::vector<component>( string_token_iterator( *tit, (dropped_delimeters = ",", kept_delimeters = dt_none)  ), 
+                                                            string_token_iterator() ) );
+
+            ++tit;           
+        }
+#endif
+    }
+
+private:
+    bool            filter_unit( test_unit const& tu )
+    {
+        // skip master test suite
+        if( m_depth == 0 )
+            return true;
+
+        // corresponding name filters are at level m_depth-1
+        std::vector<component> const& filters = m_components[m_depth-1];
+
+        // look for match
+        return std::find_if( filters.begin(), filters.end(), bind( &component::pass, _1, boost::ref(tu) ) ) != filters.end();
+    }
+
+    // test_tree_visitor interface
+    virtual void    visit( test_case const& tc )
+    {
+        if( filter_unit( tc ) )
+            m_tu_to_enable.push_back( std::make_pair( tc.p_id, false ) ); // found a test case; add it to enable list without children
+    }
+    virtual bool    test_suite_start( test_suite const& ts )
+    {
+        if( filter_unit( ts ) ) {
+            if( m_depth < m_components.size() ) {
+                ++m_depth;
+                return true;
+            }
+
+            m_tu_to_enable.push_back( std::make_pair( ts.p_id, true ) ); // found a test suite; add it to enable list with children and stop recursion
+        }
+
+        return false;
+    }
+
+    // Data members
+    typedef std::vector<std::vector<component> > components_per_level;
+
+    components_per_level    m_components;
+    tu_enable_list&         m_tu_to_enable;
+    unsigned                m_depth;
+};
+
+// ************************************************************************** //
+// **************                 label_filter                 ************** //
+// ************************************************************************** //
+
+class label_filter : public test_tree_visitor {
+public:
+    label_filter( tu_enable_list& tu_to_enable, const_string label )
+    : m_tu_to_enable( tu_to_enable )
+    , m_label( label )
+    {}
+
+private:
+    bool            filter_unit( test_unit const& tu )
+    {
+        return tu.has_label( m_label );
+    }
+
+    // test_tree_visitor interface
+    virtual void    visit( test_case const& tc )
+    {
+        if( filter_unit( tc ) )
+            m_tu_to_enable.push_back( std::make_pair( tc.p_id, false ) ); // found a test case; add it to enable list without children
+    }
+    virtual bool    test_suite_start( test_suite const& ts )
+    {
+        if( filter_unit( ts ) ) {
+            m_tu_to_enable.push_back( std::make_pair( ts.p_id, true ) ); // found a test suite; add it to enable list with children and stop recursion
+            return false;
+        }
+
+        return true;
+    }
+
+    // Data members
+    const_string    m_label;
+    tu_enable_list& m_tu_to_enable;
+};
+
+// ************************************************************************** //
+// **************                 tu_collector                 ************** //
+// ************************************************************************** //
+
+class tu_collector : public test_tree_visitor {
+public:
+    explicit        tu_collector( tu_enable_list& tu_to_enable ) : m_tu_to_enable( tu_to_enable ) {}
+
+private:
+    // test_tree_visitor interface
+    virtual void    visit( test_case const& tc )
+    {
+        if( !tc.p_enabled )
+            m_tu_to_enable.push_back( std::make_pair( tc.p_id, false ) );
+    }
+    virtual bool    test_suite_start( test_suite const& ts )
+    {
+        if( !ts.p_enabled )
+            m_tu_to_enable.push_back( std::make_pair( ts.p_id, false ) );
+
+        return true;
+    }
+
+    // Data members
+    tu_enable_list& m_tu_to_enable;
+};
+
+} // namespace ut_detail
 
 // ************************************************************************** //
 // **************                   framework                  ************** //
@@ -117,6 +314,7 @@ public:
     , m_next_test_suite_id( MIN_TEST_SUITE_ID )
     , m_is_initialized( false )
     , m_test_in_progress( false )
+    , m_context_idx( 0 )
     {}
 
     ~framework_impl() { clear(); }
@@ -134,7 +332,7 @@ public:
                 delete static_cast<test_case const*>(tu_ptr);
         }
     }
-
+                                    
     void            set_tu_id( test_unit& tu, test_unit_id id ) { tu.p_id.value = id; }
 
     // test_tree_visitor interface implementation
@@ -147,9 +345,14 @@ public:
             return;
         }
 
+        // setup contexts
+        m_context_idx = 0;
+
+        // notify all observers
         BOOST_TEST_FOREACH( test_observer*, to, m_observers )
             to->test_unit_start( tc );
 
+        // execute the test case body
         boost::timer tc_timer;
         test_unit_id bkup = m_curr_test_case;
         m_curr_test_case = tc.p_id;
@@ -157,14 +360,21 @@ public:
 
         unsigned long elapsed = static_cast<unsigned long>( tc_timer.elapsed() * 1e6 );
 
+
+        // notify all observers about abortion
         if( unit_test_monitor.is_critical_error( run_result ) ) {
             BOOST_TEST_FOREACH( test_observer*, to, m_observers )
                 to->test_aborted();
         }
 
+        // notify all observers about completion
         BOOST_TEST_REVERSE_FOREACH( test_observer*, to, m_observers )
             to->test_unit_finish( tc, elapsed );
 
+        // cleanup leftover context
+        m_context.clear();
+
+        // restore state and abort if necessary
         m_curr_test_case = bkup;
 
         if( unit_test_monitor.is_critical_error( run_result ) )
@@ -202,6 +412,18 @@ public:
 
     typedef std::map<test_unit_id,test_unit*>       test_unit_store;
     typedef std::set<test_observer*,priority_order> observer_store;
+    struct context_frame {
+        context_frame( std::string const& d, int id, bool sticky )
+        : descr( d )
+        , frame_id( id )
+        , is_sticky( sticky )
+        {}
+
+        std::string descr;
+        int         frame_id;
+        bool        is_sticky;
+    };
+    typedef std::vector<context_frame> context_data;
 
     master_test_suite_t* m_master_test_suite;
     test_unit_id    m_curr_test_case;
@@ -214,6 +436,8 @@ public:
     bool            m_test_in_progress;
 
     observer_store  m_observers;
+    context_data    m_context;
+    int             m_context_idx;
 };
 
 //____________________________________________________________________________//
@@ -271,8 +495,87 @@ init( init_unit_test_func init_func, int argc, char* argv[] )
         throw setup_error( ex.what() );
     }
 
+    impl::apply_filters( master_test_suite().p_id );
+
     s_frk_impl().m_is_initialized = true;
 }
+
+//____________________________________________________________________________//
+
+namespace impl {
+void
+apply_filters( test_unit_id tu_id )
+{
+    if( runtime_config::test_to_run().empty() ) {
+        ut_detail::tu_enabler enable( true );
+
+        traverse_test_tree( tu_id, enable );
+    }
+    else {
+        // 10. first disable all tu
+        ut_detail::tu_enabler disable( false );
+        traverse_test_tree( tu_id, disable );
+
+        // 20. collect tu to enable based on filters
+        ut_detail::tu_enable_list tu_to_enable;
+
+        BOOST_TEST_FOREACH( std::string const&, filter, runtime_config::test_to_run() ) {
+            if( filter.empty() )
+                continue;
+
+            if( filter[0] == '@' ) {
+                ut_detail::label_filter lf( tu_to_enable, const_string(filter).trim_left(1) );
+                traverse_test_tree( tu_id, lf, true );
+            }
+            else {
+                ut_detail::name_filter nf( tu_to_enable, filter );
+                traverse_test_tree( tu_id, nf, true );
+            }
+        }
+
+        // 30. enable all tu collected along with their parents, dependencies and children where necessary
+        while( !tu_to_enable.empty() ) {
+            std::pair<test_unit_id,bool>    data = tu_to_enable.front();
+            test_unit const&                tu   = framework::get( data.first, tut_any );
+
+            tu_to_enable.pop_front();
+
+            if( tu.p_enabled ) 
+                continue;
+
+            // 31. enable tu
+            tu.p_enabled.value = true;
+
+            // 32. master test suite - we are done
+            if( tu.p_id == tu_id )
+                continue;
+
+            // 33. add parent to the list (without children)
+            if( !framework::get( tu.p_parent_id, tut_any ).p_enabled )
+                tu_to_enable.push_back( std::make_pair( tu.p_parent_id, false ) );
+
+            // 34. add dependencies to the list (with children)
+            BOOST_TEST_FOREACH( test_unit_id, dep_id, tu.p_dependencies.get() ) {
+                test_unit const& dep = framework::get( dep_id, tut_any );
+
+                if( !dep.p_enabled ) {
+                    BOOST_TEST_MESSAGE( "Including test " << dep.p_type_name << ' ' << dep.p_name << 
+                                        " as a dependacy of test " << tu.p_type_name << ' ' << tu.p_name );
+
+                    tu_to_enable.push_back( std::make_pair( dep_id, true ) );
+                }
+            }
+
+            // 35. add all children to the list recursively
+            if( data.second && tu.p_type == tut_suite ) {
+                ut_detail::tu_collector collect( tu_to_enable );
+                traverse_test_tree( tu.p_id, collect, true );
+            }
+        }
+    }
+}
+
+} // namespace impl
 
 //____________________________________________________________________________//
 
@@ -361,6 +664,74 @@ reset_observers()
 
 //____________________________________________________________________________//
 
+int
+add_context( ::boost::unit_test::lazy_ostream const& context_descr, bool sticky )
+{
+    std::stringstream buffer;
+    context_descr( buffer );
+    int res_idx  = s_frk_impl().m_context_idx++;
+
+    s_frk_impl().m_context.push_back( framework_impl::context_frame( buffer.str(), res_idx, sticky ) );
+
+    return res_idx;
+}
+
+//____________________________________________________________________________//
+
+struct frame_with_id {
+    explicit frame_with_id( int id ) : m_id( id ) {}
+
+    bool    operator()( framework_impl::context_frame const& f )
+    {
+        return f.frame_id == m_id;
+    }
+    int     m_id;
+};
+
+void
+clear_context( int frame_id )
+{
+    if( frame_id == -1 ) {   // clear all non sticky frames
+        for( int i=s_frk_impl().m_context.size()-1; i>=0; i-- )
+            if( !s_frk_impl().m_context[i].is_sticky )
+                s_frk_impl().m_context.erase( s_frk_impl().m_context.begin()+i );
+    }
+ 
+    else { // clear specific frame
+        framework_impl::context_data::iterator it = 
+            std::find_if( s_frk_impl().m_context.begin(), s_frk_impl().m_context.end(), frame_with_id( frame_id ) );
+
+        if( it != s_frk_impl().m_context.end() ) // really an internal error if this is not true
+            s_frk_impl().m_context.erase( it );
+    }
+}
+
+//____________________________________________________________________________//
+
+context_generator
+get_context()
+{
+    return context_generator();
+}
+
+//____________________________________________________________________________//
+
+bool
+context_generator::is_empty() const
+{
+    return s_frk_impl().m_context.empty();
+}
+
+//____________________________________________________________________________//
+
+const_string
+context_generator::next() const
+{
+    return m_curr_frame < s_frk_impl().m_context.size() ? s_frk_impl().m_context[m_curr_frame++].descr : const_string();
+}
+
+//____________________________________________________________________________//
+
 master_test_suite_t&
 master_test_suite()
 {
@@ -402,7 +773,7 @@ run( test_unit_id id, bool continue_test )
     test_case_counter tcc;
     traverse_test_tree( id, tcc );
 
-    BOOST_TEST_SETUP_ASSERT( tcc.p_count != 0 , runtime_config::test_to_run().is_empty() 
+    BOOST_TEST_SETUP_ASSERT( tcc.p_count != 0 , runtime_config::test_to_run().empty() 
         ? BOOST_TEST_L( "test tree is empty" ) 
         : BOOST_TEST_L( "no test cases matching filter" ) );
 

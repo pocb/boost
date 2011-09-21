@@ -1,9 +1,9 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 # ===========================================================================
-#  Copyright (c) 1995-2010 Barend Gehrels, Geodan, Amsterdam, the Netherlands.
-#  Copyright (c) 2008-2010 Bruno Lalande, Paris, France.
-#  Copyright (c) 2009-2010 Mateusz Loskot (mateusz@loskot.net), London, UK
+#  Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+#  Copyright (c) 2008-2011 Bruno Lalande, Paris, France.
+#  Copyright (c) 2009-2011 Mateusz Loskot (mateusz@loskot.net), London, UK
 # 
 #  Use, modification and distribution is subject to the Boost Software License,
 #  Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
@@ -12,7 +12,19 @@
 
 import os, sys
 
-cmd = "doxygen_xml2qbk"
+os.chdir(os.path.dirname(sys.argv[0]))
+
+if 'DOXYGEN' in os.environ:
+    doxygen_cmd = os.environ['DOXYGEN']
+else:
+    doxygen_cmd = 'doxygen'
+
+if 'DOXYGEN_XML2QBK' in os.environ:
+    doxygen_xml2qbk_cmd = os.environ['DOXYGEN_XML2QBK']
+else:
+    doxygen_xml2qbk_cmd = 'doxygen_xml2qbk'
+
+cmd = doxygen_xml2qbk_cmd
 cmd = cmd + " --xml doxy/doxygen_output/xml/%s.xml"
 cmd = cmd + " --start_include boost/geometry/"
 cmd = cmd + " --convenience_header_path ../../../boost/geometry/"
@@ -23,7 +35,7 @@ cmd = cmd + " > generated/%s.qbk"
 
 def call_doxygen():
     os.chdir("doxy");
-    os.system("doxygen")
+    os.system(doxygen_cmd)
     os.chdir("..")
 
 def group_to_quickbook(section):
@@ -56,9 +68,9 @@ def cs_to_quickbook(section):
 call_doxygen()
 
 algorithms = ["append", "assign", "make", "clear"
-    , "area", "buffer", "centroid", "combine", "convert", "correct"
+    , "area", "buffer", "centroid", "convert", "correct"
     , "convex_hull", "difference", "disjoint", "distance" 
-    , "envelope", "equals", "for_each", "intersection", "intersects" 
+    , "envelope", "equals", "expand", "for_each", "intersection", "intersects" 
     , "length", "num_geometries", "num_interior_rings", "num_points" 
     , "overlaps", "perimeter", "reverse", "simplify", "sym_difference" 
     , "transform", "union", "unique", "within"]
@@ -66,23 +78,23 @@ algorithms = ["append", "assign", "make", "clear"
 access_functions = ["get", "set", "exterior_ring", "interior_rings"
     , "num_points", "num_interior_rings", "num_geometries"]
     
-coordinate_systems = ["cartesian", "geographic", "polar", "spherical"]
+coordinate_systems = ["cartesian", "geographic", "polar", "spherical", "spherical_equatorial"]
 
 core = ["closure", "coordinate_system", "coordinate_type", "cs_tag"
-    , "dimension", "exception", "geometry_id", "interior_type"
-    , "is_areal", "is_linear", "is_radian", "point_order"
-    , "point_type", "ring_type", "tag", "topological_dimension" ]
+    , "dimension", "exception", "interior_type"
+    , "degree", "radian"
+    , "is_radian", "point_order"
+    , "point_type", "ring_type", "tag", "tag_cast" ]
 
 exceptions = ["exception", "centroid_exception"];
 
-iterators = ["box_iterator", "circular_iterator", "closing_iterator"
-    , "ever_circling_iterator", "segment_range_iterator"]
+iterators = ["circular_iterator", "closing_iterator"
+    , "ever_circling_iterator"]
 
 models = ["point", "linestring", "box"
     , "polygon", "segment", "ring"
     , "multi_linestring", "multi_point", "multi_polygon", "referring_segment"]
 
-ranges = ["box_range", "segment_range"];
 
 strategies = ["distance::pythagoras", "distance::haversine"
     , "distance::cross_track", "distance::projected_point"
@@ -91,13 +103,14 @@ strategies = ["distance::pythagoras", "distance::haversine"
     , "centroid::bashein_detmer", "centroid::average"
     , "convex_hull::graham_andrew"
     , "simplify::douglas_peucker"
-    , "side::side_by_triangle", "side::side_by_cross_track"
+    , "side::side_by_triangle", "side::side_by_cross_track", "side::spherical_side_formula"
     , "transform::inverse_transformer", "transform::map_transformer"
     , "transform::rotate_transformer", "transform::scale_transformer"
     , "transform::translate_transformer", "transform::ublas_transformer"
     ]
     
-views = ["closeable_view", "reversible_view", "identity_view"]
+views = ["box_view", "segment_view"
+    , "closeable_view", "reversible_view", "identity_view"]
 
 
 
@@ -122,9 +135,6 @@ for i in iterators:
 for i in models:
     model_to_quickbook(i)
    
-for i in ranges:
-    class_to_quickbook(i)
-
 for i in strategies:
     strategy_to_quickbook(i)
 

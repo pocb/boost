@@ -10,6 +10,10 @@
 #ifndef BOOST_CHRONO_PROCESS_CPU_CLOCKS_HPP
 #define BOOST_CHRONO_PROCESS_CPU_CLOCKS_HPP
 
+
+
+#if defined(BOOST_CHRONO_HAS_PROCESS_CLOCKS)
+
 #include <boost/chrono/duration.hpp>
 #include <boost/chrono/time_point.hpp>
 #include <boost/system/error_code.hpp>
@@ -32,8 +36,8 @@ namespace boost { namespace chrono {
         typedef chrono::time_point<process_real_cpu_clock>    time_point;
         BOOST_CHRONO_STATIC_CONSTEXPR bool is_steady =             true;
 
-        static BOOST_CHRONO_INLINE time_point now(
-                system::error_code & ec = BOOST_CHRONO_THROWS );
+        static BOOST_CHRONO_INLINE time_point now() BOOST_CHRONO_NOEXCEPT;
+        static BOOST_CHRONO_INLINE time_point now(system::error_code & ec );
     };
 
     class BOOST_CHRONO_DECL process_user_cpu_clock {
@@ -44,8 +48,8 @@ namespace boost { namespace chrono {
         typedef chrono::time_point<process_user_cpu_clock>    time_point;
         BOOST_CHRONO_STATIC_CONSTEXPR bool is_steady =             true;
 
-        static BOOST_CHRONO_INLINE time_point now( 
-                system::error_code & ec = BOOST_CHRONO_THROWS );
+        static BOOST_CHRONO_INLINE time_point now() BOOST_CHRONO_NOEXCEPT;
+        static BOOST_CHRONO_INLINE time_point now(system::error_code & ec );
     };
 
     class BOOST_CHRONO_DECL process_system_cpu_clock {
@@ -56,8 +60,8 @@ namespace boost { namespace chrono {
         typedef chrono::time_point<process_system_cpu_clock>    time_point;
         BOOST_CHRONO_STATIC_CONSTEXPR bool is_steady =             true;
 
-        static BOOST_CHRONO_INLINE time_point now( 
-                system::error_code & ec = BOOST_CHRONO_THROWS );
+        static BOOST_CHRONO_INLINE time_point now() BOOST_CHRONO_NOEXCEPT;
+        static BOOST_CHRONO_INLINE time_point now(system::error_code & ec );
     };
 
         struct process_cpu_clock_times 
@@ -68,6 +72,11 @@ namespace boost { namespace chrono {
             typedef process_real_cpu_clock::rep rep;
             process_cpu_clock_times()
                 : real(0)
+                , user(0)
+                , system(0){}
+            explicit process_cpu_clock_times(
+                process_real_cpu_clock::rep r)
+                : real(r)
                 , user(0)
                 , system(0){}
             process_cpu_clock_times(
@@ -82,6 +91,10 @@ namespace boost { namespace chrono {
             process_user_cpu_clock::rep   user;    // user cpu time
             process_system_cpu_clock::rep system;  // system cpu time
 
+            operator process_real_cpu_clock::rep()
+            {
+              return real;
+            }
             bool operator==(process_cpu_clock_times const& rhs) {
                 return (real==rhs.real &&
                         user==rhs.user &&
@@ -180,8 +193,9 @@ namespace boost { namespace chrono {
         typedef chrono::time_point<process_cpu_clock>  time_point;
         BOOST_CHRONO_STATIC_CONSTEXPR bool is_steady =           true;
 
+        static BOOST_CHRONO_INLINE time_point now() BOOST_CHRONO_NOEXCEPT;
         static BOOST_CHRONO_INLINE time_point now( 
-                system::error_code & ec = BOOST_CHRONO_THROWS );
+                    system::error_code & ec );
     };
 
     template <class CharT, class Traits>
@@ -295,6 +309,7 @@ namespace std {
 #include <boost/config/abi_suffix.hpp> // pops abi_prefix.hpp pragmas
 #else
 #include <boost/chrono/detail/inlined/process_cpu_clocks.hpp>
+#endif
 #endif
 
 #endif  // BOOST_CHRONO_PROCESS_CPU_CLOCKS_HPP

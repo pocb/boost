@@ -1,8 +1,8 @@
 [/============================================================================
   Boost.Geometry (aka GGL, Generic Geometry Library)
 
-  Copyright (c) 2009-2011 Barend Gehrels, Geodan, Amsterdam, the Netherlands.
-  Copyright (c) 2009-2011 Mateusz Loskot (mateusz@loskot.net)
+  Copyright (c) 2009-2011 Barend Gehrels, Amsterdam, the Netherlands.
+  Copyright (c) 2009-2011 Mateusz Loskot, London, UK.
   Copyright (c) 2009-2011 Bruno Lalande, Paris, France.
 
   Use, modification and distribution is subject to the Boost Software License,
@@ -42,15 +42,20 @@
 [def __linestring__  Linestring]
 [def __polygon__  Polygon]
 [def __ring__  Ring]
-[def __multi_point__  Multi point]
+[def __multi_point__  Multi Point]
+[def __multi_linestring__  Multi Linestring]
 [def __multi_polygon__  Multi Polygon]
 [def __range__  Rangelike (linestring, ring)]
 [def __other__  Other geometries]
 [def __nyiversion__  Not yet supported in this version]
 
+[def __not_in_boost_geometry_hpp__ The standard header `boost/geometry.hpp` does not include this header.]
+
+
 [/Parts]
 [def __ret_zero__ Returns zero]
 [def __ret_one__ Returns 1]
+[def __does_nothing__ Nothing happens, geometry is unchanged]
 [def __cs_units__ in the same units as the input coordinates]
 [def __sph1__ on a unit sphere (or another sphere, if specified as such in the constructor of the strategy)]
 [template qbk_ret[what] Returns [what]]
@@ -60,8 +65,18 @@
 All algorithms in Boost.Geometry will check any geometry arguments against the concept requirements.]
 
 
-[def __boost_geometry__     Boost.Geometry]
-[def __boost_gil__          [@http://www.boost.org/libs/gil/ Boost.GIL]]
+[def __boost__ Boost]
+[def __boost_geometry__ Boost.Geometry]
+[def __boost_array__ Boost.Array]
+[def __boost_fusion__ Boost.Fusion]
+[def __boost_mpl__ Boost.MPL]
+[def __boost_range__ Boost.Range]
+[def __boost_tuple__ Boost.Tuple]
+[def __boost_gil__ [@http://www.boost.org/libs/gil/ Boost.GIL]]
+[def __boost_bb__ Boost.Build]
+
+[def __ttmath__ [@http://www.ttmath.org/ ttmath]]
+[def __ogc__ [@http://www.opengeospatial.org OGC]]
 
 [heading Contributions]
 
@@ -78,6 +93,17 @@ Boost.Geometry contains contributions by:
 [include quickstart.qbk]
 
 [include design_rationale.qbk]
+[include compiling.qbk]
+
+[section Indexes] 
 [include matrix.qbk]
+[section Alphabetical Index]
+'''<index><title/></index>'''
+[endsect]
+[endsect] 
+
 [include reference.qbk]
+
+
 [include about_documentation.qbk]
+[include acknowledgments.qbk]

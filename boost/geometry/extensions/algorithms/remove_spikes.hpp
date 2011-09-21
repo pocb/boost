@@ -1,6 +1,10 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
-//
-// Copyright Barend Gehrels 2010, Geodan, Amsterdam, the Netherlands.
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+
+// Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
+// (geolib/GGL), copyright (c) 1995-2010 Geodan, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -32,6 +36,9 @@
 
 #include <boost/geometry/iterators/ever_circling_iterator.hpp>
 
+#include <boost/geometry/geometries/ring.hpp>
+
+
 /*
 Remove spikes from a ring/polygon.
 Ring (having 8 vertices, including closing vertex)
@@ -57,7 +64,7 @@ namespace detail { namespace remove_spikes
 template <typename Range, typename Policy>
 struct range_remove_spikes
 {
-    typedef typename strategy_side
+    typedef typename strategy::side::services::default_strategy
     <
         typename cs_tag<Range>::type
     >::type side_strategy_type;
@@ -132,7 +139,7 @@ struct polygon_remove_spikes
 
         typename interior_return_type<Polygon>::type rings
                     = interior_rings(polygon);
-        for (BOOST_AUTO(it, boost::begin(rings)); it != boost::end(rings); ++it)
+        for (BOOST_AUTO_TPL(it, boost::begin(rings)); it != boost::end(rings); ++it)
         {
             per_range::apply(*it, policy);
         }

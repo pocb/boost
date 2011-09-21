@@ -1,6 +1,7 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
-//
-// Copyright Barend Gehrels 2011, Geodan, Amsterdam, the Netherlands.
+
+// Copyright (c) 2010-2011 Barend Gehrels, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -29,6 +30,8 @@
 #include <boost/geometry/algorithms/buffer.hpp>
 #include <boost/geometry/algorithms/distance.hpp>
 #include <boost/geometry/algorithms/perimeter.hpp>
+
+#include <boost/geometry/geometries/box.hpp>
 
 
 /*
@@ -156,7 +159,7 @@ struct range_mark_spikes
 {
     typedef typename point_type<Range>::type point_type;
 
-    typedef typename strategy_side
+    typedef typename strategy::side::services::default_strategy
     <
         typename cs_tag<Range>::type
     >::type side_strategy_type;
@@ -187,9 +190,9 @@ struct range_mark_spikes
 
         // Divide polygon in monotonic sections (in two directions)
         typedef model::box<point_type> box_type;
-        typedef boost::geometry::sections<box_type, 2> sections_type;
+        typedef geometry::sections<box_type, 2> sections_type;
         sections_type sections;
-        boost::geometry::sectionalize<false>(range, sections);
+        geometry::sectionalize<false>(range, sections);
 
         for (typename boost::range_iterator<sections_type>::type it = boost::begin(sections);
             it != boost::end(sections);
@@ -197,7 +200,7 @@ struct range_mark_spikes
         {
             // Enlarge each box with the wished max with of the gap to be sure that
             // when walking through sections all point-pairs are considered
-            boost::geometry::buffer(it->bounding_box, it->bounding_box, policy.gap_width() * 1.001);
+            geometry::buffer(it->bounding_box, it->bounding_box, policy.gap_width() * 1.001);
         }
 
         double const whole_area = geometry::area(range);
@@ -363,7 +366,7 @@ struct polygon_mark_spikes
 
         typename interior_return_type<Polygon const>::type rings
                     = interior_rings(polygon);
-        for (BOOST_AUTO(it, boost::begin(rings)); it != boost::end(rings); ++it)
+        for (BOOST_AUTO_TPL(it, boost::begin(rings)); it != boost::end(rings); ++it)
         {
             // Interior ring (zero based)
             id.ring_index++;

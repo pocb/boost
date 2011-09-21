@@ -1,6 +1,8 @@
-// Boost.Geometry (aka GGL, Generic Geometry Library) test file
-//
-// Copyright Barend Gehrels 2010, Geodan, Amsterdam, the Netherlands
+// Boost.Geometry (aka GGL, Generic Geometry Library)
+// Unit Test
+
+// Copyright (c) 2010-2011 Barend Gehrels, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -16,9 +18,15 @@
 
 #include <boost/geometry/algorithms/correct.hpp>
 #include <boost/geometry/algorithms/perimeter.hpp>
+
 #include <boost/geometry/multi/algorithms/correct.hpp>
-#include <boost/geometry/extensions/gis/io/wkb/read_wkb.hpp>
-#include <boost/geometry/extensions/gis/io/wkb/utility.hpp>
+#include <boost/geometry/multi/algorithms/intersection.hpp>
+#include <boost/geometry/multi/algorithms/within.hpp>
+
+#include <boost/geometry/geometries/point_xy.hpp>
+
+//#include <boost/geometry/extensions/gis/io/wkb/read_wkb.hpp>
+//#include <boost/geometry/extensions/gis/io/wkb/utility.hpp>
 
 #include <algorithms/test_difference.hpp>
 #include <algorithms/test_overlay.hpp>
@@ -38,8 +46,7 @@ void test_all()
     typedef bg::model::polygon<P> polygon;
     typedef bg::model::ring<P> ring;
 
-    bool const is_float = 
-        boost::is_same<typename bg::coordinate_type<P>::type, float>::value;
+    typedef typename bg::coordinate_type<P>::type ct;
 
     test_one<polygon, polygon, polygon>("simplex_normal",
         simplex_normal[0], simplex_normal[1],
@@ -85,7 +92,7 @@ void test_all()
     test_one<polygon, polygon, polygon>("distance_zero",
         distance_zero[0], distance_zero[1],
         2, 0, 8.7048386,
-        is_float ? 1 : 2, // The too small one is discarded for floating point
+        if_typed<ct, float>(1, 2), // The too small one is discarded for floating point
         0, 0.0098387);
 
 
@@ -192,17 +199,54 @@ void test_all()
     ***/
 
 #ifdef _MSC_VER
-    {
-        // Isovist (submitted by Brandon during Formal Review)
-        std::string tn = string_from_type<typename bg::coordinate_type<polygon>::type>::name();
-        test_one<polygon, polygon, polygon>("isovist",
-            isovist1[0], isovist1[1],
-            4, 0, 0.279121891701124,
-            4, 0, 224.889211358929,
-            0.01);
-    }
-#endif
+    // Isovist (submitted by Brandon during Formal Review)
+    test_one<polygon, polygon, polygon>("isovist",
+        isovist1[0], isovist1[1],
+        4, 0, 0.279121891701124,
+        4, 0, 224.889211358929,
+        0.01);
 
+    test_one<polygon, polygon, polygon>("ggl_list_20110306_javier",
+        ggl_list_20110306_javier[0], ggl_list_20110306_javier[1],
+        1, 0, 71495.3331,
+        2, 0, 8960.49049); 
+#endif
+        
+    test_one<polygon, polygon, polygon>("ggl_list_20110307_javier",
+        ggl_list_20110307_javier[0], ggl_list_20110307_javier[1],
+        1, 0, 16815.6,
+        1, 0, 3200.4,
+        0.01);
+
+    test_one<polygon, polygon, polygon>("ggl_list_20110716_enrico",
+        ggl_list_20110716_enrico[0], ggl_list_20110716_enrico[1],
+        3, 0, 35723.8506317139,
+        1, 0, 58456.4964294434
+        );
+
+    test_one<polygon, polygon, polygon>("ggl_list_20110820_christophe",
+        ggl_list_20110820_christophe[0], ggl_list_20110820_christophe[1],
+        1, 0, 2.8570121719168924,
+        1, 0, 64.498061986388564); 
+
+
+
+#ifdef _MSC_VER
+    // 2011-07-02
+    // Interesting FP-precision case.
+    // sql server gives: 6.62295817619452E-05
+    // PostGIS gives: 0.0 (no output)
+    // Boost.Geometry gives results depending on FP-type, and compiler, and operating system.
+    // For double, it is zero (skipped). On gcc/Linux, for float either.
+    // Because we cannot predict this, we only test for MSVC
+    test_one<polygon, polygon, polygon>("ggl_list_20110627_phillip",
+        ggl_list_20110627_phillip[0], ggl_list_20110627_phillip[1],
+        if_typed<ct, double>(0, 1), 0, 
+            if_typed_tt<ct>(0.0000000000001105367, 0.0), 
+        1, 0, 3577.40960816756,
+        0.01
+        );
+#endif
 
     // Other combi's
     {
@@ -211,17 +255,17 @@ void test_all()
                 5, 22, 1.1901714, 5, 27, 1.6701714);
 
         test_one<polygon, ring, polygon>(
-                "ring_star_ring", example_ring, example_star, 
+                "ring_star_ring", example_ring, example_star,
                 5, 22, 1.6701714, 5, 27, 1.1901714);
 
         static std::string const clip = "POLYGON((2.5 0.5,5.5 2.5))";
 
-        test_one<polygon, box, ring>("star_box", 
+        test_one<polygon, box, ring>("star_box",
             clip, example_star,
             4, 11, 2.833333, 4, 11, 0.833333);
 
-        test_one<polygon, ring, box>("box_star", 
-            example_star, clip, 
+        test_one<polygon, ring, box>("box_star",
+            example_star, clip,
             4, 11, 0.833333, 4, 11, 2.833333);
     }
 
@@ -247,16 +291,16 @@ void test_all()
 
         static std::string const clip = "POLYGON((2 2,4 4))";
 
-        test_one<polygon, box, mp>("simplex_multi_box_mp", 
+        test_one<polygon, box, mp>("simplex_multi_box_mp",
             clip, case_multi_simplex[0],
             3, 11, 4.53333, 3, 11, 8.53333);
-        test_one<polygon, mp, box>("simplex_multi_mp_box", 
-            case_multi_simplex[0], clip, 
+        test_one<polygon, mp, box>("simplex_multi_mp_box",
+            case_multi_simplex[0], clip,
             3, 11, 8.53333, 3, 11, 4.53333);
     }
 
     /***
-    Experimental (cut), does not work: 
+    Experimental (cut), does not work:
     test_one<polygon, polygon, polygon>(
             "polygon_pseudo_line",
             "POLYGON((0 0,0 4,4 4,4 0,0 0))",
@@ -266,7 +310,8 @@ void test_all()
     ***/
 }
 
-
+/*******
+// To be moved to another file
 template <typename T>
 void test_difference_parcel_precision()
 {
@@ -334,40 +379,22 @@ void test_difference_parcel_precision()
     }
 #endif
 }
-
-
-#include <boost/range/algorithm/reverse.hpp>
-
-
-template <typename P>
-void test_copy()
-{
-    std::vector<P> first;
-    first.push_back(P(1,1));
-    first.push_back(P(2,2));
-
-    std::vector<P> second;
-    boost::copy(first, std::back_inserter(second));
-    boost::reverse(second);
-
-    std::vector<P> third, fourth;
-    boost::copy(second, boost::copy(first, std::back_inserter(third)));
-
-}
+*****/
 
 int test_main(int, char* [])
 {
-    //test_copy<bg::model::d2::point_xy<double> >();
-
     //test_difference_parcel_precision<float>();
     //test_difference_parcel_precision<double>();
 
-    test_all<bg::model::d2::point_xy<float> >();
     test_all<bg::model::d2::point_xy<double> >();
+
+#if ! defined(BOOST_GEOMETRY_TEST_ONLY_ONE_TYPE)
+    test_all<bg::model::d2::point_xy<float> >();
 
 #ifdef HAVE_TTMATH
     test_all<bg::model::d2::point_xy<ttmath_big> >();
     //test_difference_parcel_precision<ttmath_big>();
+#endif
 #endif
 
     return 0;

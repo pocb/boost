@@ -20,12 +20,15 @@
 #include <stdexcept>
 #include <boost/assert.hpp>
 #include <boost/config.hpp>
+#include <boost/cstdint.hpp>
 #include <boost/integer/static_log2.hpp>
 #include <boost/random/detail/config.hpp>
 #include <boost/random/detail/const_mod.hpp>
 #include <boost/random/detail/seed.hpp>
 #include <boost/random/detail/operators.hpp>
 #include <boost/random/detail/seed_impl.hpp>
+
+#include <boost/random/detail/disable_warnings.hpp>
 
 namespace boost {
 namespace random {
@@ -168,15 +171,13 @@ public:
     void generate(Iter first, Iter last)
     { detail::generate_from_int(*this, first, last); }
 
-#ifndef BOOST_NO_LONG_LONG
     /** Advances the state of the generator by @c z. */
-    void discard(boost::ulong_long_type z)
+    void discard(boost::uintmax_t z)
     {
-        for(boost::ulong_long_type j = 0; j < z; ++j) {
+        for(boost::uintmax_t j = 0; j < z; ++j) {
             (*this)();
         }
     }
-#endif
 
     /**
      * Writes the textual representation of the generator to a @c std::ostream.
@@ -260,5 +261,7 @@ typedef inversive_congruential_engine<uint32_t, 9102, 2147483647-36884165,
 using random::hellekalek1995;
 
 } // namespace boost
+
+#include <boost/random/detail/enable_warnings.hpp>
 
 #endif // BOOST_RANDOM_INVERSIVE_CONGRUENTIAL_HPP

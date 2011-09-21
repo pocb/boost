@@ -23,10 +23,6 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
             An unordered associative container that stores unique values.
           </simpara></purpose>
           <description>
-            <para>Based on chapter 23 of
-              <ulink url="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2009/n2960.pdf">the working draft of the C++ standard [n2960]</ulink>.
-              But without the updated rules for allocators.
-            </para>
             <para><emphasis role="bold">Template Parameters</emphasis>
               <informaltable>
                 <tgroup cols="2">
@@ -40,8 +36,8 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
                     <row>
                       <entry><emphasis>Pred</emphasis></entry>
                       <entry>A binary function object that implements an equivalence relation on values of type <code>Value</code>.
-                        A binary function object that induces an equivalence relation on values of type Key.
-                        It takes two arguments of type Key and returns a value of type bool.</entry></row>
+                        A binary function object that induces an equivalence relation on values of type <code>Value</code>.
+                        It takes two arguments of type <code>Value</code> and returns a value of type bool.</entry></row>
                     <row>
                       <entry><emphasis>Alloc</emphasis></entry>
                       <entry>An allocator whose value type is the same as the container's value type.</entry></row></tbody></tgroup></informaltable></para>
@@ -181,6 +177,9 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
             </parameter>
             <description>
               <para>The copy constructor. Copies the contained elements, hash function, predicate, maximum load factor and allocator.</para>
+              <para>If <code>Allocator::select_on_container_copy_construction</code>
+              exists and has the right signature, the allocator will be
+              constructed from its result.</para>
             </description>
             <requires>
               <para><code>value_type</code> is copy constructible</para>
@@ -194,12 +193,18 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
               <para>The move constructor.</para>
             </description>
             <notes>
-              <para>This is emulated on compilers without rvalue references.</para>
+              <para>This is implemented using Boost.Move.</para>
             </notes>
             <requires>
               <para>
                 <code>value_type</code> is move constructible.
-                (TODO: This is not actually required in this implementation).
+              </para>
+              <para>
+                On compilers without rvalue reference support the
+                emulation does not support moving without calling
+                <code>boost::move</code> if <code>value_type</code> is
+                not copyable. So, for example, you can't return the
+                container from a function.
               </para>
             </requires>
           </constructor>
@@ -234,14 +239,12 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
             <type>unordered_set&amp;</type>
             <description>
               <para>The assignment operator. Copies the contained elements, hash function, predicate and maximum load factor but not the allocator.</para>
+              <para>If <code>Alloc::propagate_on_container_copy_assignment</code>
+              exists and <code>Alloc::propagate_on_container_copy_assignment::value
+              </code> is true, the allocator is overwritten, if not the
+              copied elements are created using the existing
+              allocator.</para>
             </description>
-            <notes>
-              <para>
-                On compilers without rvalue references, there is a single assignment
-                operator with the signature <code>operator=(unordered_set)</code>
-                in order to emulate move semantics.
-              </para>
-            </notes>
             <requires>
               <para><code>value_type</code> is copy constructible</para>
             </requires>
@@ -253,18 +256,21 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
             <type>unordered_set&amp;</type>
             <description>
               <para>The move assignment operator.</para>
+              <para>If <code>Alloc::propagate_on_container_move_assignment</code>
+              exists and <code>Alloc::propagate_on_container_move_assignment::value
+              </code> is true, the allocator is overwritten, if not the
+              moved elements are created using the existing
+              allocator.</para>
             </description>
             <notes>
               <para>
-                On compilers without rvalue references, there is a single assignment
-                operator with the signature <code>operator=(unordered_set)</code>
-                in order to emulate move semantics.
+                On compilers without rvalue references, this is emulated using
+                Boost.Move.
               </para>
             </notes>
             <requires>
               <para>
                 <code>value_type</code> is move constructible.
-                (TODO: This is not actually required in this implementation).
               </para>
             </requires>
           </method>
@@ -344,6 +350,13 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
                 <para>If the compiler doesn't support variadic template arguments or rvalue
                       references, this is emulated for up to 10 arguments, with no support
                       for rvalue references or move semantics.</para>
+                <para>Since existing <code>std::pair</code> implementations don't support
+                      <code>std::piecewise_construct</code> this emulates it,
+                      but using <code>boost::unordered::piecewise_construct</code>.</para>
+                <para>In version of Boost before 1.48 this emulated the variadic pair
+                      constructor from older C++0x drafts. For backwards compatability
+                      this can be enabled by defining the macro
+                      <code>BOOST_UNORDERED_DEPRECATED_PAIR_CONSTRUCT</code>.
               </notes>
             </method>
             <method name="emplace_hint">
@@ -360,7 +373,7 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
               <type>iterator</type>
               <description>
                 <para>Inserts an object, constructed with the arguments <code>args</code>, in the container if and only if there is no element in the container with an equivalent value.</para>
-                <para>hint is a suggestion to where the element should be inserted.</para>
+                <para><code>hint</code> is a suggestion to where the element should be inserted.</para>
               </description>
               <returns>
                 <para>If an insert took place, then the iterator points to the newly inserted element. Otherwise, it points to the element with equivalent value.</para>
@@ -375,6 +388,14 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
                 <para>If the compiler doesn't support variadic template arguments or rvalue
                       references, this is emulated for up to 10 arguments, with no support
                       for rvalue references or move semantics.</para>
+                <para>Since existing <code>std::pair</code> implementations don't support
+                      <code>std::piecewise_construct</code> this emulates it,
+                      but using <code>boost::unordered::piecewise_construct</code>.
+                <para>In version of Boost before 1.48 this emulated the variadic pair
+                      constructor from older C++0x drafts. For backwards compatability
+                      this can be enabled by defining the macro
+                      <code>BOOST_UNORDERED_DEPRECATED_PAIR_CONSTRUCT</code>.
+                </para>
               </notes>
             </method>
             <method name="insert">
@@ -383,7 +404,7 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
               </parameter>
               <type>std::pair&lt;iterator, bool&gt;</type>
               <description>
-                <para>Inserts obj in the container if and only if there is no element in the container with an equivalent value.</para>
+                <para>Inserts <code>obj</code> in the container if and only if there is no element in the container with an equivalent value.</para>
               </description>
               <returns>
                 <para>The bool component of the return type is true if an insert took place.</para>
@@ -406,7 +427,7 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
               </parameter>
               <type>iterator</type>
               <description>
-                <para>Inserts obj in the container if and only if there is no element in the container with an equivalent value.</para>
+                <para>Inserts <code>obj</code> in the container if and only if there is no element in the container with an equivalent value.</para>
                 <para>hint is a suggestion to where the element should be inserted.</para>
               </description>
               <returns>
@@ -457,15 +478,13 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
               </returns>
               <throws>
                 <para>Only throws an exception if it is thrown by <code>hasher</code> or <code>key_equal</code>.</para>
-                <para>In this implementation, this overload doesn't call either function object's methods so it is no throw, but this might not be true in other implementations.</para>
               </throws>
               <notes>
                 <para>
-                  When the number of elements is a lot smaller than the number of buckets
-                  this function can be very inefficient as it has to search through empty
-                  buckets for the next element, in order to return the iterator.
-                  The method <methodname>quick_erase</methodname> is faster, but has yet
-                  to be standardized.
+                  In older versions this could be inefficient because it had to search
+                  through several buckets to find the position of the returned iterator.
+                  The data structure has been changed so that this is no longer the case,
+                  and the alternative erase methods have been deprecated.
                 </para>
               </notes>
             </method>
@@ -517,13 +536,10 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
               </throws>
               <notes>
                 <para>
-                  This method is faster than <methodname>erase</methodname> as
-                  it doesn't have to find the next element in the container -
-                  a potentially costly operation.
-                </para>
-                <para>
-                  As it hasn't been standardized, it's likely that this may
-                  change in the future.
+                  This method was implemented because returning an iterator to
+                  the next element from <code>erase</code> was expensive, but
+                  the container has been redesigned so that is no longer the
+                  case. So this method is now deprecated.
                 </para>
               </notes>
             </method>
@@ -541,10 +557,10 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
               </throws>
               <notes>
                 <para>
-                  This method is now deprecated, use
-                  <methodname>quick_return</methodname> instead. Although be
-                  warned that as that isn't standardized yet, it could also
-                  change.
+                  This method was implemented because returning an iterator to
+                  the next element from <code>erase</code> was expensive, but
+                  the container has been redesigned so that is no longer the
+                  case. So this method is now deprecated.
                 </para>
               </notes>
             </method>
@@ -565,12 +581,19 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
                 <paramtype>unordered_set&amp;</paramtype>
               </parameter>
               <type>void</type>
+              <description>
+                <para>Swaps the contents of the container with the parameter.</para>
+                <para>If <code>Allocator::propagate_on_container_swap</code> is declared and
+                  <code>Allocator::propagate_on_container_swap::value</code> is true then the
+                  containers' allocators are swapped. Otherwise, swapping with unequal allocators
+                  results in undefined behavior.</para>
+              </description>
               <throws>
-                <para>If the allocators are equal, doesn't throw an exception unless it is thrown by the copy constructor or copy assignment operator of <code>key_equal</code> or <code>hasher</code>.</para>
+                <para>Doesn't throw an exception unless it is thrown by the copy constructor or copy assignment operator of <code>key_equal</code> or <code>hasher</code>.</para>
               </throws>
               <notes>
-                <para>For a discussion of the behavior when allocators aren't equal see
-                  <link linkend="unordered.rationale.swapping_containers_with_unequal_allocators">the implementation details</link>.</para>
+                <para>The exception specifications aren't quite the same as the C++11 standard, as
+                  the equality predieate and hash function are swapped using their copy constructors.</para>
               </notes>
             </method>
           </method-group>
@@ -815,8 +838,8 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
           <free-function-group name="Equality Comparisons">
             <function name="operator==">
               <template>
-                <template-type-parameter name="Value">
-                </template-type-parameter>
+            <template-type-parameter name="Value">
+            </template-type-parameter>
                 <template-type-parameter name="Hash">
                 </template-type-parameter>
                 <template-type-parameter name="Pred">
@@ -831,16 +854,27 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
                 <paramtype>unordered_set&lt;Value, Hash, Pred, Alloc&gt; const&amp;</paramtype>
               </parameter>
               <type>bool</type>
+              <description>
+                <para>Return <code>true</code> if <code>x.size() ==
+                y.size</code> and for every element in <code>x</code>,
+                there is an element in <code>y</code> with the same
+                for the same key, with an equal value (using
+                <code>operator==</code> to compare the value types).
+                </para>
+              </description>
               <notes>
-                <para>This is a boost extension.</para>
+                <para>The behavior of this function was changed to match
+                  the C++11 standard in Boost 1.48. If you wish to use
+                  the old behaviour, define the macro
+                  <code>BOOST_UNORDERED_DEPRECATED_EQUALITY</code>.</para>
                 <para>Behavior is undefined if the two containers don't have
                     equivalent equality predicates.</para>
               </notes>
             </function>
             <function name="operator!=">
               <template>
-                <template-type-parameter name="Value">
-                </template-type-parameter>
+            <template-type-parameter name="Value">
+            </template-type-parameter>
                 <template-type-parameter name="Hash">
                 </template-type-parameter>
                 <template-type-parameter name="Pred">
@@ -855,8 +889,19 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
                 <paramtype>unordered_set&lt;Value, Hash, Pred, Alloc&gt; const&amp;</paramtype>
               </parameter>
               <type>bool</type>
+              <description>
+                <para>Return <code>false</code> if <code>x.size() ==
+                y.size</code> and for every element in <code>x</code>,
+                there is an element in <code>y</code> with the same
+                for the same key, with an equal value (using
+                <code>operator==</code> to compare the value types).
+                </para>
+              </description>
               <notes>
-                <para>This is a boost extension.</para>
+                <para>The behavior of this function was changed to match
+                  the C++11 standard in Boost 1.48. If you wish to use
+                  the old behaviour, define the macro
+                  <code>BOOST_UNORDERED_DEPRECATED_EQUALITY</code>.</para>
                 <para>Behavior is undefined if the two containers don't have
                     equivalent equality predicates.</para>
               </notes>
@@ -865,8 +910,8 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
           <free-function-group name="swap">
             <function name="swap">
               <template>
-                <template-type-parameter name="Value">
-                </template-type-parameter>
+            <template-type-parameter name="Value">
+            </template-type-parameter>
                 <template-type-parameter name="Hash">
                 </template-type-parameter>
                 <template-type-parameter name="Pred">
@@ -884,12 +929,19 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
               <effects>
                 <para><code>x.swap(y)</code></para>
               </effects>
+              <description>
+                <para>Swaps the contents of <code>x</code> and <code>y</code>.</para>
+                <para>If <code>Allocator::propagate_on_container_swap</code> is declared and
+                  <code>Allocator::propagate_on_container_swap::value</code> is true then the
+                  containers' allocators are swapped. Otherwise, swapping with unequal allocators
+                  results in undefined behavior.</para>
+              </description>
               <throws>
-                <para>If the allocators are equal, doesn't throw an exception unless it is thrown by the copy constructor or copy assignment operator of <code>Hash</code> or <code>Pred</code>.</para>
+                <para>Doesn't throw an exception unless it is thrown by the copy constructor or copy assignment operator of <code>key_equal</code> or <code>hasher</code>.</para>
               </throws>
               <notes>
-                <para>For a discussion of the behavior when allocators aren't equal see
-                  <link linkend="unordered.rationale.swapping_containers_with_unequal_allocators">the implementation details</link>.</para>
+                <para>The exception specifications aren't quite the same as the C++11 standard, as
+                  the equality predieate and hash function are swapped using their copy constructors.</para>
               </notes>
             </function>
           </free-function-group>
@@ -909,13 +961,9 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
             </template-type-parameter>
           </template>
           <purpose><simpara>
-            An unordered associative container that stores  values. The same key can be stored multiple times.
+            An unordered associative container that stores values. The same key can be stored multiple times.
           </simpara></purpose>
           <description>
-            <para>Based on chapter 23 of
-              <ulink url="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2009/n2960.pdf">the working draft of the C++ standard [n2960]</ulink>.
-              But without the updated rules for allocators.
-            </para>
             <para><emphasis role="bold">Template Parameters</emphasis>
               <informaltable>
                 <tgroup cols="2">
@@ -929,8 +977,8 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
                     <row>
                       <entry><emphasis>Pred</emphasis></entry>
                       <entry>A binary function object that implements an equivalence relation on values of type <code>Value</code>.
-                        A binary function object that induces an equivalence relation on values of type Key.
-                        It takes two arguments of type Key and returns a value of type bool.</entry></row>
+                        A binary function object that induces an equivalence relation on values of type <code>Value</code>.
+                        It takes two arguments of type <code>Value</code> and returns a value of type bool.</entry></row>
                     <row>
                       <entry><emphasis>Alloc</emphasis></entry>
                       <entry>An allocator whose value type is the same as the container's value type.</entry></row></tbody></tgroup></informaltable></para>
@@ -1070,6 +1118,9 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
             </parameter>
             <description>
               <para>The copy constructor. Copies the contained elements, hash function, predicate, maximum load factor and allocator.</para>
+              <para>If <code>Allocator::select_on_container_copy_construction</code>
+              exists and has the right signature, the allocator will be
+              constructed from its result.</para>
             </description>
             <requires>
               <para><code>value_type</code> is copy constructible</para>
@@ -1083,12 +1134,18 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
               <para>The move constructor.</para>
             </description>
             <notes>
-              <para>This is emulated on compilers without rvalue references.</para>
+              <para>This is implemented using Boost.Move.</para>
             </notes>
             <requires>
               <para>
                 <code>value_type</code> is move constructible.
-                (TODO: This is not actually required in this implementation).
+              </para>
+              <para>
+                On compilers without rvalue reference support the
+                emulation does not support moving without calling
+                <code>boost::move</code> if <code>value_type</code> is
+                not copyable. So, for example, you can't return the
+                container from a function.
               </para>
             </requires>
           </constructor>
@@ -1123,14 +1180,12 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
             <type>unordered_multiset&amp;</type>
             <description>
               <para>The assignment operator. Copies the contained elements, hash function, predicate and maximum load factor but not the allocator.</para>
+              <para>If <code>Alloc::propagate_on_container_copy_assignment</code>
+              exists and <code>Alloc::propagate_on_container_copy_assignment::value
+              </code> is true, the allocator is overwritten, if not the
+              copied elements are created using the existing
+              allocator.</para>
             </description>
-            <notes>
-              <para>
-                On compilers without rvalue references, there is a single assignment
-                operator with the signature <code>operator=(unordered_multiset)</code>
-                in order to emulate move semantics.
-              </para>
-            </notes>
             <requires>
               <para><code>value_type</code> is copy constructible</para>
             </requires>
@@ -1142,18 +1197,21 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
             <type>unordered_multiset&amp;</type>
             <description>
               <para>The move assignment operator.</para>
+              <para>If <code>Alloc::propagate_on_container_move_assignment</code>
+              exists and <code>Alloc::propagate_on_container_move_assignment::value
+              </code> is true, the allocator is overwritten, if not the
+              moved elements are created using the existing
+              allocator.</para>
             </description>
             <notes>
               <para>
-                On compilers without rvalue references, there is a single assignment
-                operator with the signature <code>operator=(unordered_multiset)</code>
-                in order to emulate move semantics.
+                On compilers without rvalue references, this is emulated using
+                Boost.Move.
               </para>
             </notes>
             <requires>
               <para>
                 <code>value_type</code> is move constructible.
-                (TODO: This is not actually required in this implementation).
               </para>
             </requires>
           </method>
@@ -1232,6 +1290,13 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
                 <para>If the compiler doesn't support variadic template arguments or rvalue
                       references, this is emulated for up to 10 arguments, with no support
                       for rvalue references or move semantics.</para>
+                <para>Since existing <code>std::pair</code> implementations don't support
+                      <code>std::piecewise_construct</code> this emulates it,
+                      but using <code>boost::unordered::piecewise_construct</code>.</para>
+                <para>In version of Boost before 1.48 this emulated the variadic pair
+                      constructor from older C++0x drafts. For backwards compatability
+                      this can be enabled by defining the macro
+                      <code>BOOST_UNORDERED_DEPRECATED_PAIR_CONSTRUCT</code>.
               </notes>
             </method>
             <method name="emplace_hint">
@@ -1248,7 +1313,7 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
               <type>iterator</type>
               <description>
                 <para>Inserts an object, constructed with the arguments <code>args</code>, in the container.</para>
-                <para>hint is a suggestion to where the element should be inserted.</para>
+                <para><code>hint</code> is a suggestion to where the element should be inserted.</para>
               </description>
               <returns>
                 <para>An iterator pointing to the inserted element.</para>
@@ -1263,6 +1328,14 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
                 <para>If the compiler doesn't support variadic template arguments or rvalue
                       references, this is emulated for up to 10 arguments, with no support
                       for rvalue references or move semantics.</para>
+                <para>Since existing <code>std::pair</code> implementations don't support
+                      <code>std::piecewise_construct</code> this emulates it,
+                      but using <code>boost::unordered::piecewise_construct</code>.
+                <para>In version of Boost before 1.48 this emulated the variadic pair
+                      constructor from older C++0x drafts. For backwards compatability
+                      this can be enabled by defining the macro
+                      <code>BOOST_UNORDERED_DEPRECATED_PAIR_CONSTRUCT</code>.
+                </para>
               </notes>
             </method>
             <method name="insert">
@@ -1271,7 +1344,7 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
               </parameter>
               <type>iterator</type>
               <description>
-                <para>Inserts obj in the container.</para>
+                <para>Inserts <code>obj</code> in the container.</para>
               </description>
               <returns>
                 <para>An iterator pointing to the inserted element.</para>
@@ -1293,7 +1366,7 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
               </parameter>
               <type>iterator</type>
               <description>
-                <para>Inserts obj in the container.</para>
+                <para>Inserts <code>obj</code> in the container.</para>
                 <para>hint is a suggestion to where the element should be inserted.</para>
               </description>
               <returns>
@@ -1321,7 +1394,7 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
               </parameter>
               <type>void</type>
               <description>
-                <para>Inserts a range of elements into the container.</para>
+                <para>Inserts a range of elements into the container. Elements are inserted if and only if there is no element in the container with an equivalent value.</para>
               </description>
               <throws>
                 <para>When inserting a single element, if an exception is thrown by an operation other than a call to <code>hasher</code> the function has no effect.</para>
@@ -1344,15 +1417,13 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
               </returns>
               <throws>
                 <para>Only throws an exception if it is thrown by <code>hasher</code> or <code>key_equal</code>.</para>
-                <para>In this implementation, this overload doesn't call either function object's methods so it is no throw, but this might not be true in other implementations.</para>
               </throws>
               <notes>
                 <para>
-                  When the number of elements is a lot smaller than the number of buckets
-                  this function can be very inefficient as it has to search through empty
-                  buckets for the next element, in order to return the iterator.
-                  The method <methodname>quick_erase</methodname> is faster, but has yet
-                  to be standardized.
+                  In older versions this could be inefficient because it had to search
+                  through several buckets to find the position of the returned iterator.
+                  The data structure has been changed so that this is no longer the case,
+                  and the alternative erase methods have been deprecated.
                 </para>
               </notes>
             </method>
@@ -1404,13 +1475,10 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
               </throws>
               <notes>
                 <para>
-                  This method is faster than <methodname>erase</methodname> as
-                  it doesn't have to find the next element in the container -
-                  a potentially costly operation.
-                </para>
-                <para>
-                  As it hasn't been standardized, it's likely that this may
-                  change in the future.
+                  This method was implemented because returning an iterator to
+                  the next element from <code>erase</code> was expensive, but
+                  the container has been redesigned so that is no longer the
+                  case. So this method is now deprecated.
                 </para>
               </notes>
             </method>
@@ -1428,10 +1496,10 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
               </throws>
               <notes>
                 <para>
-                  This method is now deprecated, use
-                  <methodname>quick_return</methodname> instead. Although be
-                  warned that as that isn't standardized yet, it could also
-                  change.
+                  This method was implemented because returning an iterator to
+                  the next element from <code>erase</code> was expensive, but
+                  the container has been redesigned so that is no longer the
+                  case. So this method is now deprecated.
                 </para>
               </notes>
             </method>
@@ -1452,12 +1520,19 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
                 <paramtype>unordered_multiset&amp;</paramtype>
               </parameter>
               <type>void</type>
+              <description>
+                <para>Swaps the contents of the container with the parameter.</para>
+                <para>If <code>Allocator::propagate_on_container_swap</code> is declared and
+                  <code>Allocator::propagate_on_container_swap::value</code> is true then the
+                  containers' allocators are swapped. Otherwise, swapping with unequal allocators
+                  results in undefined behavior.</para>
+              </description>
               <throws>
-                <para>If the allocators are equal, doesn't throw an exception unless it is thrown by the copy constructor or copy assignment operator of <code>key_equal</code> or <code>hasher</code>.</para>
+                <para>Doesn't throw an exception unless it is thrown by the copy constructor or copy assignment operator of <code>key_equal</code> or <code>hasher</code>.</para>
               </throws>
               <notes>
-                <para>For a discussion of the behavior when allocators aren't equal see
-                  <link linkend="unordered.rationale.swapping_containers_with_unequal_allocators">the implementation details</link>.</para>
+                <para>The exception specifications aren't quite the same as the C++11 standard, as
+                  the equality predieate and hash function are swapped using their copy constructors.</para>
               </notes>
             </method>
           </method-group>
@@ -1702,8 +1777,8 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
           <free-function-group name="Equality Comparisons">
             <function name="operator==">
               <template>
-                <template-type-parameter name="Value">
-                </template-type-parameter>
+            <template-type-parameter name="Value">
+            </template-type-parameter>
                 <template-type-parameter name="Hash">
                 </template-type-parameter>
                 <template-type-parameter name="Pred">
@@ -1718,16 +1793,27 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
                 <paramtype>unordered_multiset&lt;Value, Hash, Pred, Alloc&gt; const&amp;</paramtype>
               </parameter>
               <type>bool</type>
+              <description>
+                <para>Return <code>true</code> if <code>x.size() ==
+                y.size</code> and for every equivalent key group in
+                <code>x</code>, there is a group in <code>y</code>
+                for the same key, which is a permutation (using
+                <code>operator==</code> to compare the value types).
+                </para>
+              </description>
               <notes>
-                <para>This is a boost extension.</para>
+                <para>The behavior of this function was changed to match
+                  the C++11 standard in Boost 1.48. If you wish to use
+                  the old behaviour, define the macro
+                  <code>BOOST_UNORDERED_DEPRECATED_EQUALITY</code>.</para>
                 <para>Behavior is undefined if the two containers don't have
                     equivalent equality predicates.</para>
               </notes>
             </function>
             <function name="operator!=">
               <template>
-                <template-type-parameter name="Value">
-                </template-type-parameter>
+            <template-type-parameter name="Value">
+            </template-type-parameter>
                 <template-type-parameter name="Hash">
                 </template-type-parameter>
                 <template-type-parameter name="Pred">
@@ -1742,8 +1828,19 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
                 <paramtype>unordered_multiset&lt;Value, Hash, Pred, Alloc&gt; const&amp;</paramtype>
               </parameter>
               <type>bool</type>
+              <description>
+                <para>Return <code>false</code> if <code>x.size() ==
+                y.size</code> and for every equivalent key group in
+                <code>x</code>, there is a group in <code>y</code>
+                for the same key, which is a permutation (using
+                <code>operator==</code> to compare the value types).
+                </para>
+              </description>
               <notes>
-                <para>This is a boost extension.</para>
+                <para>The behavior of this function was changed to match
+                  the C++11 standard in Boost 1.48. If you wish to use
+                  the old behaviour, define the macro
+                  <code>BOOST_UNORDERED_DEPRECATED_EQUALITY</code>.</para>
                 <para>Behavior is undefined if the two containers don't have
                     equivalent equality predicates.</para>
               </notes>
@@ -1752,8 +1849,8 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
           <free-function-group name="swap">
             <function name="swap">
               <template>
-                <template-type-parameter name="Value">
-                </template-type-parameter>
+            <template-type-parameter name="Value">
+            </template-type-parameter>
                 <template-type-parameter name="Hash">
                 </template-type-parameter>
                 <template-type-parameter name="Pred">
@@ -1771,12 +1868,19 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
               <effects>
                 <para><code>x.swap(y)</code></para>
               </effects>
+              <description>
+                <para>Swaps the contents of <code>x</code> and <code>y</code>.</para>
+                <para>If <code>Allocator::propagate_on_container_swap</code> is declared and
+                  <code>Allocator::propagate_on_container_swap::value</code> is true then the
+                  containers' allocators are swapped. Otherwise, swapping with unequal allocators
+                  results in undefined behavior.</para>
+              </description>
               <throws>
-                <para>If the allocators are equal, doesn't throw an exception unless it is thrown by the copy constructor or copy assignment operator of <code>Hash</code> or <code>Pred</code>.</para>
+                <para>Doesn't throw an exception unless it is thrown by the copy constructor or copy assignment operator of <code>key_equal</code> or <code>hasher</code>.</para>
               </throws>
               <notes>
-                <para>For a discussion of the behavior when allocators aren't equal see
-                  <link linkend="unordered.rationale.swapping_containers_with_unequal_allocators">the implementation details</link>.</para>
+                <para>The exception specifications aren't quite the same as the C++11 standard, as
+                  the equality predieate and hash function are swapped using their copy constructors.</para>
               </notes>
             </function>
           </free-function-group>
@@ -1798,17 +1902,13 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
               <default><type>std::equal_to&lt;Key&gt;</type></default>
             </template-type-parameter>
             <template-type-parameter name="Alloc">
-              <default><type>std::allocator&lt;std::pair&lt;Key const, Mapped&gt; &gt;</type></default>
+              <default><type>std::allocator&lt;std::pair&lt;Key const, Mapped&gt;&gt;</type></default>
             </template-type-parameter>
           </template>
           <purpose><simpara>
             An unordered associative container that associates unique keys with another value.
           </simpara></purpose>
           <description>
-            <para>Based on chapter 23 of
-              <ulink url="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2009/n2960.pdf">the working draft of the C++ standard [n2960]</ulink>.
-              But without the updated rules for allocators.
-            </para>
             <para><emphasis role="bold">Template Parameters</emphasis>
               <informaltable>
                 <tgroup cols="2">
@@ -1825,8 +1925,8 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
                     <row>
                       <entry><emphasis>Pred</emphasis></entry>
                       <entry>A binary function object that implements an equivalence relation on values of type <code>Key</code>.
-                        A binary function object that induces an equivalence relation on values of type Key.
-                        It takes two arguments of type Key and returns a value of type bool.</entry></row>
+                        A binary function object that induces an equivalence relation on values of type <code>Key</code>.
+                        It takes two arguments of type <code>Key</code> and returns a value of type bool.</entry></row>
                     <row>
                       <entry><emphasis>Alloc</emphasis></entry>
                       <entry>An allocator whose value type is the same as the container's value type.</entry></row></tbody></tgroup></informaltable></para>
@@ -1882,7 +1982,7 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
           <typedef name="iterator">
             <type><emphasis>implementation-defined</emphasis></type>
             <description>
-              <para>A iterator whose value type is <type>value_type</type>. </para>
+              <para>An iterator whose value type is <type>value_type</type>. </para>
               <para>The iterator category is at least a forward iterator.</para>
               <para>Convertible to <type>const_iterator</type>.</para>
             </description>
@@ -1969,6 +2069,9 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
             </parameter>
             <description>
               <para>The copy constructor. Copies the contained elements, hash function, predicate, maximum load factor and allocator.</para>
+              <para>If <code>Allocator::select_on_container_copy_construction</code>
+              exists and has the right signature, the allocator will be
+              constructed from its result.</para>
             </description>
             <requires>
               <para><code>value_type</code> is copy constructible</para>
@@ -1982,12 +2085,18 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
               <para>The move constructor.</para>
             </description>
             <notes>
-              <para>This is emulated on compilers without rvalue references.</para>
+              <para>This is implemented using Boost.Move.</para>
             </notes>
             <requires>
               <para>
                 <code>value_type</code> is move constructible.
-                (TODO: This is not actually required in this implementation).
+              </para>
+              <para>
+                On compilers without rvalue reference support the
+                emulation does not support moving without calling
+                <code>boost::move</code> if <code>value_type</code> is
+                not copyable. So, for example, you can't return the
+                container from a function.
               </para>
             </requires>
           </constructor>
@@ -2022,14 +2131,12 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
             <type>unordered_map&amp;</type>
             <description>
               <para>The assignment operator. Copies the contained elements, hash function, predicate and maximum load factor but not the allocator.</para>
+              <para>If <code>Alloc::propagate_on_container_copy_assignment</code>
+              exists and <code>Alloc::propagate_on_container_copy_assignment::value
+              </code> is true, the allocator is overwritten, if not the
+              copied elements are created using the existing
+              allocator.</para>
             </description>
-            <notes>
-              <para>
-                On compilers without rvalue references, there is a single assignment
-                operator with the signature <code>operator=(unordered_map)</code>
-                in order to emulate move semantics.
-              </para>
-            </notes>
             <requires>
               <para><code>value_type</code> is copy constructible</para>
             </requires>
@@ -2041,18 +2148,21 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
             <type>unordered_map&amp;</type>
             <description>
               <para>The move assignment operator.</para>
+              <para>If <code>Alloc::propagate_on_container_move_assignment</code>
+              exists and <code>Alloc::propagate_on_container_move_assignment::value
+              </code> is true, the allocator is overwritten, if not the
+              moved elements are created using the existing
+              allocator.</para>
             </description>
             <notes>
               <para>
-                On compilers without rvalue references, there is a single assignment
-                operator with the signature <code>operator=(unordered_map)</code>
-                in order to emulate move semantics.
+                On compilers without rvalue references, this is emulated using
+                Boost.Move.
               </para>
             </notes>
             <requires>
               <para>
                 <code>value_type</code> is move constructible.
-                (TODO: This is not actually required in this implementation).
               </para>
             </requires>
           </method>
@@ -2132,6 +2242,13 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
                 <para>If the compiler doesn't support variadic template arguments or rvalue
                       references, this is emulated for up to 10 arguments, with no support
                       for rvalue references or move semantics.</para>
+                <para>Since existing <code>std::pair</code> implementations don't support
+                      <code>std::piecewise_construct</code> this emulates it,
+                      but using <code>boost::unordered::piecewise_construct</code>.</para>
+                <para>In version of Boost before 1.48 this emulated the variadic pair
+                      constructor from older C++0x drafts. For backwards compatability
+                      this can be enabled by defining the macro
+                      <code>BOOST_UNORDERED_DEPRECATED_PAIR_CONSTRUCT</code>.
               </notes>
             </method>
             <method name="emplace_hint">
@@ -2148,7 +2265,7 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
               <type>iterator</type>
               <description>
                 <para>Inserts an object, constructed with the arguments <code>args</code>, in the container if and only if there is no element in the container with an equivalent key.</para>
-                <para>hint is a suggestion to where the element should be inserted.</para>
+                <para><code>hint</code> is a suggestion to where the element should be inserted.</para>
               </description>
               <returns>
                 <para>If an insert took place, then the iterator points to the newly inserted element. Otherwise, it points to the element with equivalent key.</para>
@@ -2163,6 +2280,14 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
                 <para>If the compiler doesn't support variadic template arguments or rvalue
                       references, this is emulated for up to 10 arguments, with no support
                       for rvalue references or move semantics.</para>
+                <para>Since existing <code>std::pair</code> implementations don't support
+                      <code>std::piecewise_construct</code> this emulates it,
+                      but using <code>boost::unordered::piecewise_construct</code>.
+                <para>In version of Boost before 1.48 this emulated the variadic pair
+                      constructor from older C++0x drafts. For backwards compatability
+                      this can be enabled by defining the macro
+                      <code>BOOST_UNORDERED_DEPRECATED_PAIR_CONSTRUCT</code>.
+                </para>
               </notes>
             </method>
             <method name="insert">
@@ -2171,7 +2296,7 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
               </parameter>
               <type>std::pair&lt;iterator, bool&gt;</type>
               <description>
-                <para>Inserts obj in the container if and only if there is no element in the container with an equivalent key.</para>
+                <para>Inserts <code>obj</code> in the container if and only if there is no element in the container with an equivalent key.</para>
               </description>
               <returns>
                 <para>The bool component of the return type is true if an insert took place.</para>
@@ -2194,7 +2319,7 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
               </parameter>
               <type>iterator</type>
               <description>
-                <para>Inserts obj in the container if and only if there is no element in the container with an equivalent key.</para>
+                <para>Inserts <code>obj</code> in the container if and only if there is no element in the container with an equivalent key.</para>
                 <para>hint is a suggestion to where the element should be inserted.</para>
               </description>
               <returns>
@@ -2245,15 +2370,13 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
               </returns>
               <throws>
                 <para>Only throws an exception if it is thrown by <code>hasher</code> or <code>key_equal</code>.</para>
-                <para>In this implementation, this overload doesn't call either function object's methods so it is no throw, but this might not be true in other implementations.</para>
               </throws>
               <notes>
                 <para>
-                  When the number of elements is a lot smaller than the number of buckets
-                  this function can be very inefficient as it has to search through empty
-                  buckets for the next element, in order to return the iterator.
-                  The method <methodname>quick_erase</methodname> is faster, but has yet
-                  to be standardized.
+                  In older versions this could be inefficient because it had to search
+                  through several buckets to find the position of the returned iterator.
+                  The data structure has been changed so that this is no longer the case,
+                  and the alternative erase methods have been deprecated.
                 </para>
               </notes>
             </method>
@@ -2305,13 +2428,10 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
               </throws>
               <notes>
                 <para>
-                  This method is faster than <methodname>erase</methodname> as
-                  it doesn't have to find the next element in the container -
-                  a potentially costly operation.
-                </para>
-                <para>
-                  As it hasn't been standardized, it's likely that this may
-                  change in the future.
+                  This method was implemented because returning an iterator to
+                  the next element from <code>erase</code> was expensive, but
+                  the container has been redesigned so that is no longer the
+                  case. So this method is now deprecated.
                 </para>
               </notes>
             </method>
@@ -2329,10 +2449,10 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
               </throws>
               <notes>
                 <para>
-                  This method is now deprecated, use
-                  <methodname>quick_return</methodname> instead. Although be
-                  warned that as that isn't standardized yet, it could also
-                  change.
+                  This method was implemented because returning an iterator to
+                  the next element from <code>erase</code> was expensive, but
+                  the container has been redesigned so that is no longer the
+                  case. So this method is now deprecated.
                 </para>
               </notes>
             </method>
@@ -2353,12 +2473,19 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
                 <paramtype>unordered_map&amp;</paramtype>
               </parameter>
               <type>void</type>
+              <description>
+                <para>Swaps the contents of the container with the parameter.</para>
+                <para>If <code>Allocator::propagate_on_container_swap</code> is declared and
+                  <code>Allocator::propagate_on_container_swap::value</code> is true then the
+                  containers' allocators are swapped. Otherwise, swapping with unequal allocators
+                  results in undefined behavior.</para>
+              </description>
               <throws>
-                <para>If the allocators are equal, doesn't throw an exception unless it is thrown by the copy constructor or copy assignment operator of <code>key_equal</code> or <code>hasher</code>.</para>
+                <para>Doesn't throw an exception unless it is thrown by the copy constructor or copy assignment operator of <code>key_equal</code> or <code>hasher</code>.</para>
               </throws>
               <notes>
-                <para>For a discussion of the behavior when allocators aren't equal see
-                  <link linkend="unordered.rationale.swapping_containers_with_unequal_allocators">the implementation details</link>.</para>
+                <para>The exception specifications aren't quite the same as the C++11 standard, as
+                  the equality predieate and hash function are swapped using their copy constructors.</para>
               </notes>
             </method>
           </method-group>
@@ -2638,10 +2765,10 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
           <free-function-group name="Equality Comparisons">
             <function name="operator==">
               <template>
-                <template-type-parameter name="Key">
-                </template-type-parameter>
-                <template-type-parameter name="Mapped">
-                </template-type-parameter>
+            <template-type-parameter name="Key">
+            </template-type-parameter>
+            <template-type-parameter name="Mapped">
+            </template-type-parameter>
                 <template-type-parameter name="Hash">
                 </template-type-parameter>
                 <template-type-parameter name="Pred">
@@ -2656,18 +2783,29 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
                 <paramtype>unordered_map&lt;Key, Mapped, Hash, Pred, Alloc&gt; const&amp;</paramtype>
               </parameter>
               <type>bool</type>
+              <description>
+                <para>Return <code>true</code> if <code>x.size() ==
+                y.size</code> and for every element in <code>x</code>,
+                there is an element in <code>y</code> with the same
+                for the same key, with an equal value (using
+                <code>operator==</code> to compare the value types).
+                </para>
+              </description>
               <notes>
-                <para>This is a boost extension.</para>
+                <para>The behavior of this function was changed to match
+                  the C++11 standard in Boost 1.48. If you wish to use
+                  the old behaviour, define the macro
+                  <code>BOOST_UNORDERED_DEPRECATED_EQUALITY</code>.</para>
                 <para>Behavior is undefined if the two containers don't have
                     equivalent equality predicates.</para>
               </notes>
             </function>
             <function name="operator!=">
               <template>
-                <template-type-parameter name="Key">
-                </template-type-parameter>
-                <template-type-parameter name="Mapped">
-                </template-type-parameter>
+            <template-type-parameter name="Key">
+            </template-type-parameter>
+            <template-type-parameter name="Mapped">
+            </template-type-parameter>
                 <template-type-parameter name="Hash">
                 </template-type-parameter>
                 <template-type-parameter name="Pred">
@@ -2682,8 +2820,19 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
                 <paramtype>unordered_map&lt;Key, Mapped, Hash, Pred, Alloc&gt; const&amp;</paramtype>
               </parameter>
               <type>bool</type>
+              <description>
+                <para>Return <code>false</code> if <code>x.size() ==
+                y.size</code> and for every element in <code>x</code>,
+                there is an element in <code>y</code> with the same
+                for the same key, with an equal value (using
+                <code>operator==</code> to compare the value types).
+                </para>
+              </description>
               <notes>
-                <para>This is a boost extension.</para>
+                <para>The behavior of this function was changed to match
+                  the C++11 standard in Boost 1.48. If you wish to use
+                  the old behaviour, define the macro
+                  <code>BOOST_UNORDERED_DEPRECATED_EQUALITY</code>.</para>
                 <para>Behavior is undefined if the two containers don't have
                     equivalent equality predicates.</para>
               </notes>
@@ -2692,10 +2841,10 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
           <free-function-group name="swap">
             <function name="swap">
               <template>
-                <template-type-parameter name="Key">
-                </template-type-parameter>
-                <template-type-parameter name="Mapped">
-                </template-type-parameter>
+            <template-type-parameter name="Key">
+            </template-type-parameter>
+            <template-type-parameter name="Mapped">
+            </template-type-parameter>
                 <template-type-parameter name="Hash">
                 </template-type-parameter>
                 <template-type-parameter name="Pred">
@@ -2713,12 +2862,19 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
               <effects>
                 <para><code>x.swap(y)</code></para>
               </effects>
+              <description>
+                <para>Swaps the contents of <code>x</code> and <code>y</code>.</para>
+                <para>If <code>Allocator::propagate_on_container_swap</code> is declared and
+                  <code>Allocator::propagate_on_container_swap::value</code> is true then the
+                  containers' allocators are swapped. Otherwise, swapping with unequal allocators
+                  results in undefined behavior.</para>
+              </description>
               <throws>
-                <para>If the allocators are equal, doesn't throw an exception unless it is thrown by the copy constructor or copy assignment operator of <code>Hash</code> or <code>Pred</code>.</para>
+                <para>Doesn't throw an exception unless it is thrown by the copy constructor or copy assignment operator of <code>key_equal</code> or <code>hasher</code>.</para>
               </throws>
               <notes>
-                <para>For a discussion of the behavior when allocators aren't equal see
-                  <link linkend="unordered.rationale.swapping_containers_with_unequal_allocators">the implementation details</link>.</para>
+                <para>The exception specifications aren't quite the same as the C++11 standard, as
+                  the equality predieate and hash function are swapped using their copy constructors.</para>
               </notes>
             </function>
           </free-function-group>
@@ -2736,17 +2892,13 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
               <default><type>std::equal_to&lt;Key&gt;</type></default>
             </template-type-parameter>
             <template-type-parameter name="Alloc">
-              <default><type>std::allocator&lt;std::pair&lt;Key const, Mapped&gt; &gt;</type></default>
+              <default><type>std::allocator&lt;std::pair&lt;Key const, Mapped&gt;&gt;</type></default>
             </template-type-parameter>
           </template>
           <purpose><simpara>
-            An unordered associative container that associates  keys with another value. The same key can be stored multiple times.
+            An unordered associative container that associates keys with another value. The same key can be stored multiple times.
           </simpara></purpose>
           <description>
-            <para>Based on chapter 23 of
-              <ulink url="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2009/n2960.pdf">the working draft of the C++ standard [n2960]</ulink>.
-              But without the updated rules for allocators.
-            </para>
             <para><emphasis role="bold">Template Parameters</emphasis>
               <informaltable>
                 <tgroup cols="2">
@@ -2763,8 +2915,8 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
                     <row>
                       <entry><emphasis>Pred</emphasis></entry>
                       <entry>A binary function object that implements an equivalence relation on values of type <code>Key</code>.
-                        A binary function object that induces an equivalence relation on values of type Key.
-                        It takes two arguments of type Key and returns a value of type bool.</entry></row>
+                        A binary function object that induces an equivalence relation on values of type <code>Key</code>.
+                        It takes two arguments of type <code>Key</code> and returns a value of type bool.</entry></row>
                     <row>
                       <entry><emphasis>Alloc</emphasis></entry>
                       <entry>An allocator whose value type is the same as the container's value type.</entry></row></tbody></tgroup></informaltable></para>
@@ -2820,7 +2972,7 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
           <typedef name="iterator">
             <type><emphasis>implementation-defined</emphasis></type>
             <description>
-              <para>A iterator whose value type is <type>value_type</type>. </para>
+              <para>An iterator whose value type is <type>value_type</type>. </para>
               <para>The iterator category is at least a forward iterator.</para>
               <para>Convertible to <type>const_iterator</type>.</para>
             </description>
@@ -2907,6 +3059,9 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
             </parameter>
             <description>
               <para>The copy constructor. Copies the contained elements, hash function, predicate, maximum load factor and allocator.</para>
+              <para>If <code>Allocator::select_on_container_copy_construction</code>
+              exists and has the right signature, the allocator will be
+              constructed from its result.</para>
             </description>
             <requires>
               <para><code>value_type</code> is copy constructible</para>
@@ -2920,12 +3075,18 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
               <para>The move constructor.</para>
             </description>
             <notes>
-              <para>This is emulated on compilers without rvalue references.</para>
+              <para>This is implemented using Boost.Move.</para>
             </notes>
             <requires>
               <para>
                 <code>value_type</code> is move constructible.
-                (TODO: This is not actually required in this implementation).
+              </para>
+              <para>
+                On compilers without rvalue reference support the
+                emulation does not support moving without calling
+                <code>boost::move</code> if <code>value_type</code> is
+                not copyable. So, for example, you can't return the
+                container from a function.
               </para>
             </requires>
           </constructor>
@@ -2960,14 +3121,12 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
             <type>unordered_multimap&amp;</type>
             <description>
               <para>The assignment operator. Copies the contained elements, hash function, predicate and maximum load factor but not the allocator.</para>
+              <para>If <code>Alloc::propagate_on_container_copy_assignment</code>
+              exists and <code>Alloc::propagate_on_container_copy_assignment::value
+              </code> is true, the allocator is overwritten, if not the
+              copied elements are created using the existing
+              allocator.</para>
             </description>
-            <notes>
-              <para>
-                On compilers without rvalue references, there is a single assignment
-                operator with the signature <code>operator=(unordered_multimap)</code>
-                in order to emulate move semantics.
-              </para>
-            </notes>
             <requires>
               <para><code>value_type</code> is copy constructible</para>
             </requires>
@@ -2979,18 +3138,21 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
             <type>unordered_multimap&amp;</type>
             <description>
               <para>The move assignment operator.</para>
+              <para>If <code>Alloc::propagate_on_container_move_assignment</code>
+              exists and <code>Alloc::propagate_on_container_move_assignment::value
+              </code> is true, the allocator is overwritten, if not the
+              moved elements are created using the existing
+              allocator.</para>
             </description>
             <notes>
               <para>
-                On compilers without rvalue references, there is a single assignment
-                operator with the signature <code>operator=(unordered_multimap)</code>
-                in order to emulate move semantics.
+                On compilers without rvalue references, this is emulated using
+                Boost.Move.
               </para>
             </notes>
             <requires>
               <para>
                 <code>value_type</code> is move constructible.
-                (TODO: This is not actually required in this implementation).
               </para>
             </requires>
           </method>
@@ -3069,6 +3231,13 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
                 <para>If the compiler doesn't support variadic template arguments or rvalue
                       references, this is emulated for up to 10 arguments, with no support
                       for rvalue references or move semantics.</para>
+                <para>Since existing <code>std::pair</code> implementations don't support
+                      <code>std::piecewise_construct</code> this emulates it,
+                      but using <code>boost::unordered::piecewise_construct</code>.</para>
+                <para>In version of Boost before 1.48 this emulated the variadic pair
+                      constructor from older C++0x drafts. For backwards compatability
+                      this can be enabled by defining the macro
+                      <code>BOOST_UNORDERED_DEPRECATED_PAIR_CONSTRUCT</code>.
               </notes>
             </method>
             <method name="emplace_hint">
@@ -3085,7 +3254,7 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
               <type>iterator</type>
               <description>
                 <para>Inserts an object, constructed with the arguments <code>args</code>, in the container.</para>
-                <para>hint is a suggestion to where the element should be inserted.</para>
+                <para><code>hint</code> is a suggestion to where the element should be inserted.</para>
               </description>
               <returns>
                 <para>An iterator pointing to the inserted element.</para>
@@ -3100,6 +3269,14 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
                 <para>If the compiler doesn't support variadic template arguments or rvalue
                       references, this is emulated for up to 10 arguments, with no support
                       for rvalue references or move semantics.</para>
+                <para>Since existing <code>std::pair</code> implementations don't support
+                      <code>std::piecewise_construct</code> this emulates it,
+                      but using <code>boost::unordered::piecewise_construct</code>.
+                <para>In version of Boost before 1.48 this emulated the variadic pair
+                      constructor from older C++0x drafts. For backwards compatability
+                      this can be enabled by defining the macro
+                      <code>BOOST_UNORDERED_DEPRECATED_PAIR_CONSTRUCT</code>.
+                </para>
               </notes>
             </method>
             <method name="insert">
@@ -3108,7 +3285,7 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
               </parameter>
               <type>iterator</type>
               <description>
-                <para>Inserts obj in the container.</para>
+                <para>Inserts <code>obj</code> in the container.</para>
               </description>
               <returns>
                 <para>An iterator pointing to the inserted element.</para>
@@ -3130,7 +3307,7 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
               </parameter>
               <type>iterator</type>
               <description>
-                <para>Inserts obj in the container.</para>
+                <para>Inserts <code>obj</code> in the container.</para>
                 <para>hint is a suggestion to where the element should be inserted.</para>
               </description>
               <returns>
@@ -3158,7 +3335,7 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
               </parameter>
               <type>void</type>
               <description>
-                <para>Inserts a range of elements into the container.</para>
+                <para>Inserts a range of elements into the container. Elements are inserted if and only if there is no element in the container with an equivalent key.</para>
               </description>
               <throws>
                 <para>When inserting a single element, if an exception is thrown by an operation other than a call to <code>hasher</code> the function has no effect.</para>
@@ -3181,15 +3358,13 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
               </returns>
               <throws>
                 <para>Only throws an exception if it is thrown by <code>hasher</code> or <code>key_equal</code>.</para>
-                <para>In this implementation, this overload doesn't call either function object's methods so it is no throw, but this might not be true in other implementations.</para>
               </throws>
               <notes>
                 <para>
-                  When the number of elements is a lot smaller than the number of buckets
-                  this function can be very inefficient as it has to search through empty
-                  buckets for the next element, in order to return the iterator.
-                  The method <methodname>quick_erase</methodname> is faster, but has yet
-                  to be standardized.
+                  In older versions this could be inefficient because it had to search
+                  through several buckets to find the position of the returned iterator.
+                  The data structure has been changed so that this is no longer the case,
+                  and the alternative erase methods have been deprecated.
                 </para>
               </notes>
             </method>
@@ -3241,13 +3416,10 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
               </throws>
               <notes>
                 <para>
-                  This method is faster than <methodname>erase</methodname> as
-                  it doesn't have to find the next element in the container -
-                  a potentially costly operation.
-                </para>
-                <para>
-                  As it hasn't been standardized, it's likely that this may
-                  change in the future.
+                  This method was implemented because returning an iterator to
+                  the next element from <code>erase</code> was expensive, but
+                  the container has been redesigned so that is no longer the
+                  case. So this method is now deprecated.
                 </para>
               </notes>
             </method>
@@ -3265,10 +3437,10 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
               </throws>
               <notes>
                 <para>
-                  This method is now deprecated, use
-                  <methodname>quick_return</methodname> instead. Although be
-                  warned that as that isn't standardized yet, it could also
-                  change.
+                  This method was implemented because returning an iterator to
+                  the next element from <code>erase</code> was expensive, but
+                  the container has been redesigned so that is no longer the
+                  case. So this method is now deprecated.
                 </para>
               </notes>
             </method>
@@ -3289,12 +3461,19 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
                 <paramtype>unordered_multimap&amp;</paramtype>
               </parameter>
               <type>void</type>
+              <description>
+                <para>Swaps the contents of the container with the parameter.</para>
+                <para>If <code>Allocator::propagate_on_container_swap</code> is declared and
+                  <code>Allocator::propagate_on_container_swap::value</code> is true then the
+                  containers' allocators are swapped. Otherwise, swapping with unequal allocators
+                  results in undefined behavior.</para>
+              </description>
               <throws>
-                <para>If the allocators are equal, doesn't throw an exception unless it is thrown by the copy constructor or copy assignment operator of <code>key_equal</code> or <code>hasher</code>.</para>
+                <para>Doesn't throw an exception unless it is thrown by the copy constructor or copy assignment operator of <code>key_equal</code> or <code>hasher</code>.</para>
               </throws>
               <notes>
-                <para>For a discussion of the behavior when allocators aren't equal see
-                  <link linkend="unordered.rationale.swapping_containers_with_unequal_allocators">the implementation details</link>.</para>
+                <para>The exception specifications aren't quite the same as the C++11 standard, as
+                  the equality predieate and hash function are swapped using their copy constructors.</para>
               </notes>
             </method>
           </method-group>
@@ -3539,10 +3718,10 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
           <free-function-group name="Equality Comparisons">
             <function name="operator==">
               <template>
-                <template-type-parameter name="Key">
-                </template-type-parameter>
-                <template-type-parameter name="Mapped">
-                </template-type-parameter>
+            <template-type-parameter name="Key">
+            </template-type-parameter>
+            <template-type-parameter name="Mapped">
+            </template-type-parameter>
                 <template-type-parameter name="Hash">
                 </template-type-parameter>
                 <template-type-parameter name="Pred">
@@ -3557,18 +3736,29 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
                 <paramtype>unordered_multimap&lt;Key, Mapped, Hash, Pred, Alloc&gt; const&amp;</paramtype>
               </parameter>
               <type>bool</type>
+              <description>
+                <para>Return <code>true</code> if <code>x.size() ==
+                y.size</code> and for every equivalent key group in
+                <code>x</code>, there is a group in <code>y</code>
+                for the same key, which is a permutation (using
+                <code>operator==</code> to compare the value types).
+                </para>
+              </description>
               <notes>
-                <para>This is a boost extension.</para>
+                <para>The behavior of this function was changed to match
+                  the C++11 standard in Boost 1.48. If you wish to use
+                  the old behaviour, define the macro
+                  <code>BOOST_UNORDERED_DEPRECATED_EQUALITY</code>.</para>
                 <para>Behavior is undefined if the two containers don't have
                     equivalent equality predicates.</para>
               </notes>
             </function>
             <function name="operator!=">
               <template>
-                <template-type-parameter name="Key">
-                </template-type-parameter>
-                <template-type-parameter name="Mapped">
-                </template-type-parameter>
+            <template-type-parameter name="Key">
+            </template-type-parameter>
+            <template-type-parameter name="Mapped">
+            </template-type-parameter>
                 <template-type-parameter name="Hash">
                 </template-type-parameter>
                 <template-type-parameter name="Pred">
@@ -3583,8 +3773,19 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
                 <paramtype>unordered_multimap&lt;Key, Mapped, Hash, Pred, Alloc&gt; const&amp;</paramtype>
               </parameter>
               <type>bool</type>
+              <description>
+                <para>Return <code>false</code> if <code>x.size() ==
+                y.size</code> and for every equivalent key group in
+                <code>x</code>, there is a group in <code>y</code>
+                for the same key, which is a permutation (using
+                <code>operator==</code> to compare the value types).
+                </para>
+              </description>
               <notes>
-                <para>This is a boost extension.</para>
+                <para>The behavior of this function was changed to match
+                  the C++11 standard in Boost 1.48. If you wish to use
+                  the old behaviour, define the macro
+                  <code>BOOST_UNORDERED_DEPRECATED_EQUALITY</code>.</para>
                 <para>Behavior is undefined if the two containers don't have
                     equivalent equality predicates.</para>
               </notes>
@@ -3593,10 +3794,10 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
           <free-function-group name="swap">
             <function name="swap">
               <template>
-                <template-type-parameter name="Key">
-                </template-type-parameter>
-                <template-type-parameter name="Mapped">
-                </template-type-parameter>
+            <template-type-parameter name="Key">
+            </template-type-parameter>
+            <template-type-parameter name="Mapped">
+            </template-type-parameter>
                 <template-type-parameter name="Hash">
                 </template-type-parameter>
                 <template-type-parameter name="Pred">
@@ -3614,12 +3815,19 @@ file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
               <effects>
                 <para><code>x.swap(y)</code></para>
               </effects>
+              <description>
+                <para>Swaps the contents of <code>x</code> and <code>y</code>.</para>
+                <para>If <code>Allocator::propagate_on_container_swap</code> is declared and
+                  <code>Allocator::propagate_on_container_swap::value</code> is true then the
+                  containers' allocators are swapped. Otherwise, swapping with unequal allocators
+                  results in undefined behavior.</para>
+              </description>
               <throws>
-                <para>If the allocators are equal, doesn't throw an exception unless it is thrown by the copy constructor or copy assignment operator of <code>Hash</code> or <code>Pred</code>.</para>
+                <para>Doesn't throw an exception unless it is thrown by the copy constructor or copy assignment operator of <code>key_equal</code> or <code>hasher</code>.</para>
               </throws>
               <notes>
-                <para>For a discussion of the behavior when allocators aren't equal see
-                  <link linkend="unordered.rationale.swapping_containers_with_unequal_allocators">the implementation details</link>.</para>
+                <para>The exception specifications aren't quite the same as the C++11 standard, as
+                  the equality predieate and hash function are swapped using their copy constructors.</para>
               </notes>
             </function>
           </free-function-group>

@@ -1,5 +1,5 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
-//
+
 // Boost.SpatialIndex - geometry helper functions
 //
 // Copyright 2008 Federico J. Fernandez.
@@ -19,7 +19,7 @@ namespace boost { namespace geometry { namespace index {
 /**
  * \brief Given two boxes, returns the minimal box that contains them
  */
-// TODO: use geometry::combine
+// TODO: use geometry::expand
 template <typename Box>
 inline Box enlarge_box(Box const& b1, Box const& b2)
 {
@@ -47,7 +47,7 @@ inline Box enlarge_box(Box const& b1, Box const& b2)
  * \brief Compute the area of the union of b1 and b2
  */
 template <typename Box>
-inline typename area_result<Box>::type compute_union_area(Box const& b1, Box const& b2)
+inline typename default_area_result<Box>::type compute_union_area(Box const& b1, Box const& b2)
 {
     Box enlarged_box = enlarge_box(b1, b2);
     return geometry::area(enlarged_box);

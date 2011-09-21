@@ -45,7 +45,8 @@ namespace client { namespace code_gen
 
     void function::add_var(std::string const& name)
     {
-        variables[name] = variables.size();
+        std::size_t n = variables.size();
+        variables[name] = n;
     }
 
     void function::link_to(std::string const& name, std::size_t address)
@@ -236,7 +237,6 @@ namespace client { namespace code_gen
         int const* p = current->find_var(x.name);
         if (p == 0)
         {
-            std::cout << x.id << std::endl;
             error_handler(x.id, "Undeclared variable: " + x.name);
             return false;
         }
@@ -291,7 +291,6 @@ namespace client { namespace code_gen
 
         if (functions.find(x.function_name.name) == functions.end())
         {
-            std::cout << x.function_name.id << std::endl;
             error_handler(x.function_name.id, "Function not found: " + x.function_name.name);
             return false;
         }
@@ -300,7 +299,6 @@ namespace client { namespace code_gen
 
         if (p->nargs() != x.args.size())
         {
-            std::cout << x.function_name.id << std::endl;
             error_handler(x.function_name.id, "Wrong number of arguments: " + x.function_name.name);
             return false;
         }
@@ -341,7 +339,6 @@ namespace client { namespace code_gen
         int const* p = current->find_var(x.lhs.name);
         if (p == 0)
         {
-            std::cout << x.lhs.id << std::endl;
             error_handler(x.lhs.id, "Undeclared variable: " + x.lhs.name);
             return false;
         }
@@ -355,7 +352,6 @@ namespace client { namespace code_gen
         int const* p = current->find_var(x.lhs.name);
         if (p != 0)
         {
-            std::cout << x.lhs.id << std::endl;
             error_handler(x.lhs.id, "Duplicate variable: " + x.lhs.name);
             return false;
         }
@@ -439,7 +435,6 @@ namespace client { namespace code_gen
         {
             if (x.expr)
             {
-                std::cout << x.id << std::endl;
                 error_handler(x.id, "'void' function returning a value: ");
                 return false;
             }
@@ -448,7 +443,6 @@ namespace client { namespace code_gen
         {
             if (!x.expr)
             {
-                std::cout << x.id << std::endl;
                 error_handler(x.id, current_function_name + " function must return a value: ");
                 return false;
             }
@@ -468,7 +462,6 @@ namespace client { namespace code_gen
         void_return = x.return_type == "void";
         if (functions.find(x.function_name.name) != functions.end())
         {
-            std::cout << x.function_name.id << std::endl;
             error_handler(x.function_name.id, "Duplicate function: " + x.function_name.name);
             return false;
         }

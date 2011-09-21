@@ -1,6 +1,8 @@
-// Boost.Geometry (aka GGL, Generic Geometry Library) test file
-//
-// Copyright Barend Gehrels 2010, Geodan, Amsterdam, the Netherlands
+// Boost.Geometry (aka GGL, Generic Geometry Library)
+// Unit Test
+
+// Copyright (c) 2010 Barend Gehrels, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -22,6 +24,7 @@
 #include <boost/geometry/algorithms/within.hpp>
 
 #include <boost/geometry/geometries/geometries.hpp>
+#include <boost/geometry/geometries/point_xy.hpp>
 
 #include <boost/geometry/strategies/strategies.hpp>
 
@@ -39,14 +42,14 @@ inline void test_assemble(std::string const& id, Geometry const& p, Geometry con
 {
 
     std::vector<Geometry> u, i, d1, d2;
-    bg::union_inserter<Geometry>(p, q, std::back_inserter(u));
-    bg::intersection_inserter<Geometry>(p, q, std::back_inserter(i));
-    bg::difference_inserter<Geometry>(p, q, std::back_inserter(d1));
-    bg::difference_inserter<Geometry>(q, p, std::back_inserter(d2));
+    bg::detail::union_::union_insert<Geometry>(p, q, std::back_inserter(u));
+    bg::detail::intersection::intersection_insert<Geometry>(p, q, std::back_inserter(i));
+    bg::detail::difference::difference_insert<Geometry>(p, q, std::back_inserter(d1));
+    bg::detail::difference::difference_insert<Geometry>(q, p, std::back_inserter(d2));
 
     if (operation == 'i')
     {
-        typedef typename bg::area_result<Geometry>::type type;
+        typedef typename bg::default_area_result<Geometry>::type type;
         type area_p = bg::area(p);
         type area_q = bg::area(q);
 

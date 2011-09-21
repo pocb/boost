@@ -1,6 +1,10 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
-//
-// Copyright Barend Gehrels 2009, Geodan, the Netherlands.
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+
+// Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
+// (geolib/GGL), copyright (c) 1995-2010 Geodan, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -19,11 +23,11 @@
 #include <boost/geometry/core/point_type.hpp>
 #include <boost/geometry/strategies/convex_hull.hpp>
 
-#include <boost/geometry/iterators/range_type.hpp>
+#include <boost/geometry/views/detail/range_type.hpp>
 
 #include <boost/geometry/policies/compare.hpp>
 
-#include <boost/geometry/util/for_each_range.hpp>
+#include <boost/geometry/algorithms/detail/for_each_range.hpp>
 #include <boost/geometry/views/reversible_view.hpp>
 
 
@@ -273,7 +277,7 @@ public:
         // This makes use of the geometry::less/greater predicates with the optional
         // direction template parameter to indicate x direction
 
-        typedef typename range_type<InputGeometry>::type range_type;
+        typedef typename geometry::detail::range_type<InputGeometry>::type range_type;
 
         typedef typename boost::range_iterator
             <
@@ -287,7 +291,7 @@ public:
                 geometry::less<point_type, 0>,
                 geometry::greater<point_type, 0>
             > extremes;
-        geometry::for_each_range(geometry, extremes);
+        geometry::detail::for_each_range(geometry, extremes);
 
         // Bounding left/right points
         // Second pass, now that extremes are found, assign all points
@@ -297,10 +301,10 @@ public:
                 range_type,
                 range_iterator,
                 container_type,
-                typename strategy_side<cs_tag>::type
+                typename strategy::side::services::default_strategy<cs_tag>::type
             > assigner(extremes.left, extremes.right);
 
-        geometry::for_each_range(geometry, assigner);
+        geometry::detail::for_each_range(geometry, assigner);
 
 
         // Sort both collections, first on x(, then on y)
@@ -354,7 +358,7 @@ private:
     template <int Factor>
     static inline void add_to_hull(point_type const& p, container_type& output)
     {
-        typedef typename strategy_side<cs_tag>::type side;
+        typedef typename strategy::side::services::default_strategy<cs_tag>::type side;
 
         output.push_back(p);
         register std::size_t output_size = output.size();
@@ -382,7 +386,7 @@ private:
 
 
     template <iterate_direction Direction, typename OutputIterator>
-    static inline void output_range(container_type const& range, 
+    static inline void output_range(container_type const& range,
         OutputIterator out, bool skip_first)
     {
         typedef typename reversible_view<container_type const, Direction>::type view_type;

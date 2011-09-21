@@ -62,11 +62,20 @@
 #     define BOOST_CHRONO_HAS_THREAD_CLOCK
 #     define BOOST_CHRONO_THREAD_CLOCK_IS_STEADY true
 #   endif
+#   if defined(CLOCK_THREAD_CPUTIME_ID) && !defined(BOOST_DISABLE_THREADS)
+#     define BOOST_CHRONO_HAS_THREAD_CLOCK
+#     define BOOST_CHRONO_THREAD_CLOCK_IS_STEADY true
+#   endif
 # endif
 
 #if defined(BOOST_CHRONO_THREAD_DISABLED) && defined(BOOST_CHRONO_HAS_THREAD_CLOCK)
 #undef BOOST_CHRONO_HAS_THREAD_CLOCK
 #undef BOOST_CHRONO_THREAD_CLOCK_IS_STEADY
+#endif
+
+#ifdef UNDER_CE
+#else
+#define BOOST_CHRONO_HAS_PROCESS_CLOCKS
 #endif
 
 // unicode support  ------------------------------//
@@ -89,6 +98,12 @@
 #define BOOST_CHRONO_CONST_REF
 #endif
 
+#if defined(BOOST_NO_NOEXCEPT)
+#define BOOST_CHRONO_NOEXCEPT
+#else
+#define BOOST_CHRONO_NOEXCEPT noexcept
+#endif
+
 #define BOOST_CHRONO_STATIC_CONSTEXPR  static BOOST_CHRONO_CONSTEXPR_OR_CONST
 
 
@@ -103,7 +118,6 @@
 
 //  enable dynamic linking on Windows  ---------------------------------------//
 
-#ifdef BOOST_HAS_DECLSPEC // defined by boost.config
 // we need to import/export our code only if the user has specifically
 // asked for it by defining either BOOST_ALL_DYN_LINK if they want all boost
 // libraries to be dynamically linked, or BOOST_CHRONO_DYN_LINK
@@ -111,12 +125,11 @@
 #if defined(BOOST_ALL_DYN_LINK) || defined(BOOST_CHRONO_DYN_LINK)
 // export if this is our own source, otherwise import:
 #ifdef BOOST_CHRONO_SOURCE
-# define BOOST_CHRONO_DECL __declspec(dllexport)
+# define BOOST_CHRONO_DECL BOOST_SYMBOL_EXPORT
 #else
-# define BOOST_CHRONO_DECL __declspec(dllimport)
+# define BOOST_CHRONO_DECL BOOST_SYMBOL_IMPORT
 #endif  // BOOST_CHRONO_SOURCE
 #endif  // DYN_LINK
-#endif  // BOOST_HAS_DECLSPEC
 //
 // if BOOST_CHRONO_DECL isn't defined yet define it now:
 #ifndef BOOST_CHRONO_DECL

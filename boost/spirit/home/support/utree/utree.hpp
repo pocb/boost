@@ -12,9 +12,13 @@
 #include <cstddef>
 #include <algorithm>
 #include <string>
-#include <ostream>
+#include <iostream>
+#include <ios>
+#include <sstream>
 #include <typeinfo>
 
+#include <boost/io/ios_state.hpp>
+#include <boost/integer.hpp>
 #include <boost/throw_exception.hpp>
 #include <boost/assert.hpp>
 #include <boost/noncopyable.hpp>
@@ -45,13 +49,12 @@ namespace boost { namespace spirit
        function, which applies to certain stored utree_type's only, but this 
        precondition is violated as the `utree` instance holds some other type.
     */
-    struct bad_type_exception : utree_exception
-    {
-        virtual const char* what() const throw()
-        {
-            return "utree: Illegal operation for currently stored data.";
-        }
-    };
+    struct bad_type_exception /*: utree_exception*/;
+
+    /*`The `empty_exception` is thrown whenever a precondition of a list
+       or range utree method is violated due to the list or range being empty. 
+    */
+    struct empty_exception /*: utree_exception*/;
     //]
 
     //[utree_types
@@ -71,7 +74,7 @@ namespace boost { namespace spirit
             any_type,           // A pointer or reference to any C++ type. 
             function_type,      // A utree holding a stored_function<F> object,
                                 // where F is an unary function object taking a 
-                                // scope as it's parameter and returning a
+                                // utree as it's parameter and returning a
                                 // utree.
 
             // numeric atoms
@@ -86,8 +89,77 @@ namespace boost { namespace spirit
 
             binary_type         // Arbitrary binary data
         };
+        typedef boost::uint_t<sizeof(info)*8>::exact exact_integral_type; 
+        typedef boost::uint_t<sizeof(info)*8>::fast fast_integral_type; 
     };
     //]
+
+    // streaming operator for utree types - essential for diagnostics    
+    inline std::ostream& operator<<(std::ostream& out, utree_type::info t)
+    {
+        boost::io::ios_all_saver saver(out);
+        switch (t) {
+            case utree_type::invalid_type: { out << "invalid"; break; }
+            case utree_type::nil_type: { out << "nil"; break; }
+            case utree_type::list_type: { out << "list"; break; }
+            case utree_type::range_type: { out << "range"; break; }
+            case utree_type::reference_type: { out << "reference"; break; }
+            case utree_type::any_type: { out << "any"; break; }
+            case utree_type::function_type: { out << "function"; break; }
+            case utree_type::bool_type: { out << "bool"; break; }
+            case utree_type::int_type: { out << "int"; break; }
+            case utree_type::double_type: { out << "double"; break; }
+            case utree_type::string_type: { out << "string"; break; }
+            case utree_type::string_range_type: { out << "string_range"; break; }
+            case utree_type::symbol_type: { out << "symbol"; break; }
+            case utree_type::binary_type: { out << "binary"; break; }
+            default: { out << "unknown"; break; }
+        }
+        out << std::hex << "[0x"
+            << static_cast<utree_type::fast_integral_type>(t) << "]";
+        return out;
+    }
+    
+    struct bad_type_exception : utree_exception
+    {
+        std::string msg;
+
+        bad_type_exception(char const* error, utree_type::info got)
+          : msg()
+        {
+            std::ostringstream oss;
+            oss << "utree: " << error
+                << " (got utree type '" << got << "')";
+            msg = oss.str();
+        }
+        
+        bad_type_exception(char const* error, utree_type::info got1,
+                           utree_type::info got2)
+          : msg()
+        {
+            std::ostringstream oss;
+            oss << "utree: " << error
+                << " (got utree types '" << got1 << "' and '" << got2 << "')";
+            msg = oss.str();
+        }
+
+        virtual ~bad_type_exception() throw() {}
+
+        virtual char const* what() const throw()
+        { return msg.c_str(); }
+    };
+    
+    struct empty_exception : utree_exception
+    {
+        char const* msg;
+
+        empty_exception(char const* error) : msg(error) {}
+        
+        virtual ~empty_exception() throw() {}
+
+        virtual char const* what() const throw()
+        { return msg; }
+    };
 
     ///////////////////////////////////////////////////////////////////////////
     // A typed string with parametric Base storage. The storage can be any
@@ -170,13 +242,13 @@ namespace boost { namespace spirit
     // Our function type
     ///////////////////////////////////////////////////////////////////////////
     class utree;
-    class scope;
 
     //[utree_function_object_interface
     struct function_base
     {
-        virtual ~function_base() {};
-        virtual utree operator()(scope const& env) const = 0;
+        virtual ~function_base() {}
+        virtual utree operator()(utree const& env) const = 0;
+        virtual utree operator()(utree& env) const = 0;
 
         // Calling f.clone() must return a newly allocated function_base 
         // instance that is equal to f.
@@ -189,7 +261,8 @@ namespace boost { namespace spirit
         F f;
         stored_function(F f = F());
         virtual ~stored_function();
-        virtual utree operator()(scope const& env) const;
+        virtual utree operator()(utree const& env) const;
+        virtual utree operator()(utree& env) const;
         virtual function_base* clone() const;
     };
     
@@ -199,7 +272,8 @@ namespace boost { namespace spirit
         F& f;
         referenced_function(F& f);
         virtual ~referenced_function();
-        virtual utree operator()(scope const& env) const;
+        virtual utree operator()(utree const& env) const;
+        virtual utree operator()(utree& env) const;
         virtual function_base* clone() const;
     };
     //]
@@ -313,7 +387,7 @@ namespace boost { namespace spirit
 
         // This initializes a `boolean_type` node, which can hold 'true' or
         // 'false' only.
-        utree(bool);
+        explicit utree(bool);
         reference operator=(bool);
 
         // This initializes an `integer_type` node, which can hold arbitrary 
@@ -364,20 +438,13 @@ namespace boost { namespace spirit
         utree(boost::iterator_range<Iterator>);
         template <class Iterator>
         reference operator=(boost::iterator_range<Iterator>);
-
-        // This initializes a `function_type` node, which can store an 
-        // arbitrary function or function object.
-        template <class F>
-        utree(stored_function<F> const&);
-        template <class F>
-        reference operator=(stored_function<F> const&);
-       
-        // This initializes a `function_type` node, storing by reference
-        // instead of copying the function object. 
-        template <class F>
-        utree(referenced_function<F> const&);
-        template <class F>
-        reference operator=(referenced_function<F> const&);
+        
+        // This initializes a `function_type` node from a polymorphic function
+        // object pointer (takes ownership) or reference. 
+        utree(function_base const&);
+        reference operator=(function_base const&);
+        utree(function_base*);
+        reference operator=(function_base*);
 
         // This initializes either a `string_type`, a `symbol_type`, or a 
         // `binary_type` node (depending on the template parameter `type_`), 
@@ -471,17 +538,16 @@ namespace boost { namespace spirit
         ref_iterator ref_end();
         //]
 
-        // random access
-        reference operator[](size_type);
-        const_reference operator[](size_type) const;
-
         // This clears the utree instance and resets its type to `invalid_type`
         void clear();
 
         void swap(utree&);
-
+ 
         bool empty() const;
+
         size_type size() const;
+        /*`[warning `size()` has O(n) complexity on `utree` ranges. On utree
+            lists, it has O(1) complexity.]`*/
 
         ////////////////////////////////////////////////////////////////////////
 
@@ -503,11 +569,14 @@ namespace boost { namespace spirit
         short tag() const;
         void tag(short);
 
-        utree eval(scope const&) const;
+        utree eval(utree const&) const;
+        utree eval(utree&) const;
 
+        utree operator() (utree const&) const;
+        utree operator() (utree&) const;
     //<-
     protected:
-        void ensure_list_type();
+        void ensure_list_type(char const* failed_in = "ensure_list_type()");
 
     private:
         typedef utree_type type;
@@ -515,10 +584,6 @@ namespace boost { namespace spirit
         template <class UTreeX, class UTreeY>
         friend struct detail::visit_impl;
         friend struct detail::index_impl;
-        friend struct detail::assign_impl;
-
-        template <class T>
-        friend struct detail::get_impl;
 
         type::info get_type() const;
         void set_type(type::info);
@@ -541,11 +606,19 @@ namespace boost { namespace spirit
     };
     //]
 
+    //[utree_tuple_interface 
+    /*<-*/inline/*->*/
+    utree::reference get(utree::reference, utree::size_type);
+    /*<-*/inline/*->*/
+    utree::const_reference get(utree::const_reference, utree::size_type);
+    /*`[warning `get()` has O(n) complexity.]`*/
+    //]
+
     struct utree::list_type : utree
     {
         using utree::operator=;
 
-        list_type() : utree() { ensure_list_type(); }
+        list_type() : utree() { ensure_list_type("list_type()"); }
 
         template <typename T0>
         list_type(T0 t0) : utree(t0) {}
@@ -559,42 +632,6 @@ namespace boost { namespace spirit
     utree::invalid_type const invalid = {};
     utree::nil_type const nil = {};
     utree::list_type const empty_list = utree::list_type();
-
-    ///////////////////////////////////////////////////////////////////////////
-    //[utree_scope
-    class scope : public boost::iterator_range<utree*> 
-    {
-    public:
-        scope(utree* first = 0,
-              utree* last = 0,
-              scope const* parent = 0) 
-              //<-
-              : boost::iterator_range<utree*>(first, last)
-              , parent(parent)
-              , depth(parent? parent->depth + 1 : 0) {}
-              //->
-
-        scope const* outer() const 
-        //<-
-        {
-            return parent;
-        }
-        //->
-
-        std::size_t level() const 
-        //<-
-        {
-            return depth;
-        }
-        //->
-
-      //<-  
-      private:
-        scope const* parent;
-        std::size_t depth;
-      //->
-    };
-    //]
 }}
 
 #if defined(BOOST_MSVC)

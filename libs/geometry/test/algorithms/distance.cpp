@@ -1,7 +1,13 @@
-// Boost.Geometry (aka GGL, Generic Geometry Library) test file
-//
-// Copyright Barend Gehrels 2007-2009, Geodan, Amsterdam, the Netherlands
-// Copyright Bruno Lalande 2008, 2009
+// Boost.Geometry (aka GGL, Generic Geometry Library)
+// Unit Test
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2011 Bruno Lalande, Paris, France.
+// Copyright (c) 2009-2011 Mateusz Loskot, London, UK.
+
+// Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
+// (geolib/GGL), copyright (c) 1995-2010 Geodan, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -13,22 +19,36 @@
 #include <algorithms/test_distance.hpp>
 
 #include <boost/mpl/if.hpp>
+#include <boost/array.hpp>
 
 #include <boost/geometry/geometries/geometries.hpp>
-#include <boost/geometry/geometries/adapted/boost_array_as_linestring.hpp>
-#include <boost/geometry/geometries/adapted/c_array_cartesian.hpp>
-#include <boost/geometry/geometries/adapted/tuple_cartesian.hpp>
+#include <boost/geometry/geometries/point_xy.hpp>
+#include <boost/geometry/geometries/adapted/c_array.hpp>
+#include <boost/geometry/geometries/adapted/boost_tuple.hpp>
 
 #include <test_common/test_point.hpp>
 #include <test_geometries/custom_segment.hpp>
 #include <test_geometries/wrapped_boost_array.hpp>
 
+BOOST_GEOMETRY_REGISTER_C_ARRAY_CS(cs::cartesian)
+BOOST_GEOMETRY_REGISTER_BOOST_TUPLE_CS(cs::cartesian)
+
+// Register boost array as a linestring
+namespace boost { namespace geometry { namespace traits
+{
+template <typename Point, std::size_t PointCount>
+struct tag< boost::array<Point, PointCount> >
+{
+    typedef linestring_tag type;
+};
+
+}}}
 
 template <typename P>
 void test_distance_point()
 {
     namespace services = bg::strategy::distance::services;
-    typedef typename bg::distance_result<P>::type return_type;
+    typedef typename bg::default_distance_result<P>::type return_type;
 
     // Basic, trivial test
 
@@ -79,7 +99,7 @@ void test_distance_point()
 template <typename P>
 void test_distance_segment()
 {
-    typedef typename bg::distance_result<P>::type return_type;
+    typedef typename bg::default_distance_result<P>::type return_type;
     typedef typename bg::coordinate_type<P>::type coordinate_type;
 
     P s1; bg::set<0>(s1, 1); bg::set<1>(s1, 1);
@@ -134,7 +154,7 @@ void test_distance_segment()
 template <typename P>
 void test_distance_array_as_linestring()
 {
-    typedef typename bg::distance_result<P>::type return_type;
+    typedef typename bg::default_distance_result<P>::type return_type;
 
     // Normal array does not have
     boost::array<P, 2> points;

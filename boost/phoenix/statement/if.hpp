@@ -14,6 +14,7 @@
 #include <boost/phoenix/core/call.hpp>
 #include <boost/phoenix/core/expression.hpp>
 #include <boost/phoenix/core/meta_grammar.hpp>
+#include <boost/phoenix/core/is_actor.hpp>
 
 #ifdef BOOST_MSVC
 #pragma warning(push)
@@ -53,26 +54,27 @@ namespace boost { namespace phoenix
     {
         typedef void result_type;
         
-        template<typename Context, typename Cond, typename Then>
+        template<typename Cond, typename Then, typename Context>
         result_type
-        operator()(Context const & ctx, Cond const & cond, Then const & then) const
+        operator()(Cond const & cond, Then const & then, Context & ctx) const
         {
-            if( eval( cond, ctx ) )
-                eval( then, ctx );
+            if(boost::phoenix::eval(cond, ctx))
+                boost::phoenix::eval(then, ctx);
         }
         
-        template<typename Context, typename Cond, typename Then, typename Else>
+        template<typename Cond, typename Then, typename Else, typename Context>
         result_type
         operator()(
-              Context const & ctx
-            , Cond const & cond
+              Cond const & cond
             , Then const & then
-            , Else const & else_) const
+            , Else const & else_
+            , Context const & ctx
+        ) const
         {
-            if( eval( cond, ctx ) )
-                eval( then, ctx );
+            if(boost::phoenix::eval(cond, ctx))
+                boost::phoenix::eval(then, ctx);
             else
-                eval( else_, ctx );
+                boost::phoenix::eval(else_, ctx);
         }
     };
     
@@ -92,8 +94,8 @@ namespace boost { namespace phoenix
     struct else_gen
     {
         else_gen(Cond const & cond, Then const & then)
-            : cond( cond )
-            , then( then ) {}
+            : cond(cond)
+            , then(then) {}
 
         template<typename Else>
         typename expression::if_else_statement<Cond, Then, Else>::type const
@@ -102,19 +104,19 @@ namespace boost { namespace phoenix
             return expression::if_else_statement<Cond, Then, Else>::make(cond, then, else_);
         }
 
-        Cond const & cond;
-        Then const & then;
+        Cond cond;
+        Then then;
     };
 
     // We subclass actor so we can provide the member else_ (which is an
     // else_gen responsible for the .else_[ expr ] branch).
     template<typename Expr>
-    struct if_actor : actor< Expr >
+    struct if_actor : actor<Expr>
     {
-        typedef actor< Expr > base_type;
+        typedef actor<Expr> base_type;
 
         if_actor(base_type const & base)
-            : base_type( base )
+            : base_type(base)
             , else_(proto::child_c<0>(*this), proto::child_c<1>(*this))
         {}
 
@@ -124,12 +126,17 @@ namespace boost { namespace phoenix
         else_gen<cond_type, then_type> else_;
     };
 
+    template <typename Expr>
+    struct is_actor<if_actor<Expr> >
+        : mpl::true_
+    {};
+
     // Generator for if( cond )[ then ] branch.
     template<typename Cond>
     struct if_gen
     {
         if_gen(Cond const & cond)
-            : cond( cond ) {}
+            : cond(cond) {}
 
         template<typename Then>
         typename expression::if_<Cond, Then>::type const
@@ -138,7 +145,7 @@ namespace boost { namespace phoenix
             return expression::if_<Cond, Then>::make(cond, then);
         }
 
-        Cond const & cond;
+        Cond cond;
     };
 
     template<typename Cond>

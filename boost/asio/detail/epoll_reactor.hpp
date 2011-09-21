@@ -73,7 +73,7 @@ public:
 
   // Recreate internal descriptors following a fork.
   BOOST_ASIO_DECL void fork_service(
-      boost::asio::io_service::fork_event event);
+      boost::asio::io_service::fork_event fork_ev);
 
   // Initialise the task.
   BOOST_ASIO_DECL void init_task();
@@ -88,6 +88,11 @@ public:
   BOOST_ASIO_DECL int register_internal_descriptor(
       int op_type, socket_type descriptor,
       per_descriptor_data& descriptor_data, reactor_op* op);
+
+  // Move descriptor registration from one descriptor_data object to another.
+  BOOST_ASIO_DECL void move_descriptor(socket_type descriptor,
+      per_descriptor_data& target_descriptor_data,
+      per_descriptor_data& source_descriptor_data);
 
   // Post a reactor operation for immediate completion.
   void post_immediate_completion(reactor_op* op)

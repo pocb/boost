@@ -1,3 +1,16 @@
+// Boost.Geometry (aka GGL, Generic Geometry Library)
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2011 Bruno Lalande, Paris, France.
+// Copyright (c) 2009-2011 Mateusz Loskot, London, UK.
+
+// Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
+// (geolib/GGL), copyright (c) 1995-2010 Geodan, Amsterdam, the Netherlands.
+
+// Use, modification and distribution is subject to the Boost Software License,
+// Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt)
+
 #ifndef TTMATH_STUB
 #define TTMATH_STUB
 
@@ -139,12 +152,25 @@ namespace detail
 
     template <>
     struct define_pi<ttmath_big>
+            : public define_pi<ttmath::Big<1,4> > 
+    {};
+    
+    template <ttmath::uint Exponent, ttmath::uint Mantissa>
+    struct equals_with_epsilon<ttmath::Big<Exponent, Mantissa>, false>
     {
-        static inline ttmath_big apply()
+        static inline bool apply(ttmath::Big<Exponent, Mantissa> const& a, ttmath::Big<Exponent, Mantissa> const& b)
         {
-            return define_pi<ttmath::Big<1,4> >::apply();
+            // See implementation in util/math.hpp
+            // But here borrow the tolerance for double, to avoid exact comparison
+            ttmath::Big<Exponent, Mantissa> const epsilon = std::numeric_limits<double>::epsilon();
+            return ttmath::Abs(a - b) <= epsilon * ttmath::Abs(a);
         }
     };
+    
+    template <>
+    struct equals_with_epsilon<ttmath_big, false> 
+            : public equals_with_epsilon<ttmath::Big<1, 4>, false> 
+    {};
 
 } // detail
 

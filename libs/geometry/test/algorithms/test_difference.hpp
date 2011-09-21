@@ -1,6 +1,7 @@
-// Boost.Geometry (aka GGL, Generic Geometry Library) test file
-//
-// Copyright Barend Gehrels 2007-2009, Geodan, Amsterdam, the Netherlands
+// Boost.Geometry (aka GGL, Generic Geometry Library) 
+// Unit Test
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -19,11 +20,9 @@
 #include <boost/geometry/algorithms/correct.hpp>
 #include <boost/geometry/algorithms/difference.hpp>
 #include <boost/geometry/algorithms/sym_difference.hpp>
-#include <boost/geometry/multi/algorithms/difference.hpp>
 
 #include <boost/geometry/algorithms/area.hpp>
 #include <boost/geometry/algorithms/num_points.hpp>
-#include <boost/geometry/algorithms/unique.hpp>
 
 #include <boost/geometry/geometries/geometries.hpp>
 
@@ -65,7 +64,7 @@ void test_difference(std::string const& caseid, G1 const& g1, G2 const& g2,
         bg::difference(g1, g2, clip);
     }
 
-    typename bg::area_result<G1>::type area = 0;
+    typename bg::default_area_result<G1>::type area = 0;
     std::size_t n = 0;
     for (typename std::vector<OutputType>::iterator it = clip.begin();
             it != clip.end();
@@ -73,9 +72,6 @@ void test_difference(std::string const& caseid, G1 const& g1, G2 const& g2,
     {
         if (expected_point_count > 0)
         {
-            // Get a correct point-count without duplicate points
-            // (note that overlay might be adapted to avoid duplicates)
-            bg::unique(*it);
             n += bg::num_points(*it);
         }
 
@@ -90,11 +86,11 @@ void test_difference(std::string const& caseid, G1 const& g1, G2 const& g2,
         array_with_one_empty_geometry.push_back(OutputType());
         if (sym)
         {
-            boost::copy(array_with_one_empty_geometry, bg::sym_difference_inserter<OutputType>(g1, g2, std::back_inserter(inserted)));
+            boost::copy(array_with_one_empty_geometry, bg::detail::sym_difference::sym_difference_insert<OutputType>(g1, g2, std::back_inserter(inserted)));
         }
         else
         {
-            boost::copy(array_with_one_empty_geometry, bg::difference_inserter<OutputType>(g1, g2, std::back_inserter(inserted)));
+            boost::copy(array_with_one_empty_geometry, bg::detail::difference::difference_insert<OutputType>(g1, g2, std::back_inserter(inserted)));
         }
 
         BOOST_CHECK_EQUAL(boost::size(clip), boost::size(inserted) - 1);

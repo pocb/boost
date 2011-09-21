@@ -1,6 +1,10 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
-//
-// Copyright Barend Gehrels 2009, Geodan, Amsterdam, the Netherlands.
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+
+// Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
+// (geolib/GGL), copyright (c) 1995-2010 Geodan, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -20,9 +24,6 @@
 #include <boost/geometry/core/ring_type.hpp>
 
 #include <boost/geometry/geometries/concepts/point_concept.hpp>
-
-#include <boost/geometry/algorithms/convert.hpp>
-
 
 
 namespace boost { namespace geometry
@@ -263,7 +264,7 @@ private:
 \brief Object generator to conveniently stream objects without including streamveshape
 \ingroup veshape
 \par Example:
-Small example showing how to use the make_veshape helper function
+Small example showing how to use the veshape helper function
 \dontinclude doxygen_1.cpp
 \skip example_as_veshape_vector
 \line {

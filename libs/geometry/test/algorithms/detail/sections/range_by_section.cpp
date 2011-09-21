@@ -1,6 +1,8 @@
-// Boost.Geometry (aka GGL, Generic Geometry Library) test file
-//
-// Copyright Barend Gehrels 2010, Geodan, Amsterdam, the Netherlands
+// Boost.Geometry (aka GGL, Generic Geometry Library)
+// Unit Test
+
+// Copyright (c) 2010 Barend Gehrels, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -13,8 +15,9 @@
 
 #include <boost/geometry/algorithms/detail/sections/sectionalize.hpp>
 #include <boost/geometry/algorithms/detail/sections/range_by_section.hpp>
-#include <boost/geometry/iterators/range_type.hpp>
+#include <boost/geometry/views/detail/range_type.hpp>
 #include <boost/geometry/geometries/geometries.hpp>
+#include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/geometry/domains/gis/io/wkt/wkt.hpp>
 
 
@@ -33,7 +36,7 @@ void test_sectionalize(std::string const caseid, Geometry const& geometry, std::
 
     typedef typename bg::closeable_view
         <
-            typename bg::range_type<Geometry>::type const,
+            typename bg::detail::range_type<Geometry>::type const,
             bg::closure<Geometry>::value
         >::type cview_type;
     typedef typename bg::reversible_view

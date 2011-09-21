@@ -1,7 +1,9 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
-//
-// Copyright Barend Gehrels 2007-2009, Geodan, Amsterdam, the Netherlands
-// Copyright Bruno Lalande 2008, 2009
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2011 Bruno Lalande, Paris, France.
+// Copyright (c) 2009-2011 Mateusz Loskot, London, UK.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -15,10 +17,18 @@
 #include <vector>
 
 #include <boost/geometry/geometry.hpp>
-// Optional includes to handle c-arrays as points, std::vectors as linestrings
-#include <boost/geometry/geometries/adapted/c_array_cartesian.hpp>
-#include <boost/geometry/geometries/adapted/std_as_linestring.hpp>
+#include <boost/geometry/geometries/linestring.hpp>
+#include <boost/geometry/geometries/point_xy.hpp>
+#include <boost/geometry/geometries/polygon.hpp>
 
+// Optional includes and defines to handle c-arrays as points, std::vectors as linestrings
+#include <boost/geometry/geometries/register/linestring.hpp>
+#include <boost/geometry/geometries/adapted/c_array.hpp>
+
+BOOST_GEOMETRY_REGISTER_C_ARRAY_CS(cs::cartesian)
+
+BOOST_GEOMETRY_REGISTER_LINESTRING_TEMPLATED(std::vector)
+BOOST_GEOMETRY_REGISTER_LINESTRING_TEMPLATED(std::deque)
 
 
 template<typename P>
@@ -77,9 +87,9 @@ int main(void)
     // points can be created using "make" and added to a linestring using the std:: "push_back"
     ls.push_back(make<point_2d>(1.1, 1.1));
 
-    // points can also be assigned using "assign" and added to a linestring using "append"
+    // points can also be assigned using "assign_values" and added to a linestring using "append"
     point_2d lp;
-    assign(lp, 2.5, 2.1);
+    assign_values(lp, 2.5, 2.1);
     append(ls, lp);
 
     // Lines can be streamed using DSV (delimiter separated values)
@@ -127,11 +137,6 @@ int main(void)
         std::cout
             << "as vector: "
             << dsv(v)
-            << std::endl;
-
-        std::cout
-            << "as it-pair: "
-            << dsv(std::make_pair(v.begin(), v.end()))
             << std::endl;
     }
 

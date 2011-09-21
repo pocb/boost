@@ -603,6 +603,24 @@
         </test>
     </library>
 
+    <!-- container-->
+    <library name="container">
+        <mark-unusable>
+            <toolset name="borland-5.*"/>
+            <toolset name="msvc-6.5*"/>
+            <toolset name="cw-9.*"/>
+            <toolset name="gcc-2.95*"/>
+            <toolset name="gcc-3.0*"/>
+            <toolset name="gcc-3.1*"/>
+            <toolset name="gcc-3.2*"/>
+            <toolset name="gcc-3.3*"/>
+            <toolset name="mipspro"/>
+            <toolset name="intel-linux-8.*"/>
+            <note author="Ion Gazta&#241;aga">
+                The compiler does not support features that are essential for the library.
+            </note>
+        </mark-unusable>
+    </library>
 
     <!-- conversion -->
     <library name="conversion">
@@ -627,28 +645,33 @@
                 <toolset name="borland-5.6*"/>
                 <toolset name="borland-5.8*"/>
                 <toolset name="borland-5.9*"/>
-                <toolset name="gcc-3.4*"/>
+                <toolset name="intel-darwin-11.*"/>
+                <toolset name="gcc-3.4.0*"/>
                 <toolset name="gcc-4.1*"/>
-                <toolset name="gcc-4.2*"/>
+                <toolset name="gcc-4.2.0*"/>
                 <toolset name="gcc-mingw-3.4*"/>
+                <toolset name="gcc-mingw-4.*"/>
                 <toolset name="sun-5.7*"/>
                 <toolset name="sun-5.8*"/>
                 <toolset name="sun-5.9*"/>
+                <toolset name="sun-5.10*"/>
                 <toolset name="msvc-8.0*"/>
                 <toolset name="msvc-9.0*"/>
+                <toolset name="msvc-10.0*"/>
                 <toolset name="msvc-7.1*"/>
+                <toolset name="vacpp-10.1"/>
                 <toolset name="acc"/>
                 <note author="Alexander Nasonov">
                     Conversion double-string-double may give a different value (or even throw) on many compilers
                 </note>
             </mark-failure>
         </test>
-        <test name="lexical_cast_vc8_bug_test">
+        <test name="lexical_cast_float_types_test">
             <mark-failure>
-                <toolset name="msvc-8.0*"/>
-                <note author="Alexander Nasonov">
-		    I don't have an access to Windows and VC++ to
-		    investigate this issue.
+                <toolset name="gcc-mingw-4.*"/>
+                <toolset name="vacpp-10.1"/>
+                <note author="Antony Polukhin">
+                    Some compilers and STL realizations convert double and long double types with bigger precision loss than minimal. Such failures are not a lexical_cast, but a compiler fault. 
                 </note>
             </mark-failure>
         </test>
@@ -1341,6 +1364,45 @@
 
     </library>
 
+    <!-- detail -->
+    <library name="detail">
+        <mark-expected-failures>
+            <test name="correctly_disable"/>
+            <test name="correctly_disable_debug"/>
+            <toolset name="pathscale-4.*"/>
+            <toolset name="sun-5.10"/>
+            <toolset name="pgi-*"/>
+            <toolset name="msvc-9.0~stlport*"/>
+            <toolset name="msvc-9.0~wm5~stlport*"/>
+            <note author="Daniel James">
+            This indicates that forward declarations could probably be used
+            for these compilers but currently aren't. All these compilers use
+            STLport, which is compatible with forward declarations in some
+            circumstances, but not in others. I haven't looked into how to
+            determine this, so I've just set container_fwd to never forward
+            declare for STLport.
+            </note>
+        </mark-expected-failures>
+
+        <mark-expected-failures>
+            <test name="container_fwd"/>
+            <test name="container_fwd_debug"/>
+            <test name="container_no_fwd_test"/>
+            <toolset name="msvc-9.0~wm5~stlport5.2"/>
+            <note author="Daniel James">
+            Failing because these tests are run with warnings as errors,
+            and the standard library is causing warnings.
+            </note>
+        </mark-expected-failures>
+
+        <mark-expected-failures>
+            <test name="container_fwd_debug"/>
+            <toolset name="sun-5.10"/>
+            <note author="Daniel James">
+            STLport debug mode seems to be broken here.
+            </note>
+        </mark-expected-failures>
+    </library>
 
     <!-- dynamic_bitset -->
     <library name="dynamic_bitset">
@@ -1504,7 +1566,6 @@
             <toolset name="acc*"/>
             <toolset name="msvc-8.0~wm5*"/>
             <toolset name="vacpp*"/>
-            <toolset name="pathscale*"/>
             <toolset name="intel-linux-8.*"/>
             <toolset name="gcc-3.4.6_linux_ia64"/>
             <note author="J. L&#195;&#179;pez" date="03 Dec 2008">
@@ -1854,13 +1915,31 @@
             <toolset name="borland-cb2009"/>
             <toolset name="borland-cb2010"/>
             <toolset name="sun-5.10"/>
-            <toolset name="pathscale-3.2"/>
-            <toolset name="pgi-10.1"/>
             <toolset name="vacpp"/>
             <toolset name="vacpp-10.1"/>
             <toolset name="msvc-7.1"/>
             <note author="Barend Gehrels">
                 These compilers do not support features that are essential for the library.
+            </note>
+        </mark-unusable>
+        <mark-unusable>
+            <toolset name="intel-darwin-10*"/>
+            <toolset name="intel-darwin-11*"/>
+            <toolset name="intel-darwin-12*"/>
+            <note author="Barend Gehrels">
+                Intel 11.1 and 12.0 on Darwin raises a SIGSEGV in almost all unit tests.
+            </note>
+        </mark-unusable>
+        <mark-unusable>
+            <toolset name="pgi-11*"/>
+            <note author="Barend Gehrels">
+                pgi 11.1 does not support BOOST_AUTO and is not configured for UBLAS
+            </note>
+        </mark-unusable>
+        <mark-unusable>
+            <toolset name="msvc-9.0~wm5~stlport5.2"/>
+            <note author="Barend Gehrels">
+                This configuration is not well configured for UBLAS
             </note>
         </mark-unusable>
     </library>
@@ -1908,55 +1987,11 @@
 			</note>
 		</mark-unusable>
 		<mark-expected-failures>
-			<test name="fastest_icl_map"/>
-			<test name="fastest_interval_map"/>
-			<test name="fastest_interval_map_infix"/>
-			<test name="fastest_interval_set"/>
-			<test name="fastest_interval_set_infix"/>
-			<test name="fastest_partial_icl_quantifier"/>
-			<test name="fastest_partial_interval_quantifier"/>
-			<test name="fastest_separate_interval_set"/>
-			<test name="fastest_separate_interval_set_infix"/>
-			<test name="fastest_set_icl_set"/>
-			<test name="fastest_set_interval_set"/>
-			<test name="fastest_split_interval_map"/>
-			<test name="fastest_split_interval_map_infix"/>
-			<test name="fastest_split_interval_set"/>
-			<test name="fastest_split_interval_set_infix"/>
-			<test name="fastest_total_icl_quantifier"/>
-			<test name="fastest_total_interval_quantifier"/>
-			<test name="fix_icl_after_thread"/>
-			<toolset name="clang-darwin-2.0"/>
-			<toolset name="clang-darwin-4.2.1"/>
-			<toolset name="clang-darwin-normal"/>
-			<toolset name="clang-darwin-*"/>
-			<toolset name="clang-linux-2.8"/>
-			<toolset name="clang-linux-4.2.1"/>
-			<note author="Joachim Faulhaber">
-				The clang compiler seems to have problems with passing template template parameters	in 
-				some combinations with test function templates. This is done in the tests in order to be
-				able to vary more than one template parameter in the tests. Because this is a feature
-				of the tests, failure does not necessarily mean, that icl can not be used with clang. 
-				The tests most likely fail for a property that relates to the test environment rather
-				than to library code itself.
-			</note>
-		</mark-expected-failures>
-		<mark-expected-failures>
-			<test name="cmp_clang_ttp_passing"/>
-			<test name="cmp_clang_ttp_passing2"/>
-			<toolset name="clang-darwin-*"/>
-			<toolset name="clang-linux-4.2.1"/>
-			<note author="Joachim Faulhaber">
-				Compiler error expected for clang: Minimal examples for passing combinations 
-				of template template parameters that derail clang.
-			</note>
-		</mark-expected-failures>
-		<mark-expected-failures>
 			<test name="cmp_msvc_value_born_error"/>
 			<toolset name="msvc-7.1"/>
 			<toolset name="msvc-8.0"/>
 			<toolset name="msvc-9.0*"/>
-			<toolset name="msvc-10.0"/>
+			<toolset name="msvc-10.0*"/>
 			<note author="Joachim Faulhaber">
 				Compiler error expected for msvc: A minimal example of a class template 'value' that
 				results in syntax error in a subsequent meta function.
@@ -1983,7 +2018,7 @@
 		</mark-expected-failures>
 	</library>
 
-	<!-- interprocess-->
+    <!-- interprocess-->
     <library name="interprocess">
         <mark-unusable>
             <toolset name="borland-5.*"/>
@@ -2020,7 +2055,6 @@
             <toolset name="gcc-3.2*"/>
             <toolset name="gcc-3.3*"/>
             <toolset name="mipspro"/>
-            <toolset name="pathscale*"/>
             <toolset name="intel-linux-8.*"/>
             <note author="Ion Gazta&#241;aga">
                 The compiler does not support features that are essential for the library.
@@ -2294,6 +2328,18 @@
               ptrdiff_t, which is an alias for a 32-bit type
             </note>
         </mark-expected-failures>
+        <mark-expected-failures>
+            <test name="path_test_filesystem2"/>
+            <toolset name="msvc-7.1"/>
+            <note author="Daniel James" date="07 Jun 2011">
+              Visual C++ 7.1's SFINAE implementation can't deal with multiple
+              assignment functions with the same parameters (but disabled with
+              SFINAE). So path's assignment from boost::filesystem2::path is
+              disabled. Would be pretty easy to workaround, but probably not
+              worth it since this is pretty obscure, and filesystem2 will be
+              removed soon.
+            </note>
+        </mark-expected-failures>
     </library>
 
     <!-- lambda -->
@@ -2339,6 +2385,24 @@
       </test>
     </library>
 
+    <!-- move-->
+    <library name="move">
+        <mark-unusable>
+            <toolset name="borland-5.*"/>
+            <toolset name="msvc-6.5*"/>
+            <toolset name="cw-9.*"/>
+            <toolset name="gcc-2.95*"/>
+            <toolset name="gcc-3.0*"/>
+            <toolset name="gcc-3.1*"/>
+            <toolset name="gcc-3.2*"/>
+            <toolset name="gcc-3.3*"/>
+            <toolset name="mipspro"/>
+            <toolset name="intel-linux-8.*"/>
+            <note author="Ion Gazta&#241;aga">
+                The compiler does not support features that are essential for the library.
+            </note>
+        </mark-unusable>
+    </library>
 
     <!-- MPL -->
     <library name="mpl">
@@ -2692,6 +2756,30 @@ for more information.
             <note author="Fernando Cacciola" refid="optional-compiler-bug"/>
         </mark-expected-failures>
     </library>
+    
+    <!-- phoenix -->
+    <library name="phoenix">
+      <mark-unusable>
+        <toolset name="sun-5.7"/>
+        <toolset name="sun-5.8"/>
+        <toolset name="sun-5.9"/>
+        <toolset name="sun-5.10"/>
+        <toolset name="borland-*"/>
+        <toolset name="vacpp*"/>
+        <note author="Thomas Heller" id="phoenix-incompatible-compilers">
+            These compilers don't work with phoenix.
+            This is due to the fact that phoenix uses proto
+        </note>
+        </mark-unusable>
+        <mark-expected-failures>
+            <test name="member"/>
+            <toolset name="msvc*"/>
+            <note author="Thomas Heller" id="phoenix-operator-member-bug">
+                MSVC seems to have a code generation bug showing up when using operator->* with a member variable
+            </note>
+        </mark-expected-failures>
+    </library>
+
 
     <library name="pool">
       <mark-unusable>
@@ -2718,6 +2806,7 @@ for more information.
         <toolset name="sun-5.10"/>
         <toolset name="borland-*"/>
         <toolset name="vacpp"/>
+        <toolset name="vacpp-*"/>
       </mark-unusable>
     </library>
 
@@ -2970,8 +3059,12 @@ for more information.
     <!-- spirit (v2) -->
     <library name="spirit">
       <mark-unusable>
-        <toolset name="borland-cb2009"/>
-        <toolset name="borland-cb2010"/>
+	<toolset name="sun-5.7"/>
+	<toolset name="sun-5.8"/>
+        <toolset name="sun-5.9"/>
+        <toolset name="sun-5.10"/>
+	<toolset name="vacpp*"/>
+	<toolset name="borland-*"/>
       </mark-unusable>
     </library>
 
@@ -5120,6 +5213,21 @@ These tests will fail in most compilers that don't support rvalue references.
     <!-- type_traits -->
     <library name="type_traits">
        <mark-expected-failures>
+          <test name="is_virtual_base_of_test"/>
+          <toolset name="gcc-3.4.6"/>
+          <note author="John Maddock">
+             Type Traits tests are run with warnings-as-errors and GCC 3.x emits warnings with this test
+             that I haven't been able to suppress.
+          </note>
+       </mark-expected-failures>
+       <mark-expected-failures>
+          <test name="tricky_rvalue_test"/>
+          <toolset name="msvc-10.0"/>
+          <note author="John Maddock">
+             RValue reference suppprt in VC10 is unable to handle these tests fully.
+          </note>
+       </mark-expected-failures>
+       <mark-expected-failures>
           <test name="has_operator_new_test"/>
           <test name="make_signed_test"/>
           <test name="make_unsigned_test"/>
@@ -5192,6 +5300,7 @@ These tests will fail in most compilers that don't support rvalue references.
             <toolset name="msvc-7.1*"/>
             <toolset name="msvc-8.0*"/>
             <toolset name="msvc-9.0*"/>
+            <toolset name="msvc-10.0*"/>
             <note author="Alexander Nasonov">
                 See bug 99776 'enum UIntEnum { value = UINT_MAX } is promoted to int'
                 http://lab.msdn.microsoft.com/ProductFeedback/viewfeedback.aspx?feedbackid=22b0a6b7-120f-4ca0-9136-fa1b25b26efe
@@ -5952,13 +6061,21 @@ These tests will fail in most compilers that don't support rvalue references.
       </mark-expected-failures>
 
       <mark-expected-failures>
-        <test name="compile_map"/>
-        <test name="compile_set"/>
-        <toolset name="gcc-open64"/>
-        <toolset name="pathscale-3.*"/>
+        <test name="minimal_allocator"/>
+        <toolset name="gcc-3.*"/>
+        <toolset name="gcc-4.0*"/>
+        <toolset name="gcc-4.1*"/>
+        <toolset name="gcc-4.2*"/>
+        <toolset name="gcc-4.3*"/>
+        <toolset name="msvc-7.*"/>
+        <toolset name="msvc-8.*"/>
+        <toolset name="sun-*"/>
+        <toolset name="pgi-*"/>
+        <toolset name="pathscale-*"/>
+        <toolset name="intel-*"/>
+        <toolset name="vacpp*"/>
         <note author="Daniel James">
-            Failing on compilers that don't have good support
-            concept check support.
+            This requires SFINAE expressions.
         </note>
       </mark-expected-failures>
     </library>
@@ -6309,6 +6426,45 @@ These tests will fail in most compilers that don't support rvalue references.
         </mark-expected-failures>
 
     </library>
+
+    <library name="locale">
+        <mark-unusable>
+            <toolset name="sun*" />
+            <note author="Artyom Beilis">
+                This library is unusable due to bug #5373 in Boost.Thread
+                on this compiler.
+            </note>
+        </mark-unusable>
+
+        <mark-unusable>
+            <toolset name="msvc-9.0~wm5~stlport5.2" />
+            <note author="Artyom Beilis">
+                Windows Mobile lacks essential features of the standard C
+                library like gmtime, mktime, localtime making it impossible
+                to use Boost.Locale on this platform.
+            </note>
+        </mark-unusable>
+
+        <mark-expected-failures>
+            <test name="test_date_time" />
+            <toolset name="gcc-mingw-4.4.0"/>
+            <note author="Artyom Beilis">
+                Compiler does not support shared runtime linking
+                thus is makes it problematic to use Boost.Locale as dll
+            </note>
+        </mark-expected-failures>
+
+        <mark-expected-failures>
+            <test name="test_codepage"/>
+            <toolset name="pathscale-4*"/>
+            <note author="Artyom Beilis">
+                Problems with wide file stream I/O. 
+                Currently unresolved due to lack of access to the 
+                compiler.
+            </note>
+        </mark-expected-failures>
+    </library>
+
 
     <!-- /////////////// Standard note definitions /////////////// -->
 

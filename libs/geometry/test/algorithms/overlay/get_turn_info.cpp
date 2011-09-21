@@ -1,6 +1,8 @@
-// Boost.Geometry (aka GGL, Generic Geometry Library) test file
-//
-// Copyright Barend Gehrels 2007-2009, Geodan, Amsterdam, the Netherlands
+// Boost.Geometry (aka GGL, Generic Geometry Library)
+// Unit Test
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -814,9 +816,8 @@ void test_all()
 
 
 /***
-#include <boost/geometry/geometries/adapted/c_array_as_linestring.hpp>
-#include <boost/geometry/geometries/adapted/c_array_as_ring.hpp>
-#include <boost/geometry/geometries/adapted/c_array_cartesian.hpp>
+#include <boost/geometry/geometries/adapted/c_array.hpp>
+BOOST_GEOMETRY_REGISTER_C_ARRAY_CS(cs::cartesian)
 
 template <typename G>
 void test2(G const& geometry)

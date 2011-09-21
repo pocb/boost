@@ -1,7 +1,10 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
-//
-// Copyright Barend Gehrels 2007-2009, Geodan, Amsterdam, the Netherlands.
-// Copyright Bruno Lalande 2008, 2009
+
+// Copyright (c) 2009-2011 Barend Gehrels, Amsterdam, the Netherlands.
+
+// Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
+// (geolib/GGL), copyright (c) 1995-2010 Geodan, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -134,11 +137,11 @@ struct svg_poly
         {
             typename interior_return_type<Polygon const>::type rings
                         = interior_rings(polygon);
-            for (BOOST_AUTO(rit, boost::begin(rings));
+            for (BOOST_AUTO_TPL(rit, boost::begin(rings));
                 rit != boost::end(rings); ++rit)
             {
                 first = true;
-                for (BOOST_AUTO(it, boost::begin(*rit)); it != boost::end(*rit);
+                for (BOOST_AUTO_TPL(it, boost::begin(*rit)); it != boost::end(*rit);
                     ++it, first = false)
                 {
                     os << (first ? "M" : " L") << " "

@@ -1,6 +1,6 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
 //
-// Copyright Barend Gehrels 2010, Geodan, Amsterdam, the Netherlands
+// Copyright (c) 2010-2011 Barend Gehrels, Amsterdam, the Netherlands.
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -108,12 +108,13 @@ static void parse_parameter(rapidxml::xml_node<>* node, parameter& p)
     // #define: <param><defname>Point</defname></param>
     // template: <param><type>typename</type><declname>CoordinateType</declname><defname>CoordinateType</defname></param>
     // template with default: <param><type>typename</type><declname>CoordinateSystem</declname><defname>CoordinateSystem</defname><defval><ref ....>cs::cartesian</ref></defval></param>
+    // with enum: <type><ref refid="group__enum_1ga7d33eca9a5389952bdf719972eb802b6" kindref="member">closure_selector</ref></type>
     if (node != NULL)
     {
         std::string name = node->name();
         if (name == "type")
         {
-            p.fulltype = node->value();
+            get_contents(node->first_node(), p.fulltype);
             p.type = p.fulltype;
             boost::replace_all(p.type, " const", "");
             boost::trim(p.type);
@@ -430,9 +431,16 @@ static void parse(rapidxml::xml_node<>* node, configuration const& config, docum
             {
                 recurse = true;
             }
-            if (kind == "struct" || kind == "class")
+            else if (kind == "struct")
             {
                 recurse = true;
+                doc.cos.is_class = false;
+                parse_element(node->first_node(), config, "", doc.cos);
+            }
+            else if (kind == "class")
+            {
+                recurse = true;
+                doc.cos.is_class = true;
                 parse_element(node->first_node(), config, "", doc.cos);
             }
         }

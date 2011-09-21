@@ -17,40 +17,55 @@
 #include <boost/fusion/sequence/intrinsic/value_at.hpp>
 #include <boost/fusion/sequence/intrinsic/at.hpp>
 #include <boost/fusion/support/category_of.hpp>
+#include <boost/fusion/include/pop_front.hpp>
 #include <boost/utility/result_of.hpp>
 
 namespace boost { namespace phoenix
 {
-    template<typename Env, typename OuterEnv, typename Locals>
+    template<typename Env, typename OuterEnv, typename Locals, typename Map>
     struct scoped_environment
         : fusion::sequence_facade<
-            scoped_environment<Env, OuterEnv, Locals>
+            scoped_environment<Env, OuterEnv, Locals, Map>
           , fusion::random_access_traversal_tag
         >
     {
         typedef Env env_type;
         typedef OuterEnv outer_env_type;
         typedef Locals locals_type;
+        typedef Map map_type;
 
         scoped_environment(
-            Env env
-          , OuterEnv outer_env
-          , Locals locals
+            Env const & env
+          , OuterEnv const &outer_env
+          , Locals const &locals
         )
             : env(env)
             , outer_env(outer_env)
             , locals(locals)
         {}
 
-        scoped_environment(scoped_environment const& o)
-            : env(o.env)
+		  scoped_environment(scoped_environment const & o)
+		      : env(o.env)
             , outer_env(o.outer_env)
-            , locals(o.locals)
-        {}
+			   , locals(o.locals)
+		 {};
 
-        Env      env;
-        OuterEnv outer_env;
-        Locals   locals;
+        Env      const & env;
+        OuterEnv const & outer_env;
+        Locals   const & locals;
+
+        typedef typename
+            fusion::result_of::pop_front<
+                typename add_const<
+                    typename proto::detail::uncvref<Env>::type
+                >::type
+            >::type
+            args_type;
+
+        args_type args() const
+        {
+            return fusion::pop_front(env);
+        }
     
         #define BOOST_PHOENIX_ADAPT_SCOPED_ENVIRONMENT(INTRINSIC)               \
         template <typename Seq>                                                 \
@@ -58,7 +73,21 @@ namespace boost { namespace phoenix
         {                                                                       \
             typedef                                                             \
                 typename fusion::result_of::INTRINSIC<                          \
-                    typename Seq::env_type                                      \
+                    typename mpl::eval_if_c<                                    \
+                        is_const<                                               \
+                            typename remove_reference<                          \
+                                typename Seq::env_type                          \
+                            >::type                                             \
+                        >::value                                                \
+                      , add_const<                                              \
+                            typename proto::detail::uncvref<                    \
+                                typename Seq::env_type                          \
+                            >::type                                             \
+                        >                                                       \
+                      , proto::detail::uncvref<                                 \
+                            typename Seq::env_type                              \
+                        >                                                       \
+                    >::type                                                     \
                 >::type                                                         \
                 type;                                                           \
                                                                                 \
@@ -78,7 +107,21 @@ namespace boost { namespace phoenix
         {
             typedef
                 typename fusion::result_of::value_at<
-                    typename proto::detail::uncvref<typename Seq::env_type>::type
+                    typename mpl::eval_if_c<
+                        is_const<
+                            typename remove_reference<
+                                typename Seq::env_type
+                            >::type
+                        >::value
+                      , add_const<
+                            typename proto::detail::uncvref<
+                                typename Seq::env_type
+                            >::type
+                        >
+                      , proto::detail::uncvref<
+                            typename Seq::env_type
+                        >
+                    >::type
                   , N
                 >::type
                 type;
@@ -89,7 +132,21 @@ namespace boost { namespace phoenix
         {
             typedef
                 typename fusion::result_of::at<
-                    typename proto::detail::uncvref<typename Seq::env_type>::type
+                    typename mpl::eval_if_c<
+                        is_const<
+                            typename remove_reference<
+                                typename Seq::env_type
+                            >::type
+                        >::value
+                      , add_const<
+                            typename proto::detail::uncvref<
+                                typename Seq::env_type
+                            >::type
+                        >
+                      , proto::detail::uncvref<
+                            typename Seq::env_type
+                        >
+                    >::type
                   , N
                 >::type
                 type;
@@ -107,13 +164,13 @@ namespace boost { namespace phoenix
     template <typename Env>
     struct is_scoped_environment<Env&> : is_scoped_environment<Env> {};
     
-    template <typename Env, typename OuterEnv, typename Locals>
-    struct is_scoped_environment<scoped_environment<Env, OuterEnv, Locals> >
+    template <typename Env, typename OuterEnv, typename Locals, typename Map>
+    struct is_scoped_environment<scoped_environment<Env, OuterEnv, Locals, Map> >
         : mpl::true_
     {};
 
-    template <typename Env, typename OuterEnv, typename Locals>
-    struct is_scoped_environment<scoped_environment<Env, OuterEnv, Locals> const>
+    template <typename Env, typename OuterEnv, typename Locals, typename Map>
+    struct is_scoped_environment<scoped_environment<Env, OuterEnv, Locals, Map> const>
         : mpl::true_
     {};
 }}

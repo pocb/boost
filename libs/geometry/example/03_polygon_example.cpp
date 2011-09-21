@@ -1,7 +1,9 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
-//
-// Copyright Barend Gehrels 2007-2009, Geodan, Amsterdam, the Netherlands
-// Copyright Bruno Lalande 2008, 2009
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2011 Bruno Lalande, Paris, France.
+// Copyright (c) 2009-2011 Mateusz Loskot, London, UK.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -13,9 +15,13 @@
 #include <string>
 
 #include <boost/geometry/geometry.hpp>
-#include <boost/geometry/geometries/adapted/c_array_cartesian.hpp>
-#include <boost/geometry/geometries/adapted/std_as_linestring.hpp>
-#include <boost/geometry/multi/multi.hpp>
+#include <boost/geometry/geometries/point_xy.hpp>
+#include <boost/geometry/geometries/polygon.hpp>
+#include <boost/geometry/geometries/adapted/c_array.hpp>
+#include <boost/geometry/multi/geometries/multi_polygon.hpp>
+
+BOOST_GEOMETRY_REGISTER_C_ARRAY_CS(cs::cartesian)
+
 
 std::string boolstr(bool v)
 {
@@ -39,7 +45,7 @@ int main(void)
             {3.4, 2.0}, {4.1, 3.0}, {5.3, 2.6}, {5.4, 1.2}, {4.9, 0.8}, {2.9, 0.7},
             {2.0, 1.3} // closing point is opening point
             };
-        assign(poly, coor);
+        assign_points(poly, coor);
     }
 
     // Polygons should be closed, and directed clockwise. If you're not sure if that is the case,
@@ -75,7 +81,7 @@ int main(void)
         model::ring<point_2d>& inner = poly.inners().back();
 
         const double coor[][2] = { {4.0, 2.0}, {4.2, 1.4}, {4.8, 1.9}, {4.4, 2.2}, {4.0, 2.0} };
-        assign(inner, coor);
+        assign_points(inner, coor);
     }
 
     correct(poly);

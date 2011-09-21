@@ -1,6 +1,7 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
-//
-// Copyright Barend Gehrels 2010, Geodan, Amsterdam, the Netherlands.
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -19,8 +20,8 @@
 #include <boost/geometry/core/ring_type.hpp>
 #include <boost/geometry/algorithms/num_interior_rings.hpp>
 #include <boost/geometry/algorithms/num_points.hpp>
-#include <boost/geometry/ranges/box_range.hpp>
-#include <boost/geometry/ranges/segment_range.hpp>
+#include <boost/geometry/views/box_view.hpp>
+#include <boost/geometry/views/segment_view.hpp>
 
 
 // Should be somewhere in your include path
@@ -103,7 +104,7 @@ struct shape_create_polygon
 
         typename interior_return_type<Polygon const>::type rings
                     = interior_rings(polygon);
-        for (BOOST_AUTO(it, boost::begin(rings)); it != boost::end(rings); ++it)
+        for (BOOST_AUTO_TPL(it, boost::begin(rings)); it != boost::end(rings); ++it)
         {
             parts[ring++] = offset;
             offset = range_to_part(*it, xp, yp, offset);
@@ -188,7 +189,7 @@ struct shp_create_object<box_tag, Box>
     : detail::shp_create_object::shape_create_adapted_range
         <
             Box,
-            box_range<Box>,
+            box_view<Box>,
             SHPT_POLYGON
         >
 {};
@@ -198,7 +199,7 @@ struct shp_create_object<segment_tag, Segment>
     : detail::shp_create_object::shape_create_adapted_range
         <
             Segment,
-            segment_range<Segment>,
+            segment_view<Segment>,
             SHPT_ARC
         >
 {};

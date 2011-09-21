@@ -1,7 +1,9 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
-//
-// Copyright Barend Gehrels 2007-2009, Geodan, Amsterdam, the Netherlands
-// Copyright Bruno Lalande 2008, 2009
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2011 Bruno Lalande, Paris, France.
+// Copyright (c) 2009-2011 Mateusz Loskot, London, UK.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -11,10 +13,15 @@
 #include <iostream>
 
 #include <boost/geometry/geometry.hpp>
-#include <boost/geometry/geometries/adapted/tuple_cartesian.hpp>
-#include <boost/geometry/geometries/adapted/c_array_cartesian.hpp>
-#include <boost/geometry/geometries/adapted/boost_array_cartesian.hpp>
+#include <boost/geometry/geometries/point_xy.hpp>
+#include <boost/geometry/geometries/adapted/boost_tuple.hpp>
+#include <boost/geometry/geometries/adapted/c_array.hpp>
+#include <boost/geometry/geometries/adapted/boost_array.hpp>
 #include <boost/geometry/geometries/adapted/boost_polygon/point.hpp>
+
+BOOST_GEOMETRY_REGISTER_C_ARRAY_CS(cs::cartesian)
+BOOST_GEOMETRY_REGISTER_BOOST_ARRAY_CS(cs::cartesian)
+BOOST_GEOMETRY_REGISTER_BOOST_TUPLE_CS(cs::cartesian)
 
 
 int main()
@@ -51,13 +58,13 @@ int main()
 
     // All these types are handled the same way. We show here
     // assigning them and calculating distances.
-    assign(pt1, 1, 1);
-    assign(pt2, 2, 2);
-    assign(pt3, 3, 3);
-    assign(pt4, 4, 4);
-    assign(pt5, 5, 5);
-    assign(pt6, 6, 6);
-    assign(pt7, 7, 7);
+    assign_values(pt1, 1, 1);
+    assign_values(pt2, 2, 2);
+    assign_values(pt3, 3, 3);
+    assign_values(pt4, 4, 4);
+    assign_values(pt5, 5, 5);
+    assign_values(pt6, 6, 6);
+    assign_values(pt7, 7, 7);
 
 
     double d1 = distance(pt1, pt2);
@@ -74,13 +81,13 @@ int main()
     // 1: default, empty constructor, causing no initialization at all
     model::d2::point_xy<double> p1;
 
-    // 2: as shown above, assign
+    // 2: as shown above, assign_values
     model::d2::point_xy<double> p2;
-    assign(p2, 1, 1);
+    assign_values(p2, 1, 1);
 
     // 3: using "set" function
     //    set uses the concepts behind, such that it can be applied for
-    //    every point-type (like assign)
+    //    every point-type (like assign_values)
     model::d2::point_xy<double> p3;
     set<0>(p3, 1);
     set<1>(p3, 1);
@@ -116,8 +123,8 @@ int main()
 
     // There are 3-dimensional points too
     model::point<double, 3, cs::cartesian> d3a, d3b;
-    assign(d3a, 1, 2, 3);
-    assign(d3b, 4, 5, 6);
+    assign_values(d3a, 1, 2, 3);
+    assign_values(d3b, 4, 5, 6);
     d3 = distance(d3a, d3b);
 
 

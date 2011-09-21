@@ -43,7 +43,7 @@
                 >::type::type &                                                 \
             )                                                                   \
             {                                                                   \
-                eval(proto::child_c<1>(BOOST_PP_CAT(a, N)), ctx);               \
+                boost::phoenix::eval(proto::child_c<1>(BOOST_PP_CAT(a, N)), ctx);               \
             }                                                                   \
     /**/
 
@@ -63,7 +63,7 @@
 
 #else
 
-        template <typename Context, typename Try, BOOST_PHOENIX_typename_A>
+        template <typename Try, BOOST_PHOENIX_typename_A, typename Context>
         typename boost::enable_if<
             proto::matches<
                 BOOST_PP_CAT(A, BOOST_PP_DEC(BOOST_PHOENIX_ITERATION))
@@ -71,16 +71,16 @@
             >
           , result_type
         >::type
-        operator()(Context & ctx, Try const & try_, BOOST_PHOENIX_A_const_ref_a) const
+        operator()(Try const & try_, BOOST_PHOENIX_A_const_ref_a, Context & ctx) const
         {
             try
             {
-                eval(proto::child_c<0>(try_), ctx);
+                boost::phoenix::eval(proto::child_c<0>(try_), ctx);
             }
             BOOST_PP_REPEAT(BOOST_PHOENIX_ITERATION, BOOST_PHOENIX_TRY_CATCH_EVAL_R, _)
         }
 
-        template <typename Context, typename Try, BOOST_PHOENIX_typename_A>
+        template <typename Try, BOOST_PHOENIX_typename_A, typename Context>
         typename boost::disable_if<
             proto::matches<
                 BOOST_PP_CAT(A, BOOST_PP_DEC(BOOST_PHOENIX_ITERATION))
@@ -88,11 +88,11 @@
             >
           , result_type
         >::type
-        operator()(Context & ctx, Try const & try_, BOOST_PHOENIX_A_const_ref_a) const
+        operator()(Try const & try_, BOOST_PHOENIX_A_const_ref_a, Context & ctx) const
         {
             try
             {
-                eval(proto::child_c<0>(try_), ctx);
+                boost::phoenix::eval(proto::child_c<0>(try_), ctx);
             }
             BOOST_PP_REPEAT(
                 BOOST_PP_DEC(BOOST_PHOENIX_ITERATION)
@@ -100,7 +100,7 @@
             )
             catch(...)
             {
-                eval(
+                boost::phoenix::eval(
                     proto::child_c<0>(
                         BOOST_PP_CAT(a, BOOST_PP_DEC(BOOST_PHOENIX_ITERATION))
                     )

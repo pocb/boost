@@ -1,6 +1,12 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
-//
-// Copyright Barend Gehrels 2009, Geodan, Amsterdam, the Netherlands.
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2011 Bruno Lalande, Paris, France.
+// Copyright (c) 2009-2011 Mateusz Loskot, London, UK.
+
+// Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
+// (geolib/GGL), copyright (c) 1995-2010 Geodan, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -42,9 +48,9 @@ struct full_section_polygon
 {
     static inline typename ring_return_type<Polygon const>::type apply(Polygon const& polygon, Section const& section)
     {
-        return section.ring_index < 0
+        return section.ring_id.ring_index < 0
             ? geometry::exterior_ring(polygon)
-            : geometry::interior_rings(polygon)[section.ring_index];
+            : geometry::interior_rings(polygon)[section.ring_id.ring_index];
     }
 };
 

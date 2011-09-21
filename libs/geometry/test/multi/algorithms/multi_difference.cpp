@@ -1,6 +1,8 @@
-// Boost.Geometry (aka GGL, Generic Geometry Library) test file
-//
-// Copyright Barend Gehrels 2010, Geodan, Amsterdam, the Netherlands
+// Boost.Geometry (aka GGL, Generic Geometry Library)
+// Unit Test
+
+// Copyright (c) 2010 Barend Gehrels, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -9,16 +11,17 @@
 #include <string>
 
 // #define BOOST_GEOMETRY_DEBUG_ASSEMBLE
-#define BOOST_GEOMETRY_CHECK_WITH_SQLSERVER
+//#define BOOST_GEOMETRY_CHECK_WITH_SQLSERVER
 
 #include <algorithms/test_difference.hpp>
 #include <algorithms/test_overlay.hpp>
 #include <multi/algorithms/overlay/multi_overlay_cases.hpp>
 
 #include <boost/geometry/multi/algorithms/correct.hpp>
-#include <boost/geometry/multi/algorithms/difference.hpp>
+#include <boost/geometry/multi/algorithms/intersection.hpp>
 #include <boost/geometry/multi/algorithms/within.hpp> // only for testing #77
 
+#include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/geometry/multi/geometries/multi_point.hpp>
 #include <boost/geometry/multi/geometries/multi_linestring.hpp>
 #include <boost/geometry/multi/geometries/multi_polygon.hpp>

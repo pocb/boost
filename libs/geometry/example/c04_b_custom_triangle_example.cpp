@@ -1,7 +1,9 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
-//
-// Copyright Barend Gehrels 2007-2009, Geodan, Amsterdam, the Netherlands
-// Copyright Bruno Lalande 2008, 2009
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2011 Bruno Lalande, Paris, France.
+// Copyright (c) 2009-2011 Mateusz Loskot, London, UK.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -15,12 +17,12 @@
 
 #include <boost/geometry/algorithms/area.hpp>
 #include <boost/geometry/algorithms/centroid.hpp>
-#include <boost/geometry/geometries/adapted/tuple.hpp>
-#include <boost/geometry/geometries/adapted/tuple_cartesian.hpp>
+#include <boost/geometry/geometries/adapted/boost_tuple.hpp>
 #include <boost/geometry/geometries/register/ring.hpp>
 #include <boost/geometry/strategies/strategies.hpp>
 #include <boost/geometry/util/write_dsv.hpp>
 
+BOOST_GEOMETRY_REGISTER_BOOST_TUPLE_CS(cs::cartesian)
 
 
 template <typename P>
@@ -28,8 +30,9 @@ struct triangle : public boost::array<P, 3>
 {
 };
 
-// Register triangle<P>
-BOOST_GEOMETRY_REGISTER_RING_TEMPLATIZED(triangle)
+
+// Register triangle<P> as a ring
+BOOST_GEOMETRY_REGISTER_RING_TEMPLATED(triangle)
 
 
 namespace boost { namespace geometry { namespace dispatch {

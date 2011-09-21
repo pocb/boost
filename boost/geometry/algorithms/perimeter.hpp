@@ -1,7 +1,12 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
-//
-// Copyright Barend Gehrels 2007-2009, Geodan, Amsterdam, the Netherlands.
-// Copyright Bruno Lalande 2008, 2009
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2011 Bruno Lalande, Paris, France.
+// Copyright (c) 2009-2011 Mateusz Loskot, London, UK.
+
+// Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
+// (geolib/GGL), copyright (c) 1995-2010 Geodan, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -13,7 +18,7 @@
 #include <boost/geometry/core/cs.hpp>
 #include <boost/geometry/core/closure.hpp>
 #include <boost/geometry/geometries/concepts/check.hpp>
-#include <boost/geometry/strategies/length_result.hpp>
+#include <boost/geometry/strategies/default_length_result.hpp>
 #include <boost/geometry/algorithms/length.hpp>
 #include <boost/geometry/algorithms/detail/calculate_null.hpp>
 #include <boost/geometry/algorithms/detail/calculate_sum.hpp>
@@ -30,7 +35,7 @@ namespace dispatch
 template <typename Tag, typename Geometry, typename Strategy>
 struct perimeter : detail::calculate_null
     <
-        typename length_result<Geometry>::type,
+        typename default_length_result<Geometry>::type,
         Geometry,
         Strategy
     >
@@ -50,7 +55,7 @@ template <typename Polygon, typename Strategy>
 struct perimeter<polygon_tag, Polygon, Strategy>
     : detail::calculate_polygon_sum
         <
-            typename length_result<Polygon>::type,
+            typename default_length_result<Polygon>::type,
             Polygon,
             Strategy,
             detail::length::range_length
@@ -81,7 +86,7 @@ struct perimeter<polygon_tag, Polygon, Strategy>
 \qbk{[include reference/algorithms/perimeter.qbk]}
  */
 template<typename Geometry>
-inline typename length_result<Geometry>::type perimeter(
+inline typename default_length_result<Geometry>::type perimeter(
         Geometry const& geometry)
 {
     concept::check<Geometry const>();
@@ -115,7 +120,7 @@ inline typename length_result<Geometry>::type perimeter(
 \qbk{[include reference/algorithms/perimeter.qbk]}
  */
 template<typename Geometry, typename Strategy>
-inline typename length_result<Geometry>::type perimeter(
+inline typename default_length_result<Geometry>::type perimeter(
         Geometry const& geometry, Strategy const& strategy)
 {
     concept::check<Geometry const>();

@@ -1,6 +1,6 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
 //
-// Copyright Barend Gehrels, Geodan B.V. Amsterdam, the Netherlands.
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -23,9 +23,13 @@
 #include <boost/geometry/domains/gis/io/wkt/read_wkt_multi.hpp>
 
 #include <boost/geometry/geometries/geometries.hpp>
-#include <boost/geometry/geometries/adapted/c_array_cartesian.hpp>
-#include <boost/geometry/geometries/adapted/tuple_cartesian.hpp>
+#include <boost/geometry/geometries/point_xy.hpp>
+#include <boost/geometry/geometries/adapted/c_array.hpp>
+#include <boost/geometry/geometries/adapted/boost_tuple.hpp>
 #include <test_common/test_point.hpp>
+
+BOOST_GEOMETRY_REGISTER_C_ARRAY_CS(cs::cartesian)
+BOOST_GEOMETRY_REGISTER_BOOST_TUPLE_CS(cs::cartesian)
 
 
 template <typename Geometry1, typename Geometry2>
@@ -35,7 +39,7 @@ void test_distance(std::string const& wkt1, std::string const& wkt2, double expe
     Geometry2 g2;
     bg::read_wkt(wkt1, g1);
     bg::read_wkt(wkt2, g2);
-    typename bg::distance_result<Geometry1, Geometry2>::type d = bg::distance(g1, g2);
+    typename bg::default_distance_result<Geometry1, Geometry2>::type d = bg::distance(g1, g2);
 
     BOOST_CHECK_CLOSE(d, expected, 0.0001);
 }
@@ -48,7 +52,7 @@ void test_distance(Strategy const& strategy, std::string const& wkt1,
     Geometry2 g2;
     bg::read_wkt(wkt1, g1);
     bg::read_wkt(wkt2, g2);
-    typename bg::distance_result<Geometry1, Geometry2>::type d = bg::distance(g1, g2, strategy);
+    typename bg::default_distance_result<Geometry1, Geometry2>::type d = bg::distance(g1, g2, strategy);
 
     BOOST_CHECK_CLOSE(d, expected, 0.0001);
 }

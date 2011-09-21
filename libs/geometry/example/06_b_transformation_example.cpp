@@ -1,12 +1,12 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
+// Example: Affine Transformation (translate, scale, rotate)
 //
-// Copyright (c) 2009 Mateusz Loskot (mateusz@loskot.net), London, UK
+// Copyright (c) 2009-2011 Mateusz Loskot, London, UK.
 //
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
-//
-// Example: Affine Transformation (translate, scale, rotate)
+
 
 #include <ctime> // for std::time
 #include <algorithm>
@@ -16,11 +16,16 @@
 #include <sstream>
 
 #include <boost/geometry/geometry.hpp>
+#include <boost/geometry/geometries/point_xy.hpp>
+#include <boost/geometry/geometries/polygon.hpp>
 #include <boost/geometry/algorithms/centroid.hpp>
 #include <boost/geometry/strategies/transform.hpp>
 #include <boost/geometry/strategies/transform/matrix_transformers.hpp>
-#include <boost/geometry/extensions/io/svg/write_svg.hpp>
 #include <boost/geometry/domains/gis/io/wkt/read_wkt.hpp>
+
+#if defined(HAVE_SVG)
+#  include <boost/geometry/extensions/io/svg/write_svg.hpp>
+#endif
 
 #include <boost/bind.hpp>
 #include <boost/random.hpp>
@@ -84,8 +89,9 @@ struct svg_output
     void put(G const& g, std::string const& label)
     {
         std::string style_str(style.fill(opacity) + style.stroke(5, opacity));
-        os << ::boost::geometry::svg(g, style_str) << std::endl;
-
+#if defined(HAVE_SVG)
+        os << boost::geometry::svg(g, style_str) << std::endl;
+#endif
         if (!label.empty())
         {
             typename point_type<G>::type c;
@@ -100,6 +106,7 @@ private:
     double opacity;
     random_style style;
 };
+
 
 int main()
 {

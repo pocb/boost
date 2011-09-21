@@ -1,7 +1,9 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
-//
-// Copyright Barend Gehrels 2007-2009, Geodan, Amsterdam, the Netherlands
-// Copyright Bruno Lalande 2008, 2009
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2011 Bruno Lalande, Paris, France.
+// Copyright (c) 2009-2011 Mateusz Loskot, London, UK.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -11,8 +13,12 @@
 #include <iostream>
 
 #include <boost/geometry/geometry.hpp>
-#include <boost/geometry/geometries/adapted/c_array_cartesian.hpp>
-#include <boost/geometry/geometries/adapted/std_as_linestring.hpp>
+#include <boost/geometry/geometries/point_xy.hpp>
+#include <boost/geometry/geometries/polygon.hpp>
+#include <boost/geometry/geometries/adapted/c_array.hpp>
+
+BOOST_GEOMETRY_REGISTER_C_ARRAY_CS(cs::cartesian)
+
 
 int main()
 {
@@ -32,8 +38,8 @@ int main()
     model::polygon<point_2d> poly, poly2;
     const double coor[][2] = { {0, 0}, {0, 7}, {2, 2}, {2, 0}, {0, 0} };
     // note that for this syntax you have to include the two
-    // include files above (c_array_cartesian.hpp, std_as_linestring.hpp)
-    assign(poly, coor);
+    // include files above (c_array.hpp)
+    assign_points(poly, coor);
     //read_wkt("POLYGON((0 0,0 7,4 2,2 0,0 0))", poly);
     transform(poly, poly2, translate);
 
@@ -44,7 +50,7 @@ int main()
     // - from Cartesian to Spherical coordinate systems and back
     // - from Cartesian to Cartesian (mapping, affine transformations) and back (inverse)
     // - Map Projections
-    // - from Degree to Radian and back in spherical or geographic coordinate systems
+    // - from Degree to Radian and back in spherical_equatorial or geographic coordinate systems
 
     return 0;
 }

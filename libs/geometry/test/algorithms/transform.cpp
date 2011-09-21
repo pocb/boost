@@ -1,7 +1,13 @@
-// Boost.Geometry (aka GGL, Generic Geometry Library) test file
-//
-// Copyright Barend Gehrels 2007-2009, Geodan, Amsterdam, the Netherlands
-// Copyright Bruno Lalande 2008, 2009
+// Boost.Geometry (aka GGL, Generic Geometry Library)
+// Unit Test
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2011 Bruno Lalande, Paris, France.
+// Copyright (c) 2009-2011 Mateusz Loskot, London, UK.
+
+// Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
+// (geolib/GGL), copyright (c) 1995-2010 Geodan, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -16,6 +22,7 @@
 #include <boost/geometry/algorithms/transform.hpp>
 #include <boost/geometry/strategies/strategies.hpp>
 #include <boost/geometry/geometries/geometries.hpp>
+#include <boost/geometry/geometries/point_xy.hpp>
 
 #include <boost/geometry/util/write_dsv.hpp>
 #include <boost/geometry/domains/gis/io/wkt/wkt.hpp>
@@ -74,7 +81,7 @@ void test_transformations(double phi, double theta, double r)
     {
         typedef bg::model::point<T, 3, bg::cs::spherical<DegreeOrRadian> >  spherical_type;
         spherical_type sph1;
-        assign(sph1, phi, theta, r);
+        assign_values(sph1, phi, theta, r);
         BOOST_CHECK(transform(sph1, p));
 
         spherical_type sph2;
@@ -91,7 +98,7 @@ void test_transformations(double phi, double theta, double r)
     {
         typedef bg::model::point<T, 2, bg::cs::spherical<DegreeOrRadian> >  spherical_type;
         spherical_type sph1, sph2;
-        assign(sph1, phi, theta);
+        assign_values(sph1, phi, theta);
         BOOST_CHECK(transform(sph1, p));
         BOOST_CHECK(transform(p, sph2));
 

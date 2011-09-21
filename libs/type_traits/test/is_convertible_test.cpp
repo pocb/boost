@@ -24,7 +24,7 @@ struct base2 { };
 struct middle2 : public virtual base2 { };
 struct derived2 : public middle2 { };
 
-#ifndef BOOST_NO_RVALUE_REFERENCES
+#if !defined(BOOST_NO_RVALUE_REFERENCES)
 
 template<typename T>
 struct test_bug_4530
@@ -182,7 +182,7 @@ BOOST_CHECK_INTEGRAL_CONSTANT((::tt::is_convertible<__int64,float>::value), true
 BOOST_CHECK_INTEGRAL_CONSTANT((::tt::is_convertible<test_bug_4530<A4530>,A4530>::value), true);
 #endif
 
-#ifdef BOOST_MSVC
+#if defined(BOOST_MSVC) && (BOOST_MSVC > 1310)
 BOOST_CHECK_INTEGRAL_CONSTANT((::tt::is_convertible<int, bug_5271a>::value), false);
 BOOST_CHECK_INTEGRAL_CONSTANT((::tt::is_convertible<int, bug_5271b>::value), true);
 #endif

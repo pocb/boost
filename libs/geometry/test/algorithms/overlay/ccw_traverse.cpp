@@ -1,6 +1,8 @@
-// Boost.Geometry (aka GGL, Generic Geometry Library) test file
-//
-// Copyright Barend Gehrels 2010, Geodan, Amsterdam, the Netherlands
+// Boost.Geometry (aka GGL, Generic Geometry Library)
+// Unit Test
+
+// Copyright (c) 2010 Barend Gehrels, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -14,6 +16,7 @@
 #include <geometry_test_common.hpp>
 
 #include <boost/geometry/geometry.hpp>
+#include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/geometry/domains/gis/io/wkt/wkt.hpp>
 
 #if defined(TEST_WITH_SVG)
@@ -32,7 +35,7 @@ template <typename Geometry1, typename Geometry2>
 inline typename bg::coordinate_type<Geometry1>::type intersect(Geometry1 const& g1, Geometry2 const& g2, std::string const& name,
                bg::detail::overlay::operation_type op)
 {
-    typedef typename bg::strategy_side
+    typedef typename bg::strategy::side::services::default_strategy
     <
         typename bg::cs_tag<Geometry1>::type
     >::type side_strategy_type;
@@ -59,7 +62,11 @@ inline typename bg::coordinate_type<Geometry1>::type intersect(Geometry1 const& 
     typedef std::deque<ring_type> out_vector;
     out_vector v;
 
-    bg::traverse<rev<Geometry1>::value, rev<Geometry2>::value>(g1, g2, op, turns, v);
+    bg::detail::overlay::traverse
+        <
+            rev<Geometry1>::value, rev<Geometry2>::value,
+            Geometry1, Geometry2
+        >::apply(g1, g2, op, turns, v);
 
     typename bg::coordinate_type<Geometry1>::type result = 0.0;
     BOOST_FOREACH(ring_type& ring, v)

@@ -1,6 +1,7 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
-//
-// Copyright Barend Gehrels 2010, Geodan, Amsterdam, the Netherlands.
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -22,6 +23,7 @@
 #include <boost/geometry/core/interior_rings.hpp>
 
 #include <boost/geometry/algorithms/disjoint.hpp>
+#include <boost/geometry/algorithms/expand.hpp>
 #include <boost/geometry/algorithms/detail/disjoint.hpp>
 
 #include <boost/geometry/algorithms/detail/overlay/get_turns.hpp>
@@ -188,8 +190,8 @@ public :
         typedef typename geometry::point_type<Geometry2>::type point_type;
         std::cout << "Combine "
             << area_a << " with " << " " << area_b
-            << " { " << geometry::wkt(geometry::make_centroid<point_type>(a))
-            << geometry::wkt(geometry::make_centroid<point_type>(b)) << " }"
+            << " { " << geometry::wkt(geometry::return_centroid<point_type>(a))
+            << geometry::wkt(geometry::return_centroid<point_type>(b)) << " }"
              << std::endl;
         */
         // END DEBUG
@@ -217,7 +219,7 @@ public :
             typedef typename geometry::point_type<Geometry2>::type point_type;
             std::cout << "Result "
                 << geometry::area(output_collection[i])
-                << " " << geometry::wkt(geometry::make_centroid<point_type>(output_collection[i]))
+                << " " << geometry::wkt(geometry::return_centroid<point_type>(output_collection[i]))
                 << std::endl;
         }
         */
@@ -285,7 +287,7 @@ struct dissolver_generic
             ++it, ++index)
         {
             helper.push_back(dissolve_helper<box_type>(index,
-                    geometry::make_envelope<box_type>(*it),
+                    geometry::return_envelope<box_type>(*it),
                     geometry::area(*it),
                     source));
         }
@@ -506,7 +508,7 @@ struct dissolver_generic
             ++it, ++index)
         {
             index_vector.push_back(index);
-            geometry::combine(total_box, it->box);
+            geometry::expand(total_box, it->box);
         }
 
         std::vector<output_type> unioned_collection;

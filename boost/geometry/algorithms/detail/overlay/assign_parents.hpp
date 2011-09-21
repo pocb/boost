@@ -1,6 +1,7 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
-//
-// Copyright Barend Gehrels 2011, Amsterdam, the Netherlands.
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -10,9 +11,12 @@
 
 #include <boost/geometry/algorithms/area.hpp>
 #include <boost/geometry/algorithms/envelope.hpp>
+#include <boost/geometry/algorithms/expand.hpp>
 #include <boost/geometry/algorithms/detail/partition.hpp>
 #include <boost/geometry/algorithms/detail/overlay/get_ring.hpp>
-#include <boost/geometry/algorithms/detail/overlay/within_util.hpp>
+#include <boost/geometry/algorithms/within.hpp>
+
+#include <boost/geometry/geometries/box.hpp>
 
 
 namespace boost { namespace geometry
@@ -38,30 +42,29 @@ static inline bool within_selected_input(Item const& item2, ring_identifier cons
     typedef typename geometry::tag<Geometry1>::type tag1;
     typedef typename geometry::tag<Geometry2>::type tag2;
 
-    int code = -1;
     switch (ring_id.source_index)
     {
         case 0 :
-            code = point_in_ring(item2.point,
+            return geometry::within(item2.point,
                 get_ring<tag1>::apply(ring_id, geometry1));
             break;
         case 1 :
-            code = point_in_ring(item2.point,
+            return geometry::within(item2.point,
                 get_ring<tag2>::apply(ring_id, geometry2));
             break;
         case 2 :
-            code = point_in_ring(item2.point,
+            return geometry::within(item2.point,
                 get_ring<void>::apply(ring_id, collection));
             break;
     }
-    return code == 1;
+    return false;
 }
 
 
 template <typename Point>
 struct ring_info_helper
 {
-    typedef typename geometry::area_result<Point>::type area_type;
+    typedef typename geometry::default_area_result<Point>::type area_type;
 
     ring_identifier id;
     area_type real_area;
@@ -73,7 +76,7 @@ struct ring_info_helper
     {}
 
     inline ring_info_helper(ring_identifier i, area_type a)
-        : id(i), real_area(a), abs_area(abs(a))
+        : id(i), real_area(a), abs_area(geometry::math::abs(a))
     {}
 };
 
@@ -83,7 +86,7 @@ struct ring_info_helper_get_box
     template <typename Box, typename InputItem>
     static inline void apply(Box& total, InputItem const& item)
     {
-        boost::geometry::combine(total, item.envelope);
+        geometry::expand(total, item.envelope);
     }
 };
 
@@ -92,7 +95,7 @@ struct ring_info_helper_ovelaps_box
     template <typename Box, typename InputItem>
     static inline bool apply(Box const& box, InputItem const& item)
     {
-        return ! boost::geometry::detail::disjoint::disjoint_box_box(box, item.envelope);
+        return ! geometry::detail::disjoint::disjoint_box_box(box, item.envelope);
     }
 };
 
@@ -192,7 +195,8 @@ inline void assign_parents(Geometry1 const& geometry1,
         // Copy to vector (with new approach this might be obsolete as well, using the map directly)
         vector_type vector(count_total);
 
-        for (map_iterator_type it = boost::begin(ring_map); it != boost::end(ring_map); ++it, ++index)
+        for (map_iterator_type it = boost::begin(ring_map);
+            it != boost::end(ring_map); ++it, ++index)
         {
             vector[index] = helper(it->first, it->second.get_area());
             helper& item = vector[index];
@@ -273,7 +277,8 @@ inline void assign_parents(Geometry1 const& geometry1,
 
     if (check_for_orientation)
     {
-        for (map_iterator_type it = boost::begin(ring_map); it != boost::end(ring_map); ++it)
+        for (map_iterator_type it = boost::begin(ring_map);
+            it != boost::end(ring_map); ++it)
         {
             if (geometry::math::equals(it->second.get_area(), 0))
             {
@@ -294,7 +299,8 @@ inline void assign_parents(Geometry1 const& geometry1,
     }
 
     // Assign childlist
-    for (map_iterator_type it = boost::begin(ring_map); it != boost::end(ring_map); ++it)
+    for (map_iterator_type it = boost::begin(ring_map);
+        it != boost::end(ring_map); ++it)
     {
         if (it->second.parent.source_index >= 0)
         {

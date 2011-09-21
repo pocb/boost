@@ -1,6 +1,7 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
-//
-// Copyright Barend Gehrels 2010, Geodan, Amsterdam, the Netherlands.
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -186,7 +187,7 @@ struct insert_rings<polygon_tag, RingCollection, Polygon>
 
         typename interior_return_type<Polygon const>::type rings
                     = interior_rings(polygon);
-        for (BOOST_AUTO(it, boost::begin(rings)); it != boost::end(rings); ++it)
+        for (BOOST_AUTO_TPL(it, boost::begin(rings)); it != boost::end(rings); ++it)
         {
 #ifdef BOOST_GEOMETRY_DEBUG_SPLIT_RINGS
 std::cout << geometry::wkt(*it)
@@ -232,10 +233,10 @@ struct split_turn_operation : public detail::overlay::turn_operation
 {
    inline split_turn_operation()
         : detail::overlay::turn_operation()
-        , distance(geometry::make_distance_result<distance_type>(0))
+        , distance(geometry::return_distance_result<distance_type>(0))
     {}
 
-    typedef typename distance_result<P, P>::type distance_type;
+    typedef typename default_distance_result<P, P>::type distance_type;
     distance_type distance; // distance-measurement from segment.first to IP
 };
 
@@ -263,9 +264,9 @@ struct split_calculate_distance_policy
     static inline void apply(Info& info, Point1 const& p1, Point2 const& p2)
     {
         info.operations[0].distance
-                    = boost::geometry::distance(info.point, p1);
+                    = geometry::distance(info.point, p1);
         info.operations[1].distance
-                    = boost::geometry::distance(info.point, p2);
+                    = geometry::distance(info.point, p2);
     }
 
 };
@@ -494,7 +495,7 @@ struct polygon_split_rings
     static inline void apply(Polygon const& polygon, RingCollection& ring_collection)
     {
         per_ring::apply(exterior_ring(polygon), ring_collection);
-        for (BOOST_AUTO(it, boost::begin(interior_rings(polygon)));
+        for (BOOST_AUTO_TPL(it, boost::begin(interior_rings(polygon)));
              it != boost::end(interior_rings(polygon));
              ++it)
         {

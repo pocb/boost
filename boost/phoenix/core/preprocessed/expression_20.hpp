@@ -22,9 +22,6 @@ namespace boost { namespace phoenix
       , typename Dummy = void
     >
     struct expr : expr_ext<actor, Tag, A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19> {};
-    struct default_domain_with_basic_expr
-        : proto::domain<proto::use_basic_expr<proto::default_generator> >
-    {};
     
     
     
@@ -39,8 +36,8 @@ namespace boost { namespace phoenix
         typedef
             typename proto::result_of::make_expr<
                 Tag
-              , default_domain_with_basic_expr
-              , A0
+              , proto::basic_default_domain
+              , typename proto::detail::uncvref<typename call_traits<A0>::value_type>::type
             >::type
             base_type;
         typedef Actor<base_type> type;
@@ -48,13 +45,13 @@ namespace boost { namespace phoenix
             typename proto::nary_expr<Tag, A0>::proto_grammar
             proto_grammar;
         
-        static type make(A0 a0)
+        static type make(typename call_traits<A0>::param_type a0)
         {
             actor<base_type> const e =
                 {
                     proto::make_expr<
                         Tag
-                      , default_domain_with_basic_expr
+                      , proto::basic_default_domain
                     >(a0)
                 };
             return e;
@@ -81,8 +78,8 @@ namespace boost { namespace phoenix
         typedef
             typename proto::result_of::make_expr<
                 Tag
-              , default_domain_with_basic_expr
-              , A0 , A1
+              , proto::basic_default_domain
+              , typename proto::detail::uncvref<typename call_traits<A0>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A1>::value_type>::type
             >::type
             base_type;
         typedef Actor<base_type> type;
@@ -90,13 +87,13 @@ namespace boost { namespace phoenix
             typename proto::nary_expr<Tag, A0 , A1>::proto_grammar
             proto_grammar;
         
-        static type make(A0 a0 , A1 a1)
+        static type make(typename call_traits<A0>::param_type a0 , typename call_traits<A1>::param_type a1)
         {
             actor<base_type> const e =
                 {
                     proto::make_expr<
                         Tag
-                      , default_domain_with_basic_expr
+                      , proto::basic_default_domain
                     >(a0 , a1)
                 };
             return e;
@@ -123,8 +120,8 @@ namespace boost { namespace phoenix
         typedef
             typename proto::result_of::make_expr<
                 Tag
-              , default_domain_with_basic_expr
-              , A0 , A1 , A2
+              , proto::basic_default_domain
+              , typename proto::detail::uncvref<typename call_traits<A0>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A1>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A2>::value_type>::type
             >::type
             base_type;
         typedef Actor<base_type> type;
@@ -132,13 +129,13 @@ namespace boost { namespace phoenix
             typename proto::nary_expr<Tag, A0 , A1 , A2>::proto_grammar
             proto_grammar;
         
-        static type make(A0 a0 , A1 a1 , A2 a2)
+        static type make(typename call_traits<A0>::param_type a0 , typename call_traits<A1>::param_type a1 , typename call_traits<A2>::param_type a2)
         {
             actor<base_type> const e =
                 {
                     proto::make_expr<
                         Tag
-                      , default_domain_with_basic_expr
+                      , proto::basic_default_domain
                     >(a0 , a1 , a2)
                 };
             return e;
@@ -165,8 +162,8 @@ namespace boost { namespace phoenix
         typedef
             typename proto::result_of::make_expr<
                 Tag
-              , default_domain_with_basic_expr
-              , A0 , A1 , A2 , A3
+              , proto::basic_default_domain
+              , typename proto::detail::uncvref<typename call_traits<A0>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A1>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A2>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A3>::value_type>::type
             >::type
             base_type;
         typedef Actor<base_type> type;
@@ -174,13 +171,13 @@ namespace boost { namespace phoenix
             typename proto::nary_expr<Tag, A0 , A1 , A2 , A3>::proto_grammar
             proto_grammar;
         
-        static type make(A0 a0 , A1 a1 , A2 a2 , A3 a3)
+        static type make(typename call_traits<A0>::param_type a0 , typename call_traits<A1>::param_type a1 , typename call_traits<A2>::param_type a2 , typename call_traits<A3>::param_type a3)
         {
             actor<base_type> const e =
                 {
                     proto::make_expr<
                         Tag
-                      , default_domain_with_basic_expr
+                      , proto::basic_default_domain
                     >(a0 , a1 , a2 , a3)
                 };
             return e;
@@ -207,8 +204,8 @@ namespace boost { namespace phoenix
         typedef
             typename proto::result_of::make_expr<
                 Tag
-              , default_domain_with_basic_expr
-              , A0 , A1 , A2 , A3 , A4
+              , proto::basic_default_domain
+              , typename proto::detail::uncvref<typename call_traits<A0>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A1>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A2>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A3>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A4>::value_type>::type
             >::type
             base_type;
         typedef Actor<base_type> type;
@@ -216,13 +213,13 @@ namespace boost { namespace phoenix
             typename proto::nary_expr<Tag, A0 , A1 , A2 , A3 , A4>::proto_grammar
             proto_grammar;
         
-        static type make(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4)
+        static type make(typename call_traits<A0>::param_type a0 , typename call_traits<A1>::param_type a1 , typename call_traits<A2>::param_type a2 , typename call_traits<A3>::param_type a3 , typename call_traits<A4>::param_type a4)
         {
             actor<base_type> const e =
                 {
                     proto::make_expr<
                         Tag
-                      , default_domain_with_basic_expr
+                      , proto::basic_default_domain
                     >(a0 , a1 , a2 , a3 , a4)
                 };
             return e;
@@ -249,8 +246,8 @@ namespace boost { namespace phoenix
         typedef
             typename proto::result_of::make_expr<
                 Tag
-              , default_domain_with_basic_expr
-              , A0 , A1 , A2 , A3 , A4 , A5
+              , proto::basic_default_domain
+              , typename proto::detail::uncvref<typename call_traits<A0>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A1>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A2>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A3>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A4>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A5>::value_type>::type
             >::type
             base_type;
         typedef Actor<base_type> type;
@@ -258,13 +255,13 @@ namespace boost { namespace phoenix
             typename proto::nary_expr<Tag, A0 , A1 , A2 , A3 , A4 , A5>::proto_grammar
             proto_grammar;
         
-        static type make(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5)
+        static type make(typename call_traits<A0>::param_type a0 , typename call_traits<A1>::param_type a1 , typename call_traits<A2>::param_type a2 , typename call_traits<A3>::param_type a3 , typename call_traits<A4>::param_type a4 , typename call_traits<A5>::param_type a5)
         {
             actor<base_type> const e =
                 {
                     proto::make_expr<
                         Tag
-                      , default_domain_with_basic_expr
+                      , proto::basic_default_domain
                     >(a0 , a1 , a2 , a3 , a4 , a5)
                 };
             return e;
@@ -291,8 +288,8 @@ namespace boost { namespace phoenix
         typedef
             typename proto::result_of::make_expr<
                 Tag
-              , default_domain_with_basic_expr
-              , A0 , A1 , A2 , A3 , A4 , A5 , A6
+              , proto::basic_default_domain
+              , typename proto::detail::uncvref<typename call_traits<A0>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A1>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A2>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A3>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A4>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A5>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A6>::value_type>::type
             >::type
             base_type;
         typedef Actor<base_type> type;
@@ -300,13 +297,13 @@ namespace boost { namespace phoenix
             typename proto::nary_expr<Tag, A0 , A1 , A2 , A3 , A4 , A5 , A6>::proto_grammar
             proto_grammar;
         
-        static type make(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6)
+        static type make(typename call_traits<A0>::param_type a0 , typename call_traits<A1>::param_type a1 , typename call_traits<A2>::param_type a2 , typename call_traits<A3>::param_type a3 , typename call_traits<A4>::param_type a4 , typename call_traits<A5>::param_type a5 , typename call_traits<A6>::param_type a6)
         {
             actor<base_type> const e =
                 {
                     proto::make_expr<
                         Tag
-                      , default_domain_with_basic_expr
+                      , proto::basic_default_domain
                     >(a0 , a1 , a2 , a3 , a4 , a5 , a6)
                 };
             return e;
@@ -333,8 +330,8 @@ namespace boost { namespace phoenix
         typedef
             typename proto::result_of::make_expr<
                 Tag
-              , default_domain_with_basic_expr
-              , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7
+              , proto::basic_default_domain
+              , typename proto::detail::uncvref<typename call_traits<A0>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A1>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A2>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A3>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A4>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A5>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A6>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A7>::value_type>::type
             >::type
             base_type;
         typedef Actor<base_type> type;
@@ -342,13 +339,13 @@ namespace boost { namespace phoenix
             typename proto::nary_expr<Tag, A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7>::proto_grammar
             proto_grammar;
         
-        static type make(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7)
+        static type make(typename call_traits<A0>::param_type a0 , typename call_traits<A1>::param_type a1 , typename call_traits<A2>::param_type a2 , typename call_traits<A3>::param_type a3 , typename call_traits<A4>::param_type a4 , typename call_traits<A5>::param_type a5 , typename call_traits<A6>::param_type a6 , typename call_traits<A7>::param_type a7)
         {
             actor<base_type> const e =
                 {
                     proto::make_expr<
                         Tag
-                      , default_domain_with_basic_expr
+                      , proto::basic_default_domain
                     >(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7)
                 };
             return e;
@@ -375,8 +372,8 @@ namespace boost { namespace phoenix
         typedef
             typename proto::result_of::make_expr<
                 Tag
-              , default_domain_with_basic_expr
-              , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8
+              , proto::basic_default_domain
+              , typename proto::detail::uncvref<typename call_traits<A0>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A1>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A2>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A3>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A4>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A5>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A6>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A7>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A8>::value_type>::type
             >::type
             base_type;
         typedef Actor<base_type> type;
@@ -384,13 +381,13 @@ namespace boost { namespace phoenix
             typename proto::nary_expr<Tag, A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8>::proto_grammar
             proto_grammar;
         
-        static type make(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8)
+        static type make(typename call_traits<A0>::param_type a0 , typename call_traits<A1>::param_type a1 , typename call_traits<A2>::param_type a2 , typename call_traits<A3>::param_type a3 , typename call_traits<A4>::param_type a4 , typename call_traits<A5>::param_type a5 , typename call_traits<A6>::param_type a6 , typename call_traits<A7>::param_type a7 , typename call_traits<A8>::param_type a8)
         {
             actor<base_type> const e =
                 {
                     proto::make_expr<
                         Tag
-                      , default_domain_with_basic_expr
+                      , proto::basic_default_domain
                     >(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8)
                 };
             return e;
@@ -417,8 +414,8 @@ namespace boost { namespace phoenix
         typedef
             typename proto::result_of::make_expr<
                 Tag
-              , default_domain_with_basic_expr
-              , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9
+              , proto::basic_default_domain
+              , typename proto::detail::uncvref<typename call_traits<A0>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A1>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A2>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A3>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A4>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A5>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A6>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A7>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A8>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A9>::value_type>::type
             >::type
             base_type;
         typedef Actor<base_type> type;
@@ -426,13 +423,13 @@ namespace boost { namespace phoenix
             typename proto::nary_expr<Tag, A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9>::proto_grammar
             proto_grammar;
         
-        static type make(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9)
+        static type make(typename call_traits<A0>::param_type a0 , typename call_traits<A1>::param_type a1 , typename call_traits<A2>::param_type a2 , typename call_traits<A3>::param_type a3 , typename call_traits<A4>::param_type a4 , typename call_traits<A5>::param_type a5 , typename call_traits<A6>::param_type a6 , typename call_traits<A7>::param_type a7 , typename call_traits<A8>::param_type a8 , typename call_traits<A9>::param_type a9)
         {
             actor<base_type> const e =
                 {
                     proto::make_expr<
                         Tag
-                      , default_domain_with_basic_expr
+                      , proto::basic_default_domain
                     >(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9)
                 };
             return e;
@@ -459,8 +456,8 @@ namespace boost { namespace phoenix
         typedef
             typename proto::result_of::make_expr<
                 Tag
-              , default_domain_with_basic_expr
-              , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10
+              , proto::basic_default_domain
+              , typename proto::detail::uncvref<typename call_traits<A0>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A1>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A2>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A3>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A4>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A5>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A6>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A7>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A8>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A9>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A10>::value_type>::type
             >::type
             base_type;
         typedef Actor<base_type> type;
@@ -468,13 +465,13 @@ namespace boost { namespace phoenix
             typename proto::nary_expr<Tag, A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10>::proto_grammar
             proto_grammar;
         
-        static type make(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10)
+        static type make(typename call_traits<A0>::param_type a0 , typename call_traits<A1>::param_type a1 , typename call_traits<A2>::param_type a2 , typename call_traits<A3>::param_type a3 , typename call_traits<A4>::param_type a4 , typename call_traits<A5>::param_type a5 , typename call_traits<A6>::param_type a6 , typename call_traits<A7>::param_type a7 , typename call_traits<A8>::param_type a8 , typename call_traits<A9>::param_type a9 , typename call_traits<A10>::param_type a10)
         {
             actor<base_type> const e =
                 {
                     proto::make_expr<
                         Tag
-                      , default_domain_with_basic_expr
+                      , proto::basic_default_domain
                     >(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10)
                 };
             return e;
@@ -501,8 +498,8 @@ namespace boost { namespace phoenix
         typedef
             typename proto::result_of::make_expr<
                 Tag
-              , default_domain_with_basic_expr
-              , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11
+              , proto::basic_default_domain
+              , typename proto::detail::uncvref<typename call_traits<A0>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A1>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A2>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A3>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A4>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A5>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A6>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A7>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A8>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A9>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A10>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A11>::value_type>::type
             >::type
             base_type;
         typedef Actor<base_type> type;
@@ -510,13 +507,13 @@ namespace boost { namespace phoenix
             typename proto::nary_expr<Tag, A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11>::proto_grammar
             proto_grammar;
         
-        static type make(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11)
+        static type make(typename call_traits<A0>::param_type a0 , typename call_traits<A1>::param_type a1 , typename call_traits<A2>::param_type a2 , typename call_traits<A3>::param_type a3 , typename call_traits<A4>::param_type a4 , typename call_traits<A5>::param_type a5 , typename call_traits<A6>::param_type a6 , typename call_traits<A7>::param_type a7 , typename call_traits<A8>::param_type a8 , typename call_traits<A9>::param_type a9 , typename call_traits<A10>::param_type a10 , typename call_traits<A11>::param_type a11)
         {
             actor<base_type> const e =
                 {
                     proto::make_expr<
                         Tag
-                      , default_domain_with_basic_expr
+                      , proto::basic_default_domain
                     >(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11)
                 };
             return e;
@@ -543,8 +540,8 @@ namespace boost { namespace phoenix
         typedef
             typename proto::result_of::make_expr<
                 Tag
-              , default_domain_with_basic_expr
-              , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12
+              , proto::basic_default_domain
+              , typename proto::detail::uncvref<typename call_traits<A0>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A1>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A2>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A3>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A4>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A5>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A6>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A7>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A8>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A9>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A10>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A11>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A12>::value_type>::type
             >::type
             base_type;
         typedef Actor<base_type> type;
@@ -552,13 +549,13 @@ namespace boost { namespace phoenix
             typename proto::nary_expr<Tag, A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12>::proto_grammar
             proto_grammar;
         
-        static type make(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12)
+        static type make(typename call_traits<A0>::param_type a0 , typename call_traits<A1>::param_type a1 , typename call_traits<A2>::param_type a2 , typename call_traits<A3>::param_type a3 , typename call_traits<A4>::param_type a4 , typename call_traits<A5>::param_type a5 , typename call_traits<A6>::param_type a6 , typename call_traits<A7>::param_type a7 , typename call_traits<A8>::param_type a8 , typename call_traits<A9>::param_type a9 , typename call_traits<A10>::param_type a10 , typename call_traits<A11>::param_type a11 , typename call_traits<A12>::param_type a12)
         {
             actor<base_type> const e =
                 {
                     proto::make_expr<
                         Tag
-                      , default_domain_with_basic_expr
+                      , proto::basic_default_domain
                     >(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12)
                 };
             return e;
@@ -585,8 +582,8 @@ namespace boost { namespace phoenix
         typedef
             typename proto::result_of::make_expr<
                 Tag
-              , default_domain_with_basic_expr
-              , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13
+              , proto::basic_default_domain
+              , typename proto::detail::uncvref<typename call_traits<A0>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A1>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A2>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A3>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A4>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A5>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A6>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A7>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A8>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A9>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A10>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A11>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A12>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A13>::value_type>::type
             >::type
             base_type;
         typedef Actor<base_type> type;
@@ -594,13 +591,13 @@ namespace boost { namespace phoenix
             typename proto::nary_expr<Tag, A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13>::proto_grammar
             proto_grammar;
         
-        static type make(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13)
+        static type make(typename call_traits<A0>::param_type a0 , typename call_traits<A1>::param_type a1 , typename call_traits<A2>::param_type a2 , typename call_traits<A3>::param_type a3 , typename call_traits<A4>::param_type a4 , typename call_traits<A5>::param_type a5 , typename call_traits<A6>::param_type a6 , typename call_traits<A7>::param_type a7 , typename call_traits<A8>::param_type a8 , typename call_traits<A9>::param_type a9 , typename call_traits<A10>::param_type a10 , typename call_traits<A11>::param_type a11 , typename call_traits<A12>::param_type a12 , typename call_traits<A13>::param_type a13)
         {
             actor<base_type> const e =
                 {
                     proto::make_expr<
                         Tag
-                      , default_domain_with_basic_expr
+                      , proto::basic_default_domain
                     >(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13)
                 };
             return e;
@@ -627,8 +624,8 @@ namespace boost { namespace phoenix
         typedef
             typename proto::result_of::make_expr<
                 Tag
-              , default_domain_with_basic_expr
-              , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14
+              , proto::basic_default_domain
+              , typename proto::detail::uncvref<typename call_traits<A0>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A1>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A2>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A3>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A4>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A5>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A6>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A7>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A8>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A9>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A10>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A11>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A12>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A13>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A14>::value_type>::type
             >::type
             base_type;
         typedef Actor<base_type> type;
@@ -636,13 +633,13 @@ namespace boost { namespace phoenix
             typename proto::nary_expr<Tag, A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14>::proto_grammar
             proto_grammar;
         
-        static type make(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14)
+        static type make(typename call_traits<A0>::param_type a0 , typename call_traits<A1>::param_type a1 , typename call_traits<A2>::param_type a2 , typename call_traits<A3>::param_type a3 , typename call_traits<A4>::param_type a4 , typename call_traits<A5>::param_type a5 , typename call_traits<A6>::param_type a6 , typename call_traits<A7>::param_type a7 , typename call_traits<A8>::param_type a8 , typename call_traits<A9>::param_type a9 , typename call_traits<A10>::param_type a10 , typename call_traits<A11>::param_type a11 , typename call_traits<A12>::param_type a12 , typename call_traits<A13>::param_type a13 , typename call_traits<A14>::param_type a14)
         {
             actor<base_type> const e =
                 {
                     proto::make_expr<
                         Tag
-                      , default_domain_with_basic_expr
+                      , proto::basic_default_domain
                     >(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14)
                 };
             return e;
@@ -669,8 +666,8 @@ namespace boost { namespace phoenix
         typedef
             typename proto::result_of::make_expr<
                 Tag
-              , default_domain_with_basic_expr
-              , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15
+              , proto::basic_default_domain
+              , typename proto::detail::uncvref<typename call_traits<A0>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A1>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A2>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A3>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A4>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A5>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A6>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A7>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A8>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A9>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A10>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A11>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A12>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A13>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A14>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A15>::value_type>::type
             >::type
             base_type;
         typedef Actor<base_type> type;
@@ -678,13 +675,13 @@ namespace boost { namespace phoenix
             typename proto::nary_expr<Tag, A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15>::proto_grammar
             proto_grammar;
         
-        static type make(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15)
+        static type make(typename call_traits<A0>::param_type a0 , typename call_traits<A1>::param_type a1 , typename call_traits<A2>::param_type a2 , typename call_traits<A3>::param_type a3 , typename call_traits<A4>::param_type a4 , typename call_traits<A5>::param_type a5 , typename call_traits<A6>::param_type a6 , typename call_traits<A7>::param_type a7 , typename call_traits<A8>::param_type a8 , typename call_traits<A9>::param_type a9 , typename call_traits<A10>::param_type a10 , typename call_traits<A11>::param_type a11 , typename call_traits<A12>::param_type a12 , typename call_traits<A13>::param_type a13 , typename call_traits<A14>::param_type a14 , typename call_traits<A15>::param_type a15)
         {
             actor<base_type> const e =
                 {
                     proto::make_expr<
                         Tag
-                      , default_domain_with_basic_expr
+                      , proto::basic_default_domain
                     >(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15)
                 };
             return e;
@@ -711,8 +708,8 @@ namespace boost { namespace phoenix
         typedef
             typename proto::result_of::make_expr<
                 Tag
-              , default_domain_with_basic_expr
-              , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16
+              , proto::basic_default_domain
+              , typename proto::detail::uncvref<typename call_traits<A0>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A1>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A2>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A3>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A4>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A5>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A6>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A7>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A8>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A9>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A10>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A11>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A12>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A13>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A14>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A15>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A16>::value_type>::type
             >::type
             base_type;
         typedef Actor<base_type> type;
@@ -720,13 +717,13 @@ namespace boost { namespace phoenix
             typename proto::nary_expr<Tag, A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16>::proto_grammar
             proto_grammar;
         
-        static type make(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16)
+        static type make(typename call_traits<A0>::param_type a0 , typename call_traits<A1>::param_type a1 , typename call_traits<A2>::param_type a2 , typename call_traits<A3>::param_type a3 , typename call_traits<A4>::param_type a4 , typename call_traits<A5>::param_type a5 , typename call_traits<A6>::param_type a6 , typename call_traits<A7>::param_type a7 , typename call_traits<A8>::param_type a8 , typename call_traits<A9>::param_type a9 , typename call_traits<A10>::param_type a10 , typename call_traits<A11>::param_type a11 , typename call_traits<A12>::param_type a12 , typename call_traits<A13>::param_type a13 , typename call_traits<A14>::param_type a14 , typename call_traits<A15>::param_type a15 , typename call_traits<A16>::param_type a16)
         {
             actor<base_type> const e =
                 {
                     proto::make_expr<
                         Tag
-                      , default_domain_with_basic_expr
+                      , proto::basic_default_domain
                     >(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16)
                 };
             return e;
@@ -753,8 +750,8 @@ namespace boost { namespace phoenix
         typedef
             typename proto::result_of::make_expr<
                 Tag
-              , default_domain_with_basic_expr
-              , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17
+              , proto::basic_default_domain
+              , typename proto::detail::uncvref<typename call_traits<A0>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A1>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A2>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A3>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A4>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A5>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A6>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A7>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A8>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A9>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A10>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A11>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A12>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A13>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A14>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A15>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A16>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A17>::value_type>::type
             >::type
             base_type;
         typedef Actor<base_type> type;
@@ -762,13 +759,13 @@ namespace boost { namespace phoenix
             typename proto::nary_expr<Tag, A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17>::proto_grammar
             proto_grammar;
         
-        static type make(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17)
+        static type make(typename call_traits<A0>::param_type a0 , typename call_traits<A1>::param_type a1 , typename call_traits<A2>::param_type a2 , typename call_traits<A3>::param_type a3 , typename call_traits<A4>::param_type a4 , typename call_traits<A5>::param_type a5 , typename call_traits<A6>::param_type a6 , typename call_traits<A7>::param_type a7 , typename call_traits<A8>::param_type a8 , typename call_traits<A9>::param_type a9 , typename call_traits<A10>::param_type a10 , typename call_traits<A11>::param_type a11 , typename call_traits<A12>::param_type a12 , typename call_traits<A13>::param_type a13 , typename call_traits<A14>::param_type a14 , typename call_traits<A15>::param_type a15 , typename call_traits<A16>::param_type a16 , typename call_traits<A17>::param_type a17)
         {
             actor<base_type> const e =
                 {
                     proto::make_expr<
                         Tag
-                      , default_domain_with_basic_expr
+                      , proto::basic_default_domain
                     >(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17)
                 };
             return e;
@@ -795,8 +792,8 @@ namespace boost { namespace phoenix
         typedef
             typename proto::result_of::make_expr<
                 Tag
-              , default_domain_with_basic_expr
-              , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18
+              , proto::basic_default_domain
+              , typename proto::detail::uncvref<typename call_traits<A0>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A1>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A2>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A3>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A4>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A5>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A6>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A7>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A8>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A9>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A10>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A11>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A12>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A13>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A14>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A15>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A16>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A17>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A18>::value_type>::type
             >::type
             base_type;
         typedef Actor<base_type> type;
@@ -804,13 +801,13 @@ namespace boost { namespace phoenix
             typename proto::nary_expr<Tag, A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18>::proto_grammar
             proto_grammar;
         
-        static type make(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17 , A18 a18)
+        static type make(typename call_traits<A0>::param_type a0 , typename call_traits<A1>::param_type a1 , typename call_traits<A2>::param_type a2 , typename call_traits<A3>::param_type a3 , typename call_traits<A4>::param_type a4 , typename call_traits<A5>::param_type a5 , typename call_traits<A6>::param_type a6 , typename call_traits<A7>::param_type a7 , typename call_traits<A8>::param_type a8 , typename call_traits<A9>::param_type a9 , typename call_traits<A10>::param_type a10 , typename call_traits<A11>::param_type a11 , typename call_traits<A12>::param_type a12 , typename call_traits<A13>::param_type a13 , typename call_traits<A14>::param_type a14 , typename call_traits<A15>::param_type a15 , typename call_traits<A16>::param_type a16 , typename call_traits<A17>::param_type a17 , typename call_traits<A18>::param_type a18)
         {
             actor<base_type> const e =
                 {
                     proto::make_expr<
                         Tag
-                      , default_domain_with_basic_expr
+                      , proto::basic_default_domain
                     >(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18)
                 };
             return e;
@@ -837,8 +834,8 @@ namespace boost { namespace phoenix
         typedef
             typename proto::result_of::make_expr<
                 Tag
-              , default_domain_with_basic_expr
-              , A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19
+              , proto::basic_default_domain
+              , typename proto::detail::uncvref<typename call_traits<A0>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A1>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A2>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A3>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A4>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A5>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A6>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A7>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A8>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A9>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A10>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A11>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A12>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A13>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A14>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A15>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A16>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A17>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A18>::value_type>::type , typename proto::detail::uncvref<typename call_traits<A19>::value_type>::type
             >::type
             base_type;
         typedef Actor<base_type> type;
@@ -846,13 +843,13 @@ namespace boost { namespace phoenix
             typename proto::nary_expr<Tag, A0 , A1 , A2 , A3 , A4 , A5 , A6 , A7 , A8 , A9 , A10 , A11 , A12 , A13 , A14 , A15 , A16 , A17 , A18 , A19>::proto_grammar
             proto_grammar;
         
-        static type make(A0 a0 , A1 a1 , A2 a2 , A3 a3 , A4 a4 , A5 a5 , A6 a6 , A7 a7 , A8 a8 , A9 a9 , A10 a10 , A11 a11 , A12 a12 , A13 a13 , A14 a14 , A15 a15 , A16 a16 , A17 a17 , A18 a18 , A19 a19)
+        static type make(typename call_traits<A0>::param_type a0 , typename call_traits<A1>::param_type a1 , typename call_traits<A2>::param_type a2 , typename call_traits<A3>::param_type a3 , typename call_traits<A4>::param_type a4 , typename call_traits<A5>::param_type a5 , typename call_traits<A6>::param_type a6 , typename call_traits<A7>::param_type a7 , typename call_traits<A8>::param_type a8 , typename call_traits<A9>::param_type a9 , typename call_traits<A10>::param_type a10 , typename call_traits<A11>::param_type a11 , typename call_traits<A12>::param_type a12 , typename call_traits<A13>::param_type a13 , typename call_traits<A14>::param_type a14 , typename call_traits<A15>::param_type a15 , typename call_traits<A16>::param_type a16 , typename call_traits<A17>::param_type a17 , typename call_traits<A18>::param_type a18 , typename call_traits<A19>::param_type a19)
         {
             actor<base_type> const e =
                 {
                     proto::make_expr<
                         Tag
-                      , default_domain_with_basic_expr
+                      , proto::basic_default_domain
                     >(a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 , a11 , a12 , a13 , a14 , a15 , a16 , a17 , a18 , a19)
                 };
             return e;

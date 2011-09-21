@@ -19,6 +19,7 @@
 
 #include <iostream>
 #include <boost/config.hpp>
+#include <boost/cstdint.hpp>
 #include <boost/limits.hpp>
 #include <boost/static_assert.hpp>
 #include <boost/random/detail/config.hpp>
@@ -40,6 +41,8 @@ namespace random {
 template<class UniformRandomNumberGenerator, std::size_t p, std::size_t r>
 class discard_block_engine
 {
+    typedef typename detail::seed_type<
+        typename UniformRandomNumberGenerator::result_type>::type seed_type;
 public:
     typedef UniformRandomNumberGenerator base_type;
     typedef typename base_type::result_type result_type;
@@ -68,7 +71,7 @@ public:
      * generator with @c value
      */
     BOOST_RANDOM_DETAIL_ARITHMETIC_CONSTRUCTOR(discard_block_engine,
-                                               result_type, value)
+                                               seed_type, value)
     { _rng.seed(value); _n = 0; }
     
     /**
@@ -88,7 +91,7 @@ public:
     /** default seeds the underlying generator. */
     void seed() { _rng.seed(); _n = 0; }
     /** Seeds the underlying generator with s. */
-    BOOST_RANDOM_DETAIL_ARITHMETIC_SEED(discard_block_engine, result_type, s)
+    BOOST_RANDOM_DETAIL_ARITHMETIC_SEED(discard_block_engine, seed_type, s)
     { _rng.seed(s); _n = 0; }
     /** Seeds the underlying generator with seq. */
     BOOST_RANDOM_DETAIL_SEED_SEQ_SEED(discard_block_engine, SeedSeq, seq)
@@ -105,22 +108,24 @@ public:
     {
         if(_n >= returned_block) {
             // discard values of random number generator
-            for( ; _n < total_block; ++_n)
+            // Don't use discard, since we still need to
+            // be somewhat compatible with TR1.
+            // _rng.discard(total_block - _n);
+            for(std::size_t i = 0; i < total_block - _n; ++i) {
                 _rng();
+            }
             _n = 0;
         }
         ++_n;
         return _rng();
     }
 
-#ifndef BOOST_NO_LONG_LONG
-    void discard(boost::ulong_long_type z)
+    void discard(boost::uintmax_t z)
     {
-        for(boost::ulong_long_type j = 0; j < z; ++j) {
+        for(boost::uintmax_t j = 0; j < z; ++j) {
             (*this)();
         }
     }
-#endif
 
     template<class It>
     void generate(It first, It last)
@@ -139,16 +144,6 @@ public:
     static result_type max BOOST_PREVENT_MACRO_SUBSTITUTION ()
     { return (base_type::max)(); }
 
-    /**
-     * INTERNAL ONLY
-     * Returns the number of random bits.
-     * This is not part of the standard, and I'm not sure that
-     * it's the best solution, but something like this is needed
-     * to implement generate_canonical.  For now, mark it as
-     * an implementation detail.
-     */
-    static std::size_t precision() { return base_type::precision(); }
-
 #ifndef BOOST_RANDOM_NO_STREAM_OPERATORS
     /** Writes a \discard_block_engine to a @c std::ostream. */
     template<class CharT, class Traits>
@@ -156,7 +151,7 @@ public:
     operator<<(std::basic_ostream<CharT,Traits>& os,
                const discard_block_engine& s)
     {
-        os << s._rng << " " << s._n;
+        os << s._rng << ' ' << s._n;
         return os;
     }
 
@@ -220,6 +215,23 @@ public:
 };
 
 /// \endcond
+
+namespace detail {
+
+    template<class Engine>
+    struct generator_bits;
+    
+    template<class URNG, std::size_t p, std::size_t r>
+    struct generator_bits<discard_block_engine<URNG, p, r> > {
+        static std::size_t value() { return generator_bits<URNG>::value(); }
+    };
+
+    template<class URNG, int p, int r>
+    struct generator_bits<discard_block<URNG, p, r> > {
+        static std::size_t value() { return generator_bits<URNG>::value(); }
+    };
+
+}
 
 } // namespace random
 

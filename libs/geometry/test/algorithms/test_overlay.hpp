@@ -1,6 +1,7 @@
-// Boost.Geometry (aka GGL, Generic Geometry Library) test file
-//
-// Copyright Barend Gehrels 2007-2009, Geodan, Amsterdam, the Netherlands
+// Boost.Geometry (aka GGL, Generic Geometry Library) 
+// Unit Test
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -143,7 +144,7 @@ static std::string two_bends[2] =
 
 // within each other, having no intersections but many holes within each other
 static std::string winded[2] =
-    {"POLYGON((0 0,0 11,11 11,11 0,0 0),(3 3,4 3,4 4,3 4,3 3),(5 3,6 3,6 4,5 4,5 3),(2 6,7 6,7 6,7 9,2 9,2 6),(9 2,10 2,10 5,9 5,9 2))",
+    {"POLYGON((0 0,0 11,11 11,11 0,0 0),(3 3,4 3,4 4,3 4,3 3),(5 3,6 3,6 4,5 4,5 3),(2 6,7 6,7 9,2 9,2 6),(9 2,10 2,10 5,9 5,9 2))",
     "POLYGON((1 1,1 10,10 10,10 6,8 6,8 1,1 1),(2 2,7 2,7 5,2 5,2 2),(3 7,4 7,4 8,3 8,3 7),(5 7,6 7,6 8,5 8,5 7),(8 7,9 7,9 8,8 8,8 7))"};
 
 static std::string within_holes_disjoint[2] =

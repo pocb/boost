@@ -50,6 +50,7 @@ ALIASES                = qbk{1}="\xmlonly <qbk>\1</qbk> \endxmlonly" \
 			brief_macro{1}="Macro to register a \1" \
 			brief_macro_const=" (const version)" \
 			brief_macro_getset=" (having separate get/set methods)" \
+            brief_meta{3}="Metafunction defining [*\1] as the \2 of the \3" \
 			tparam_allocator="container-allocator-type" \
 			tparam_box="Any type fulfilling a Box Concept" \
 			tparam_box_or_segment="Any type fulfilling a Box Concept or a Segment Concept" \
@@ -60,7 +61,7 @@ ALIASES                = qbk{1}="\xmlonly <qbk>\1</qbk> \endxmlonly" \
 			tparam_functor="Function or class with operator()" \
 			tparam_output_collection="output collection, either a multi-geometry, or a std::vector<Geometry> / std::deque<Geometry> etc" \
 			tparam_geometry="Any type fulfilling a Geometry Concept" \
-			tparam_geometry{1}="A type fulfilling a \1 Concept" \
+			tparam_geometry{1}="A type fulfilling the \1 Concept" \
 			tparam_index_required="Index, this template parameter is required. For a Box: either min_corner or max_corner. For a Segment: either 0 or 1 for first or last point." \
 			tparam_numeric="numerical type (int, double, ttmath, ...)" \
 			tparam_out{1}="A valid output iterator type, accepting geometries of \1 Concept" \
@@ -94,19 +95,22 @@ ALIASES                = qbk{1}="\xmlonly <qbk>\1</qbk> \endxmlonly" \
 			details_calc2{2}="The free function \1 calculates the \2 of two geometries" \
 			details_calc2{1}="The free function \1 calculates the \1 of two geometries" \
 			details_check12{2}="The free function \1 checks if the first geometry \2 the second geometry" \
-			details_macro{2}="The macro \1 registers a \2 such that it is recognized by Boost.Geometry and that Boost.Geometry functionality can used with the specified point type" \
+			details_macro{2}="The macro \1 registers a \2 such that it is recognized by Boost.Geometry and that Boost.Geometry functionality can used with the specified type." \
 			details_macro_const="The const version registers only read access to the fields, the point type is therefore read-only" \
 			details_macro_getset="The get/set version registers get and set methods separately and can be used for classes with protected member variables and get/set methods to change coordinates" \
+			details_macro_templated{2}="The type must have one template parameter, which should be a \2 type, and should not be specified. Boost.Geometry takes care of inserting the template parameter. Hence all types of this templated \1 are registered, regardless of their point type." \
 			details_default_strategy="It uses the default strategy, based on the coordinate system of the geometry." \
 			details_strategy_reasons="Reasons to specify a strategy include: use another coordinate system for calculations; construct the strategy beforehand (e.g. with the radius of the Earth); select a strategy when there are more than one available for a calculation." \
-			details_make{1}="This version with the make_ prefix returns the \1, and a template parameter must therefore be specified in the call." \
-			details_inserter{1}="This version with the _inserter suffix outputs the \1 to an output iterator, and a template parameter must therefore be specified in the call." \
+			details_return{1}="This version with the return_ prefix returns the \1, and a template parameter must therefore be specified in the call." \
+			details_insert{1}="This version with the _insert suffix outputs the \1 to an output iterator, and a template parameter must therefore be specified in the call." \
 			details_get_set="The free functions [*get] and [*set] are two of the most important functions of Boost.Geometry, both within the library, as also for the library user. With these two functions you normally get and set coordinate values from and for a point, box, segment or sphere." \
 			details_make="Boost.Geometry uses concepts for all its geometries. It does not rely on constructors. The "make" functions are object generators creating geometries. There are overloads, currently with two or three coordinate values or ranges, to construct geometry instances" \
 			return_calc{1}="The calculated \1" \
 			return_check{1}="Returns true if the geometry \1" \
 			return_check2{1}="Returns true if two geometries \1" \
 			return_out="The output iterator" \
+            meta_geometry_type="specified geometry type" \
+            meta_point_type="point type making up the specified geometry type" \
 			brf_for_each{1}="Applies function [*f] to each \1" \ 
 			det_envelope="envelope (also known as axis aligned bounding box, aabb, or minimum bounding rectangle, mbr)" \
 			det_buffer="buffer (a polygon being the spatial point set collection within a specified maximum distance from a geometry)" \
@@ -178,7 +182,6 @@ INPUT                  = . .. ../../../../boost/geometry/core \
 			../../../../boost/geometry/algorithms/detail/sections \
 			../../../../boost/geometry/arithmetic \
 			../../../../boost/geometry/geometries/concepts \
-			../../../../boost/geometry/geometries/concepts/detail \
 			../../../../boost/geometry/geometries \
 			../../../../boost/geometry/geometries/adapted \
 			../../../../boost/geometry/geometries/register \
@@ -187,12 +190,11 @@ INPUT                  = . .. ../../../../boost/geometry/core \
 			../../../../boost/geometry/multi/algorithms/detail \
 			../../../../boost/geometry/multi/core \
 			../../../../boost/geometry/multi/geometries \
+			../../../../boost/geometry/multi/geometries/register \
 			../../../../boost/geometry/multi/geometries/concepts \
-			../../../../boost/geometry/multi/iterators \
 			../../../../boost/geometry/multi/strategies/cartesian \
 			../../../../boost/geometry/policies \
 			../../../../boost/geometry/policies/relate \
-			../../../../boost/geometry/ranges \
 			../../../../boost/geometry/strategies \
 			../../../../boost/geometry/strategies/concepts \
 			../../../../boost/geometry/strategies/agnostic \
@@ -201,7 +203,6 @@ INPUT                  = . .. ../../../../boost/geometry/core \
 			../../../../boost/geometry/strategies/transform \
 			../../../../boost/geometry/util \
 			../../../../boost/geometry/views \
-			../../../../boost/geometry/extensions/io/svg \
 			./doxygen_input/pages \
 			./doxygen_input/groups
 INPUT_ENCODING         = UTF-8

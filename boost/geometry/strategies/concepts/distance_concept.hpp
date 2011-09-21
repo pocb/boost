@@ -1,6 +1,12 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
-//
-// Copyright Barend Gehrels 2007-2009, Geodan, Amsterdam, the Netherlands.
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2011 Bruno Lalande, Paris, France.
+// Copyright (c) 2009-2011 Mateusz Loskot, London, UK.
+
+// Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
+// (geolib/GGL), copyright (c) 1995-2010 Geodan, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -13,13 +19,7 @@
 
 #include <boost/concept_check.hpp>
 
-#include <boost/function_types/function_arity.hpp>
-#include <boost/function_types/is_member_function_pointer.hpp>
-#include <boost/function_types/parameter_types.hpp>
-#include <boost/mpl/at.hpp>
-#include <boost/mpl/int.hpp>
-#include <boost/mpl/plus.hpp>
-#include <boost/type_traits.hpp>
+#include <boost/geometry/util/parameter_type_of.hpp>
 
 #include <boost/geometry/geometries/concepts/point_concept.hpp>
 #include <boost/geometry/geometries/segment.hpp>
@@ -44,43 +44,18 @@ private :
         template <typename ApplyMethod>
         static void apply(ApplyMethod const&)
         {
-            namespace ft = boost::function_types;
-            typedef typename ft::parameter_types
-                <
-                    ApplyMethod
-                >::type parameter_types;
-
-            typedef typename boost::mpl::if_
-                <
-                    ft::is_member_function_pointer<ApplyMethod>,
-                    boost::mpl::int_<1>,
-                    boost::mpl::int_<0>
-                >::type base_index;
-
             // 1: inspect and define both arguments of apply
-            typedef typename boost::remove_reference
+            typedef typename parameter_type_of
                 <
-                    typename boost::mpl::at
-                        <
-                            parameter_types, 
-                            base_index
-                        >::type
+                    ApplyMethod, 0
                 >::type ptype1;
 
-            typedef typename boost::remove_reference
+            typedef typename parameter_type_of
                 <
-                    typename boost::mpl::at
-                        <
-                            parameter_types, 
-                            typename boost::mpl::plus
-                                <
-                                    base_index, 
-                                    boost::mpl::int_<1> 
-                                >::type
-                        >::type
+                    ApplyMethod, 1
                 >::type ptype2;
 
-            // 2) check if apply-arguments fulfill point concept 
+            // 2) check if apply-arguments fulfill point concept
             BOOST_CONCEPT_ASSERT
                 (
                     (concept::ConstPoint<ptype1>)
@@ -171,43 +146,17 @@ private :
         template <typename ApplyMethod>
         static void apply(ApplyMethod const&)
         {
-            namespace ft = boost::function_types;
-            typedef typename ft::parameter_types
+            typedef typename parameter_type_of
                 <
-                    ApplyMethod
-                >::type parameter_types;
-
-            typedef typename boost::mpl::if_
-                <
-                    ft::is_member_function_pointer<ApplyMethod>,
-                    boost::mpl::int_<1>,
-                    boost::mpl::int_<0>
-                >::type base_index;
-
-            // 1: inspect and define both arguments of apply
-            typedef typename boost::remove_reference
-                <
-                    typename boost::mpl::at
-                        <
-                            parameter_types, 
-                            base_index
-                        >::type
+                    ApplyMethod, 0
                 >::type ptype;
 
-            typedef typename boost::remove_reference
+            typedef typename parameter_type_of
                 <
-                    typename boost::mpl::at
-                        <
-                            parameter_types, 
-                            typename boost::mpl::plus
-                                <
-                                    base_index, 
-                                    boost::mpl::int_<1> 
-                                >::type
-                        >::type
+                    ApplyMethod, 1
                 >::type sptype;
 
-            // 2) check if apply-arguments fulfill point concept 
+            // 2) check if apply-arguments fulfill point concept
             BOOST_CONCEPT_ASSERT
                 (
                     (concept::ConstPoint<ptype>)

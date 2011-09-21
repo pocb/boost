@@ -1,6 +1,9 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
-//
-// Copyright (C) 2010 Mateusz Loskot <mateusz at loskot dot net>, London, UK
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2011 Bruno Lalande, Paris, France.
+// Copyright (c) 2009-2011 Mateusz Loskot, London, UK.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -16,9 +19,15 @@
 
 
 #include <boost/geometry/geometry.hpp>
-#include <boost/geometry/geometries/adapted/c_array_cartesian.hpp>
+#include <boost/geometry/geometries/point_xy.hpp>
+#include <boost/geometry/geometries/polygon.hpp>
+#include <boost/geometry/geometries/adapted/c_array.hpp>
 
-#include <boost/geometry/extensions/io/svg/svg_mapper.hpp>
+#if defined(HAVE_SVG)
+#  include <boost/geometry/extensions/io/svg/svg_mapper.hpp>
+#endif
+
+BOOST_GEOMETRY_REGISTER_C_ARRAY_CS(cs::cartesian)
 
 
 int main(void)
@@ -29,8 +38,10 @@ int main(void)
     typedef bg::model::polygon<point_2d> polygon_2d;
 
 
+#if defined(HAVE_SVG)
     std::ofstream stream("05_a_intersection_polygon_example.svg");
     bg::svg_mapper<point_2d> svg(stream, 500, 500);
+#endif
 
     // Define a polygons and fill the outer rings.
     polygon_2d a;
@@ -38,25 +49,27 @@ int main(void)
         const double c[][2] = {
             {160, 330}, {60, 260}, {20, 150}, {60, 40}, {190, 20}, {270, 130}, {260, 250}, {160, 330}
         };
-        bg::assign(a, c);
+        bg::assign_points(a, c);
     }
     bg::correct(a);
     std::cout << "A: " << bg::dsv(a) << std::endl;
-    svg.add(a);
 
     polygon_2d b;
     {
         const double c[][2] = {
             {300, 330}, {190, 270}, {150, 170}, {150, 110}, {250, 30}, {380, 50}, {380, 250}, {300, 330}
         };
-        bg::assign(b, c);
+        bg::assign_points(b, c);
     }
     bg::correct(b);
     std::cout << "B: " << bg::dsv(b) << std::endl;
+#if defined(HAVE_SVG)
+    svg.add(a);
     svg.add(b);
 
     svg.map(a, "opacity:0.6;fill:rgb(0,255,0);");
     svg.map(b, "opacity:0.6;fill:rgb(0,0,255);");
+#endif
 
 
     // Calculate interesection(s)
@@ -67,7 +80,9 @@ int main(void)
     BOOST_FOREACH(polygon_2d const& polygon, intersection)
     {
         std::cout << bg::dsv(polygon) << std::endl;
+#if defined(HAVE_SVG)
         svg.map(polygon, "opacity:0.5;fill:none;stroke:rgb(255,0,0);stroke-width:6");
+#endif
     }
 
     return 0;

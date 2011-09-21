@@ -1,7 +1,12 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
-//
-// Copyright Barend Gehrels 2007-2009, Geodan, Amsterdam, the Netherlands.
-// Copyright Bruno Lalande 2008, 2009
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2011 Bruno Lalande, Paris, France.
+// Copyright (c) 2009-2011 Mateusz Loskot, London, UK.
+
+// Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
+// (geolib/GGL), copyright (c) 1995-2010 Geodan, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -16,6 +21,7 @@
 
 #include <boost/geometry/util/select_coordinate_type.hpp>
 
+#include <boost/geometry/strategies/side.hpp>
 
 
 namespace boost { namespace geometry
@@ -26,8 +32,7 @@ namespace strategy { namespace side
 
 /*!
 \brief Check at which side of a segment a point lies:
-\details left of segment (> 0), right of segment (< 0), on segment (0)
-         In fact this is twice the area of a triangle
+    left of segment (> 0), right of segment (< 0), on segment (0)
 \ingroup strategies
 \tparam CalculationType \tparam_calculation
  */
@@ -84,22 +89,28 @@ public :
 
         promoted_type const s = dx * dpy - dy * dpx;
 
-        promoted_type zero = promoted_type();
-        return math::equals(s, zero) ? 0 : s > zero ? 1 : -1;
-        //return s > 0 ? 1 : s < 0 ? -1 : 0;
+        promoted_type const zero = promoted_type();
+        return math::equals(s, zero) ? 0 
+            : s > zero ? 1 
+            : -1;
     }
 };
 
-}} // namespace strategy::side
-
 
 #ifndef DOXYGEN_NO_STRATEGY_SPECIALIZATIONS
-template <typename CalculationType>
-struct strategy_side<cartesian_tag, CalculationType>
+namespace services
 {
-    typedef strategy::side::side_by_triangle<CalculationType> type;
+
+template <typename CalculationType>
+struct default_strategy<cartesian_tag, CalculationType>
+{
+    typedef side_by_triangle<CalculationType> type;
 };
+
+}
 #endif
+
+}} // namespace strategy::side
 
 }} // namespace boost::geometry
 

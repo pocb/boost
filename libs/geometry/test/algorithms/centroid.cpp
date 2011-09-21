@@ -1,7 +1,13 @@
-// Boost.Geometry (aka GGL, Generic Geometry Library) test file
-//
-// Copyright Barend Gehrels 2007-2009, Geodan, Amsterdam, the Netherlands
-// Copyright Bruno Lalande 2008, 2009
+// Boost.Geometry (aka GGL, Generic Geometry Library)
+// Unit Test
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2011 Bruno Lalande, Paris, France.
+// Copyright (c) 2009-2011 Mateusz Loskot, London, UK.
+
+// Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
+// (geolib/GGL), copyright (c) 1995-2010 Geodan, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -9,10 +15,15 @@
 #include <algorithms/test_centroid.hpp>
 
 #include <boost/geometry/geometries/geometries.hpp>
-#include <boost/geometry/geometries/adapted/c_array_cartesian.hpp>
-#include <boost/geometry/geometries/adapted/tuple_cartesian.hpp>
+#include <boost/geometry/geometries/point_xy.hpp>
+#include <boost/geometry/geometries/adapted/c_array.hpp>
+#include <boost/geometry/geometries/adapted/boost_tuple.hpp>
 
 #include <test_geometries/all_custom_polygon.hpp>
+
+BOOST_GEOMETRY_REGISTER_C_ARRAY_CS(cs::cartesian)
+BOOST_GEOMETRY_REGISTER_BOOST_TUPLE_CS(cs::cartesian)
+
 
 template <typename Polygon>
 void test_polygon()
@@ -72,8 +83,18 @@ void test_2d()
 template <typename P>
 void test_3d()
 {
+    test_centroid<bg::model::linestring<P> >("LINESTRING(1 2 3,4 5 -6,7 -8 9,-10 11 12,13 -14 -15, 16 17 18)",
+                                             5.6748865168734692, 0.31974938587214002, 1.9915270387763671);
     test_centroid<bg::model::box<P> >("POLYGON((1 2 3,5 6 7))", 3, 4, 5);
     test_centroid<P>("POINT(1 2 3)", 1, 2, 3);
+}
+
+
+template <typename P>
+void test_5d()
+{
+    test_centroid<bg::model::linestring<P> >("LINESTRING(1 2 3 4 95,4 5 -6 24 40,7 -8 9 -5 -7,-10 11 12 -5 5,13 -14 -15 4 3, 16 17 18 5 12)",
+                                             4.9202312983547678, 0.69590937869808345, 1.2632138719797417, 6.0468332057401986, 23.082402715244868);
 }
 
 
@@ -85,8 +106,11 @@ int test_main(int, char* [])
 
     test_3d<boost::tuple<double, double, double> >();
 
+    test_5d<boost::tuple<double, double, double, double, double> >();
+
 #if defined(HAVE_TTMATH)
     test_2d<bg::model::d2::point_xy<ttmath_big> >();
+    test_3d<boost::tuple<ttmath_big, ttmath_big, ttmath_big> >();
 #endif
 
     return 0;

@@ -82,11 +82,13 @@ void select_reactor::shutdown_service()
     op_queue_[i].get_all_operations(ops);
 
   timer_queues_.get_all_timers(ops);
+
+  io_service_.abandon_operations(ops);
 }
 
-void select_reactor::fork_service(boost::asio::io_service::fork_event event)
+void select_reactor::fork_service(boost::asio::io_service::fork_event fork_ev)
 {
-  if (event == boost::asio::io_service::fork_child)
+  if (fork_ev == boost::asio::io_service::fork_child)
     interrupter_.recreate();
 }
 
@@ -111,6 +113,12 @@ int select_reactor::register_internal_descriptor(
   interrupter_.interrupt();
 
   return 0;
+}
+
+void select_reactor::move_descriptor(socket_type,
+    select_reactor::per_descriptor_data&,
+    select_reactor::per_descriptor_data&)
+{
 }
 
 void select_reactor::start_op(int op_type, socket_type descriptor,

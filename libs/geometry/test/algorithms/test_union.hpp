@@ -1,6 +1,7 @@
-// Boost.Geometry (aka GGL, Generic Geometry Library) test file
-//
-// Copyright Barend Gehrels 2007-2009, Geodan, Amsterdam, the Netherlands
+// Boost.Geometry (aka GGL, Generic Geometry Library) 
+// Unit Test
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -20,7 +21,6 @@
 #include <boost/geometry/algorithms/correct.hpp>
 #include <boost/geometry/algorithms/length.hpp>
 #include <boost/geometry/algorithms/num_points.hpp>
-#include <boost/geometry/algorithms/unique.hpp>
 
 #include <boost/geometry/geometries/geometries.hpp>
 
@@ -45,7 +45,7 @@ void test_union(std::string const& caseid, G1 const& g1, G2 const& g2,
     std::vector<OutputType> clip;
     bg::union_(g1, g2, clip);
 
-    typename bg::area_result<G1>::type area = 0;
+    typename bg::default_area_result<G1>::type area = 0;
     std::size_t n = 0;
     std::size_t holes = 0;
     for (typename std::vector<OutputType>::iterator it = clip.begin();
@@ -54,10 +54,6 @@ void test_union(std::string const& caseid, G1 const& g1, G2 const& g2,
         area += bg::area(*it);
         holes += bg::num_interior_rings(*it);
 
-        // Get a correct point-count without duplicate points
-        // (note that overlay might be adapted to avoid duplicates)
-        OutputType simplified;
-        bg::unique(*it);
         n += bg::num_points(*it, true);
     }
 
@@ -66,9 +62,9 @@ void test_union(std::string const& caseid, G1 const& g1, G2 const& g2,
         // Test if inserter returns output-iterator (using Boost.Range copy)
         std::vector<OutputType> inserted, array_with_one_empty_geometry;
         array_with_one_empty_geometry.push_back(OutputType());
-        boost::copy(array_with_one_empty_geometry, bg::union_inserter<OutputType>(g1, g2, std::back_inserter(inserted)));
+        boost::copy(array_with_one_empty_geometry, bg::detail::union_::union_insert<OutputType>(g1, g2, std::back_inserter(inserted)));
 
-        typename bg::area_result<G1>::type area_inserted = 0;
+        typename bg::default_area_result<G1>::type area_inserted = 0;
         for (typename std::vector<OutputType>::iterator it = inserted.begin();
                 it != inserted.end(); ++it)
         {

@@ -1,6 +1,7 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
-//
-// Copyright Barend Gehrels 2010, Geodan, Amsterdam, the Netherlands.
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -20,7 +21,7 @@ namespace detail { namespace buffer
 {
 
 
-// TODO: once convert this to proper strategy
+// TODO: once change this to proper strategy
 // It is different from current segment intersection because these are not segments but lines
 // If we have the Line concept, we can create a strategy
 template <typename Point, typename Line1, typename Line2 = Line1>

@@ -1,6 +1,7 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
-//
-// Copyright Barend Gehrels 2010, Geodan, Amsterdam, the Netherlands.
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -18,14 +19,14 @@
 
 #include <boost/geometry/core/point_type.hpp>
 
-#include <boost/geometry/strategies/buffer_side.hpp>
-#include <boost/geometry/algorithms/detail/buffer/intersecting_inserter.hpp>
-#include <boost/geometry/algorithms/detail/buffer/linestring_buffer.hpp>
-#include <boost/geometry/algorithms/detail/buffer/line_line_intersection.hpp>
+#include <boost/geometry/extensions/strategies/buffer_side.hpp>
+#include <boost/geometry/extensions/algorithms/detail/buffer/intersecting_inserter.hpp>
+#include <boost/geometry/extensions/algorithms/detail/buffer/linestring_buffer.hpp>
+#include <boost/geometry/extensions/algorithms/detail/buffer/line_line_intersection.hpp>
 
 
-#include <boost/geometry/algorithms/detail/overlay/dissolver.hpp>
-#include <boost/geometry/algorithms/detail/overlay/split_rings.hpp>
+#include <boost/geometry/extensions/algorithms/detail/overlay/dissolver.hpp>
+#include <boost/geometry/extensions/algorithms/detail/overlay/split_rings.hpp>
 
 
 
@@ -77,7 +78,7 @@ inline void splitting_buffer(Geometry const& geometry,
     std::vector<ring_type> rings;
     BOOST_FOREACH(GeometryOut const& polygon, buffered)
     {
-//std::cout << bg::wkt(polygon) << " ; POLYGON" << std::endl;
+//std::cout << geometry::wkt(polygon) << " ; POLYGON" << std::endl;
         geometry::split_rings(polygon, rings);
     }
 

@@ -1,7 +1,13 @@
-// Boost.Geometry (aka GGL, Generic Geometry Library) test file
-//
-// Copyright Barend Gehrels 2007-2009, Geodan, Amsterdam, the Netherlands
-// Copyright Bruno Lalande 2008, 2009
+// Boost.Geometry (aka GGL, Generic Geometry Library)
+// Unit Test
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2011 Bruno Lalande, Paris, France.
+// Copyright (c) 2009-2011 Mateusz Loskot, London, UK.
+
+// Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
+// (geolib/GGL), copyright (c) 1995-2010 Geodan, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -14,14 +20,22 @@
 //#define BOOST_GEOMETRY_DEBUG_IDENTIFIER
 
 
+#include <boost/geometry/geometries/point_xy.hpp>
+#include <boost/geometry/geometries/register/linestring.hpp>
+
+#include <boost/geometry/util/rational.hpp>
+
 #include <algorithms/test_intersection.hpp>
 #include <algorithms/test_overlay.hpp>
 
-#include <boost/geometry/geometries/adapted/std_as_linestring.hpp>
+#include <algorithms/overlay/overlay_cases.hpp>
 
 #include <test_common/test_point.hpp>
 #include <test_common/with_pointer.hpp>
 #include <test_geometries/custom_segment.hpp>
+
+BOOST_GEOMETRY_REGISTER_LINESTRING_TEMPLATED(std::vector)
+
 
 static std::string pie_2_3_23_0[2] =
 {
@@ -40,7 +54,7 @@ void test_areal()
         simplex_normal[0], polygon_empty,
         0, 0, 0.0);
     test_one<Polygon, Polygon, Polygon>("simplex_with_empty_2",
-        polygon_empty, simplex_normal[0], 
+        polygon_empty, simplex_normal[0],
         0, 0, 0.0);
 
     test_one<Polygon, Polygon, Polygon>("simplex_normal",
@@ -145,17 +159,40 @@ void test_areal()
         crossed[0], crossed[1],
         3, 0, 1.5);
 
+    typedef typename bg::coordinate_type<Polygon>::type ct;
+
 #ifdef _MSC_VER
-    {
-        // Isovist (submitted by Brandon during Formal Review)
-        std::string tn = string_from_type<typename bg::coordinate_type<Polygon>::type>::name();
-        test_one<Polygon, Polygon, Polygon>("isovist",
-            isovist1[0], isovist1[1],
-            1,
-            tn == std::string("f") ? 19 : tn == std::string("d") ? 22 : 20,
-            88.19203,
-            tn == std::string("f") ? 0.5 : tn == std::string("d") ? 0.1 : 0.01);
-    }
+    // Isovist (submitted by Brandon during Formal Review)
+    test_one<Polygon, Polygon, Polygon>("isovist",
+        isovist1[0], isovist1[1],
+        1,
+        if_typed<ct, float>(19, if_typed<ct, double>(20, 20)),
+        88.19203,
+        if_typed<ct, float>(0.5, if_typed<ct, double>(0.1, 0.01)));
+#endif
+
+    //std::cout << typeid(ct).name() << std::endl;
+
+    test_one<Polygon, Polygon, Polygon>("ggl_list_20110306_javier",
+        ggl_list_20110306_javier[0], ggl_list_20110306_javier[1],
+        1, if_typed_tt<ct>(5, 4), 
+        0.6649875, 
+        if_typed<ct, float>(1.0, 0.01)); 
+        
+    test_one<Polygon, Polygon, Polygon>("ggl_list_20110307_javier",
+        ggl_list_20110307_javier[0], ggl_list_20110307_javier[1],
+        1, 4, 0.4, 0.01);
+
+    test_one<Polygon, Polygon, Polygon>("ggl_list_20110627_phillip",
+        ggl_list_20110627_phillip[0], ggl_list_20110627_phillip[1],
+        1, if_typed_tt<ct>(6, 5), 11151.6618);
+
+#ifdef _MSC_VER // gcc/linux behaves differently
+    test_one<Polygon, Polygon, Polygon>("ggl_list_20110716_enrico",
+        ggl_list_20110716_enrico[0], ggl_list_20110716_enrico[1],
+        3, 
+        if_typed<ct, float>(19, if_typed<ct, double>(22, 21)),
+        35723.8506317139);
 #endif
 
     return;
@@ -204,7 +241,7 @@ void test_areal_clip()
         2, 13, 1.0744456);
 
     test_one<Polygon, Box, Polygon>("clip_poly7", "Box(0 0, 3 3)",
-        "POLYGON((2 2, 1 4, 2 4, 3 3, 2 2))", 
+        "POLYGON((2 2, 1 4, 2 4, 3 3, 2 2))",
         1, 4, 0.75);
 }
 
@@ -217,7 +254,7 @@ void test_boxes(std::string const& wkt1, std::string const& wkt2, double expecte
 
     Box box_out;
     bool detected = bg::intersection(box1, box2, box_out);
-    typename bg::area_result<Box>::type area = bg::area(box_out);
+    typename bg::default_area_result<Box>::type area = bg::area(box_out);
 
     BOOST_CHECK_EQUAL(detected, expected_result);
     if (detected && expected_result)
@@ -226,6 +263,23 @@ void test_boxes(std::string const& wkt1, std::string const& wkt2, double expecte
     }
 }
 
+
+template <typename P>
+void test_point_output()
+{
+    typedef bg::model::linestring<P> linestring;
+    typedef bg::model::polygon<P> polygon;
+    typedef bg::model::box<P> box;
+    typedef bg::model::segment<P> segment;
+
+    test_point_output<polygon, polygon>(simplex_normal[0], simplex_normal[1], 6);
+    test_point_output<box, polygon>("box(1 1,6 4)", simplex_normal[0], 4);
+    test_point_output<linestring, polygon>("linestring(0 2,6 2)", simplex_normal[0], 2);
+    // NYI because of sectionize:
+    // test_point_output<segment, polygon>("linestring(0 2,6 2)", simplex_normal[0], 2);
+    // NYI because needs special treatment:
+    // test_point_output<box, box>("box(0 0,4 4)", "box(2 2,6 6)", 2);
+}
 
 template <typename P>
 void test_all()
@@ -253,7 +307,7 @@ void test_all()
 
 #if defined(TEST_FAIL_DIFFERENT_ORIENTATIONS)
     // Should NOT compile
-    // NOTE: this can probably be relaxed later on.        
+    // NOTE: this can probably be relaxed later on.
     test_one<polygon, polygon_ccw, polygon>("simplex_normal",
         simplex_normal[0], simplex_normal[1],
         1, 7, 5.47363293);
@@ -287,7 +341,7 @@ void test_all()
     // Outputting two lines (because of 3-4-5 constructions (0.3,0.4,0.5)
     // which occur 4 times, the length is expected to be 2.0)
     test_one<linestring, linestring, box>("llb_2", "LINESTRING(1.7 1.6,2.3 2.4,2.9 1.6,3.5 2.4,4.1 1.6)", clip, 2, 6, 4 * 0.5);
-    
+
     // linear
     test_one<P, linestring, linestring>("llp1", "LINESTRING(0 0,1 1)", "LINESTRING(0 1,1 0)", 1, 1, 0);
     test_one<P, segment, segment>("ssp1", "LINESTRING(0 0,1 1)", "LINESTRING(0 1,1 0)", 1, 1, 0);
@@ -300,6 +354,8 @@ void test_all()
     test_boxes<box>("box(2 2,8 7)", "box(4 4,10 10)", 12, true);
     test_boxes<box>("box(2 2,8 7)", "box(14 4,20 10)", 0, false);
     test_boxes<box>("box(2 2,4 4)", "box(4 4,8 8)", 0, true);
+
+    test_point_output<P>();
 
 
     /*
@@ -318,11 +374,11 @@ void test_pointer_version()
     p = new test::test_point_xy; p->x = 10; p->y = 10; ln.push_back(p);
 
     bg::model::box<bg::model::d2::point_xy<double> > box;
-    bg::assign(box, 2, 2, 8, 8);
+    bg::assign_values(box, 2, 2, 8, 8);
 
     typedef bg::model::linestring<bg::model::d2::point_xy<double> > output_type;
     std::vector<output_type> clip;
-    bg::intersection_inserter<output_type>(box, ln, std::back_inserter(clip));
+    bg::detail::intersection::intersection_insert<output_type>(box, ln, std::back_inserter(clip));
 
     double length = 0;
     int n = 0;
@@ -344,18 +400,54 @@ void test_pointer_version()
 }
 
 
+template <typename P>
+void test_exception()
+{
+    typedef bg::model::polygon<P> polygon;
+
+    try
+    {
+        // Define polygon with a spike (= invalid)
+        std::string spike = "POLYGON((0 0,0 4,2 4,2 6,2 4,4 4,4 0,0 0))";
+
+        test_one<polygon, polygon, polygon>("with_spike",
+            simplex_normal[0], spike,
+            0, 0, 0);
+    }
+    catch(bg::overlay_invalid_input_exception const& )
+    {
+        return;
+    }
+    BOOST_CHECK_MESSAGE(false, "No exception thrown");
+}
+
+template <typename Point>
+void test_rational()
+{
+    typedef bg::model::polygon<Point> polygon;
+    test_one<polygon, polygon, polygon>("simplex_normal",
+        simplex_normal[0], simplex_normal[1],
+        1, 7, 5.47363293);
+}
 
 
 int test_main(int, char* [])
 {
-    test_all<bg::model::d2::point_xy<float> >();
     test_all<bg::model::d2::point_xy<double> >();
+
+#if ! defined(BOOST_GEOMETRY_TEST_ONLY_ONE_TYPE)
+    test_all<bg::model::d2::point_xy<float> >();
 
 #if defined(HAVE_TTMATH)
     test_all<bg::model::d2::point_xy<ttmath_big> >();
 #endif
 
-    //test_pointer_version();
+#endif
+
+    test_exception<bg::model::d2::point_xy<double> >();
+    test_pointer_version();
+    test_rational<bg::model::d2::point_xy<boost::rational<int> > >();
+
     return 0;
 }
 

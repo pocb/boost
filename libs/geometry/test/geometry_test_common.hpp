@@ -1,7 +1,12 @@
-// Boost.Geometry (aka GGL, Generic Geometry Library) test file
-//
-// Copyright Barend Gehrels 2007-2009, Geodan, Amsterdam, the Netherlands
-// Copyright Bruno Lalande 2008, 2009
+// Boost.Geometry (aka GGL, Generic Geometry Library)
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2011 Bruno Lalande, Paris, France.
+// Copyright (c) 2009-2011 Mateusz Loskot, London, UK.
+
+// Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
+// (geolib/GGL), copyright (c) 1995-2010 Geodan, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -18,6 +23,15 @@
 
 //#pragma warning( disable : 4305 )
 #endif // defined(_MSC_VER)
+
+#include <boost/config.hpp>
+
+
+#if defined(BOOST_INTEL_CXX_VERSION)
+#define BOOST_GEOMETRY_TEST_ONLY_ONE_TYPE
+#endif
+
+
 
 #include <boost/foreach.hpp>
 
@@ -68,6 +82,11 @@ template <> struct string_from_type<long double>
     { static std::string name() { return "t"; }  };
 #endif
 
+#if defined(BOOST_RATIONAL_HPP) 
+template <typename T> struct string_from_type<boost::rational<T> >
+{ static std::string name() { return "r"; }  };
+#endif
+
 
 #if defined(HAVE_GMP)
     template <> struct string_from_type<boost::numeric_adaptor::gmp_value_type>
@@ -78,6 +97,47 @@ template <> struct string_from_type<long double>
     template <> struct string_from_type<boost::numeric_adaptor::cln_value_type>
     { static std::string name() { return "c"; }  };
 #endif
+
+
+template <typename CoordinateType, typename T>
+inline T if_typed_tt(T value_tt, T value)
+{
+#if defined(HAVE_TTMATH)
+    return boost::is_same<CoordinateType, ttmath_big>::value ? value_tt : value;
+#else
+    return value;
+#endif
+}
+
+template <typename CoordinateType, typename Specified, typename T>
+inline T if_typed(T value_typed, T value)
+{
+    return boost::is_same<CoordinateType, Specified>::value ? value_typed : value;
+}
+
+
+
+
+struct geographic_policy
+{
+    template <typename CoordinateType>
+    static inline CoordinateType apply(CoordinateType const& value)
+    {
+        return value;
+    }
+};
+
+struct mathematical_policy
+{
+    template <typename CoordinateType>
+    static inline CoordinateType apply(CoordinateType const& value)
+    {
+        return 90 - value;
+    }
+    
+};
+
+
 
 
 // For all tests:

@@ -75,7 +75,7 @@ public:
 
   // Recreate internal descriptors following a fork.
   BOOST_ASIO_DECL void fork_service(
-      boost::asio::io_service::fork_event event);
+      boost::asio::io_service::fork_event fork_ev);
 
   // Initialise the task, but only if the reactor is not in its own thread.
   BOOST_ASIO_DECL void init_task();
@@ -114,6 +114,11 @@ public:
   // Remote the descriptor's registration from the reactor.
   BOOST_ASIO_DECL void deregister_internal_descriptor(
       socket_type descriptor, per_descriptor_data& descriptor_data);
+
+  // Move descriptor registration from one descriptor_data object to another.
+  BOOST_ASIO_DECL void move_descriptor(socket_type descriptor,
+      per_descriptor_data& target_descriptor_data,
+      per_descriptor_data& source_descriptor_data);
 
   // Add a new timer queue to the reactor.
   template <typename Time_Traits>

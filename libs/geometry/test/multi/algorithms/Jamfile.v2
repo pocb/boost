@@ -1,6 +1,8 @@
-# test/arithmetic/Jamfile.v2 
+# Boost.Geometry (aka GGL, Generic Geometry Library)
 #
-# Copyright (c) 2009 Mateusz Loskot <mateusz@loskot.net>
+# Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+# Copyright (c) 2008-2011 Bruno Lalande, Paris, France.
+# Copyright (c) 2009-2011 Mateusz Loskot, London, UK.
 #
 # Use, modification and distribution is subject to the Boost Software License,
 # Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
@@ -10,8 +12,10 @@ test-suite boost-geometry-multi-algorithms
     :
     [ run multi_area.cpp ]
     [ run multi_centroid.cpp ]
+    [ run multi_convert.cpp ]
     [ run multi_convex_hull.cpp ]
     [ run multi_correct.cpp ]
+    [ run multi_covered_by.cpp ]
     [ run multi_difference.cpp ]
     [ run multi_envelope.cpp ]
     [ run multi_equals.cpp ]

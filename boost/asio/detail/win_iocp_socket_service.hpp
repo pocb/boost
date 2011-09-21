@@ -133,6 +133,39 @@ public:
   {
   }
 
+  // Move-construct a new socket implementation.
+  void move_construct(implementation_type& impl,
+      implementation_type& other_impl)
+  {
+    this->base_move_construct(impl, other_impl);
+
+    impl.protocol_ = other_impl.protocol_;
+    other_impl.protocol_ = endpoint_type().protocol();
+
+    impl.have_remote_endpoint_ = other_impl.have_remote_endpoint_;
+    other_impl.have_remote_endpoint_ = false;
+
+    impl.remote_endpoint_ = other_impl.remote_endpoint_;
+    other_impl.remote_endpoint_ = endpoint_type();
+  }
+
+  // Move-assign from another socket implementation.
+  void move_assign(implementation_type& impl,
+      win_iocp_socket_service_base& other_service,
+      implementation_type& other_impl)
+  {
+    this->base_move_assign(impl, other_service, other_impl);
+
+    impl.protocol_ = other_impl.protocol_;
+    other_impl.protocol_ = endpoint_type().protocol();
+
+    impl.have_remote_endpoint_ = other_impl.have_remote_endpoint_;
+    other_impl.have_remote_endpoint_ = false;
+
+    impl.remote_endpoint_ = other_impl.remote_endpoint_;
+    other_impl.remote_endpoint_ = endpoint_type();
+  }
+
   // Open a new socket implementation.
   boost::system::error_code open(implementation_type& impl,
       const protocol_type& protocol, boost::system::error_code& ec)
@@ -258,7 +291,7 @@ public:
   template <typename ConstBufferSequence, typename Handler>
   void async_send_to(implementation_type& impl,
       const ConstBufferSequence& buffers, const endpoint_type& destination,
-      socket_base::message_flags flags, Handler& handler)
+      socket_base::message_flags flags, Handler handler)
   {
     // Allocate and construct an operation to wrap the handler.
     typedef win_iocp_socket_send_op<ConstBufferSequence, Handler> op;
@@ -281,7 +314,7 @@ public:
   // Start an asynchronous wait until data can be sent without blocking.
   template <typename Handler>
   void async_send_to(implementation_type& impl, const null_buffers&,
-      const endpoint_type&, socket_base::message_flags, Handler& handler)
+      const endpoint_type&, socket_base::message_flags, Handler handler)
   {
     // Allocate and construct an operation to wrap the handler.
     typedef win_iocp_null_buffers_op<Handler> op;
@@ -339,7 +372,7 @@ public:
   template <typename MutableBufferSequence, typename Handler>
   void async_receive_from(implementation_type& impl,
       const MutableBufferSequence& buffers, endpoint_type& sender_endp,
-      socket_base::message_flags flags, Handler& handler)
+      socket_base::message_flags flags, Handler handler)
   {
     // Allocate and construct an operation to wrap the handler.
     typedef win_iocp_socket_recvfrom_op<
@@ -363,7 +396,7 @@ public:
   template <typename Handler>
   void async_receive_from(implementation_type& impl,
       const null_buffers&, endpoint_type& sender_endpoint,
-      socket_base::message_flags flags, Handler& handler)
+      socket_base::message_flags flags, Handler handler)
   {
     // Allocate and construct an operation to wrap the handler.
     typedef win_iocp_null_buffers_op<Handler> op;
@@ -415,7 +448,7 @@ public:
   // must be valid until the accept's handler is invoked.
   template <typename Socket, typename Handler>
   void async_accept(implementation_type& impl, Socket& peer,
-      endpoint_type* peer_endpoint, Handler& handler)
+      endpoint_type* peer_endpoint, Handler handler)
   {
     // Allocate and construct an operation to wrap the handler.
     typedef win_iocp_socket_accept_op<Socket, protocol_type, Handler> op;
@@ -448,7 +481,7 @@ public:
   // Start an asynchronous connect.
   template <typename Handler>
   void async_connect(implementation_type& impl,
-      const endpoint_type& peer_endpoint, Handler& handler)
+      const endpoint_type& peer_endpoint, Handler handler)
   {
     // Allocate and construct an operation to wrap the handler.
     typedef reactive_socket_connect_op<Handler> op;

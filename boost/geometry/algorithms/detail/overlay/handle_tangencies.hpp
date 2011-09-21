@@ -1,6 +1,7 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
-//
-// Copyright Barend Gehrels 2010, Geodan, Amsterdam, the Netherlands.
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -10,10 +11,11 @@
 
 #include <algorithm>
 
-
 #include <boost/geometry/algorithms/detail/ring_identifier.hpp>
 #include <boost/geometry/algorithms/detail/overlay/copy_segment_point.hpp>
 #include <boost/geometry/algorithms/detail/overlay/turn_info.hpp>
+
+#include <boost/geometry/geometries/segment.hpp>
 
 
 namespace boost { namespace geometry
@@ -175,9 +177,9 @@ private :
         }
         else
         {
-//#ifdef BOOST_GEOMETRY_DEBUG_ENRICH
+#ifdef BOOST_GEOMETRY_DEBUG_ENRICH
             std::cout << "ux/ux unhandled" << std::endl;
-//#endif
+#endif
         }
 
         //debug_consider(0, left, right, header, false, "-> return ", ret);
@@ -219,7 +221,7 @@ private :
         else
         {
 #ifdef BOOST_GEOMETRY_DEBUG_ENRICH
-            // TODO: this still happens in the traverse.cpp test
+            // this still happens in the traverse.cpp test
             std::cout << " iu/ux unhandled" << std::endl;
 #endif
             ret = order == 1;
@@ -303,9 +305,9 @@ private :
                 debug_consider(0, left, right, header, false, "opp.", ret);
                 return ret;
             }
-//#ifdef BOOST_GEOMETRY_DEBUG_ENRICH
+#ifdef BOOST_GEOMETRY_DEBUG_ENRICH
             std::cout << " iu/iu coming from opposite unhandled" << std::endl;
-//#endif
+#endif
         }
 
         // We need EXTRA information here: are p/r/s overlapping?
@@ -358,10 +360,10 @@ private :
             }
         }
 
-//#ifdef BOOST_GEOMETRY_DEBUG_ENRICH
+#ifdef BOOST_GEOMETRY_DEBUG_ENRICH
         std::cout << " iu/iu unhandled" << std::endl;
         debug_consider(0, left, right, header, false, "unhandled", left.index < right.index);
-//#endif
+#endif
         return left.index < right.index;
     }
 

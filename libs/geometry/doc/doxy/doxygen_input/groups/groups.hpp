@@ -1,6 +1,7 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
 //
-// Copyright Barend Gehrels 2011, Geodan, Amsterdam, the Netherlands
+// Copyright (c) 2011 Barend Gehrels, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -16,7 +17,6 @@
 \defgroup buffer buffer: calculate buffer of a geometry
 \defgroup centroid centroid: calculate centroid (center of gravity) of a geometry
 \defgroup clear clear: clear geometries
-\defgroup combine combine: add a geometry to a bounding box
 \defgroup compare compare: define compare functors for points
 \defgroup concepts geometry concepts: defines and checks concepts for geometries
 \defgroup convert convert: convert geometries from one type to another
@@ -30,6 +30,7 @@
 \defgroup enum enum: enumerations
 \defgroup envelope envelope: calculate envelope (minimum bounding rectangle) of a geometry
 \defgroup equals equals: detect if two geometries are spatially equal
+\defgroup expand expand: add a geometry to a bounding box
 \defgroup exterior_ring exterior_ring: exterior_ring
 \defgroup for_each for_each: apply a functor to each point or segment of a geometry
 \defgroup geometries geometries: geometries provided by default

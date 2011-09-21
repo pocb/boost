@@ -20,6 +20,7 @@
 #include <stdexcept>
 #include <boost/assert.hpp>
 #include <boost/config.hpp>
+#include <boost/cstdint.hpp>
 #include <boost/limits.hpp>
 #include <boost/static_assert.hpp>
 #include <boost/integer/static_log2.hpp>
@@ -186,9 +187,8 @@ public:
     void generate(Iter first, Iter last)
     { detail::generate_from_int(*this, first, last); }
 
-#ifndef BOOST_NO_LONG_LONG
     /** Advances the state of the generator by @c z. */
-    void discard(boost::ulong_long_type z)
+    void discard(boost::uintmax_t z)
     {
         typedef const_mod<IntType, m> mod_type;
         IntType b_inv = mod_type::invert(a-1);
@@ -202,7 +202,7 @@ public:
             // we're storing the intermediate result / b_gcd
             IntType a_zm1_over_gcd = 0;
             IntType a_km1_over_gcd = (a - 1) / b_gcd;
-            boost::ulong_long_type exponent = z;
+            boost::uintmax_t exponent = z;
             while(exponent != 0) {
                 if(exponent % 2 == 1) {
                     a_zm1_over_gcd =
@@ -224,7 +224,6 @@ public:
             _x = mod_type::mult_add(a_z, _x, mod_type::mult(b_inv, num));
         }
     }
-#endif
 
     friend bool operator==(const linear_congruential_engine& x,
                            const linear_congruential_engine& y)
@@ -348,7 +347,7 @@ typedef linear_congruential_engine<uint32_t, 48271, 0, 2147483647> minstd_rand;
 class rand48 
 {
 public:
-    typedef uint32_t result_type;
+    typedef boost::uint32_t result_type;
 
     BOOST_STATIC_CONSTANT(bool, has_fixed_range = false);
     /**
@@ -364,15 +363,15 @@ public:
     /** Seeds the generator with the default seed. */
     rand48() : lcf(cnv(static_cast<uint32_t>(1))) {}
     /**
-     * If T is an integral type smaller than int64_t, constructs
-     * a \rand48 generator with x(0) := (x0 << 16) | 0x330e.  Otherwise
-     * constructs a \rand48 generator with x(0) = x0.
+     * Constructs a \rand48 generator with x(0) := (x0 << 16) | 0x330e.
      */
-    template<class T> explicit rand48(const T& x0) : lcf(cnv(x0)) { }
+    BOOST_RANDOM_DETAIL_ARITHMETIC_CONSTRUCTOR(rand48, result_type, x0)
+    { seed(x0); }
     /**
      * Seeds the generator with values produced by @c seq.generate().
      */
-    template<class SeedSeq> explicit rand48(SeedSeq& seq) : lcf(cnv(seq)) { }
+    BOOST_RANDOM_DETAIL_SEED_SEQ_CONSTRUCTOR(rand48, SeedSeq, seq)
+    { seed(seq); }
     /**
      * Seeds the generator using values from an iterator range,
      * and updates first to point one past the last value consumed.
@@ -384,11 +383,10 @@ public:
     /** Seeds the generator with the default seed. */
     void seed() { seed(static_cast<uint32_t>(1)); }
     /**
-     * If T is an integral type smaller than int64_t, changes
-     * the current value x(n) of the generator to (x0 << 16) | 0x330e.
-     * Otherwise changes the current value x(n) to x0.
+     * Changes the current value x(n) of the generator to (x0 << 16) | 0x330e.
      */
-    template<class T> void seed(const T& x0) { lcf.seed(cnv(x0)); }
+    BOOST_RANDOM_DETAIL_ARITHMETIC_SEED(rand48, result_type, x0)
+    { lcf.seed(cnv(x0)); }
     /**
      * Seeds the generator using values from an iterator range,
      * and updates first to point one past the last value consumed.
@@ -397,15 +395,14 @@ public:
     /**
      * Seeds the generator with values produced by @c seq.generate().
      */
-    template<class SeedSeq> void seed(SeedSeq& seq) { lcf.seed(cnv(seq)); }
+    BOOST_RANDOM_DETAIL_SEED_SEQ_SEED(rand48, SeedSeq, seq)
+    { lcf.seed(seq); }
 
     /**  Returns the next value of the generator. */
     uint32_t operator()() { return static_cast<uint32_t>(lcf() >> 17); }
     
-#ifndef BOOST_NO_LONG_LONG
     /** Advances the state of the generator by @c z. */
-    void discard(boost::ulong_long_type z) { lcf.discard(z); }
-#endif
+    void discard(boost::uintmax_t z) { lcf.discard(z); }
   
     /** Fills a range with random values */
     template<class Iter>
@@ -450,47 +447,8 @@ private:
         0xB, uint64_t(1)<<48> lcf_t;
     lcf_t lcf;
 
-    template<class T>
-    struct cnv_impl_arithmetic {
-        typedef uint64_t type;
-        static type call(T x)
-        {
-            if(sizeof(T) < sizeof(uint64_t)) {
-                return (static_cast<uint64_t>(x) << 16) | 0x330e;
-            } else {
-                return(static_cast<uint64_t>(x));
-            }
-        }
-    };
-
-    template<class T>
-    struct cnv_impl_seed_seq
-    {
-        typedef T& type;
-        static type call(T& seq) { return seq; }
-    };
-
-    template<class T, class CV_T>
-    struct cnv_impl :
-        mpl::if_<is_arithmetic<T>,
-            cnv_impl_arithmetic<T>,
-            cnv_impl_seed_seq<CV_T> >::type
-    {};
-
-    template<class T>
-    static typename cnv_impl<T, T>::type cnv(T& x) 
-    {
-        return cnv_impl<T, T>::call(x);
-    }
-    template<class T>
-    static typename cnv_impl<T, const T>::type cnv(const T& x) 
-    {
-        return cnv_impl<T, const T>::call(x);
-    }
-    static lcf_t& cnv(rand48& x) { return x.lcf; }
-    static uint64_t cnv(float x) { return(static_cast<uint64_t>(x)); }
-    static uint64_t cnv(double x) { return(static_cast<uint64_t>(x)); }
-    static uint64_t cnv(long double x) { return(static_cast<uint64_t>(x)); }
+    static boost::uint64_t cnv(boost::uint32_t x)
+    { return (static_cast<uint64_t>(x) << 16) | 0x330e; }
     /// \endcond
 };
 #endif /* !BOOST_NO_INT64_T && !BOOST_NO_INTEGRAL_INT64_T */

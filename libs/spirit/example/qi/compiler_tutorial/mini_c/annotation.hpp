@@ -9,6 +9,8 @@
 
 #include <map>
 #include <boost/variant/apply_visitor.hpp>
+#include <boost/type_traits/is_base_of.hpp>
+#include <boost/mpl/bool.hpp>
 #include "ast.hpp"
 
 namespace client
@@ -35,16 +37,20 @@ namespace client
             int id;
             set_id(int id) : id(id) {}
 
-            // This will catch all nodes inheriting from ast::tagged
-            void operator()(ast::tagged& x) const
+            void operator()(ast::function_call& x) const
+            {
+                x.function_name.id = id;
+            }
+
+            void operator()(ast::identifier& x) const
             {
                 x.id = id;
             }
 
-            // This will catch all nodes except those inheriting from ast::tagged
-            void operator()(...) const
+            template <typename T>
+            void operator()(T& x) const
             {
-                // (no-op) no need for tags
+                // no-op
             }
         };
 
@@ -53,6 +59,13 @@ namespace client
             int id = iters.size();
             iters.push_back(pos);
             boost::apply_visitor(set_id(id), ast);
+        }
+
+        void operator()(ast::variable_declaration& ast, Iterator pos) const
+        {
+            int id = iters.size();
+            iters.push_back(pos);
+            ast.lhs.id = id;
         }
 
         void operator()(ast::assignment& ast, Iterator pos) const

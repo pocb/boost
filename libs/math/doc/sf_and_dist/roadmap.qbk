@@ -1,5 +1,25 @@
 [template history[]
 
+[h4 Boost-1.48]
+
+* Added new series evaluation methods to the cyclic Bessel I, J, K and Y functions.
+Also taken great care to avoid spurious over and underflow of these functions.
+Fixes issue [@https://svn.boost.org/trac/boost/ticket/5560 #5560]
+
+* Added an example of using Inverse Chi-Squared distribution for Bayesian statistics,
+provided by Thomas Mang.
+
+* Added tests to use improved version of lexical_cast which handles C99 nonfinites without using globale facets.
+
+* Corrected wrong out-of-bound uniform distribution CDF complement values https://svn.boost.org/trac/boost/ticket/5733 #5733.
+
+[h4 Boost-1.47]
+
+* Added changesign function to sign.hpp to facilitate addition of nonfinite facets.
+* Addition of nonfinite facets from Johan Rade, with tests,
+examples of use for C99 format infinity and NaN, and documentation.
+* Added tests and documentation of changesign from Johan Rade.
+
 [h4 Boost-1.46.1]
 
 * Fixed issues [@https://svn.boost.org/trac/boost/ticket/5095 #5095], [@https://svn.boost.org/trac/boost/ticket/5095 #5113].
@@ -8,7 +28,7 @@
 
 * Added Wald, Inverse Gaussian and geometric distributions.
 * Added information about configuration macros. 
-* Added support for mpreal as a real-numered type.
+* Added support for mpreal as a real-numbered type.
 
 [h4 Boost-1.45.0]
 

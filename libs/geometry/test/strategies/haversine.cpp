@@ -1,7 +1,13 @@
-// Boost.Geometry (aka GGL, Generic Geometry Library) test file
-//
-// Copyright Barend Gehrels 2007-2009, Geodan, Amsterdam, the Netherlands
-// Copyright Bruno Lalande 2008, 2009
+// Boost.Geometry (aka GGL, Generic Geometry Library)
+// Unit Test
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2011 Bruno Lalande, Paris, France.
+// Copyright (c) 2009-2011 Mateusz Loskot, London, UK.
+
+// Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
+// (geolib/GGL), copyright (c) 1995-2010 Geodan, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -28,7 +34,7 @@
 double const average_earth_radius = 6372795.0;
 
 
-template <typename Point>
+template <typename Point, typename LatitudePolicy>
 struct test_distance
 {
     typedef bg::strategy::distance::haversine
@@ -54,15 +60,15 @@ struct test_distance
         haversine_type strategy(radius);
 
         Point p1, p2;
-        bg::assign(p1, lon1, lat1);
-        bg::assign(p2, lon2, lat2);
+        bg::assign_values(p1, lon1, LatitudePolicy::apply(lat1));
+        bg::assign_values(p2, lon2, LatitudePolicy::apply(lat2));
         return_type d = strategy.apply(p1, p2);
 
         BOOST_CHECK_CLOSE(d, expected, tolerance);
     }
 };
 
-template <typename Point>
+template <typename Point, typename LatitudePolicy>
 void test_all()
 {
     // earth to unit-sphere -> divide by earth circumference, then it is from 0-1,
@@ -71,19 +77,19 @@ void test_all()
 
     // ~ Amsterdam/Paris, 467 kilometers
     double const a_p = 467.2704 * 1000.0;
-    test_distance<Point>::test(4, 52, 2, 48, average_earth_radius, a_p, 1.0);
-    test_distance<Point>::test(2, 48, 4, 52, average_earth_radius, a_p, 1.0);
-    test_distance<Point>::test(4, 52, 2, 48, 1.0, a_p * e2u, 0.001);
+    test_distance<Point, LatitudePolicy>::test(4, 52, 2, 48, average_earth_radius, a_p, 1.0);
+    test_distance<Point, LatitudePolicy>::test(2, 48, 4, 52, average_earth_radius, a_p, 1.0);
+    test_distance<Point, LatitudePolicy>::test(4, 52, 2, 48, 1.0, a_p * e2u, 0.001);
 
     // ~ Amsterdam/Barcelona
     double const a_b = 1232.9065 * 1000.0;
-    test_distance<Point>::test(4, 52, 2, 41, average_earth_radius, a_b, 1.0);
-    test_distance<Point>::test(2, 41, 4, 52, average_earth_radius, a_b, 1.0);
-    test_distance<Point>::test(4, 52, 2, 41, 1.0, a_b * e2u, 0.001);
+    test_distance<Point, LatitudePolicy>::test(4, 52, 2, 41, average_earth_radius, a_b, 1.0);
+    test_distance<Point, LatitudePolicy>::test(2, 41, 4, 52, average_earth_radius, a_b, 1.0);
+    test_distance<Point, LatitudePolicy>::test(4, 52, 2, 41, 1.0, a_b * e2u, 0.001);
 }
 
 
-template <typename P1, typename P2, typename CalculationType>
+template <typename P1, typename P2, typename CalculationType, typename LatitudePolicy>
 void test_services()
 {
     namespace bgsd = bg::strategy::distance;
@@ -96,10 +102,10 @@ void test_services()
     }
 
     P1 p1;
-    bg::assign(p1, 4, 52);
+    bg::assign_values(p1, 4, 52);
 
     P2 p2;
-    bg::assign(p2, 2, 48);
+    bg::assign_values(p2, 2, 48);
 
     // ~ Amsterdam/Paris, 467 kilometers
     double const km = 1000.0;
@@ -171,8 +177,8 @@ void time_compare_s(int const n)
 {
     boost::timer t;
     P p1, p2;
-    bg::assign(p1, 1, 1);
-    bg::assign(p2, 2, 2);
+    bg::assign_values(p1, 1, 1);
+    bg::assign_values(p2, 2, 2);
     Strategy strategy;
     typename Strategy::return_type s = 0;
     for (int i = 0; i < n; i++)
@@ -238,9 +244,12 @@ double time_normal(int n)
 
 int test_main(int, char* [])
 {
-    test_all<bg::model::point<int, 2, bg::cs::spherical<bg::degree> > >();
-    test_all<bg::model::point<float, 2, bg::cs::spherical<bg::degree> > >();
-    test_all<bg::model::point<double, 2, bg::cs::spherical<bg::degree> > >();
+    test_all<bg::model::point<int, 2, bg::cs::spherical_equatorial<bg::degree> >, geographic_policy>();
+    test_all<bg::model::point<float, 2, bg::cs::spherical_equatorial<bg::degree> >, geographic_policy>();
+    test_all<bg::model::point<double, 2, bg::cs::spherical_equatorial<bg::degree> >, geographic_policy>();
+
+    // NYI: haversine for mathematical spherical coordinate systems
+    // test_all<bg::model::point<double, 2, bg::cs::spherical<bg::degree> >, mathematical_policy>();
 
     //double t1 = time_sqrt(20000);
     //double t2 = time_normal(20000);
@@ -249,15 +258,16 @@ int test_main(int, char* [])
 
 #if defined(HAVE_TTMATH)
     typedef ttmath::Big<1,4> tt;
-    test_all<bg::model::point<tt, 2, bg::cs::spherical<bg::degree> > >();
+    test_all<bg::model::point<tt, 2, bg::cs::spherical_equatorial<bg::degree> >, geographic_policy>();
 #endif
 
 
     test_services
         <
-            bg::model::point<float, 2, bg::cs::spherical<bg::degree> >,
-            bg::model::point<double, 2, bg::cs::spherical<bg::degree> >,
-            double
+            bg::model::point<double, 2, bg::cs::spherical_equatorial<bg::degree> >,
+            bg::model::point<double, 2, bg::cs::spherical_equatorial<bg::degree> >,
+            double, 
+            geographic_policy 
         >();
 
     return 0;

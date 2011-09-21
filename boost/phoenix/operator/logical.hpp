@@ -10,17 +10,22 @@
 
 #include <boost/phoenix/operator/detail/define_operator.hpp>
 #include <boost/phoenix/core/expression.hpp>
+#include <boost/proto/operators.hpp>
 
 namespace boost { namespace phoenix
 {
-	
-	BOOST_PHOENIX_UNARY_OPERATORS(
-		(logical_not)
-	)
-	BOOST_PHOENIX_BINARY_OPERATORS(
-		(logical_and)
-		(logical_or)
-	)
+    
+    BOOST_PHOENIX_UNARY_OPERATORS(
+        (logical_not)
+    )
+    BOOST_PHOENIX_BINARY_OPERATORS(
+        (logical_and)
+        (logical_or)
+    )
+    
+    using proto::exprns_::operator!;
+    using proto::exprns_::operator&&;
+    using proto::exprns_::operator||;
 }}
 
 #include <boost/phoenix/operator/detail/undef_operator.hpp>

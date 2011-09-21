@@ -7,7 +7,6 @@
     http://www.boost.org/LICENSE_1_0.txt)
 =============================================================================*/
 #include "post_process.hpp"
-#include "utils.hpp"
 #include <boost/spirit/include/classic_core.hpp>
 #include <boost/bind.hpp>
 #include <set>
@@ -33,9 +32,14 @@ namespace quickbook
             column = current_indent;
         }
 
-        void break_line()
+        void trim_spaces()
         {
             out.erase(out.find_last_not_of(' ')+1); // trim trailing spaces
+        }
+
+        void break_line()
+        {
+            trim_spaces();
             out += '\n';
             indent();
         }
@@ -339,13 +343,16 @@ namespace quickbook
 
         void do_code(iter_type f, iter_type l) const
         {
-            state.out += '\n';
+            state.printer_.trim_spaces();
+            if (state.out[state.out.size() - 1] != '\n')
+                state.out += '\n';
             // print the string taking care of line
             // ending CR/LF platform issues
             for (iter_type i = f; i != l; ++i)
             {
                 if (*i == '\n')
                 {
+                    state.printer_.trim_spaces();
                     state.out += '\n';
                     ++i;
                     if (i != l && *i != '\r')
@@ -353,6 +360,7 @@ namespace quickbook
                 }
                 else if (*i == '\r')
                 {
+                    state.printer_.trim_spaces();
                     state.out += '\n';
                     ++i;
                     if (i != l && *i != '\n')
@@ -403,6 +411,9 @@ namespace quickbook
 
         void do_end_tag(iter_type f, iter_type l) const
         {
+            if (state.tags.empty())
+                throw quickbook::post_process_failure("Mismatched tags.");
+        
             bool is_flow_tag = state.is_flow_tag(state.tags.top());
             if (!is_flow_tag)
             {
@@ -419,9 +430,8 @@ namespace quickbook
         int indent;
     };
 
-    int post_process(
+    std::string post_process(
         std::string const& in
-      , std::ostream& out
       , int indent
       , int linewidth)
     {
@@ -430,36 +440,17 @@ namespace quickbook
         if (linewidth == -1)
             linewidth = 80;     // set default to 80
 
-        try
+        std::string tidy;
+        tidy_compiler state(tidy, linewidth);
+        tidy_grammar g(state, indent);
+        cl::parse_info<iter_type> r = parse(in.begin(), in.end(), g, cl::space_p);
+        if (r.full)
         {
-            std::string tidy;
-            tidy_compiler state(tidy, linewidth);
-            tidy_grammar g(state, indent);
-            cl::parse_info<iter_type> r = parse(in.begin(), in.end(), g, cl::space_p);
-            if (r.full)
-            {
-                out << tidy;
-                return 0;
-            }
-            else
-            {
-                // fallback!
-                ::quickbook::detail::outerr("")
-                    << "Warning: Post Processing Failed."
-                    << std::endl;
-                out << in;
-                return 1;
-            }
+            return tidy;
         }
-
-        catch(...)
+        else
         {
-            // fallback!
-            ::quickbook::detail::outerr("")
-                << "Post Processing Failed."
-                << std::endl;
-            out << in;
-            return 1;
+            throw quickbook::post_process_failure("Post Processing Failed.");
         }
     }
 }

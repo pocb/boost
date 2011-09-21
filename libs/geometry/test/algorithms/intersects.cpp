@@ -1,6 +1,6 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
 //
-// Copyright Barend Gehrels, Geodan B.V. Amsterdam, the Netherlands.
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -9,6 +9,7 @@
 
 
 #include <boost/geometry/geometries/geometries.hpp>
+#include <boost/geometry/geometries/point_xy.hpp>
 
 
 template <typename P>
@@ -57,6 +58,57 @@ void test_all()
     // Hole: two intersecting holes
     test_self_intersects<polygon>(
         "POLYGON((0 0,0 4,4 4,4 0,0 0),(1 1,1 3,3 3,3 1,1 1),(2 2,2 3.5,3.5 3.5,3.5 2,2 2))", true);
+
+    // Mail Akira T on [Boost-users] at 27-7-2011 3:17
+    test_self_intersects<bg::model::linestring<P> >(
+        "LINESTRING(0 0,0 4,4 4,2 2,2 5)", true);
+
+    test_self_intersects<bg::model::linestring<P> >(
+        "LINESTRING(0 4,4 4,2 2,2 5)", true);
+
+    // Test self-intersections at last segment in close/open rings:
+    test_self_intersects<bg::model::ring<P> >(
+        "POLYGON((0 0,3 3,4 1,0 0))", false);
+
+    test_self_intersects<bg::model::ring<P, true, false> >(
+        "POLYGON((0 0,3 3,4 1))", false);
+
+    test_self_intersects<bg::model::ring<P> >(
+        "POLYGON((0 0,3 3,4 1,0 1,0 0))", true);
+
+    test_self_intersects<bg::model::ring<P, true, false> >(
+        "POLYGON((0 0,3 3,4 1,0 1))", true);
+
+    // Duplicates in first or last
+    test_self_intersects<bg::model::ring<P> >(
+        "POLYGON((0 0,3 3,4 1,0 1,0 1,0 0))", true);
+    test_self_intersects<bg::model::ring<P> >(
+        "POLYGON((0 0,3 3,4 1,0 1,0 0,0 0))", true);
+    test_self_intersects<bg::model::ring<P, true, false> >(
+        "POLYGON((0 0,3 3,4 1,0 1,0 1))", true);
+    test_self_intersects<bg::model::ring<P> >(
+        "POLYGON((0 0,0 0,3 3,4 1,0 1,0 1,0 0))", true);
+    test_self_intersects<bg::model::ring<P, true, false> >(
+        "POLYGON((0 0,0 0,3 3,4 1,0 1,0 1))", true);
+    test_self_intersects<bg::model::ring<P> >(
+        "POLYGON((0 0,3 3,3 3,4 1,0 1,0 1,0 0))", true);
+    test_self_intersects<bg::model::ring<P, true, false> >(
+        "POLYGON((0 0,3 3,3 3,4 1,0 1,0 1))", true);
+
+    test_self_intersects<bg::model::ring<P> >(
+        "POLYGON((0 0,3 3,4 1,0 0,0 0))", false);
+    test_self_intersects<bg::model::ring<P> >(
+        "POLYGON((0 0,3 3,4 1,4 1,0 0))", false);
+    test_self_intersects<bg::model::ring<P, true, false> >(
+        "POLYGON((0 0,3 3,4 1,4 1))", false);
+    test_self_intersects<bg::model::ring<P> >(
+        "POLYGON((0 0,0 0,3 3,4 1,0 0))", false);
+    test_self_intersects<bg::model::ring<P, true, false> >(
+        "POLYGON((0 0,0 0,3 3,4 1))", false);
+    test_self_intersects<bg::model::ring<P> >(
+        "POLYGON((0 0,3 3,3 3,4 1,0 0))", false);
+    test_self_intersects<bg::model::ring<P, true, false> >(
+        "POLYGON((0 0,3 3,3 3,4 1))", false);
 }
 
 

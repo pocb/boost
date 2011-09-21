@@ -1,6 +1,12 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
-//
-// Copyright Barend Gehrels 2008-2009, Geodan, Amsterdam, the Netherlands.
+
+// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2011 Bruno Lalande, Paris, France.
+// Copyright (c) 2009-2011 Mateusz Loskot, London, UK.
+
+// Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
+// (geolib/GGL), copyright (c) 1995-2010 Geodan, Amsterdam, the Netherlands.
+
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -171,7 +177,7 @@ struct wkt_poly
 
         typename interior_return_type<Polygon const>::type rings
                     = interior_rings(poly);
-        for (BOOST_AUTO(it, boost::begin(rings)); it != boost::end(rings); ++it)
+        for (BOOST_AUTO_TPL(it, boost::begin(rings)); it != boost::end(rings); ++it)
         {
             os << ",";
             wkt_sequence<ring>::apply(os, *it);
@@ -190,7 +196,7 @@ struct wkt_box
     static inline void apply(std::basic_ostream<Char, Traits>& os,
                 Box const& box)
     {
-        // Convert to linear ring, then stream
+        // Convert to ring, then stream
         typedef model::ring<point_type> ring_type;
         ring_type ring;
         geometry::convert(box, ring);
@@ -222,8 +228,8 @@ struct wkt_segment
         typedef boost::array<point_type, 2> sequence;
 
         sequence points;
-        assign_point_from_index<0>(segment, points[0]);
-        assign_point_from_index<1>(segment, points[1]);
+        geometry::detail::assign_point_from_index<0>(segment, points[0]);
+        geometry::detail::assign_point_from_index<1>(segment, points[1]);
 
         // In Boost.Geometry a segment is represented
         // in WKT-format like (for 2D): LINESTRING(x y,x y)
@@ -295,8 +301,8 @@ struct wkt<segment_tag, Segment>
 
 /*!
 \brief Specialization to stream a ring as WKT
-\details A "linear_ring" does not exist in WKT.
-A linear ring is equivalent to a polygon without inner rings
+\details A ring or "linear_ring" does not exist in WKT.
+A ring is equivalent to a polygon without inner rings
 It is therefore streamed as a polygon
 */
 template <typename Ring>
@@ -377,16 +383,6 @@ Small example showing how to use the wkt helper function
 */
 template <typename Geometry>
 inline wkt_manipulator<Geometry> wkt(Geometry const& geometry)
-{
-    concept::check<Geometry const>();
-
-    return wkt_manipulator<Geometry>(geometry);
-}
-
-
-// Backward compatibility
-template <typename Geometry>
-inline wkt_manipulator<Geometry> make_wkt(Geometry const& geometry)
 {
     concept::check<Geometry const>();
 

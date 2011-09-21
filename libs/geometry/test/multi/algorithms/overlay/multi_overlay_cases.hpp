@@ -1,6 +1,7 @@
-// Boost.Geometry (aka GGL, Generic Geometry Library) test file
-//
-// Copyright Barend Gehrels 2010, Geodan, Amsterdam, the Netherlands
+// Boost.Geometry (aka GGL, Generic Geometry Library) 
+// Unit Test
+
+// Copyright (c) 2010-2011 Barend Gehrels, Amsterdam, the Netherlands.
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -137,7 +138,7 @@ static std::string case_77_multi[2] =
     // -> went wrong in the assemble phase for intersection (traversal is OK)
     // -> fixed
     "MULTIPOLYGON(((3 3,3 4,4 4,4 3,3 3)),((5 3,5 4,4 4,4 5,3 5,3 6,5 6,5 5,7 5,7 6,8 6,8 5,9 5,9 2,8 2,8 1,7 1,7 2,5 2,5 3),(6 3,8 3,8 4,6 4,6 3)))",
-    "MULTIPOLYGON(((6 3,6 4,7 4,7 3,6 3)),((2 3,1 3,1 4,3 4,3 5,4 5,4 6,5 6,5 7,9 7,9 4,7 4,7 5,8 5,8 6,7 6,7 5,6 5,6 4,4 4,4 3,3 3,3 2,4 2,2 2,2 3)),((5 2,4 2,4 3,6 3,6 2,5 2)),((7 2,7 3,8 3,8 2,8 1,7 1,7 2)))" 
+    "MULTIPOLYGON(((6 3,6 4,7 4,7 3,6 3)),((2 3,1 3,1 4,3 4,3 5,4 5,4 6,5 6,5 7,9 7,9 4,7 4,7 5,8 5,8 6,7 6,7 5,6 5,6 4,4 4,4 3,3 3,3 2,2 2,2 3)),((5 2,4 2,4 3,6 3,6 2,5 2)),((7 2,7 3,8 3,8 2,8 1,7 1,7 2)))" 
 };
 
 static std::string case_78_multi[2] = 
