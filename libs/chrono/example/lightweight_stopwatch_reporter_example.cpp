@@ -6,17 +6,21 @@
 //  See http://www.boost.org/libs/chrono/stopwatches for documentation.
 
 //#include <iostream>
-#include <boost/chrono/stopwatches/reporters/stopwatch_reporter.hpp>
+#include <boost/chrono/stopwatches/basic_stopwatch.hpp>
+#include <boost/chrono/stopwatches/reporters/lightweight_stopwatch_reporter.hpp>
 #include <boost/chrono/stopwatches/reporters/system_default_formatter.hpp>
 #include <boost/chrono/chrono_io.hpp>
 #include <cmath>
 
 using namespace boost::chrono;
 
+elapsed_formatter fmtr;
+
 int f1(long j)
 {
+
   std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-  stopwatch_reporter<simple_stopwatch<> > sw;
+  lightweight_stopwatch_reporter<simple_stopwatch<> > sw(fmtr);
   std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
 
   for ( long i = 0; i < j; ++i )
@@ -28,7 +32,7 @@ int f1(long j)
 int main()
 {
   std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
-  stopwatch_reporter<simple_stopwatch<> > sw;
+  lightweight_stopwatch_reporter<simple_stopwatch<> > sw(fmtr);
   std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
 
   f1(1000);
@@ -36,6 +40,8 @@ int main()
   f1(2000);
   std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
   f1(3000);
+  std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
+  f1(4000);
   std::cout << __FILE__ << "[" << __LINE__ << "]" << std::endl;
   return 0;
 }

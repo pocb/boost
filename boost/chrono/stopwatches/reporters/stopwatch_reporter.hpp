@@ -19,6 +19,7 @@
 #endif
 
 #include <boost/chrono/stopwatches/reporters/stopwatch_reporter_default_formatter.hpp>
+#include <boost/chrono/stopwatches/stopwatch_scoped.hpp>
 #include <boost/chrono/chrono.hpp>
 #include <boost/system/error_code.hpp>
 #include <boost/cstdint.hpp>
@@ -62,17 +63,21 @@ namespace boost
 
       ~basic_stopwatch_reporter() BOOST_CHRONO_NOEXCEPT
       {
-        system::error_code ec;
         if (!reported())
         {
-          this->report(ec);
+          this->report();
         }
       }
 
-      inline void report(system::error_code & ec= BOOST_CHRONO_THROWS)
+      inline void report() BOOST_CHRONO_NOEXCEPT
       {
+        formatter_(*this);
         reported_ = true;
+      }
+      inline void report(system::error_code & ec)
+      {
         formatter_(*this, ec);
+        reported_ = true;
       }
       bool reported() const
       {
@@ -133,14 +138,14 @@ namespace boost
         base_type(fmt)
       {
       }
-//      typedef stopwatch_runner<stopwatch_reporter<Stopwatch, Formatter> >
-//          scoped_run;
-//      typedef stopwatch_stopper<stopwatch_reporter<Stopwatch, Formatter> >
-//          scoped_stop;
-//      typedef stopwatch_suspender<stopwatch_reporter<Stopwatch, Formatter> >
-//          scoped_suspend;
-//      typedef stopwatch_resumer<stopwatch_reporter<Stopwatch, Formatter> >
-//          scoped_resume;
+      typedef stopwatch_runner<stopwatch_reporter<Stopwatch, Formatter> >
+          scoped_run;
+      typedef stopwatch_stopper<stopwatch_reporter<Stopwatch, Formatter> >
+          scoped_stop;
+      typedef stopwatch_suspender<stopwatch_reporter<Stopwatch, Formatter> >
+          scoped_suspend;
+      typedef stopwatch_resumer<stopwatch_reporter<Stopwatch, Formatter> >
+          scoped_resume;
 
     protected:
 
@@ -183,14 +188,14 @@ namespace boost
       {
       }
 
-//      typedef stopwatch_runner<wstopwatch_reporter<Stopwatch, Formatter> >
-//          scoped_run;
-//      typedef stopwatch_stopper<wstopwatch_reporter<Stopwatch, Formatter> >
-//          scoped_stop;
-//      typedef stopwatch_suspender<wstopwatch_reporter<Stopwatch, Formatter> >
-//          scoped_suspend;
-//      typedef stopwatch_resumer<wstopwatch_reporter<Stopwatch, Formatter> >
-//          scoped_resume;
+      typedef stopwatch_runner<wstopwatch_reporter<Stopwatch, Formatter> >
+          scoped_run;
+      typedef stopwatch_stopper<wstopwatch_reporter<Stopwatch, Formatter> >
+          scoped_stop;
+      typedef stopwatch_suspender<wstopwatch_reporter<Stopwatch, Formatter> >
+          scoped_suspend;
+      typedef stopwatch_resumer<wstopwatch_reporter<Stopwatch, Formatter> >
+          scoped_resume;
 
     protected:
 
