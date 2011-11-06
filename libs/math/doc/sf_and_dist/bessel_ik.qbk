@@ -123,7 +123,7 @@ When /x/ is small compared to /v/, I[sub v]x[space] is best computed directly fr
 
 [equation mbessel17]
 
-In the general case, we first normalize [nu][space] to \[[^0, [inf]])
+In the general case, we first normalize [nu][space] to \[[^0, [infin]])
 with the help of the reflection formulae:
 
 [equation mbessel9]
