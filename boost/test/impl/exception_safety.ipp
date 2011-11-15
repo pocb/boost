@@ -21,23 +21,23 @@
 #if BOOST_TEST_SUPPORT_INTERACTION_TESTING
 
 #include <boost/test/detail/global_typedef.hpp>
-#include <boost/test/detail/unit_test_parameters.hpp>
+#include <boost/test/unit_test_parameters.hpp>
 
-#include <boost/test/utils/callback.hpp>
 #include <boost/test/utils/wrap_stringstream.hpp>
 #include <boost/test/utils/iterator/token_iterator.hpp>
 
-#include <boost/test/interaction_based.hpp>
+#include <boost/test/interaction/interaction_based.hpp>
 #include <boost/test/test_tools.hpp>
 #include <boost/test/unit_test_log.hpp>
 #include <boost/test/framework.hpp>
-#include <boost/test/test_observer.hpp>
+#include <boost/test/tree/observer.hpp>
 #include <boost/test/debug.hpp>
 
 #include <boost/test/detail/suppress_warnings.hpp>
 
 // Boost
 #include <boost/lexical_cast.hpp>
+#include <boost/function/function0.hpp>
 
 // STL
 #include <vector>
@@ -509,7 +509,7 @@ exception_safety_tester::report_error()
 // ************************************************************************** //
 
 void BOOST_TEST_DECL
-exception_safety( callback0<> const& F, const_string test_name )
+exception_safety( boost::function<void ()> const& F, const_string test_name )
 {
     exception_safety_tester est( test_name );
 
@@ -525,10 +525,7 @@ exception_safety( callback0<> const& F, const_string test_name )
 //____________________________________________________________________________//
 
 }  // namespace itest
-
 } // namespace boost
-
-//____________________________________________________________________________//
 
 #include <boost/test/detail/enable_warnings.hpp>
 

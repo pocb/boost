@@ -18,11 +18,10 @@
 // Boost.Test
 #include <boost/test/unit_test_log.hpp>
 #include <boost/test/unit_test_log_formatter.hpp>
-#include <boost/test/unit_test_suite_impl.hpp>
 #include <boost/test/execution_monitor.hpp>
 #include <boost/test/framework.hpp>
 
-#include <boost/test/detail/unit_test_parameters.hpp>
+#include <boost/test/unit_test_parameters.hpp>
 
 #include <boost/test/utils/basic_cstring/compare.hpp>
 
@@ -39,7 +38,6 @@ typedef ::boost::io::ios_base_all_saver io_saver_type;
 //____________________________________________________________________________//
 
 namespace boost {
-
 namespace unit_test {
 
 // ************************************************************************** //
@@ -242,6 +240,8 @@ unit_test_log_t::exception_caught( execution_exception const& ex )
 
         s_log_impl().m_log_formatter->log_exception_finish( s_log_impl().stream() );
     }
+
+    clear_entry_context();
 }
 
 //____________________________________________________________________________//
@@ -294,6 +294,8 @@ unit_test_log_t::operator<<( log::end const& )
 
         s_log_impl().m_entry_in_progress = false;
     }
+
+    clear_entry_context();
 
     return *this;
 }
@@ -399,7 +401,13 @@ unit_test_log_t::log_entry_context()
         s_log_impl().m_log_formatter->log_entry_context( s_log_impl().stream(), frame );
 
     s_log_impl().m_log_formatter->entry_context_finish( s_log_impl().stream() );
+}
 
+//____________________________________________________________________________//
+
+void
+unit_test_log_t::clear_entry_context()
+{
     framework::clear_context();
 }
 
@@ -463,10 +471,7 @@ unit_test_log_formatter::log_entry_value( std::ostream& ostr, lazy_ostream const
 //____________________________________________________________________________//
 
 } // namespace unit_test
-
 } // namespace boost
-
-//____________________________________________________________________________//
 
 #include <boost/test/detail/enable_warnings.hpp>
 

@@ -1,4 +1,4 @@
-//  (C) Copyright Gennadiy Rozental 2001-2010.
+//  (C) Copyright Gennadiy Rozental 2001-2011.
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at 
 //  http://www.boost.org/LICENSE_1_0.txt)
@@ -18,7 +18,7 @@
 #define BOOST_TEST_UNIT_TEST_LOG_HPP_071894GER
 
 // Boost.Test
-#include <boost/test/test_observer.hpp>
+#include <boost/test/tree/observer.hpp>
 
 #include <boost/test/detail/global_typedef.hpp>
 #include <boost/test/detail/log_level.hpp>
@@ -39,7 +39,6 @@
 //____________________________________________________________________________//
 
 namespace boost {
-
 namespace unit_test {
 
 // ************************************************************************** //
@@ -129,8 +128,9 @@ private:
     // Implementation helpers
     bool                log_entry_start();
     void                log_entry_context();
+    void                clear_entry_context();
 
-    BOOST_TEST_SINGLETON_CONS( unit_test_log_t );
+    BOOST_TEST_SINGLETON_CONS( unit_test_log_t )
 }; // unit_test_log_t
 
 BOOST_TEST_SINGLETON_INST( unit_test_log )
@@ -142,7 +142,6 @@ BOOST_TEST_SINGLETON_INST( unit_test_log )
 /**/
 
 } // namespace unit_test
-
 } // namespace boost
 
 // ************************************************************************** //

@@ -17,7 +17,7 @@ namespace boost
 namespace chrono
 {
 
-  system_clock::time_point system_clock::now() BOOST_CHRONO_NOEXCEPT
+  system_clock::time_point system_clock::now() BOOST_NOEXCEPT
   {
     timespec ts;
     if ( ::clock_gettime( CLOCK_REALTIME, &ts ) )
@@ -29,6 +29,7 @@ namespace chrono
       static_cast<system_clock::rep>( ts.tv_sec ) * 1000000000 + ts.tv_nsec));
   }
 
+#if !defined BOOST_CHRONO_DONT_PROVIDE_HYBRID_ERROR_HANDLING
   system_clock::time_point system_clock::now(system::error_code & ec)
   {
     timespec ts;
@@ -56,20 +57,21 @@ namespace chrono
     return time_point(duration(
       static_cast<system_clock::rep>( ts.tv_sec ) * 1000000000 + ts.tv_nsec));
   }
+#endif
 
-  std::time_t system_clock::to_time_t(const system_clock::time_point& t) BOOST_CHRONO_NOEXCEPT
+  std::time_t system_clock::to_time_t(const system_clock::time_point& t) BOOST_NOEXCEPT
   {
       return static_cast<std::time_t>( t.time_since_epoch().count() / 1000000000 );
   }
 
-  system_clock::time_point system_clock::from_time_t(std::time_t t) BOOST_CHRONO_NOEXCEPT
+  system_clock::time_point system_clock::from_time_t(std::time_t t) BOOST_NOEXCEPT
   {
       return time_point(duration(static_cast<system_clock::rep>(t) * 1000000000));
   }
 
 #ifdef BOOST_CHRONO_HAS_CLOCK_STEADY
 
-  steady_clock::time_point steady_clock::now() BOOST_CHRONO_NOEXCEPT
+  steady_clock::time_point steady_clock::now() BOOST_NOEXCEPT
   {
     timespec ts;
     if ( ::clock_gettime( CLOCK_MONOTONIC, &ts ) )
@@ -81,6 +83,7 @@ namespace chrono
       static_cast<steady_clock::rep>( ts.tv_sec ) * 1000000000 + ts.tv_nsec));
   }
 
+#if !defined BOOST_CHRONO_DONT_PROVIDE_HYBRID_ERROR_HANDLING
   steady_clock::time_point steady_clock::now(system::error_code & ec)
   {
     timespec ts;
@@ -108,6 +111,7 @@ namespace chrono
     return time_point(duration(
       static_cast<steady_clock::rep>( ts.tv_sec ) * 1000000000 + ts.tv_nsec));
   }
+#endif
 #endif
 
 }  // namespace chrono

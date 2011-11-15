@@ -23,7 +23,7 @@ namespace chrono
 namespace chrono_detail
 {
 
-  BOOST_CHRONO_INLINE double get_nanosecs_per_tic() BOOST_CHRONO_NOEXCEPT
+  BOOST_CHRONO_INLINE double get_nanosecs_per_tic() BOOST_NOEXCEPT
   {
       boost::detail::win32::LARGE_INTEGER_ freq;
       if ( !boost::detail::win32::QueryPerformanceFrequency( &freq ) )
@@ -33,7 +33,7 @@ namespace chrono_detail
 
 }
 
-  steady_clock::time_point steady_clock::now() BOOST_CHRONO_NOEXCEPT
+  steady_clock::time_point steady_clock::now() BOOST_NOEXCEPT
   {
     static double nanosecs_per_tic = chrono_detail::get_nanosecs_per_tic();
 
@@ -49,6 +49,7 @@ namespace chrono_detail
   }
 
 
+#if !defined BOOST_CHRONO_DONT_PROVIDE_HYBRID_ERROR_HANDLING
   steady_clock::time_point steady_clock::now( system::error_code & ec )
   {
     static double nanosecs_per_tic = chrono_detail::get_nanosecs_per_tic();
@@ -82,9 +83,10 @@ namespace chrono_detail
     return time_point(duration(
       static_cast<steady_clock::rep>(nanosecs_per_tic * pcount.QuadPart)));
   }
+#endif
 
   BOOST_CHRONO_INLINE
-  system_clock::time_point system_clock::now() BOOST_CHRONO_NOEXCEPT
+  system_clock::time_point system_clock::now() BOOST_NOEXCEPT
   {
     boost::detail::win32::FILETIME_ ft;
   #if defined(UNDER_CE)
@@ -99,6 +101,7 @@ namespace chrono_detail
       (static_cast<__int64>( ft.dwHighDateTime ) << 32) | ft.dwLowDateTime));
   }
 
+#if !defined BOOST_CHRONO_DONT_PROVIDE_HYBRID_ERROR_HANDLING
   BOOST_CHRONO_INLINE
   system_clock::time_point system_clock::now( system::error_code & ec )
   {
@@ -118,9 +121,10 @@ namespace chrono_detail
     return time_point(duration(
       (static_cast<__int64>( ft.dwHighDateTime ) << 32) | ft.dwLowDateTime));
   }
+#endif
 
   BOOST_CHRONO_INLINE
-  std::time_t system_clock::to_time_t(const system_clock::time_point& t) BOOST_CHRONO_NOEXCEPT
+  std::time_t system_clock::to_time_t(const system_clock::time_point& t) BOOST_NOEXCEPT
   {
       __int64 temp = t.time_since_epoch().count();
 
@@ -135,7 +139,7 @@ namespace chrono_detail
   }
 
   BOOST_CHRONO_INLINE
-  system_clock::time_point system_clock::from_time_t(std::time_t t) BOOST_CHRONO_NOEXCEPT
+  system_clock::time_point system_clock::from_time_t(std::time_t t) BOOST_NOEXCEPT
   {
       __int64 temp = t;
       temp *= 10000000;

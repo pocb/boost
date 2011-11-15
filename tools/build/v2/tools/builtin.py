@@ -348,8 +348,11 @@ class SearchedLibTarget (virtual_target.AbstractFileTarget):
 class CScanner (scanner.Scanner):
     def __init__ (self, includes):
         scanner.Scanner.__init__ (self)
-    
-        self.includes_ = includes
+
+        self.includes_ = []
+
+        for i in includes:
+            self.includes_.extend(i.split("&&"))              
 
     def pattern (self):
         return r'#[ \t]*include[ ]*(<(.*)>|"(.*)")'
@@ -399,7 +402,7 @@ class LibGenerator (generators.Generator):
         SHARED_LIB.
     """
 
-    def __init__(self, id = 'LibGenerator', composing = True, source_types = [], target_types_and_names = ['LIB'], requirements = []):
+    def __init__(self, id, composing = True, source_types = [], target_types_and_names = ['LIB'], requirements = []):
         generators.Generator.__init__(self, id, composing, source_types, target_types_and_names, requirements)
     
     def run(self, project, name, prop_set, sources):
@@ -432,7 +435,9 @@ class LibGenerator (generators.Generator):
     def viable_source_types(self):
         return ['*']
 
-generators.register(LibGenerator())
+generators.register(LibGenerator("builtin.lib-generator"))
+
+generators.override("builtin.prebuilt", "builtin.lib-generator")
 
 def lib(names, sources=[], requirements=[], default_build=[], usage_requirements=[]):
     """The implementation of the 'lib' rule. Beyond standard syntax that rule allows
@@ -508,22 +513,19 @@ class SearchedLibGenerator (generators.Generator):
 
 generators.register (SearchedLibGenerator ())
 
-### class prebuilt-lib-generator : generator
-### {
-###     rule __init__ ( * : * )
-###     {
-###         generator.__init__ $(1) : $(2) : $(3) : $(4) : $(5) : $(6) : $(7) : $(8) : $(9) ;
-###     }
-### 
-###     rule run ( project name ? : prop_set : sources * : multiple ? )
-###     {
-###         local f = [ $(prop_set).get <file> ] ;
-###         return $(f) $(sources) ;
-###     }    
-### }
-### 
-### generators.register 
-###   [ new prebuilt-lib-generator builtin.prebuilt : : LIB : <file> ] ;
+class PrebuiltLibGenerator(generators.Generator):
+
+    def __init__(self, id, composing, source_types, target_types_and_names, requirements):
+        generators.Generator.__init__ (self, id, composing, source_types, target_types_and_names, requirements)        
+
+    def run(self, project, name, properties, sources):
+        f = properties.get("file")
+        return f + sources
+
+generators.register(PrebuiltLibGenerator("builtin.prebuilt", False, [],
+                                         ["LIB"], ["<file>"]))
+
+generators.override("builtin.prebuilt", "builtin.lib-generator")
 
 
 class CompileAction (virtual_target.Action):
@@ -565,9 +567,8 @@ class LinkingGenerator (generators.Generator):
         generators.Generator.__init__ (self, id, composing, source_types, target_types_and_names, requirements)
         
     def run (self, project, name, prop_set, sources):
-       
-        lib_sources = prop_set.get('<library>')
-        sources.extend(lib_sources)
+
+        sources.extend(prop_set.get('<library>'))
         
         # Add <library-path> properties for all searched libraries
         extra = []
@@ -576,38 +577,41 @@ class LinkingGenerator (generators.Generator):
                 search = s.search()
                 extra.extend(property.Property('<library-path>', sp) for sp in search)
 
-        orig_xdll_path = []
-                   
-        if prop_set.get('<hardcode-dll-paths>') == ['true'] \
-               and type.is_derived(self.target_types_ [0], 'EXE'):
-            xdll_path = prop_set.get('<xdll-path>')
-            orig_xdll_path = [ replace_grist(x, '<dll-path>') for x in xdll_path ]
-            # It's possible that we have libraries in sources which did not came
-            # from 'lib' target. For example, libraries which are specified
-            # just as filenames as sources. We don't have xdll-path properties
-            # for such target, but still need to add proper dll-path properties.
-            for s in sources:
+        # It's possible that we have libraries in sources which did not came
+        # from 'lib' target. For example, libraries which are specified
+        # just as filenames as sources. We don't have xdll-path properties
+        # for such target, but still need to add proper dll-path properties.   
+        extra_xdll_path = []                            
+        for s in sources:
                 if type.is_derived (s.type (), 'SHARED_LIB') and not s.action ():
                     # Unfortunately, we don't have a good way to find the path
                     # to a file, so use this nasty approach.
                     p = s.project()
-                    location = path.root(s.name(), p.get('source-location'))
-                    xdll_path.append(path.parent(location))
-                          
-            extra.extend(property.Property('<dll-path>', sp) for sp in xdll_path)
+                    location = path.root(s.name(), p.get('source-location')[0])
+                    extra_xdll_path.append(os.path.dirname(location))
+
+        # Hardcode DLL paths only when linking executables.
+        # Pros: do not need to relink libraries when installing.
+        # Cons: "standalone" libraries (plugins, python extensions) can not
+        # hardcode paths to dependent libraries.            
+        if prop_set.get('<hardcode-dll-paths>') == ['true'] \
+              and type.is_derived(self.target_types_ [0], 'EXE'):
+                xdll_path = prop_set.get('<xdll-path>')
+                extra.extend(property.Property('<dll-path>', sp) \
+                     for sp in extra_xdll_path)
+                extra.extend(property.Property('<dll-path>', sp) \
+                     for sp in xdll_path)
         
         if extra:
-            prop_set = prop_set.add_raw (extra)
-                        
+            prop_set = prop_set.add_raw (extra)                
         result = generators.Generator.run(self, project, name, prop_set, sources)
-
+        
         if result:
             ur = self.extra_usage_requirements(result, prop_set)
-            ur = ur.add(property_set.create(orig_xdll_path))
+            ur = ur.add(property_set.create(['<xdll-path>' + p for p in extra_xdll_path]))
         else:
             return None
-        
-        return(ur, result)
+        return (ur, result)
     
     def extra_usage_requirements (self, created_targets, prop_set):
         
@@ -710,6 +714,14 @@ class ArchiveGenerator (generators.Generator):
 ### 
 ### 
 ### 
+
+class DummyGenerator(generators.Generator):
+     """Generator that accepts everything and produces nothing. Useful as a general
+     fallback for toolset-specific actions like PCH generation.
+     """
+     def run (self, project, name, prop_set, sources):
+       return (property_set.empty(), [])
+
 
 get_manager().projects().add_rule("variant", variant)
 

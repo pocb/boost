@@ -67,7 +67,7 @@ using std::va_list;
 #ifdef BOOST_SEH_BASED_SIGNAL_HANDLING
 #  include <windows.h>
 
-#  if defined(__MWERKS__) || (defined(BOOST_MSVC) && !defined(UNDER_CE))
+#  if defined(__MWERKS__) || (defined(_MSC_VER) && !defined(UNDER_CE))
 #    include <eh.h>
 #  endif
 
@@ -79,11 +79,11 @@ using std::va_list;
     typedef unsigned uintptr_t;
 #  endif
 
-#  if BOOST_WORKAROUND(BOOST_MSVC,  < 1300 ) || defined(UNDER_CE)
+#  if BOOST_WORKAROUND(_MSC_VER,  < 1300 ) || defined(UNDER_CE)
 typedef void* uintptr_t;
 #  endif
 
-#  if !defined(NDEBUG) && defined(BOOST_MSVC) && !defined(UNDER_CE)
+#  if !defined(NDEBUG) && defined(_MSC_VER) && !defined(UNDER_CE)
 #    include <crtdbg.h>
 #    define BOOST_TEST_CRT_HOOK_TYPE    _CRT_REPORT_HOOK
 #    define BOOST_TEST_CRT_ASSERT       _CRT_ASSERT
@@ -96,9 +96,7 @@ typedef void* uintptr_t;
 #    define BOOST_TEST_CRT_SET_HOOK(H)  (void*)(H)
 #  endif
 
-// como always sets BOOST_MSVC to 1310, regardless of the
-// actual underlying msvc version.
-#  if (!BOOST_WORKAROUND(BOOST_MSVC,  >= 1400 ) && \
+#  if (!BOOST_WORKAROUND(_MSC_VER,  >= 1400 ) && \
       !defined(BOOST_COMO)) || defined(UNDER_CE)
 
 typedef void* _invalid_parameter_handler;
@@ -160,6 +158,7 @@ namespace { void _set_se_translator( void* ) {} }
 #    define BOOST_TEST_ALT_STACK_SIZE SIGSTKSZ
 #  endif
 
+
 #else
 
 #  define BOOST_NO_SIGNAL_HANDLING
@@ -168,6 +167,10 @@ namespace { void _set_se_translator( void* ) {} }
 
 #ifndef UNDER_CE
 #include <errno.h>
+#endif
+
+#if defined(__GNUC__) && !defined(BOOST_NO_TYPEID)
+#  include <cxxabi.h>
 #endif
 
 #include <boost/test/detail/suppress_warnings.hpp>
@@ -184,7 +187,7 @@ namespace detail {
 
 #ifdef __BORLANDC__
 #  define BOOST_TEST_VSNPRINTF( a1, a2, a3, a4 ) std::vsnprintf( (a1), (a2), (a3), (a4) )
-#elif BOOST_WORKAROUND(BOOST_MSVC, <= 1310) || \
+#elif BOOST_WORKAROUND(_MSC_VER, <= 1310) || \
       BOOST_WORKAROUND(__MWERKS__, BOOST_TESTED_AT(0x3000)) || \
       defined(UNDER_CE)
 #  define BOOST_TEST_VSNPRINTF( a1, a2, a3, a4 ) _vsnprintf( (a1), (a2), (a3), (a4) )
@@ -257,24 +260,44 @@ do_invoke( Tr const& tr, Functor const& F )
 
 struct fpe_except_guard {
     explicit fpe_except_guard( unsigned detect_fpe )
-	: m_detect_fpe( detect_fpe )
+    : m_detect_fpe( detect_fpe )
     {
         // prepare fp exceptions control
         m_previosly_enabled = fpe::disable( fpe::BOOST_FPE_ALL );
-		if( m_previosly_enabled != fpe::BOOST_FPE_INV && detect_fpe != fpe::BOOST_FPE_OFF )
+        if( m_previosly_enabled != fpe::BOOST_FPE_INV && detect_fpe != fpe::BOOST_FPE_OFF )
             fpe::enable( detect_fpe );
     }
     ~fpe_except_guard()
     {
         if( m_detect_fpe != fpe::BOOST_FPE_OFF )
             fpe::disable( m_detect_fpe );
-		if( m_previosly_enabled != fpe::BOOST_FPE_INV )
-			fpe::enable( m_previosly_enabled );
+        if( m_previosly_enabled != fpe::BOOST_FPE_INV )
+            fpe::enable( m_previosly_enabled );
     }
 
     unsigned m_detect_fpe;
     unsigned m_previosly_enabled;
 };
+
+#ifndef BOOST_NO_TYPEID
+
+// ************************************************************************** //
+// **************                  typeid_name                 ************** //
+// ************************************************************************** //
+
+template<typename T>
+char const*
+typeid_name( T const& t )
+{
+#ifdef __GNUC__
+    int status;
+
+    return abi::__cxa_demangle( typeid(t).name(), 0, 0, &status );
+#else
+    return typeid(t).name();
+#endif
+}
+#endif
 
 } // namespace detail
 
@@ -791,7 +814,7 @@ static void boost_execution_monitor_attaching_signal_handler( int sig, siginfo_t
 // ************************************************************************** //
 
 int
-execution_monitor::catch_signals( unit_test::callback0<int> const& F )
+execution_monitor::catch_signals( boost::function<int ()> const& F )
 {
     using namespace detail;
 
@@ -1071,7 +1094,7 @@ invalid_param_handler( wchar_t const* /* expr */,
 // ************************************************************************** //
 
 int
-execution_monitor::catch_signals( unit_test::callback0<int> const& F )
+execution_monitor::catch_signals( boost::function<int ()> const& F )
 {
     _invalid_parameter_handler old_iph = _invalid_parameter_handler();
     BOOST_TEST_CRT_HOOK_TYPE old_crt_hook = 0;
@@ -1089,8 +1112,8 @@ execution_monitor::catch_signals( unit_test::callback0<int> const& F )
 
     detail::system_signal_exception SSE( this );
     
-	int ret_val = 0;
-	
+    int ret_val = 0;
+    
     __try {
         __try {
             ret_val = detail::do_invoke( m_custom_translators, F );
@@ -1106,8 +1129,8 @@ execution_monitor::catch_signals( unit_test::callback0<int> const& F )
            _set_invalid_parameter_handler( old_iph );
         }
     }
-	
-	return ret_val;
+    
+    return ret_val;
 }
 
 //____________________________________________________________________________//
@@ -1124,7 +1147,7 @@ public:
 } // namespace detail
 
 int
-execution_monitor::catch_signals( unit_test::callback0<int> const& F )
+execution_monitor::catch_signals( boost::function<int ()> const& F )
 {
     return detail::do_invoke( m_custom_translators , F );
 }
@@ -1148,7 +1171,7 @@ execution_monitor::execution_monitor()
 //____________________________________________________________________________//
 
 int
-execution_monitor::execute( unit_test::callback0<int> const& F )
+execution_monitor::execute( boost::function<int ()> const& F )
 {
     if( debug::under_debugger() )
         p_catch_system_errors.value = false;
@@ -1173,81 +1196,53 @@ execution_monitor::execute( unit_test::callback0<int> const& F )
                               "std::string: %s", ex.c_str() ); }
 
     //  std:: exceptions
-
-    catch( std::bad_alloc const& ex )
-      { detail::report_error( execution_exception::cpp_exception_error, 
-                              current_exception_cast<boost::exception const>(),
-                              "std::bad_alloc: %s", ex.what() ); }
-
-#if BOOST_WORKAROUND(__BORLANDC__, <= 0x0551)
-    catch( std::bad_cast const& ex )
-      { detail::report_error( execution_exception::cpp_exception_error, 
-                              current_exception_cast<boost::exception const>(),
-                              "std::bad_cast" ); }
-    catch( std::bad_typeid const& ex )
-      { detail::report_error( execution_exception::cpp_exception_error, 
-                              current_exception_cast<boost::exception const>(),
-                              "std::bad_typeid" ); }
+#ifdef BOOST_NO_TYPEID
+#define CATCH_AND_REPORT_STD_EXCEPTION( ex_name )                           \
+    catch( ex_name const& ex )                                              \
+       { detail::report_error( execution_exception::cpp_exception_error,    \
+                          current_exception_cast<boost::exception const>(), \
+                          #ex_name ": %s", ex.what() ); }                   \
+/**/
 #else
-    catch( std::bad_cast const& ex )
-      { detail::report_error( execution_exception::cpp_exception_error, 
-                              current_exception_cast<boost::exception const>(),
-                              "std::bad_cast: %s", ex.what() ); }
-    catch( std::bad_typeid const& ex )
-      { detail::report_error( execution_exception::cpp_exception_error, 
-                              current_exception_cast<boost::exception const>(),
-                              "std::bad_typeid: %s", ex.what() ); }
+#define CATCH_AND_REPORT_STD_EXCEPTION( ex_name )                           \
+    catch( ex_name const& ex )                                              \
+        { detail::report_error( execution_exception::cpp_exception_error,   \
+                          current_exception_cast<boost::exception const>(), \
+                          "%s: %s", detail::typeid_name(ex), ex.what() ); } \
+/**/
 #endif
 
-    catch( std::bad_exception const& ex )
-      { detail::report_error( execution_exception::cpp_exception_error, 
-                              current_exception_cast<boost::exception const>(),
-                              "std::bad_exception: %s", ex.what() ); }
-    catch( std::domain_error const& ex )
-      { detail::report_error( execution_exception::cpp_exception_error, 
-                              current_exception_cast<boost::exception const>(),
-                              "std::domain_error: %s", ex.what() ); }
-    catch( std::invalid_argument const& ex )
-      { detail::report_error( execution_exception::cpp_exception_error, 
-                              current_exception_cast<boost::exception const>(),
-                              "std::invalid_argument: %s", ex.what() ); }
-    catch( std::length_error const& ex )
-      { detail::report_error( execution_exception::cpp_exception_error, 
-                              current_exception_cast<boost::exception const>(),
-                              "std::length_error: %s", ex.what() ); }
-    catch( std::out_of_range const& ex )
-      { detail::report_error( execution_exception::cpp_exception_error, 
-                              current_exception_cast<boost::exception const>(),
-                              "std::out_of_range: %s", ex.what() ); }
-    catch( std::range_error const& ex )
-      { detail::report_error( execution_exception::cpp_exception_error, 
-                              current_exception_cast<boost::exception const>(),
-                              "std::range_error: %s", ex.what() ); }
-    catch( std::overflow_error const& ex )
-      { detail::report_error( execution_exception::cpp_exception_error, 
-                              current_exception_cast<boost::exception const>(),
-                              "std::overflow_error: %s", ex.what() ); }
-    catch( std::underflow_error const& ex )
-      { detail::report_error( execution_exception::cpp_exception_error, 
-                              current_exception_cast<boost::exception const>(),
-                              "std::underflow_error: %s", ex.what() ); }
-    catch( std::logic_error const& ex )
-      { detail::report_error( execution_exception::cpp_exception_error, 
-                              current_exception_cast<boost::exception const>(),
-                              "std::logic_error: %s", ex.what() ); }
-    catch( std::runtime_error const& ex )
-      { detail::report_error( execution_exception::cpp_exception_error, 
-                              current_exception_cast<boost::exception const>(),
-                              "std::runtime_error: %s", ex.what() ); }
-    catch( std::exception const& ex )
-      { detail::report_error( execution_exception::cpp_exception_error, 
-                              current_exception_cast<boost::exception const>(),
-                              "std::exception: %s", ex.what() ); }
+    CATCH_AND_REPORT_STD_EXCEPTION( std::bad_alloc )
+
+#if BOOST_WORKAROUND(__BORLANDC__, <= 0x0551)
+    CATCH_AND_REPORT_STD_EXCEPTION( std::bad_cast )
+    CATCH_AND_REPORT_STD_EXCEPTION( std::bad_typeid )
+#else
+    CATCH_AND_REPORT_STD_EXCEPTION( std::bad_cast )
+    CATCH_AND_REPORT_STD_EXCEPTION( std::bad_typeid )
+#endif
+
+    CATCH_AND_REPORT_STD_EXCEPTION( std::bad_exception )
+    CATCH_AND_REPORT_STD_EXCEPTION( std::domain_error )
+    CATCH_AND_REPORT_STD_EXCEPTION( std::invalid_argument )
+    CATCH_AND_REPORT_STD_EXCEPTION( std::length_error )
+    CATCH_AND_REPORT_STD_EXCEPTION( std::out_of_range )
+    CATCH_AND_REPORT_STD_EXCEPTION( std::range_error )
+    CATCH_AND_REPORT_STD_EXCEPTION( std::overflow_error )
+    CATCH_AND_REPORT_STD_EXCEPTION( std::underflow_error )
+    CATCH_AND_REPORT_STD_EXCEPTION( std::logic_error )
+    CATCH_AND_REPORT_STD_EXCEPTION( std::runtime_error )
+    CATCH_AND_REPORT_STD_EXCEPTION( std::exception )
+#undef CATCH_AND_REPORT_STD_EXCEPTION
 
     catch( boost::exception const& ex )
-    { detail::report_error( execution_exception::cpp_exception_error, 
-                            &ex,
-                            "unknown boost::exception" ); }
+      { detail::report_error( execution_exception::cpp_exception_error, 
+                              &ex,
+#ifdef BOOST_NO_TYPEID
+                              "unknown boost::exception" ); }
+#else
+                              typeid(ex).name()          ); }
+#endif
 
     // system errors
     catch( system_error const& ex )
@@ -1272,6 +1267,23 @@ execution_monitor::execute( unit_test::callback0<int> const& F )
 } // execute
 
 //____________________________________________________________________________//
+
+namespace detail {
+
+struct forward {
+    explicit    forward( boost::function<void ()> const& F ) : m_F( F ) {}
+
+    int         operator()() { m_F(); return 0; }
+
+    boost::function<void ()> const& m_F;
+};
+
+} // namespace detail
+void
+execution_monitor::vexecute( boost::function<void ()> const& F )
+{
+    execute( detail::forward( F ) );
+}
 
 // ************************************************************************** //
 // **************                  system_error                ************** //
@@ -1329,18 +1341,18 @@ enable( unsigned mask )
 #else
     unsigned old_cw;
     if( ::_controlfp_s( &old_cw, 0, 0 ) != 0 )
-		return BOOST_FPE_INV;
+        return BOOST_FPE_INV;
 
     // Set the control word
     if( ::_controlfp_s( 0, old_cw & ~mask, BOOST_FPE_ALL ) != 0 )
-		return BOOST_FPE_INV;
+        return BOOST_FPE_INV;
 #endif
 
-	return ~old_cw & BOOST_FPE_ALL;
+    return ~old_cw & BOOST_FPE_ALL;
 #elif defined(__GLIBC__) && defined(__USE_GNU) && !defined(BOOST_CLANG) && !defined(BOOST_NO_FENV_H)
     ::feclearexcept(BOOST_FPE_ALL);
-	int res = ::feenableexcept( mask );
-	return res == -1 ? BOOST_FPE_INV : (unsigned)res;
+    int res = ::feenableexcept( mask );
+    return res == -1 ? BOOST_FPE_INV : (unsigned)res;
 #else
     /* Not Implemented  */
     return 0;
@@ -1364,18 +1376,18 @@ disable( unsigned mask )
 #else
     unsigned old_cw;
     if( ::_controlfp_s( &old_cw, 0, 0 ) != 0 )
-		return BOOST_FPE_INV;
+        return BOOST_FPE_INV;
 
     // Set the control word
     if( ::_controlfp_s( 0, old_cw | mask, BOOST_FPE_ALL ) != 0 )
-		return BOOST_FPE_INV;
+        return BOOST_FPE_INV;
 #endif
 
     return ~old_cw & BOOST_FPE_ALL;
 #elif defined(__GLIBC__) && defined(__USE_GNU) && !defined(BOOST_CLANG) && !defined(BOOST_NO_FENV_H)
     ::feclearexcept(BOOST_FPE_ALL);
-	int res = ::fedisableexcept( mask );
-	return res == -1 ? BOOST_FPE_INV : (unsigned)res;
+    int res = ::fedisableexcept( mask );
+    return res == -1 ? BOOST_FPE_INV : (unsigned)res;
 #else
     /* Not Implemented */
     return BOOST_FPE_INV;

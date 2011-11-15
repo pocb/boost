@@ -1,4 +1,4 @@
-//  (C) Copyright Gennadiy Rozental 2001-2010.
+//  (C) Copyright Gennadiy Rozental 2001-2011.
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at 
 //  http://www.boost.org/LICENSE_1_0.txt)
@@ -17,7 +17,7 @@
 #define BOOST_TEST_RESULTS_COLLECTOR_HPP_071894GER
 
 // Boost.Test
-#include <boost/test/test_observer.hpp>
+#include <boost/test/tree/observer.hpp>
 
 #include <boost/test/detail/global_typedef.hpp>
 #include <boost/test/detail/fwd_decl.hpp>
@@ -30,7 +30,6 @@
 //____________________________________________________________________________//
 
 namespace boost {
-
 namespace unit_test {
 
 // ************************************************************************** //
@@ -97,16 +96,13 @@ public:
     test_results const& results( test_unit_id ) const;
 
 private:
-    BOOST_TEST_SINGLETON_CONS( results_collector_t );
+    BOOST_TEST_SINGLETON_CONS( results_collector_t )
 };
 
 BOOST_TEST_SINGLETON_INST( results_collector )
 
 } // namespace unit_test
-
 } // namespace boost
-
-//____________________________________________________________________________//
 
 #include <boost/test/detail/enable_warnings.hpp>
 

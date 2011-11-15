@@ -646,6 +646,7 @@
                 <toolset name="borland-5.8*"/>
                 <toolset name="borland-5.9*"/>
                 <toolset name="intel-darwin-11.*"/>
+                <toolset name="intel-darwin-12.0"/>
                 <toolset name="gcc-3.4.0*"/>
                 <toolset name="gcc-4.1*"/>
                 <toolset name="gcc-4.2.0*"/>
@@ -660,6 +661,7 @@
                 <toolset name="msvc-10.0*"/>
                 <toolset name="msvc-7.1*"/>
                 <toolset name="vacpp-10.1"/>
+                <toolset name="qcc-4*"/>
                 <toolset name="acc"/>
                 <note author="Alexander Nasonov">
                     Conversion double-string-double may give a different value (or even throw) on many compilers
@@ -670,8 +672,15 @@
             <mark-failure>
                 <toolset name="gcc-mingw-4.*"/>
                 <toolset name="vacpp-10.1"/>
+                <toolset name="vacpp"/>
+                <toolset name="msvc-9.0~stlport5.2"/>
+                <toolset name="msvc-9.0~wm5~stlport5.2"/>
+                <toolset name="intel-darwin-11.*"/>
+                <toolset name="intel-darwin-12.0"/>
+                <toolset name="qcc-4*"/>
+                <toolset name="clang-darwin-libcxx*"/>
                 <note author="Antony Polukhin">
-                    Some compilers and STL realizations convert double and long double types with bigger precision loss than minimal. Such failures are not a lexical_cast, but a compiler fault. 
+                    Some compilers and STL realizations convert double and long double types with bigger precision loss than minimal (or even round to infinity). Such failures are not a lexical_cast, but a compiler fault. 
                 </note>
             </mark-failure>
         </test>
@@ -1402,6 +1411,17 @@
             STLport debug mode seems to be broken here.
             </note>
         </mark-expected-failures>
+
+        <mark-expected-failures>
+            <test name="container_fwd_debug"/>
+            <toolset name="clang-darwin-0x"/>
+            <toolset name="clang-darwin-normal"/>
+            <note author="Daniel James">
+            Some old versions of GCC's libstdc++ don't work on clang with
+            _GLIBCXX_DEBUG defined.
+            http://lists.cs.uiuc.edu/pipermail/cfe-dev/2011-May/015178.html
+            </note>
+        </mark-expected-failures>
     </library>
 
     <!-- dynamic_bitset -->
@@ -1599,7 +1619,7 @@
             <toolset name="gcc-3.2*"/>
             <toolset name="gcc-3_3-darwin"/>
             <toolset name="intel-linux"/>
-            <toolset name="vacpp"/>
+            <toolset name="vacpp*"/>
             <toolset name="cw-8.3"/>
             <toolset name="cw-9.4"/>
             <toolset name="cw-9.5-darwin"/>
@@ -1610,7 +1630,7 @@
             <toolset name="sun-5.7"/>
             <toolset name="sun-5.8"/>
             <toolset name="sun-5.9"/>
-            <toolset name="pathscale*"/>
+            <toolset name="sun-5.10"/>
             <note author="Eric Niebler">
                 This compiler does not support detection of
                 const rvalues.
@@ -1629,7 +1649,7 @@
             <toolset name="gcc-3.2*"/>
             <toolset name="gcc-3_3-darwin"/>
             <toolset name="intel-linux"/>
-            <toolset name="vacpp"/>
+            <toolset name="vacpp*"/>
             <toolset name="cw-8.3"/>
             <toolset name="cw-9.4"/>
             <toolset name="cw-9.5-darwin"/>
@@ -1640,7 +1660,7 @@
             <toolset name="sun-5.7"/>
             <toolset name="sun-5.8"/>
             <toolset name="sun-5.9"/>
-            <toolset name="pathscale*"/>
+            <toolset name="sun-5.10"/>
             <note author="Eric Niebler">
                 This compiler does not support detection of
                 const rvalues.
@@ -1660,6 +1680,7 @@
             <toolset name="sun-5.7"/>
             <toolset name="sun-5.8"/>
             <toolset name="sun-5.9"/>
+            <toolset name="sun-5.10"/>
             <note author="Eric Niebler">
                 This compiler does not support detection of
                 rvalues.
@@ -1679,6 +1700,7 @@
             <toolset name="sun-5.7"/>
             <toolset name="sun-5.8"/>
             <toolset name="sun-5.9"/>
+            <toolset name="sun-5.10"/>
             <note author="Eric Niebler">
                 This compiler does not support detection of
                 rvalues.
@@ -1704,6 +1726,16 @@
                 ADL which these compilers do not support.
             </note>
         </mark-expected-failures>
+
+        <mark-expected-failures>
+            <test name="noncopyable_rvalue_const"/>
+            <test name="noncopyable_rvalue_const_r"/>
+            <test name="noncopyable_rvalue_nonconst"/>
+            <test name="noncopyable_rvalue_nonconst_r"/>
+            <toolset name="*"/>
+            <note refid="50" author="Eric Niebler"/>
+        </mark-expected-failures>
+
     </library>
 
     <!-- format -->
@@ -6691,6 +6723,10 @@ These tests will fail in most compilers that don't support rvalue references.
 
     <note id="49">
         This test fails because MinGW apparently does not always catch exceptions properly.
+    </note>
+
+    <note id="50">
+        This test requires C++0x support.
     </note>
 
 </explicit-failures-markup>

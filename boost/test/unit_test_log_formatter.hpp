@@ -1,4 +1,4 @@
-//  (C) Copyright Gennadiy Rozental 2003-2010.
+//  (C) Copyright Gennadiy Rozental 2003-2011.
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at 
 //  http://www.boost.org/LICENSE_1_0.txt)
@@ -20,8 +20,6 @@
 #include <boost/test/detail/log_level.hpp>
 #include <boost/test/detail/fwd_decl.hpp>
 
-#include <boost/test/execution_monitor.hpp>
-
 // STL
 #include <iosfwd>
 #include <string> // for std::string
@@ -31,7 +29,6 @@
 //____________________________________________________________________________//
 
 namespace boost {
-
 namespace unit_test {
 
 // ************************************************************************** //
@@ -112,7 +109,6 @@ public:
 };
 
 } // namespace unit_test
-
 } // namespace boost
 
 //____________________________________________________________________________//

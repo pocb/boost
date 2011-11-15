@@ -24,7 +24,7 @@
 #include <boost/math/special_functions/detail/round_fwd.hpp>
 
 #if (defined(__CYGWIN__) || defined(__FreeBSD__) || defined(__NetBSD__) \
-   || defined(__hppa) || defined(__NO_LONG_DOUBLE_MATH)) && !defined(BOOST_MATH_NO_LONG_DOUBLE_MATH_FUNCTIONS)
+   || (defined(__hppa) && !defined(__OpenBSD__)) || defined(__NO_LONG_DOUBLE_MATH)) && !defined(BOOST_MATH_NO_LONG_DOUBLE_MATH_FUNCTIONS)
 #  define BOOST_MATH_NO_LONG_DOUBLE_MATH_FUNCTIONS
 #endif
 #if BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x582))
@@ -265,7 +265,9 @@ void suppress_unused_variable_warning(const T&)
 
    #include <boost/detail/fenv.hpp>
 
-   namespace boost{ namespace math{
+#  ifdef FE_ALL_EXCEPT
+
+namespace boost{ namespace math{
    namespace detail
    {
    struct fpu_guard
@@ -286,8 +288,16 @@ void suppress_unused_variable_warning(const T&)
    } // namespace detail
    }} // namespaces
 
-#  define BOOST_FPU_EXCEPTION_GUARD boost::math::detail::fpu_guard local_guard_object;
-#  define BOOST_MATH_INSTRUMENT_FPU do{ fexcept_t cpu_flags; fegetexceptflag(&cpu_flags, FE_ALL_EXCEPT); BOOST_MATH_INSTRUMENT_VARIABLE(cpu_flags); } while(0); 
+#    define BOOST_FPU_EXCEPTION_GUARD boost::math::detail::fpu_guard local_guard_object;
+#    define BOOST_MATH_INSTRUMENT_FPU do{ fexcept_t cpu_flags; fegetexceptflag(&cpu_flags, FE_ALL_EXCEPT); BOOST_MATH_INSTRUMENT_VARIABLE(cpu_flags); } while(0); 
+
+#  else
+
+#    define BOOST_FPU_EXCEPTION_GUARD
+#    define BOOST_MATH_INSTRUMENT_FPU
+
+#  endif
+
 #else // All other platforms.
 #  define BOOST_FPU_EXCEPTION_GUARD
 #  define BOOST_MATH_INSTRUMENT_FPU

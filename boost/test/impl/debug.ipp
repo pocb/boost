@@ -113,7 +113,6 @@ namespace std { using ::memset; using ::sprintf; }
 //____________________________________________________________________________//
 
 namespace boost {
-
 namespace debug {
 
 using unit_test::const_string;
@@ -922,7 +921,7 @@ attach_debugger( bool break_or_continue )
 // ************************************************************************** //
 
 void
-detect_memory_leaks( bool on_off )
+detect_memory_leaks( bool on_off, unit_test::const_string report_file )
 {
     unit_test::ut_detail::ignore_unused_variable_warning( on_off );
 
@@ -934,7 +933,14 @@ detect_memory_leaks( bool on_off )
     else  {
         flags |= _CRTDBG_LEAK_CHECK_DF;
         _CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_FILE);
-        _CrtSetReportFile(_CRT_WARN, _CRTDBG_FILE_STDOUT);
+
+        if( report_file.is_empty() )
+            _CrtSetReportFile(_CRT_WARN, _CRTDBG_FILE_STDERR);
+        else {
+            HANDLE hreport_f = ::CreateFileA( report_file.begin(), 
+                                              GENERIC_WRITE, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+            _CrtSetReportFile(_CRT_WARN, hreport_f );
+        }
     }
 
     _CrtSetDbgFlag ( flags );
@@ -958,11 +964,10 @@ break_memory_alloc( long mem_alloc_order_num )
 #endif // BOOST_MS_CRT_BASED_DEBUG
 }
 
-} // namespace debug
-
-} // namespace boost
-
 //____________________________________________________________________________//
+
+} // namespace debug
+} // namespace boost
 
 #include <boost/test/detail/enable_warnings.hpp>
 

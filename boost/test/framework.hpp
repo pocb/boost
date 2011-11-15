@@ -1,4 +1,4 @@
-//  (C) Copyright Gennadiy Rozental 2005-2010.
+//  (C) Copyright Gennadiy Rozental 2005-2011.
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at 
 //  http://www.boost.org/LICENSE_1_0.txt)
@@ -20,7 +20,6 @@
 #include <boost/test/detail/fwd_decl.hpp>
 #include <boost/test/utils/trivial_singleton.hpp>
 
-
 #include <boost/test/detail/suppress_warnings.hpp>
 
 // STL
@@ -29,7 +28,6 @@
 //____________________________________________________________________________//
 
 namespace boost {
-
 namespace unit_test {
 
 // ************************************************************************** //
@@ -51,6 +49,9 @@ namespace framework {
 // initialization
 BOOST_TEST_DECL void    init( init_unit_test_func init_func, int argc, char* argv[] );
 BOOST_TEST_DECL bool    is_initialized();
+
+// shutdown
+BOOST_TEST_DECL void    shutdown();
 
 // mutation access methods
 BOOST_TEST_DECL void    register_test_unit( test_case* tc );
@@ -86,6 +87,7 @@ BOOST_TEST_DECL master_test_suite_t& master_test_suite();
 
 // constant access methods
 BOOST_TEST_DECL test_case const&    current_test_case();
+BOOST_TEST_DECL test_unit_id        current_test_case_id(); /* safe version of above */
 
 BOOST_TEST_DECL test_unit&  get( test_unit_id, test_unit_type );
 template<typename UnitType>
@@ -105,7 +107,7 @@ BOOST_TEST_DECL void    test_unit_aborted( test_unit const& );
 
 namespace impl { // publisized to facilitate internal unit test only
 
-void    apply_filters( test_unit_id );
+void                    apply_filters( test_unit_id );
 
 } // namespace impl
 
@@ -113,25 +115,31 @@ void    apply_filters( test_unit_id );
 // **************                framework errors              ************** //
 // ************************************************************************** //
 
-struct internal_error : std::runtime_error {
+struct BOOST_TEST_DECL internal_error : std::runtime_error {
     internal_error( const_string m ) : std::runtime_error( std::string( m.begin(), m.size() ) ) {}
 };
 
-struct setup_error : std::runtime_error {
+//____________________________________________________________________________//
+
+struct BOOST_TEST_DECL setup_error : std::runtime_error {
     setup_error( const_string m ) : std::runtime_error( std::string( m.begin(), m.size() ) ) {}
 };
 
 #define BOOST_TEST_SETUP_ASSERT( cond, msg ) if( cond ) {} else throw unit_test::framework::setup_error( msg )
 
-struct nothing_to_test {}; // not really an error
+//____________________________________________________________________________//
 
-} // namespace framework
-
-} // unit_test
-
-} // namespace boost
+struct BOOST_TEST_DECL test_being_aborted {};
 
 //____________________________________________________________________________//
+
+struct nothing_to_test {}; // not really an error
+
+//____________________________________________________________________________//
+
+} // namespace framework
+} // unit_test
+} // namespace boost
 
 #include <boost/test/detail/enable_warnings.hpp>
 
