@@ -171,7 +171,7 @@ namespace quickbook
             qbk_major_version = 1;
             qbk_minor_version = 1;
             detail::outwarn(actions.filename,1)
-                << "Warning: Quickbook version undefined. "
+                << "Quickbook version undefined. "
                 "Version 1.1 is assumed" << std::endl;
         }
         else
@@ -406,6 +406,20 @@ namespace quickbook
         {
             return;
         } 
+
+        // Close any open sections.
+        if (actions.section_level != 0) {
+            detail::outwarn(actions.filename)
+                << "Missing [endsect] detected at end of file."
+                << std::endl;
+
+            while(actions.section_level > 0) {
+                out << "</section>";
+                --actions.section_level;
+            }
+
+            actions.qualified_section_id.clear();
+        }
 
         // We've finished generating our output. Here's what we'll do
         // *after* everything else.

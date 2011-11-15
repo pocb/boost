@@ -116,16 +116,28 @@ EOL;
           </typedef>
           <typedef name="pointer">
             <type>typename allocator_type::pointer</type>
+            <description>
+              <para>
+                <code>value_type*</code> if
+                <code>allocator_type::pointer</code> is not defined.
+              </para>
+            </description>
           </typedef>
           <typedef name="const_pointer">
             <type>typename allocator_type::const_pointer</type>
+            <description>
+              <para>
+                <code>boost::pointer_to_other&lt;pointer, value_type&gt;::type</code>
+                if <code>allocator_type::const_pointer</code> is not defined.
+              </para>
+            </description>
           </typedef>
           <typedef name="reference">
-            <type>typename allocator_type::reference</type>
+            <type>value_type&amp;</type>
             <purpose><simpara>lvalue of <type>value_type</type>.</simpara></purpose>
           </typedef>
           <typedef name="const_reference">
-            <type>typename allocator_type::const_reference</type>
+            <type>value_type const&amp;</type>
             <purpose><simpara>const lvalue of <type>value_type</type>.</simpara></purpose>
           </typedef>
           <typedef name="size_type">
@@ -320,7 +332,8 @@ EOL;
             <notes>
               <para>
                 On compilers without rvalue references, this is emulated using
-                Boost.Move.
+                Boost.Move. Note that on some compilers the copy assignment
+                operator may be used in some circumstances.
               </para>
             </notes>
             <requires>
@@ -418,7 +431,7 @@ EOL;
                 <para>In version of Boost before 1.48 this emulated the variadic pair
                       constructor from older C++0x drafts. For backwards compatability
                       this can be enabled by defining the macro
-                      <code>BOOST_UNORDERED_DEPRECATED_PAIR_CONSTRUCT</code>.
+                      <code>BOOST_UNORDERED_DEPRECATED_PAIR_CONSTRUCT</code>.</para>
               </notes>
             </method>
             <method name="emplace_hint">
@@ -459,12 +472,11 @@ EOL;
                       for rvalue references or move semantics.</para>
                 <para>Since existing <code>std::pair</code> implementations don't support
                       <code>std::piecewise_construct</code> this emulates it,
-                      but using <code>boost::unordered::piecewise_construct</code>.
+                      but using <code>boost::unordered::piecewise_construct</code>.</para>
                 <para>In version of Boost before 1.48 this emulated the variadic pair
                       constructor from older C++0x drafts. For backwards compatability
                       this can be enabled by defining the macro
-                      <code>BOOST_UNORDERED_DEPRECATED_PAIR_CONSTRUCT</code>.
-                </para>
+                      <code>BOOST_UNORDERED_DEPRECATED_PAIR_CONSTRUCT</code>.</para>
               </notes>
             </method>
             <method name="insert">
@@ -811,10 +823,6 @@ EOL;
               <throws>
                 <para>An exception object of type <code>std::out_of_range</code> if no such element is present.</para>
               </throws>
-              <notes>
-                <para>This is not specified in the draft standard, but that is probably an oversight. The issue has been raised in
-                  <ulink url="http://groups.google.com/group/comp.std.c++/browse_thread/thread/ab7c22a868fd370b">comp.std.c++</ulink>.</para>
-              </notes>
             </overloaded-method>
 <?php endif; ?>
           </method-group>
