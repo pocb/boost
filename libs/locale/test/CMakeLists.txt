@@ -2,10 +2,10 @@
 # CMake framework maintained by Denis Arnaud on git@github.com:pocb/boost
 #----------------------------------------------------------------------------
 #
-boost_additional_test_dependencies(chrono BOOST_DEPENDS test)
+boost_additional_test_dependencies (locale BOOST_DEPENDS test)
 
-set (CHRONO_LIBRARIES
-  boost_chrono
+set (LOCALE_LIBRARIES
+  boost_locale
   boost_test_exec_monitor)
 
 set (BOOST_TEST_EXEC_MONITOR_SUFFIX "")
@@ -19,23 +19,42 @@ if (NOT BUILD_RELEASE)
 endif (NOT BUILD_RELEASE)
 
 #
-macro (chrono_test_run TESTNAME)
+macro (locale_test_run TESTNAME)
   boost_test_run (${TESTNAME} 
     STATIC
-    DEPENDS boost_chrono boost_test_exec_monitor )
+    DEPENDS boost_locale boost_test_exec_monitor )
   boost_test_run ("${TESTNAME}_dll"
     ${TESTNAME}.cpp
     SHARED
-    DEPENDS boost_chrono 
+    DEPENDS boost_locale 
     "boost_test_exec_monitor${BOOST_TEST_EXEC_MONITOR_SUFFIX}")
-endmacro (chrono_test_run)
+endmacro (locale_test_run)
 
 #
 set (TESTS 
-  clock
-  duration
-  time_point
-  traits)
+  test_config.cpp
+  test_utf.cpp
+  test_date_time.cpp
+  test_ios_prop.cpp
+  test_codepage_converter.cpp
+  test_codepage.cpp
+  test_message.cpp
+  test_generator.cpp
+  test_collate.cpp
+  test_convert.cpp
+  test_boundary.cpp
+  test_formatting.cpp
+  test_icu_vs_os_timezone.cpp
+  test_winapi_collate.cpp
+  test_winapi_convert.cpp
+  test_winapi_formatting.cpp
+  test_posix_collate.cpp
+  test_posix_convert.cpp
+  test_posix_formatting.cpp
+  test_std_collate.cpp
+  test_std_convert.cpp
+  test_std_formatting.cpp
+  )
 
 #
-chrono_test_run (run_timer_test) 
+locale_test_(run_timer_test) 

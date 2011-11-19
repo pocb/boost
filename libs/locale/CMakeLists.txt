@@ -4,18 +4,18 @@
 #
 # Add a variable to hold the headers for the library
 set (lib_headers
-    chrono.hpp
-    chrono
+  locale.hpp
+  locale
 )
 
 # Add a library target to the build system
-boost_library_project(
-  chrono
+boost_library_project (
+  locale
   SRCDIRS  src
   TESTDIRS  test
   HEADERS ${lib_headers}
   #  DOCDIRS 
-  DESCRIPTION  "Useful time utilities."
+  DESCRIPTION  "Provide localization and Unicode handling tools for C++."
   MODULARIZED
   AUTHORS  "Vicente J. Botet Escribá <vicente.botet - at - wanadoo.fr>"
   #  MAINTAINERS 
