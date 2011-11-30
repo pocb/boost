@@ -56,14 +56,14 @@
 #include "parse.h"
 #include "scan.h"
 #include "compile.h"
-#include "newstr.h"
+#include "object.h"
 #include "rules.h"
 
 # define YYMAXDEPTH 10000	/* for OSF and other less endowed yaccs */
 
 # define F0 (LIST *(*)(PARSE *, FRAME *))0
 # define P0 (PARSE *)0
-# define S0 (char *)0
+# define S0 (OBJECT *)0
 
 # define pappend( l,r )    	parse_make( compile_append,l,r,P0,S0,S0,0 )
 # define peval( c,l,r )	parse_make( compile_eval,l,r,P0,S0,S0,c )
@@ -281,9 +281,9 @@ arg	: ARG
  * This needs to be split cleanly out of 'rule'
  */
 
-func	: arg lol
+func	: ARG lol
 		{ $$.parse = prule( $1.string, $2.parse ); }
-	| `on` arg arg lol
+	| `on` arg ARG lol
 		{ $$.parse = pon( $2.parse, prule( $3.string, $4.parse ) ); }
 	| `on` arg `return` list
 		{ $$.parse = pon( $2.parse, $4.parse ); }

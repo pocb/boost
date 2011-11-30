@@ -1,4 +1,5 @@
 [template perf[name value] [value]]
+[template para[text] '''<para>'''[text]'''</para>''']
 
 [section:perf Performance]
 

@@ -412,6 +412,13 @@ boost
             public T,
             public clone_base
             {
+            struct clone_tag { };
+            clone_impl( clone_impl const & x, clone_tag ):
+                T(x)
+                {
+                copy_boost_exception(this,&x);
+                }
+
             public:
 
             explicit
@@ -430,7 +437,7 @@ boost
             clone_base const *
             clone() const
                 {
-                return new clone_impl(*this);
+                return new clone_impl(*this,clone_tag());
                 }
 
             void

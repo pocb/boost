@@ -213,20 +213,22 @@ rm -f config.log
 
 # Build bjam
 if test "x$BJAM" = x; then
-  echo -n "Building Boost.Jam with toolset $TOOLSET... "
+  echo -n "Building Boost.Build engine with toolset $TOOLSET... "
   pwd=`pwd`
   (cd "$my_dir/tools/build/v2/engine" && ./build.sh "$TOOLSET") > bootstrap.log 2>&1
   if [ $? -ne 0 ]; then
       echo
-      echo "Failed to build Boost.Jam" 
+      echo "Failed to build Boost.Build build engine" 
       echo "Consult 'bootstrap.log' for more details"
       exit 1
   fi
   cd "$pwd"
   arch=`cd $my_dir/tools/build/v2/engine && ./bootstrap/jam0 -d0 -f build.jam --toolset=$TOOLSET --toolset-root= --show-locate-target && cd ..`
-  BJAM="$my_dir/tools/build/v2/engine/$arch/bjam"
-  echo "tools/build/v2/engine/$arch/bjam"
+  BJAM="$my_dir/tools/build/v2/engine/$arch/b2"
+  echo "tools/build/v2/engine/$arch/b2"
   cp "$BJAM" .
+  cp "$my_dir/tools/build/v2/engine/$arch/bjam" .
+
 fi
 
 # TBD: Turn BJAM into an absolute path
@@ -241,7 +243,7 @@ the headers only.
 
 The Boost libraries requiring separate building and installation are:
 EOF
-  $BJAM -d0 --show-libraries | grep '^\s*-'
+  $BJAM -d0 --show-libraries | grep '^[[:space:]]*-'
   exit 0
 fi
 
@@ -275,7 +277,7 @@ if test "x$flag_no_python" = x; then
 
     if test "x$PYTHON_ROOT" = x; then
         echo -n "Detecting Python root... "
-        PYTHON_ROOT=`$PYTHON -c "import sys; print sys.prefix"`
+        PYTHON_ROOT=`$PYTHON -c "import sys; print(sys.prefix)"`
         echo $PYTHON_ROOT
     fi    
 fi
@@ -378,13 +380,13 @@ cat << EOF
 
 Bootstrapping is done. To build, run:
 
-    ./bjam
+    ./b2
     
 To adjust configuration, edit 'project-config.jam'.
 Further information:
 
    - Command line help:
-     ./bjam --help
+     ./b2 --help
      
    - Getting started guide: 
      http://www.boost.org/more/getting_started/unix-variants.html

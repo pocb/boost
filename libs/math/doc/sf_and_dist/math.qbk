@@ -1,6 +1,5 @@
 [article Math Toolkit
-    [quickbook 1.6]
-    [compatibility-mode 1.5]
+    [quickbook 1.5]
     [copyright 2006, 2007, 2008, 2009, 2010 John Maddock, Paul A. Bristow, Hubert Holin, Xiaogang Zhang, Bruno Lalande, Johan Råde, Gautam Sewani and Thijs van den Berg]
     [/purpose ISBN 0-9504833-2-X  978-0-9504833-2-0, Classification 519.2-dc22]
     [license
@@ -13,8 +12,6 @@
 ]
 
 [/ \u00E5 = Latin small letter A with ring above doesn't seem to work in authors with Quickbook 1.5]
-
-[template para[text] '''<para>'''[text]'''</para>''']
 
 [template equation[name]  '''<inlinemediaobject>
 <imageobject role="html">
@@ -34,13 +31,13 @@
 </imageobject>
 </inlinemediaobject>''']
 
-[import html4_symbols.qbk]
-[/import math_symbols.qbk]
+[include html4_symbols.qbk]
+[/include math_symbols.qbk]
 
-[/import latin1_symbols.qbk] [/ just for testing]
-[import common_overviews.qbk] [/ overviews that appear in more than one place!]
-[import tr1.qbk] [/tr1 docs also appear in more than one place!]
-[import roadmap.qbk] [/ for history]
+[/include latin1_symbols.qbk] [/ just for testing]
+[include common_overviews.qbk] [/ overviews that appear in more than one place!]
+[include tr1.qbk] [/tr1 docs also appear in more than one place!]
+[include roadmap.qbk] [/ for history]
 
 [def __effects [*Effects: ]]
 [def __formula [*Formula: ]]
@@ -501,7 +498,7 @@ and as a CD ISBN 0-9504833-2-X  978-0-9504833-2-0, Classification 519.2-dc22.
 
 [endsect] [/section:status Status and Roadmap]
 
-[import ../../../../tools/auto_index/include/auto_index_helpers.qbk]
+[include ../../../../tools/auto_index/include/auto_index_helpers.qbk]
 [named_index function_name Function Index]
 [named_index class_name Class Index]
 [named_index typedef_name Typedef Index]
