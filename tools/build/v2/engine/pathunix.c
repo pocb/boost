@@ -326,6 +326,7 @@ DWORD ShortPathToLongPath(LPCTSTR lpszShortPath,LPTSTR lpszLongPath,DWORD
             return len;
         }
         _tcsncpy(ret,path,2);
+        ret[0] = toupper(ret[0]);
     }
 
     /* Expand the path for each subpath, and strip trailing backslashes */
@@ -390,7 +391,74 @@ OBJECT * short_path_to_long_path( OBJECT * short_path )
     if (ret)
         return object_new( buffer2 );
     else
-      return object_copy( short_path );
+        return object_copy( short_path );
+}
+
+#endif
+
+#ifdef NT
+
+struct path_key_entry
+{
+    OBJECT * path;
+    OBJECT * key;
+};
+
+static struct hash * path_key_cache;
+
+OBJECT * path_as_key( OBJECT * path )
+{
+    struct path_key_entry e, *result = &e;
+
+    if ( ! path_key_cache )
+        path_key_cache = hashinit( sizeof( struct path_key_entry ), "path to key" );
+
+    result->path = path;
+    if ( hashenter( path_key_cache, (HASHDATA * *)&result ) )
+    {
+        string buf[1];
+        char * s;
+        string_copy( buf, object_str( path ) );
+        for ( s = buf->value; s < buf->value + buf->size; ++s )
+        {
+            if ( *s == '/' )
+                *s = '\\';
+            else
+                *s = tolower( *s );
+        }
+        result->path = object_copy( path );
+        result->key = object_new( buf->value );
+        string_free( buf );
+    }
+
+    return result->key;
+}
+
+static void free_path_key_entry( void * xentry, void * data )
+{
+    struct path_key_entry * entry = (struct path_key_entry *)xentry;
+    object_free( entry->path );
+    object_free( entry->key );
+}
+
+void path_done( void )
+{
+    if ( path_key_cache )
+    {
+        hashenumerate( path_key_cache, &free_path_key_entry, (void *)0 );
+        hashdone( path_key_cache );
+    }
+}
+
+#else
+
+OBJECT * path_as_key( OBJECT * path )
+{
+    return object_copy( path );
+}
+
+void path_done( void )
+{
 }
 
 #endif
