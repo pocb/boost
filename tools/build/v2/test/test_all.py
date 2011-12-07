@@ -121,7 +121,7 @@ def reorder_tests(tests, first_test):
 critical_tests = ["unit_tests", "module_actions", "startup_v1", "startup_v2"]
 
 critical_tests += ["core_d12", "core_typecheck", "core_delete_module",
-                   "core_language", "core_varnames", "core_import_module"]
+                   "core_language", "core_arguments", "core_varnames", "core_import_module"]
 
 tests = [ "absolute_sources",
           "alias",
@@ -140,6 +140,16 @@ tests = [ "absolute_sources",
           "conditionals_multiple",
           "configuration",
           "copy_time",
+          "core_action_status",
+          "core_actions_quietly",
+          "core_bindrule",
+          "core_nt_line_length",
+          "core_option_d2",
+          "core_option_l",
+          "core_option_n",
+          "core_parallel_actions",
+          "core_parallel_multifile_actions_1",
+          "core_parallel_multifile_actions_2",
           "custom_generator",
           "default_build",
           "default_features",

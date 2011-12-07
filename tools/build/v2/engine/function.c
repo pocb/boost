@@ -26,6 +26,10 @@
 #  include <windows.h>
 # endif
 
+int glob( const char * s, const char * c );
+void backtrace( FRAME * frame );
+void backtrace_line( FRAME * frame );
+
 #define INSTR_PUSH_EMPTY                    0
 #define INSTR_PUSH_CONSTANT                 1
 #define INSTR_PUSH_ARG                      2
@@ -127,18 +131,14 @@ struct _function
 
 typedef struct _builtin_function
 {
-    int type;
-    int reference_count;
-    OBJECT * rulename;
+    FUNCTION base;
     LIST * ( * func )( FRAME *, int flags );
     int flags;
 } BUILTIN_FUNCTION;
 
 typedef struct _jam_function
 {
-    int type;
-    int reference_count;
-    OBJECT * rulename;
+    FUNCTION base;
     instruction * code;
     int num_constants;
     OBJECT * * constants;
@@ -170,45 +170,60 @@ STACK * stack_global()
     return &result;
 }
 
-void stack_push( STACK * s, LIST * l )
+static void check_alignment( STACK * s )
 {
-    *--(*(LIST * * *)&s->data) = l;
-}
-
-LIST * stack_pop( STACK * s )
-{
-    return *(*(LIST * * *)&s->data)++;
-}
-
-LIST * stack_top(STACK * s)
-{
-    return *(LIST * *)s->data;
-}
-
-LIST * stack_at( STACK * s, int n )
-{
-    return *((LIST * *)s->data + n);
-}
-
-void stack_set( STACK * s, int n, LIST * value )
-{
-    *((LIST * *)s->data + n) = value;
-}
-
-void * stack_get( STACK * s )
-{
-    return (LIST * *)s->data;
+    assert( (unsigned long)s->data % sizeof( LIST * ) == 0 );
 }
 
 void * stack_allocate( STACK * s, int size )
 {
-    *(char * *)&s->data -= size;
+    check_alignment( s );
+    s->data = (char *)s->data - size;
+    check_alignment( s );
     return s->data;
 }
 
 void stack_deallocate( STACK * s, int size )
 {
-    *(char * *)&s->data += size;
+    check_alignment( s );
+    s->data = (char *)s->data + size;
+    check_alignment( s );
+}
+
+void stack_push( STACK * s, LIST * l )
+{
+    *(LIST * *)stack_allocate( s, sizeof( LIST * ) ) = l;
+}
+
+LIST * stack_pop( STACK * s )
+{
+    LIST * result = *(LIST * *)s->data;
+    stack_deallocate( s, sizeof( LIST * ) );
+    return result;
+}
+
+LIST * stack_top(STACK * s)
+{
+    check_alignment( s );
+    return *(LIST * *)s->data;
+}
+
+LIST * stack_at( STACK * s, int n )
+{
+    check_alignment( s );
+    return *((LIST * *)s->data + n);
+}
+
+void stack_set( STACK * s, int n, LIST * value )
+{
+    check_alignment( s );
+    *((LIST * *)s->data + n) = value;
+}
+
+void * stack_get( STACK * s )
+{
+    check_alignment( s );
+    return (LIST * *)s->data;
 }
 
 LIST * frame_get_local( FRAME * frame, int idx )
@@ -367,6 +382,7 @@ static LIST * function_call_rule( JAM_FUNCTION * function, FRAME * frame, STACK 
     LIST * first = stack_pop( s );
     LIST * result = L0;
     OBJECT * rulename;
+    LIST * trailing;
 
     frame->file = file;
     frame->line = line;
@@ -376,6 +392,14 @@ static LIST * function_call_rule( JAM_FUNCTION * function, FRAME * frame, STACK 
         backtrace_line( frame );
         printf( "warning: rulename %s expands to empty string\n", unexpanded );
         backtrace( frame );
+
+        list_free( first );
+
+        for( i = 0; i < n_args; ++i )
+        {
+            list_free( stack_pop( s ) );
+        }
+
         return result;
     }
 
@@ -397,14 +421,18 @@ static LIST * function_call_rule( JAM_FUNCTION * function, FRAME * frame, STACK 
         stack_pop( s );
     }
 
-    if ( inner->args->count == 0 )
+    trailing = list_pop_front( first );
+    if ( trailing )
     {
-        lol_add( inner->args, list_pop_front( first ) );
-    }
-    else
-    {
-        LIST * * l = &inner->args->list[0];
-        *l = list_append( list_pop_front( first ), *l );
+        if ( inner->args->count == 0 )
+        {
+            lol_add( inner->args, trailing );
+        }
+        else
+        {
+            LIST * * l = &inner->args->list[0];
+            *l = list_append( trailing, *l );
+        }
     }
 
     result = evaluate_rule( rulename, inner );
@@ -1156,10 +1184,10 @@ static JAM_FUNCTION * compile_to_function( compiler * c )
 {
     JAM_FUNCTION * result = BJAM_MALLOC( sizeof(JAM_FUNCTION) );
     int i;
-    result->type = FUNCTION_JAM;
-    result->reference_count = 1;
+    result->base.type = FUNCTION_JAM;
+    result->base.reference_count = 1;
 
-    result->rulename = 0;
+    result->base.rulename = 0;
 
     result->code = BJAM_MALLOC( c->code->size * sizeof(instruction) );
     memcpy( result->code, c->code->data, c->code->size * sizeof(instruction) );
@@ -1209,7 +1237,7 @@ typedef struct _var_parse
 
 typedef struct
 {
-    int type;
+    VAR_PARSE base;
     VAR_PARSE_GROUP * name;
     VAR_PARSE_GROUP * subscript;
     struct dynamic_array modifiers[1];
@@ -1217,13 +1245,13 @@ typedef struct
 
 typedef struct
 {
-    int type;
+    VAR_PARSE base;
     OBJECT * s;
 } VAR_PARSE_STRING;
 
 typedef struct
 {
-    int type;
+    VAR_PARSE base;
     struct dynamic_array filename[1];
     struct dynamic_array contents[1];
 } VAR_PARSE_FILE;
@@ -1263,7 +1291,7 @@ static void var_parse_group_maybe_add_constant( VAR_PARSE_GROUP * group, const c
     {
         string buf[1];
         VAR_PARSE_STRING * value = (VAR_PARSE_STRING *)BJAM_MALLOC( sizeof(VAR_PARSE_STRING) );
-        value->type = VAR_PARSE_TYPE_STRING;
+        value->base.type = VAR_PARSE_TYPE_STRING;
         string_new( buf );
         string_append_range( buf, start, end );
         value->s = object_new( buf->value );
@@ -1279,7 +1307,7 @@ static void var_parse_group_maybe_add_constant( VAR_PARSE_GROUP * group, const c
 static VAR_PARSE_VAR * var_parse_var_new()
 {
     VAR_PARSE_VAR * result = BJAM_MALLOC( sizeof( VAR_PARSE_VAR ) );
-    result->type = VAR_PARSE_TYPE_VAR;
+    result->base.type = VAR_PARSE_TYPE_VAR;
     result->name = var_parse_group_new();
     result->subscript = 0;
     dynamic_array_init( result->modifiers );
@@ -1322,7 +1350,7 @@ static void var_parse_string_free( VAR_PARSE_STRING * string )
 static VAR_PARSE_FILE * var_parse_file_new( void )
 {
     VAR_PARSE_FILE * result = (VAR_PARSE_FILE *)BJAM_MALLOC( sizeof( VAR_PARSE_FILE ) );
-    result->type = VAR_PARSE_TYPE_FILE;
+    result->base.type = VAR_PARSE_TYPE_FILE;
     dynamic_array_init( result->filename );
     dynamic_array_init( result->contents );
     return result;
@@ -2011,7 +2039,7 @@ static void compile_parse( PARSE * parse, compiler * c, int result_location )
         }
         else
         {
-            printf( "%s:%d: Conditional used as list (check operator precedence).\n", object_str(parse->file), parse->line, parse->num );
+            printf( "%s:%d: Conditional used as list (check operator precedence).\n", object_str(parse->file), parse->line );
             exit( 1 );
         }
     }
@@ -2384,9 +2412,9 @@ void function_location( FUNCTION * function_, OBJECT * * file, int * line )
 FUNCTION * function_builtin( LIST * ( * func )( FRAME * frame, int flags ), int flags )
 {
     BUILTIN_FUNCTION * result = BJAM_MALLOC( sizeof( BUILTIN_FUNCTION ) );
-    result->type = FUNCTION_BUILTIN;
-    result->reference_count = 1;
-    result->rulename = 0;
+    result->base.type = FUNCTION_BUILTIN;
+    result->base.reference_count = 1;
+    result->base.rulename = 0;
     result->func = func;
     result->flags = flags;
     return (FUNCTION *)result;
@@ -2449,6 +2477,27 @@ void function_free( FUNCTION * function_ )
 
     BJAM_FREE( function_ );
 }
+
+
+/* Alignment check for stack */
+
+struct align_var_edits
+{
+    char ch;
+    VAR_EDITS e;
+};
+
+struct align_expansion_item
+{
+    char ch;
+    expansion_item e;
+};
+
+static char check_align_var_edits[ sizeof(struct align_var_edits) <= sizeof(VAR_EDITS) + sizeof(void *) ? 1 : -1 ];
+static char check_align_expansion_item[ sizeof(struct align_expansion_item) <= sizeof(expansion_item) + sizeof(void *) ? 1 : -1 ];
+
+static char check_ptr_size1[ sizeof(LIST *) <= sizeof(void *) ? 1 : -1 ];
+static char check_ptr_size2[ sizeof(char *) <= sizeof(void *) ? 1 : -1 ];
 
 /*
  * WARNING: The instruction set is tuned for Jam and
@@ -2714,6 +2763,18 @@ LIST * function_run( FUNCTION * function_, FRAME * frame, STACK * s )
 
         case INSTR_RETURN:
         {
+#ifndef NDEBUG
+    
+            if ( !( saved_stack == s->data ) )
+            {
+                frame->file = function->file;
+                frame->line = function->line;
+                backtrace_line( frame );
+                printf( "error: stack check failed.\n" );
+                backtrace( frame );
+                assert( saved_stack == s->data );
+            }
+#endif
             assert( saved_stack == s->data );
             return result;
         }
