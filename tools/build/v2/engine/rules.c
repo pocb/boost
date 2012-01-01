@@ -49,15 +49,6 @@ static void set_rule_body   ( RULE *, argument_list *, FUNCTION * procedure );
 
 static struct hash * targethash = 0;
 
-struct _located_target
-{
-    OBJECT * file_name;
-    TARGET * target;
-};
-typedef struct _located_target LOCATED_TARGET ;
-
-static struct hash * located_targets = 0;
-
 
 /*
  * target_include() - adds the 'included' TARGET to the list of targets included
@@ -188,13 +179,13 @@ static void bind_explicitly_located_target( void * xtarget, void * data )
         {
             if ( strcmp( object_str( s->symbol ), "LOCATE" ) == 0 )
             {
-                pushsettings( t->settings );
+                pushsettings( root_module(), t->settings );
                 /* We are binding a target with explicit LOCATE. So third
                  * argument is of no use: nothing will be returned through it.
                  */
                 object_free( t->boundname );
                 t->boundname = search( t->name, &t->time, 0, 0 );
-                popsettings( t->settings );
+                popsettings( root_module(), t->settings );
                 break;
             }
         }
@@ -206,88 +197,6 @@ void bind_explicitly_located_targets()
 {
     if ( targethash )
         hashenumerate( targethash, bind_explicitly_located_target, (void *)0 );
-}
-
-
-/* TODO: It is probably not a good idea to use functions in other modules like
-  this. */
-void call_bind_rule( OBJECT * target, OBJECT * boundname );
-
-
-TARGET * search_for_target ( OBJECT * name, LIST * search_path )
-{
-    PATHNAME f[1];
-    string buf[1];
-    LOCATED_TARGET lt;
-    LOCATED_TARGET * lta = &lt;
-    time_t time;
-    int found = 0;
-    TARGET * result;
-
-    string_new( buf );
-
-    path_parse( object_str( name ), f );
-
-    f->f_grist.ptr = 0;
-    f->f_grist.len = 0;
-
-    while ( search_path )
-    {
-        OBJECT * key;
-        f->f_root.ptr = object_str( search_path->value );
-        f->f_root.len = strlen( object_str( search_path->value ) );
-
-        string_truncate( buf, 0 );
-        path_build( f, buf, 1 );
-
-        lt.file_name = key = object_new( buf->value ) ;
-
-        if ( !located_targets )
-            located_targets = hashinit( sizeof(LOCATED_TARGET),
-                                        "located targets" );
-
-        if ( hashcheck( located_targets, (HASHDATA * *)&lta ) )
-        {
-            object_free( key );
-            string_free( buf );
-            return lta->target;
-        }
-
-        timestamp( key, &time );
-        object_free( key );
-        if ( time )
-        {
-            found = 1;
-            break;
-        }
-
-        search_path = list_next( search_path );
-    }
-
-    if ( !found )
-    {
-        OBJECT * key;
-        f->f_root.ptr = 0;
-        f->f_root.len = 0;
-
-        string_truncate( buf, 0 );
-        path_build( f, buf, 1 );
-
-        key = object_new( buf->value );
-        timestamp( key, &time );
-        object_free( key );
-    }
-
-    result = bindtarget( name );
-    result->boundname = object_new( buf->value );
-    result->time = time;
-    result->binding = time ? T_BIND_EXISTS : T_BIND_MISSING;
-
-    call_bind_rule( result->name, result->boundname );
-
-    string_free( buf );
-
-    return result;
 }
 
 
@@ -471,10 +380,10 @@ SETTINGS * addsettings( SETTINGS * head, int flag, OBJECT * symbol, LIST * value
  * pushsettings() - set all target specific variables.
  */
 
-void pushsettings( SETTINGS * v )
+void pushsettings( struct module_t * module, SETTINGS * v )
 {
     for ( ; v; v = v->next )
-        v->value = var_swap( v->symbol, v->value );
+        v->value = var_swap( module, v->symbol, v->value );
 }
 
 
@@ -482,9 +391,9 @@ void pushsettings( SETTINGS * v )
  * popsettings() - reset target specific variables to their pre-push values.
  */
 
-void popsettings( SETTINGS * v )
+void popsettings( struct module_t * module, SETTINGS * v )
 {
-    pushsettings( v );  /* just swap again */
+    pushsettings( module, v );  /* just swap again */
 }
 
 
@@ -642,7 +551,7 @@ void actions_free( rule_actions * a )
 {
     if ( --a->reference_count <= 0 )
     {
-        object_free( a->command );
+        function_free( a->command );
         list_free( a->bindlist );
         BJAM_FREE( a );
     }
@@ -741,10 +650,11 @@ static void set_rule_actions( RULE * rule, rule_actions * actions )
 }
 
 
-static rule_actions * actions_new( OBJECT * command, LIST * bindlist, int flags )
+static rule_actions * actions_new( FUNCTION * command, LIST * bindlist, int flags )
 {
     rule_actions * result = (rule_actions *)BJAM_MALLOC( sizeof( rule_actions ) );
-    result->command = object_copy( command );
+    function_refer( command );
+    result->command = command;
     result->bindlist = bindlist;
     result->flags = flags;
     result->reference_count = 0;
@@ -752,7 +662,7 @@ static rule_actions * actions_new( OBJECT * command, LIST * bindlist, int flags 
 }
 
 
-RULE * new_rule_actions( module_t * m, OBJECT * rulename, OBJECT * command, LIST * bindlist, int flags )
+RULE * new_rule_actions( module_t * m, OBJECT * rulename, FUNCTION * command, LIST * bindlist, int flags )
 {
     RULE * local = define_rule( m, rulename, m );
     RULE * global = global_rule( local );

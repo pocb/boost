@@ -126,7 +126,11 @@ int make( int n_targets, OBJECT * * targets, int anyhow )
     {
         PROFILE_ENTER( MAKE_MAKE0 );
         for ( i = 0; i < n_targets; ++i )
-            make0( bindtarget( targets[ i ] ), 0, 0, counts, anyhow );
+        {
+            TARGET * t = bindtarget( targets[ i ] );
+            if ( t->fate == T_FATE_INIT )
+                make0( t, 0, 0, counts, anyhow );
+        }
         PROFILE_EXIT( MAKE_MAKE0 );
     }
 
@@ -280,7 +284,7 @@ void make0
 
     /* Step 2a: set "on target" variables. */
     s = copysettings( t->settings );
-    pushsettings( s );
+    pushsettings( root_module(), s );
 
     /* Step 2b: find and timestamp the target file (if it is a file). */
     if ( ( t->binding == T_BIND_UNBOUND ) && !( t->flags & T_FLAG_NOTFILE ) )
@@ -314,9 +318,7 @@ void make0
 
 #ifdef OPT_SEMAPHORE
     {
-        OBJECT * jam_semaphore = object_new( "JAM_SEMAPHORE" );
-        LIST * var = var_get( jam_semaphore );
-        object_free( jam_semaphore );
+        LIST * var = var_get( root_module(), constant_JAM_SEMAPHORE );
         if ( var )
         {
             TARGET * semaphore = bindtarget( var->value );
@@ -331,7 +333,7 @@ void make0
         headers( t );
 
     /* Step 2d: reset "on target" variables. */
-    popsettings( s );
+    popsettings( root_module(), s );
     freesettings( s );
 
     /*

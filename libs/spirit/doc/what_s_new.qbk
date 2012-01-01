@@ -15,6 +15,11 @@
 
 * Integrated Vitaly Budovski's patch to add binary floating point parsers and
   generators.
+* Fixed #6253: `lex::lexertl::generate_static_dfa` compiler errors if lexer has
+  wchar_t as underlying stream type.
+* Added the possibility to match a token range when parsing with a lexer by
+  using `qi::token(min, max)`, or `qi::tokenid(min, max)`. Both parsers match
+  any token with a token id in the range [min, max].
 
 [endsect]
 
@@ -27,7 +32,7 @@
   construction time whether the underlying stream has reached eof (end of file).
 * __qi__ now properly collapses attributes generated from optionals embedded
   inside another optional parser (i.e. `-('(' > -int_ >> ')'). That means that
-  attributes like `boost::optiona<boost::optional<int> >` will be collapsed
+  attributes like `boost::optional<boost::optional<int> >` will be collapsed
   to `boost::optional<int>`. Thanks to Peter Schueller for reporting that
   problem.
 * Actions attached to binary parsers now properly propagate the parser's

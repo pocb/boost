@@ -24,7 +24,7 @@
 
 #include <boost/geometry/strategies/strategies.hpp>
 
-#include <boost/geometry/domains/gis/io/wkt/wkt.hpp>
+#include <boost/geometry/io/wkt/wkt.hpp>
 
 
 #if defined(TEST_WITH_SVG)
@@ -222,7 +222,7 @@ void test_one_lp(std::string const& caseid,
 }
 
 template <typename Geometry1, typename Geometry2>
-void test_point_output(std::string const& wkt1, std::string const& wkt2, int expected_count)
+void test_point_output(std::string const& wkt1, std::string const& wkt2, unsigned int expected_count)
 {
     Geometry1 g1;
     bg::read_wkt(wkt1, g1);

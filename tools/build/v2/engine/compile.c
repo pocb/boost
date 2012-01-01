@@ -16,7 +16,6 @@
 # include "parse.h"
 # include "compile.h"
 # include "variable.h"
-# include "expand.h"
 # include "rules.h"
 # include "object.h"
 # include "make.h"
@@ -200,9 +199,7 @@ static void type_check
 
     if ( !typecheck )
     {
-        OBJECT * str_typecheck = object_new( ".typecheck" );
-        typecheck = bindmodule( str_typecheck );
-        object_free( str_typecheck );
+        typecheck = bindmodule( constant_typecheck );
     }
 
     /* If the checking rule can not be found, also bail. */
@@ -214,8 +211,6 @@ static void type_check
             return;
     }
 
-    exit_module( caller->module );
-
     while ( values != 0 )
     {
         LIST *error;
@@ -225,12 +220,9 @@ static void type_check
         frame->prev = caller;
         frame->prev_user = caller->module->user_module ? caller : caller->prev_user;
 
-        enter_module( typecheck );
         /* Prepare the argument list */
         lol_add( frame->args, list_new( L0, object_copy( values->value ) ) );
         error = evaluate_rule( type_name, frame );
-
-        exit_module( typecheck );
 
         if ( error )
             argument_error( object_str( error->value ), called, caller, arg_name );
@@ -238,8 +230,6 @@ static void type_check
         frame_free( frame );
         values = values->next;
     }
-
-    enter_module( caller->module );
 }
 
 /*
@@ -510,40 +500,12 @@ evaluate_rule(
     module_t      * prev_module = frame->module;
 
     rule = bindrule( rulename, frame->module );
-    rulename = rule->name;
 
 #ifdef HAVE_PYTHON
     if ( rule->python_function )
     {
-        /* The below messing with modules is due to the way modules are
-         * implemented in Jam. Suppose we are in module M1 now. The global
-         * variable map actually holds 'M1' variables, and M1->variables hold
-         * global variables.
-         *
-         * If we call Python right away, Python calls back Jam and then Jam
-         * does 'module M1 { }' then Jam will try to swap the current global
-         * variables with M1->variables. The result will be that global
-         * variables map will hold global variables, and any variable settings
-         * we do will go to the global module, not M1.
-         *
-         * By restoring basic state, where the global variable map holds global
-         * variable, we make sure any future 'module M1' entry will work OK.
-         */
-
-        LIST * result;
-        module_t * m = python_module();
-
-        frame->module = m;
-
-        exit_module( prev_module );
-        enter_module( m );
-
-        result = call_python_function( rule, frame );
-
-        exit_module( m );
-        enter_module ( prev_module );
-
-        return result;
+        frame->module = python_module();
+        return call_python_function( rule, frame );
     }
 #endif
 
@@ -571,10 +533,6 @@ evaluate_rule(
     {
         /* Propagate current module to nested rule invocations. */
         frame->module = rule->module;
-
-        /* Swap variables. */
-        exit_module( prev_module );
-        enter_module( rule->module );
     }
 
     /* Record current rule name in frame. */
@@ -672,18 +630,12 @@ evaluate_rule(
 
         function_refer( function );
 
-        pushsettings( local_args );
+        pushsettings( frame->module, local_args );
         result = function_run( function, frame, stack_global() );
-        popsettings( local_args );
+        popsettings( frame->module, local_args );
         freesettings( local_args );
 
         function_free( function );
-    }
-
-    if ( frame->module != prev_module )
-    {
-        exit_module( frame->module );
-        enter_module( prev_module );
     }
 
     if ( DEBUG_PROFILE && rule->procedure )

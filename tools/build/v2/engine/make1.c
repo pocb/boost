@@ -72,7 +72,7 @@
 
 static CMD      * make1cmds    ( TARGET * );
 static LIST     * make1list    ( LIST *, TARGETS *, int flags );
-static SETTINGS * make1settings( LIST * vars );
+static SETTINGS * make1settings( struct module_t * module, LIST * vars );
 static void       make1bind    ( TARGET * );
 
 /* Ugly static - it is too hard to carry it through the callbacks. */
@@ -281,6 +281,15 @@ static void make1a( state * pState )
                 ++pState->parent->asynccnt;
         }
 
+    /*
+     * If the target has been previously updated with -n in
+     * effect, and we're ignoring -n, update it for real.
+     */
+    if ( !globs.noexec && pState->t->progress == T_MAKE_NOEXEC_DONE )
+    {
+        pState->t->progress = T_MAKE_INIT;
+    }
+
     /* If this target is already being processed then do nothing. There is no
      * need to start processing the same target all over again.
      */
@@ -384,13 +393,21 @@ static void make1b( state * pState )
 
     /* Now ready to build target 't', if dependencies built OK. */
 
-    /* Collect status from dependencies. */
-    for ( c = t->depends; c; c = c->next )
-        if ( c->target->status > t->status && !( c->target->flags & T_FLAG_NOCARE ) )
-        {
-            failed = c->target;
-            pState->t->status = c->target->status;
-        }
+    /* Collect status from dependencies. If -n was passed then
+     * act as though all dependencies built correctly.  The only
+     * way they can fail is if UPDATE_NOW was called.  If
+     * the dependencies can't be found or we got an interrupt,
+     * we can't get here.
+     */
+    if ( !globs.noexec )
+    {
+        for ( c = t->depends; c; c = c->next )
+            if ( c->target->status > t->status && !( c->target->flags & T_FLAG_NOCARE ) )
+            {
+                failed = c->target;
+                pState->t->status = c->target->status;
+            }
+    }
     /* If an internal header node failed to build, we want to output the target
      * that it failed on.
      */
@@ -517,7 +534,7 @@ static void make1c( state * pState )
             rule_name = object_str( cmd->rule->name );
             target = object_str( lol_get( &cmd->args, 0 )->value );
             if ( globs.noexec )
-                out_action( rule_name, target, cmd->buf, "", "", EXIT_OK );
+                out_action( rule_name, target, cmd->buf->value, "", "", EXIT_OK );
         }
 
         if ( globs.noexec )
@@ -529,7 +546,7 @@ static void make1c( state * pState )
         {
             /* Pop state first because exec_cmd() could push state. */
             pop_state( &state_stack );
-            exec_cmd( cmd->buf, make_closure, pState->t, cmd->shell, rule_name,
+            exec_cmd( cmd->buf->value, make_closure, pState->t, cmd->shell, rule_name,
                 target );
         }
     }
@@ -560,7 +577,10 @@ static void make1c( state * pState )
             TARGET * t = pState->t;
             TARGET * additional_includes = NULL;
 
-            t->progress = T_MAKE_DONE;
+            if ( globs.noexec )
+                t->progress = T_MAKE_NOEXEC_DONE;
+            else
+                t->progress = T_MAKE_DONE;
 
             /* Target has been updated so rescan it for dependencies. */
             if ( ( t->fate >= T_FATE_MISSING ) &&
@@ -581,9 +601,9 @@ static void make1c( state * pState )
                 target_to_rescan->includes = 0;
 
                 s = copysettings( target_to_rescan->settings );
-                pushsettings( s );
+                pushsettings( root_module(), s );
                 headers( target_to_rescan );
-                popsettings( s );
+                popsettings( root_module(), s );
                 freesettings( s );
 
                 if ( target_to_rescan->includes )
@@ -671,13 +691,10 @@ static void make1c( state * pState )
 static void call_timing_rule( TARGET * target, timing_info * time )
 {
     LIST * timing_rule;
-    OBJECT * varname;
 
-    varname = object_new( "__TIMING_RULE__" );
-    pushsettings( target->settings );
-    timing_rule = var_get( varname );
-    popsettings( target->settings );
-    object_free( varname );
+    pushsettings( root_module(), target->settings );
+    timing_rule = var_get( root_module(), constant_TIMING_RULE );
+    popsettings( root_module(), target->settings );
 
     if ( timing_rule )
     {
@@ -725,13 +742,10 @@ static void call_action_rule
 )
 {
     LIST   * action_rule;
-    OBJECT * varname;
 
-    varname = object_new( "__ACTION_RULE__" );
-    pushsettings( target->settings );
-    action_rule = var_get( varname );
-    popsettings( target->settings );
-    object_free( varname );
+    pushsettings( root_module(), target->settings );
+    action_rule = var_get( root_module(), constant_ACTION_RULE );
+    popsettings( root_module(), target->settings );
 
     if ( action_rule )
     {
@@ -817,7 +831,7 @@ static void make1d( state * pState )
     CMD    * cmd    = (CMD *)t->cmds;
     int      status = pState->status;
 
-    if ( t->flags & T_FLAG_FAIL_EXPECTED )
+    if ( t->flags & T_FLAG_FAIL_EXPECTED && !globs.noexec )
     {
         /* Invert execution result when FAIL_EXPECTED has been applied. */
         switch ( status )
@@ -839,7 +853,7 @@ static void make1d( state * pState )
     if ( ( status == EXEC_CMD_FAIL ) && DEBUG_MAKE )
     {
         if ( !DEBUG_EXEC )
-            printf( "%s\n", cmd->buf );
+            printf( "%s\n", cmd->buf->value );
 
         printf( "...failed %s ", object_str( cmd->rule->name ) );
         list_print( lol_get( &cmd->args, 0 ) );
@@ -894,29 +908,17 @@ static void swap_settings
     TARGET     * new_target
 )
 {
-    if ( new_module == root_module() )
-        new_module = 0;
-
     if ( ( new_target == *current_target ) && ( new_module == *current_module ) )
         return;
 
     if ( *current_target )
-        popsettings( (*current_target)->settings );
+        popsettings( *current_module, (*current_target)->settings );
 
-    if ( new_module != *current_module )
-    {
-        if ( *current_module )
-            exit_module( *current_module );
-
-        *current_module = new_module;
-
-        if ( new_module )
-            enter_module( new_module );
-    }
-
-    *current_target = new_target;
     if ( new_target )
-        pushsettings( new_target->settings );
+        pushsettings( new_module, new_target->settings );
+
+    *current_module = new_module;
+    *current_target = new_target;
 }
 
 
@@ -936,6 +938,7 @@ static CMD * make1cmds( TARGET * t )
     module_t * settings_module = 0;
     TARGET   * settings_target = 0;
     ACTIONS  * a0;
+    int running_flag = globs.noexec ? A_RUNNING_NOEXEC : A_RUNNING;
 
     /* Step through actions. Actions may be shared with other targets or grouped
      * using RULE_TOGETHER, so actions already seen are skipped.
@@ -955,10 +958,10 @@ static CMD * make1cmds( TARGET * t )
         /* Only do rules with commands to execute. If this action has already
          * been executed, use saved status.
          */
-        if ( !actions || a0->action->running )
+        if ( !actions || a0->action->running >= running_flag )
             continue;
 
-        a0->action->running = 1;
+        a0->action->running = running_flag;
 
         /* Make LISTS of targets and sources. If `execute together` has been
          * specified for this rule, tack on sources from each instance of this
@@ -968,10 +971,10 @@ static CMD * make1cmds( TARGET * t )
         ns = make1list( L0, a0->action->sources, actions->flags );
         if ( actions->flags & RULE_TOGETHER )
             for ( a1 = a0->next; a1; a1 = a1->next )
-                if ( a1->action->rule == rule && !a1->action->running )
+                if ( a1->action->rule == rule && a1->action->running < running_flag )
                 {
                     ns = make1list( ns, a1->action->sources, actions->flags );
-                    a1->action->running = 1;
+                    a1->action->running = running_flag;
                 }
 
         /* If doing only updated (or existing) sources, but none have been
@@ -986,14 +989,12 @@ static CMD * make1cmds( TARGET * t )
         swap_settings( &settings_module, &settings_target, rule->module, t );
         if ( !shell )
         {
-            OBJECT * varname = object_new( "JAMSHELL" );
-            shell = var_get( varname );  /* shell is per-target */
-            object_free( varname );
+            shell = var_get( rule->module, constant_JAMSHELL );  /* shell is per-target */
         }
 
         /* If we had 'actions xxx bind vars' we bind the vars now. */
-        boundvars = make1settings( actions->bindlist );
-        pushsettings( boundvars );
+        boundvars = make1settings( rule->module, actions->bindlist );
+        pushsettings( rule->module, boundvars );
 
         /*
          * Build command, starting with all source args.
@@ -1044,8 +1045,8 @@ static CMD * make1cmds( TARGET * t )
                 /* Tell the user what didn't fit. */
                 cmd = cmd_new( rule, list_copy( L0, nt ),
                     list_sublist( ns, start, chunk ),
-                    list_new( L0, object_new( "%" ) ) );
-                fputs( cmd->buf, stdout );
+                    list_new( L0, object_copy( constant_percent ) ) );
+                fputs( cmd->buf->value, stdout );
                 exit( EXITBAD );
             }
         }
@@ -1058,7 +1059,7 @@ static CMD * make1cmds( TARGET * t )
         /* Free the variables whose values were bound by 'actions xxx bind
          * vars'.
          */
-        popsettings( boundvars );
+        popsettings( rule->module, boundvars );
         freesettings( boundvars );
     }
 
@@ -1117,13 +1118,13 @@ static LIST * make1list( LIST * l, TARGETS * targets, int flags )
  * make1settings() - for vars that get bound values, build up replacement lists.
  */
 
-static SETTINGS * make1settings( LIST * vars )
+static SETTINGS * make1settings( struct module_t * module, LIST * vars )
 {
     SETTINGS * settings = 0;
 
     for ( ; vars; vars = list_next( vars ) )
     {
-        LIST * l = var_get( vars->value );
+        LIST * l = var_get( module, vars->value );
         LIST * nl = 0;
 
         for ( ; l; l = list_next( l ) )
@@ -1158,9 +1159,9 @@ static void make1bind( TARGET * t )
     if ( t->flags & T_FLAG_NOTFILE )
         return;
 
-    pushsettings( t->settings );
+    pushsettings( root_module(), t->settings );
     object_free( t->boundname );
     t->boundname = search( t->name, &t->time, 0, ( t->flags & T_FLAG_ISFILE ) );
     t->binding = t->time ? T_BIND_EXISTS : T_BIND_MISSING;
-    popsettings( t->settings );
+    popsettings( root_module(), t->settings );
 }

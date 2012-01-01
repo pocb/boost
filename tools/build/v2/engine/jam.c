@@ -73,7 +73,6 @@
  *  command.c - maintain lists of commands
  *  compile.c - compile parsed jam statements
  *  execunix.c - execute a shell script on UNIX
- *  expand.c - expand a buffer, given variable values
  *  file*.c - scan directories and archives on *
  *  hash.c - simple in-memory hashing routines
  *  hdrmacro.c - handle header file parsing for filename macro definitions
@@ -119,7 +118,6 @@
 #include "timestamp.h"
 #include "make.h"
 #include "strings.h"
-#include "expand.h"
 #include "filesys.h"
 #include "output.h"
 #include "search.h"
@@ -202,7 +200,6 @@ static void run_unit_tests()
     execnt_unit_test();
 #endif
     string_unit_test();
-    var_expand_unit_test();
 }
 #endif
 
@@ -231,7 +228,6 @@ int main( int argc, char * * argv, char * * arg_environ )
     int                     arg_c = argc;
     char          *       * arg_v = argv;
     char            const * progname = argv[0];
-    OBJECT                * varname;
     module_t              * environ_module;
 
     saved_argv0 = argv[0];
@@ -389,19 +385,15 @@ int main( int argc, char * * argv, char * * arg_environ )
 #endif
 
         /* Set JAMDATE. */
-        varname = object_new( "JAMDATE" );
-        var_set( varname, list_new( L0, outf_time(time(0)) ), VAR_SET );
-        object_free( varname );
+        var_set( root_module(), constant_JAMDATE, list_new( L0, outf_time(time(0)) ), VAR_SET );
 
         /* Set JAM_VERSION. */
-        varname = object_new( "JAM_VERSION" );
-        var_set( varname,
+        var_set( root_module(), constant_JAM_VERSION,
                  list_new( list_new( list_new( L0,
                    object_new( VERSION_MAJOR_SYM ) ),
                    object_new( VERSION_MINOR_SYM ) ),
                    object_new( VERSION_PATCH_SYM ) ),
                    VAR_SET );
-        object_free( varname );
 
         /* Set JAMUNAME. */
 #ifdef unix
@@ -410,8 +402,7 @@ int main( int argc, char * * argv, char * * arg_environ )
 
             if ( uname( &u ) >= 0 )
             {
-                varname = object_new( "JAMUNAME" );
-                var_set( varname,
+                var_set( root_module(), constant_JAMUNAME,
                          list_new(
                              list_new(
                                  list_new(
@@ -422,7 +413,6 @@ int main( int argc, char * * argv, char * * arg_environ )
                                      object_new( u.release ) ),
                                  object_new( u.version ) ),
                              object_new( u.machine ) ), VAR_SET );
-                object_free( varname );
             }
         }
 #endif /* unix */
@@ -432,22 +422,18 @@ int main( int argc, char * * argv, char * * arg_environ )
         /* First into the global module, with splitting, for backward
          * compatibility.
          */
-        var_defines( use_environ, 1 );
+        var_defines( root_module(), use_environ, 1 );
 
-        varname = object_new( ".ENVIRON" );
-        environ_module = bindmodule( varname );
-        object_free( varname );
+        environ_module = bindmodule( constant_ENVIRON );
         /* Then into .ENVIRON, without splitting. */
-        enter_module( environ_module );
-        var_defines( use_environ, 0 );
-        exit_module( environ_module );
+        var_defines( environ_module, use_environ, 0 );
 
         /*
          * Jam defined variables OS & OSPLAT. We load them after environment, so
          * that setting OS in environment does not change Jam's notion of the
          * current platform.
          */
-        var_defines( othersyms, 1 );
+        var_defines( root_module(), othersyms, 1 );
 
         /* Load up variables set on command line. */
         for ( n = 0; ( s = getoptval( optv, 's', n ) ); ++n )
@@ -455,20 +441,16 @@ int main( int argc, char * * argv, char * * arg_environ )
             char *symv[2];
             symv[ 0 ] = s;
             symv[ 1 ] = 0;
-            var_defines( symv, 1 );
-            enter_module( environ_module );
-            var_defines( symv, 0 );
-            exit_module( environ_module );
+            var_defines( root_module(), symv, 1 );
+            var_defines( environ_module, symv, 0 );
         }
 
         /* Set the ARGV to reflect the complete list of arguments of invocation.
          */
-        varname = object_new( "ARGV" );
         for ( n = 0; n < arg_c; ++n )
         {
-            var_set( varname, list_new( L0, object_new( arg_v[n] ) ), VAR_APPEND );
+            var_set( root_module(), constant_ARGV, list_new( L0, object_new( arg_v[n] ) ), VAR_APPEND );
         }
-        object_free( varname );
 
         /* Initialize built-in rules. */
         load_builtins();
@@ -492,9 +474,7 @@ int main( int argc, char * * argv, char * * arg_environ )
 
         if (!targets_to_update())
         {
-            OBJECT * target = object_new( "all" );
-            mark_target_for_updating( target );
-            object_free( target );
+            mark_target_for_updating( constant_all );
         }
 
         /* Parse ruleset. */
@@ -510,9 +490,7 @@ int main( int argc, char * * argv, char * * arg_environ )
 
             if ( !n )
             {
-                OBJECT * filename = object_new( "+" );
-                parse_file( filename, frame );
-                object_free( filename );
+                parse_file( constant_plus, frame );
             }
         }
 
@@ -541,9 +519,7 @@ int main( int argc, char * * argv, char * * arg_environ )
            options.  */
         {
             LIST *p = L0;
-            varname = object_new( "PARALLELISM" );
-            p = var_get ( varname );
-            object_free( varname );
+            p = var_get ( root_module(), constant_PARALLELISM );
             if ( p )
             {
                 int j = atoi( object_str( p->value ) );
@@ -561,9 +537,7 @@ int main( int argc, char * * argv, char * * arg_environ )
         /* KEEP_GOING overrides -q option. */
         {
             LIST *p = L0;
-            varname = object_new( "KEEP_GOING" );
-            p = var_get( varname );
-            object_free(varname);
+            p = var_get( root_module(), constant_KEEP_GOING );
             if ( p )
             {
                 int v = atoi( object_str( p->value ) );
@@ -612,7 +586,6 @@ int main( int argc, char * * argv, char * * arg_environ )
     clear_targets_to_update();
 
     /* Widely scattered cleanup. */
-    var_done();
     file_done();
     rules_done();
     stamps_done();

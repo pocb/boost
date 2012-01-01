@@ -16,12 +16,12 @@
 #include "lists.h"
 #include "parse.h"
 #include "variable.h"
-#include "expand.h"
 #include "hash.h"
 #include "filesys.h"
 #include "object.h"
 #include "strings.h"
 #include "pathsys.h"
+#include "modules.h"
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -49,8 +49,6 @@
  * 09/11/00 (seiwald) - defunct var_list() removed
  */
 
-static struct hash *varhash = 0;
-
 /*
  * VARIABLE - a user defined multi-value variable
  */
@@ -63,22 +61,8 @@ struct _variable
     LIST   * value;
 };
 
-static VARIABLE * var_enter( OBJECT * symbol );
+static VARIABLE * var_enter( struct module_t * module, OBJECT * symbol );
 static void var_dump( OBJECT * symbol, LIST * value, char * what );
-
-
-/*
- * var_hash_swap() - swap all variable settings with those passed
- *
- * Used to implement separate settings spaces for modules
- */
-
-void var_hash_swap( struct hash * * new_vars )
-{
-    struct hash * old = varhash;
-    varhash = *new_vars;
-    *new_vars = old;
-}
 
 
 /*
@@ -94,7 +78,7 @@ void var_hash_swap( struct hash * * new_vars )
  * Otherwise, split the value at blanks.
  */
 
-void var_defines( char * const * e, int preprocess )
+void var_defines( struct module_t * module, char * const * e, int preprocess )
 {
     string buf[1];
 
@@ -167,323 +151,13 @@ void var_defines( char * const * e, int preprocess )
             /* Get name. */
             string_append_range( buf, *e, val );
             varname = object_new( buf->value );
-            var_set( varname, l, VAR_SET );
+            var_set( module, varname, l, VAR_SET );
             object_free( varname );
             string_truncate( buf, 0 );
         }
     }
     string_free( buf );
 }
-
-
-/*
- * var_string() - expand a string with variables in it
- *
- * Copies in to out; doesn't modify targets & sources.
- */
-
-int var_string( const char * in, char * out, int outsize, LOL * lol )
-{
-    char * out0 = out;
-    char * oute = out + outsize - 1;
-
-    while ( *in )
-    {
-        char * lastword;
-        int    dollar = 0;
-
-        /* Copy white space. */
-        while ( isspace( *in ) )
-        {
-            if ( out >= oute )
-                return -1;
-            *out++ = *in++;
-        }
-
-        lastword = out;
-
-        /* Copy non-white space, watching for variables. */
-        while ( *in && !isspace( *in ) )
-        {
-            if ( out >= oute )
-                return -1;
-
-            if ( ( in[ 0 ] == '$' ) && ( in[ 1 ] == '(' ) )
-            {
-                ++dollar;
-                *out++ = *in++;
-            }
-            #ifdef OPT_AT_FILES
-            else if ( ( in[ 0 ] == '@' ) && ( in[ 1 ] == '(' ) )
-            {
-                int depth = 1;
-                const char * ine = in + 2;
-                const char * split = 0;
-
-                /* Scan the content of the response file @() section. */
-                while ( *ine && ( depth > 0 ) )
-                {
-                    switch ( *ine )
-                    {
-                    case '(': ++depth; break;
-                    case ')': --depth; break;
-                    case ':':
-                        if ( ( depth == 1 ) && ( ine[ 1 ] == 'E' ) && ( ine[ 2 ] == '=' ) )
-                            split = ine;
-                        break;
-                    }
-                    ++ine;
-                }
-
-                if ( !split )
-                {
-                    /*  the @() reference doesn't match the @(foo:E=bar) format.
-                        hence we leave it alone by copying directly to output. */
-                    int l = 0;
-                    if ( out + 2 >= oute ) return -1;
-                    *( out++ ) = '@';
-                    *( out++ ) = '(';
-                    l = var_string( in + 2, out, oute - out, lol );
-                    if ( l < 0 ) return -1;
-                    out += l;
-                    if ( out + 1 >= oute ) return -1;
-                    *( out++ ) = ')';
-                }
-                else if ( depth == 0 )
-                {
-                    string file_name_v;
-                    OBJECT * file_name = 0;
-                    int file_name_l = 0;
-                    const char * file_name_s = 0;
-
-                    /* Expand the temporary file name var inline. */
-                    #if 0
-                    string_copy( &file_name_v, "$(" );
-                    string_append_range( &file_name_v, in + 2, split );
-                    string_push_back( &file_name_v, ')' );
-                    #else
-                    string_new( &file_name_v );
-                    string_append_range( &file_name_v, in + 2, split );
-                    #endif
-                    file_name_l = var_string( file_name_v.value, out, oute - out + 1, lol );
-                    string_free( &file_name_v );
-                    if ( file_name_l < 0 ) return -1;
-                    file_name_s = out;
-
-                    /* For stdout/stderr we will create a temp file and generate
-                     * a command that outputs the content as needed.
-                     */
-                    if ( ( strcmp( "STDOUT", out ) == 0 ) ||
-                        ( strcmp( "STDERR", out ) == 0 ) )
-                    {
-                        int err_redir = strcmp( "STDERR", out ) == 0;
-                        out[ 0 ] = '\0';
-
-                        file_name = path_tmpfile();
-                        file_name_s = object_str(file_name);
-                        file_name_l = strlen(file_name_s);
-                        #ifdef OS_NT
-                        if ( ( out + 7 + file_name_l + ( err_redir ? 5 : 0 ) ) >= oute )
-                            return -1;
-                        sprintf( out,"type \"%s\"%s", file_name_s,
-                            err_redir ? " 1>&2" : "" );
-                        #else
-                        if ( ( out + 6 + file_name_l + ( err_redir ? 5 : 0 ) ) >= oute )
-                            return -1;
-                        sprintf( out,"cat \"%s\"%s", file_name_s,
-                            err_redir ? " 1>&2" : "" );
-                        #endif
-                        /* We also make sure that the temp files created by this
-                         * get nuked eventually.
-                         */
-                        file_remove_atexit( file_name );
-                    }
-
-                    /* Expand the file value into the file reference. */
-                    var_string_to_file( split + 3, ine - split - 4, file_name_s,
-                        lol );
-
-                    if ( file_name )
-                    {
-                        object_free( file_name );
-                    }
-
-                    /* Continue on with the expansion. */
-                    out += strlen( out );
-                }
-
-                /* And continue with the parsing just past the @() reference. */
-                in = ine;
-            }
-            #endif
-            else
-            {
-                *out++ = *in++;
-            }
-        }
-
-        /* Add zero to 'out' so that 'lastword' is correctly zero-terminated. */
-        if ( out >= oute )
-            return -1;
-        /* Do not increment, intentionally. */
-        *out = '\0';
-
-        /* If a variable encountered, expand it and and embed the
-         * space-separated members of the list in the output.
-         */
-        if ( dollar )
-        {
-            LIST * l = var_expand( L0, lastword, out, lol, 0 );
-            LIST * saved = l;
-
-            out = lastword;
-
-            while ( l )
-            {
-                int so = strlen( object_str( l->value ) );
-
-                if ( out + so >= oute )
-                    return -1;
-
-                strcpy( out, object_str( l->value ) );
-                out += so;
-                l = list_next( l );
-                if ( l ) *out++ = ' ';
-            }
-
-            list_free( saved );
-        }
-    }
-
-    if ( out >= oute )
-        return -1;
-
-    *out++ = '\0';
-
-    return out - out0;
-}
-
-
-void var_string_to_file( const char * in, int insize, const char * out, LOL * lol )
-{
-    char const * ine = in + insize;
-    FILE * out_file = 0;
-    int out_debug = DEBUG_EXEC ? 1 : 0;
-    if ( globs.noexec )
-    {
-        /* out_debug = 1; */
-    }
-    else if ( strcmp( out, "STDOUT" ) == 0 )
-    {
-        out_file = stdout;
-    }
-    else if ( strcmp( out, "STDERR" ) == 0 )
-    {
-        out_file = stderr;
-    }
-    else
-    {
-        /* Handle "path to file" filenames. */
-        string out_name;
-        if ( ( out[ 0 ] == '"' ) && ( out[ strlen( out ) - 1 ] == '"' ) )
-        {
-            string_copy( &out_name, out + 1 );
-            string_truncate( &out_name, out_name.size - 1 );
-        }
-        else
-        {
-            string_copy( &out_name,out );
-        }
-        out_file = fopen( out_name.value, "w" );
-        if ( !out_file )
-        {
-            printf( "failed to write output file '%s'!\n", out_name.value );
-            exit( EXITBAD );
-        }
-        string_free( &out_name );
-    }
-
-    if ( out_debug ) printf( "\nfile %s\n", out );
-
-    while ( *in && ( in < ine ) )
-    {
-        int dollar = 0;
-        const char * output_0 = in;
-        const char * output_1 = in;
-
-        /* Copy white space. */
-        while ( ( output_1 < ine ) && isspace( *output_1 ) )
-            ++output_1;
-
-        if ( output_0 < output_1 )
-        {
-            if ( out_file  ) fwrite( output_0, output_1 - output_0, 1, out_file );
-            if ( out_debug ) fwrite( output_0, output_1 - output_0, 1, stdout   );
-        }
-        output_0 = output_1;
-
-        /* Copy non-white space, watching for variables. */
-        while ( ( output_1 < ine ) && *output_1 && !isspace( *output_1 ) )
-        {
-            if ( ( output_1[ 0 ] == '$' ) && ( output_1[ 1 ] == '(' ) )
-                ++dollar;
-            ++output_1;
-        }
-
-        /* If a variable encountered, expand it and embed the space-separated
-         * members of the list in the output.
-         */
-        if ( dollar )
-        {
-            LIST * l = var_expand( L0, (char *)output_0, (char *)output_1, lol, 0 );
-            LIST * saved = l;
-
-            while ( l )
-            {
-                if ( out_file ) fputs( object_str( l->value ), out_file );
-                if ( out_debug ) puts( object_str( l->value ) );
-                l = list_next( l );
-                if ( l )
-                {
-                    if ( out_file ) fputc( ' ', out_file );
-                    if ( out_debug ) fputc( ' ', stdout );
-                }
-            }
-
-            list_free( saved );
-        }
-        else if ( output_0 < output_1 )
-        {
-            if ( out_file )
-            {
-                const char * output_n = output_0;
-                while ( output_n < output_1 )
-                {
-                    output_n += fwrite( output_n, 1, output_1-output_n, out_file );
-                }
-            }
-            if ( out_debug )
-            {
-                const char * output_n = output_0;
-                while ( output_n < output_1 )
-                {
-                    output_n += fwrite( output_n, 1, output_1-output_n, stdout );
-                }
-            }
-        }
-
-        in = output_1;
-    }
-
-    if ( out_file && ( out_file != stdout ) && ( out_file != stderr ) )
-    {
-        fflush( out_file );
-        fclose( out_file );
-    }
-
-    if ( out_debug ) fputc( '\n', stdout );
-}
-
 
 
 static LIST * saved_var = 0;
@@ -494,35 +168,35 @@ static LIST * saved_var = 0;
  * Returns NULL if symbol unset.
  */
 
-LIST * var_get( OBJECT * symbol )
+LIST * var_get( struct module_t * module, OBJECT * symbol )
 {
     LIST * result = 0;
 #ifdef OPT_AT_FILES
     /* Some "fixed" variables... */
-    if ( strcmp( "TMPDIR", object_str( symbol ) ) == 0 )
+    if ( object_equal( symbol, constant_TMPDIR ) )
     {
         list_free( saved_var );
         result = saved_var = list_new( L0, object_new( path_tmpdir() ) );
     }
-    else if ( strcmp( "TMPNAME", object_str( symbol ) ) == 0 )
+    else if ( object_equal( symbol, constant_TMPNAME ) )
     {
         list_free( saved_var );
         result = saved_var = list_new( L0, path_tmpnam() );
     }
-    else if ( strcmp( "TMPFILE", object_str( symbol ) ) == 0 )
+    else if ( object_equal( symbol, constant_TMPFILE ) )
     {
         list_free( saved_var );
         result = saved_var = list_new( L0, path_tmpfile() );
     }
-    else if ( strcmp( "STDOUT", object_str( symbol ) ) == 0 )
+    else if ( object_equal( symbol, constant_STDOUT ) )
     {
         list_free( saved_var );
-        result = saved_var = list_new( L0, object_new( "STDOUT" ) );
+        result = saved_var = list_new( L0, object_copy( constant_STDOUT ) );
     }
-    else if ( strcmp( "STDERR", object_str( symbol ) ) == 0 )
+    else if ( object_equal( symbol, constant_STDERR ) )
     {
         list_free( saved_var );
-        result = saved_var = list_new( L0, object_new( "STDERR" ) );
+        result = saved_var = list_new( L0, object_copy( constant_STDERR ) );
     }
     else
 #endif
@@ -532,7 +206,7 @@ LIST * var_get( OBJECT * symbol )
 
         v->symbol = symbol;
 
-        if ( varhash && hashcheck( varhash, (HASHDATA * *)&v ) )
+        if ( module->variables && hashcheck( module->variables, (HASHDATA * *)&v ) )
         {
             if ( DEBUG_VARGET )
                 var_dump( v->symbol, v->value, "get" );
@@ -553,9 +227,9 @@ LIST * var_get( OBJECT * symbol )
  * Copies symbol. Takes ownership of value.
  */
 
-void var_set( OBJECT * symbol, LIST * value, int flag )
+void var_set( struct module_t * module, OBJECT * symbol, LIST * value, int flag )
 {
-    VARIABLE * v = var_enter( symbol );
+    VARIABLE * v = var_enter( module, symbol );
 
     if ( DEBUG_VARSET )
         var_dump( symbol, value, "set" );
@@ -588,9 +262,9 @@ void var_set( OBJECT * symbol, LIST * value, int flag )
  * var_swap() - swap a variable's value with the given one.
  */
 
-LIST * var_swap( OBJECT * symbol, LIST * value )
+LIST * var_swap( struct module_t * module, OBJECT * symbol, LIST * value )
 {
-    VARIABLE * v = var_enter( symbol );
+    VARIABLE * v = var_enter( module, symbol );
     LIST     * oldvalue = v->value;
     if ( DEBUG_VARSET )
         var_dump( symbol, value, "set" );
@@ -603,18 +277,18 @@ LIST * var_swap( OBJECT * symbol, LIST * value )
  * var_enter() - make new var symbol table entry, returning var ptr.
  */
 
-static VARIABLE * var_enter( OBJECT * symbol )
+static VARIABLE * var_enter( struct module_t * module, OBJECT * symbol )
 {
     VARIABLE var;
     VARIABLE * v = &var;
 
-    if ( !varhash )
-        varhash = hashinit( sizeof( VARIABLE ), "variables" );
+    if ( !module->variables )
+        module->variables = hashinit( sizeof( VARIABLE ), "variables" );
 
     v->symbol = symbol;
     v->value = 0;
 
-    if ( hashenter( varhash, (HASHDATA * *)&v ) )
+    if ( hashenter( module->variables, (HASHDATA * *)&v ) )
         v->symbol = object_copy( symbol );
 
     return v;
@@ -645,10 +319,10 @@ static void delete_var_( void * xvar, void * data )
 }
 
 
-void var_done()
+void var_done( struct module_t * module )
 {
     list_free( saved_var );
     saved_var = 0;
-    hashenumerate( varhash, delete_var_, (void *)0 );
-    hashdone( varhash );
+    hashenumerate( module->variables, delete_var_, (void *)0 );
+    hashdone( module->variables );
 }

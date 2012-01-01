@@ -283,12 +283,6 @@ void load_builtins()
       }
 
       {
-          const char * args[] = { "target", "*", ":", "path", "*", 0 };
-          bind_builtin( "SEARCH_FOR_TARGET",
-                        builtin_search_for_target, 0, args );
-      }
-
-      {
           const char * args[] = { "modules_to_import", "+", ":", "target_module", "?", 0 };
           bind_builtin( "IMPORT_MODULE",
                         builtin_import_module, 0, args );
@@ -858,11 +852,9 @@ LIST * glob_recursive( const char * pattern )
         else
         {
             /** No directory, just a pattern. */
-            OBJECT * d = object_new( "." );
             OBJECT * p = object_new( pattern );
-            result = list_append( result, glob1( d, p ) );
+            result = list_append( result, glob1( constant_dot, p ) );
             object_free( p );
-            object_free( d );
         }
     }
 
@@ -1021,32 +1013,13 @@ static void add_hash_key( void * np, void * result_ )
 }
 
 
-static struct hash * get_running_module_vars()
-{
-    struct hash * dummy;
-    struct hash * vars = NULL;
-    /* Get the global variables pointer (that of the currently running module).
-     */
-    var_hash_swap( &vars );
-    dummy = vars;
-    /* Put the global variables pointer in its right place. */
-    var_hash_swap( &dummy );
-    return vars;
-}
-
-
 LIST * builtin_varnames( FRAME * frame, int flags )
 {
     LIST * arg0 = lol_get( frame->args, 0 );
     LIST * result = L0;
     module_t * source_module = bindmodule( arg0 ? arg0->value : 0 );
 
-    /* The running module _always_ has its 'variables' member set to NULL due to
-     * the way enter_module() and var_hash_swap() work.
-     */
-    struct hash * vars = source_module == frame->module
-        ? get_running_module_vars()
-        : source_module->variables;
+    struct hash * vars = source_module->variables;
 
     if ( vars )
         hashenumerate( vars, add_hash_key, &result );
@@ -1432,17 +1405,9 @@ LIST * builtin_update_now( FRAME * frame, int flags )
     last_update_now_status = status;
 	
     if ( status == 0 )
-        return list_new( L0, object_new( "ok" ) );
+        return list_new( L0, object_copy( constant_ok ) );
     else
         return L0;
-}
-
-LIST * builtin_search_for_target( FRAME * frame, int flags )
-{
-    LIST * arg1 = lol_get( frame->args, 0 );
-    LIST * arg2 = lol_get( frame->args, 1 );
-    TARGET * t = search_for_target( arg1->value, arg2 );
-    return list_new( L0, object_copy( t->name ) );
 }
 
 
@@ -1645,7 +1610,7 @@ LIST * builtin_has_native_rule( FRAME * frame, int flags )
     {
         int expected_version = atoi( object_str( version->value ) );
         if ( np->version == expected_version )
-            return list_new( 0, object_new( "true" ) );
+            return list_new( 0, object_copy( constant_true ) );
     }
     return L0;
 }
@@ -1689,7 +1654,7 @@ LIST * builtin_check_if_file( FRAME * frame, int flags )
 {
     LIST * name = lol_get( frame->args, 0 );
     return file_is_file( name->value ) == 1
-        ? list_new( 0, object_new( "true" ) )
+        ? list_new( 0, object_copy( constant_true ) )
         : L0 ;
 }
 
@@ -1836,19 +1801,7 @@ LIST * builtin_python_import_rule( FRAME * frame, int flags )
 
         first_time = 0;
 
-        if ( outer_module != root_module() )
-        {
-            exit_module( outer_module );
-            enter_module( root_module() );
-        }
-
-        extra = var_get( constant_extra_pythonpath );
-
-        if ( outer_module != root_module() )
-        {
-             exit_module( root_module() );
-             enter_module( outer_module );
-        }
+        extra = var_get( root_module(), constant_extra_pythonpath );
 
         for ( ; extra; extra = extra->next )
         {
@@ -2092,7 +2045,7 @@ PyObject * bjam_define_action( PyObject * self, PyObject * args )
     int        n;
     int        i;
     OBJECT   * name_str;
-    OBJECT   * body_str;
+    FUNCTION * body_func;
 
     if ( !PyArg_ParseTuple( args, "ssO!i:define_action", &name, &body,
                           &PyList_Type, &bindlist_python, &flags ) )
@@ -2112,9 +2065,9 @@ PyObject * bjam_define_action( PyObject * self, PyObject * args )
     }
 
     name_str = object_new( name );
-    body_str = object_new( body );
-    new_rule_actions( root_module(), name_str, body_str, bindlist, flags );
-    object_free( body_str );
+    body_func = function_compile_actions( body, constant_builtin, -1 );
+    new_rule_actions( root_module(), name_str, body_func, bindlist, flags );
+    function_free( body_func );
     object_free( name_str );
 
     Py_INCREF( Py_None );
@@ -2137,11 +2090,9 @@ PyObject * bjam_variable( PyObject * self, PyObject * args )
     if ( !PyArg_ParseTuple( args, "s", &name ) )
         return NULL;
 
-    enter_module( root_module() );
     varname = object_new( name );
-    value = var_get( varname );
+    value = var_get( root_module(), varname );
     object_free( varname );
-    exit_module( root_module() );
 
     result = PyList_New( list_length( value ) );
     for ( i = 0; value; value = list_next( value ), ++i )
