@@ -15,7 +15,7 @@ set (lib_headers
 # Add a library target to the build system
 boost_library_project(
   math
-  #  SRCDIRS 
+  SRCDIRS src/tr1
   TESTDIRS  test
   HEADERS ${lib_headers}
   #  DOCDIRS 
