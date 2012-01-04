@@ -1,7 +1,7 @@
 # include "jam.h"
 # include "pathsys.h"
 # include "strings.h"
-# include "newstr.h"
+# include "object.h"
 # include "filesys.h"
 # include "lists.h"
 
@@ -36,12 +36,14 @@ void file_build1( PATHNAME * f, string * file )
 static struct hash * filecache_hash = 0;
 static file_info_t filecache_finfo;
 
-file_info_t * file_info(char * filename)
+file_info_t * file_info( OBJECT * filename )
 {
     file_info_t *finfo = &filecache_finfo;
 
     if ( !filecache_hash )
         filecache_hash = hashinit( sizeof( file_info_t ), "file_info" );
+
+    filename = path_as_key( filename );
 
     finfo->name = filename;
     finfo->is_file = 0;
@@ -52,8 +54,10 @@ file_info_t * file_info(char * filename)
     if ( hashenter( filecache_hash, (HASHDATA**)&finfo ) )
     {
         /* printf( "file_info: %s\n", filename ); */
-        finfo->name = newstr( finfo->name );
+        finfo->name = object_copy( finfo->name );
     }
+
+    object_free( filename );
 
     return finfo;
 }
@@ -66,7 +70,7 @@ static void remove_files_atexit(void)
        more than once */
     while ( files_to_remove )
     {
-        remove( files_to_remove->string );
+        remove( object_str( files_to_remove->value ) );
         files_to_remove = list_pop_front( files_to_remove );
     }
 }
@@ -74,18 +78,21 @@ static void remove_files_atexit(void)
 static void free_file_info ( void * xfile, void * data )
 {
     file_info_t * file = (file_info_t *)xfile;
-    freestr( file->name );
+    object_free( file->name );
     list_free( file->files );
 }
 
 void file_done()
 {
     remove_files_atexit();
-    hashenumerate( filecache_hash, free_file_info, (void *)0 );
-    hashdone( filecache_hash );
+    if ( filecache_hash )
+    {
+        hashenumerate( filecache_hash, free_file_info, (void *)0 );
+        hashdone( filecache_hash );
+    }
 }
 
-void file_remove_atexit( const char * path )
+void file_remove_atexit( OBJECT * path )
 {
-    files_to_remove = list_new( files_to_remove, newstr((char*)path) );
+    files_to_remove = list_new( files_to_remove, object_copy( path ) );
 }

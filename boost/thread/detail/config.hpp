@@ -1,7 +1,7 @@
 // Copyright (C) 2001-2003
 // William E. Kempf
 //
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying 
+//  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #ifndef BOOST_THREAD_CONFIG_WEK01032003_HPP
@@ -9,6 +9,38 @@
 
 #include <boost/config.hpp>
 #include <boost/detail/workaround.hpp>
+
+
+#if !defined BOOST_THREAD_VERSION
+#define BOOST_THREAD_VERSION 1
+#else
+#if BOOST_THREAD_VERSION!=1  && BOOST_THREAD_VERSION!=2
+#error "BOOST_THREAD_VERSION must be 1 or 2"
+#endif
+#endif
+
+#ifdef BOOST_NO_SCOPED_ENUMS
+#define BOOST_DECLARE_STRONG_ENUM_BEGIN(x) \
+  struct x { \
+    enum enum_type
+
+#define BOOST_DECLARE_STRONG_ENUM_END(x) \
+    enum_type v_; \
+    inline x()  {} \
+    inline x(enum_type v) : v_(v) {} \
+    inline operator int() const {return v_;} \
+    friend inline bool operator ==(x lhs, int rhs)  {return lhs.v_==rhs;} \
+    friend inline bool operator ==(int lhs, x rhs)  {return lhs==rhs.v_;} \
+    friend inline bool operator !=(x lhs, int rhs)  {return lhs.v_!=rhs;} \
+    friend inline bool operator !=(int lhs, x rhs)  {return lhs!=rhs.v_;} \
+  };
+
+#define BOOST_STRONG_ENUM_NATIVE(x) x::type
+#else  // BOOST_NO_SCOPED_ENUMS
+#define BOOST_DECLARE_STRONG_ENUM_BEGIN(x) enum class BOOST_SYMBOL_VISIBLE x
+#define BOOST_DECLARE_STRONG_ENUM_END(x)
+#define BOOST_STRONG_ENUM_NATIVE(x) x
+#endif  // BOOST_NO_SCOPED_ENUMS
 
 #if BOOST_WORKAROUND(__BORLANDC__, < 0x600)
 #  pragma warn -8008 // Condition always true/false
@@ -53,12 +85,18 @@
 
 #if defined(BOOST_HAS_DECLSPEC)
 #   if defined(BOOST_THREAD_BUILD_DLL) //Build dll
-#       define BOOST_THREAD_DECL __declspec(dllexport)
+#       define BOOST_THREAD_DECL BOOST_SYMBOL_EXPORT
+//#       define BOOST_THREAD_DECL __declspec(dllexport)
+
 #   elif defined(BOOST_THREAD_USE_DLL) //Use dll
-#       define BOOST_THREAD_DECL __declspec(dllimport)
+#       define BOOST_THREAD_DECL BOOST_SYMBOL_IMPORT
+//#       define BOOST_THREAD_DECL __declspec(dllimport)
 #   else
 #       define BOOST_THREAD_DECL
 #   endif
+#elif (__GNUC__ == 4 && __GNUC_MINOR__ >= 1) || (__GNUC__ > 4)
+#  define BOOST_THREAD_DECL BOOST_SYMBOL_VISIBLE
+
 #else
 #   define BOOST_THREAD_DECL
 #endif // BOOST_HAS_DECLSPEC
@@ -69,7 +107,7 @@
 #if !defined(BOOST_ALL_NO_LIB) && !defined(BOOST_THREAD_NO_LIB) && !defined(BOOST_THREAD_BUILD_DLL) && !defined(BOOST_THREAD_BUILD_LIB)
 //
 // Tell the autolink to link dynamically, this will get undef'ed by auto_link.hpp
-// once it's done with it: 
+// once it's done with it:
 //
 #if defined(BOOST_THREAD_USE_DLL)
 #   define BOOST_DYN_LINK

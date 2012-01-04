@@ -150,7 +150,7 @@ class Configurations(object):
 
     def get(self, id, param):
         """ Returns the value of a configuration parameter. """
-        self.params_.get(param, {}).get(id)
+        return self.params_.get(param, {}).get(id)
 
     def set (self, id, param, value):
         """ Sets the value of a configuration parameter. """
@@ -294,6 +294,8 @@ def get_invocation_command_nodefault(
             #print "warning: initialized from" [ errors.nearest-user-location ] ;
     else:
         command = check_tool(user_provided_command)
+        assert(isinstance(command, list))
+        command=' '.join(command)
         if not command and __debug_configuration:
             print "warning: toolset", toolset, "initialization:"
             print "warning: can't find user-provided command", user_provided_command
@@ -347,7 +349,9 @@ def get_absolute_tool_path(command):
         programs = path.programs_path()
         m = path.glob(programs, [command, command + '.exe' ])
         if not len(m):
-            print "Could not find:", command, "in", programs
+            if __debug_configuration:
+                print "Could not find:", command, "in", programs
+            return None
         return os.path.dirname(m[0])
 
 # ported from trunk@47174

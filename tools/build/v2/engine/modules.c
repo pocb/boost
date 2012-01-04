@@ -8,7 +8,7 @@
 #include "modules.h"
 #include "string.h"
 #include "hash.h"
-#include "newstr.h"
+#include "object.h"
 #include "lists.h"
 #include "parse.h"
 #include "rules.h"
@@ -18,55 +18,42 @@
 #include <assert.h>
 
 static struct hash * module_hash = 0;
+static module_t root;
 
-
-static char * new_module_str( module_t * m, char * suffix )
+module_t * bindmodule( OBJECT * name )
 {
-    char * result;
-    string s;
-    string_copy( &s, m->name );
-    string_append( &s, suffix );
-    result = newstr( s.value );
-    string_free( &s );
-    return result;
-}
 
-
-module_t * bindmodule( char * name )
-{
-    PROFILE_ENTER( BINDMODULE );
-
-    string s;
-    module_t m_;
-    module_t * m = &m_;
-
-    if ( !module_hash )
-        module_hash = hashinit( sizeof( module_t ), "modules" );
-
-    string_new( &s );
-    if ( name )
+    if ( !name )
     {
-        string_append( &s, name );
-        string_push_back( &s, '.' );
+        return &root;
     }
-
-    m->name = s.value;
-
-    if ( hashenter( module_hash, (HASHDATA * *)&m ) )
+    else
     {
-        m->name = newstr( m->name );
-        m->variables = 0;
-        m->rules = 0;
-        m->imported_modules = 0;
-        m->class_module = 0;
-        m->native_rules = 0;
-        m->user_module = 0;
+        PROFILE_ENTER( BINDMODULE );
+
+        module_t m_;
+        module_t * m = &m_;
+
+        if ( !module_hash )
+            module_hash = hashinit( sizeof( module_t ), "modules" );
+
+        m->name = name;
+
+        if ( hashenter( module_hash, (HASHDATA * *)&m ) )
+        {
+            m->name = object_copy( name );
+            m->variables = 0;
+            m->rules = 0;
+            m->imported_modules = 0;
+            m->class_module = 0;
+            m->native_rules = 0;
+            m->user_module = 0;
+        }
+
+        PROFILE_EXIT( BINDMODULE );
+
+        return m;
     }
-    string_free( &s );
-
-    PROFILE_EXIT( BINDMODULE );
-
-    return m;
 }
 
 /*
@@ -75,7 +62,7 @@ module_t * bindmodule( char * name )
 struct hash * demand_rules( module_t * m )
 {
     if ( !m->rules )
-        m->rules = hashinit( sizeof( RULE ), new_module_str( m, "rules" ) );
+        m->rules = hashinit( sizeof( RULE ), "rules" );
     return m->rules;
 }
 
@@ -95,15 +82,15 @@ static void delete_native_rule( void * xrule, void * data )
     native_rule_t * rule = (native_rule_t *)xrule;
     if ( rule->arguments )
         args_free( rule->arguments );
-    freestr( rule->name );
+    object_free( rule->name );
     if ( rule->procedure )
-        parse_free( rule->procedure );
+        function_free( rule->procedure );
 }
 
 
 static void delete_imported_modules( void * xmodule_name, void * data )
 {
-    freestr( *(char * *)xmodule_name );
+    object_free( *(OBJECT * *)xmodule_name );
 }
 
 
@@ -112,17 +99,13 @@ void delete_module( module_t * m )
     /* Clear out all the rules. */
     if ( m->rules )
     {
-        char * name;
         hashenumerate( m->rules, delete_rule_, (void *)0 );
-        name = hashname( m->rules );
         hashdone( m->rules );
-        freestr( name );
         m->rules = 0;
     }
 
     if ( m->native_rules )
     {
-        char * name;
         hashenumerate( m->native_rules, delete_native_rule, (void *)0 );
         hashdone( m->native_rules );
         m->native_rules = 0;
@@ -130,9 +113,7 @@ void delete_module( module_t * m )
 
     if ( m->variables )
     {
-        var_hash_swap( &m->variables );
-        var_done();
-        var_hash_swap( &m->variables );
+        var_done( m );
         m->variables = 0;
     }
 
@@ -150,11 +131,7 @@ static void delete_module_( void * xmodule, void * data )
     module_t *m = (module_t *)xmodule;
 
     delete_module( m );
-
-    if ( m->name )
-    {
-        freestr( m->name );
-    }
+    object_free( m->name );
 }
 
 void modules_done()
@@ -162,25 +139,12 @@ void modules_done()
     hashenumerate( module_hash, delete_module_, (void *)0 ); 
     hashdone( module_hash );
     module_hash = 0;
+    delete_module( &root );
 }
 
 module_t * root_module()
 {
-    static module_t * root = 0;
-    if ( !root )
-        root = bindmodule( 0 );
-    return root;
-}
-
-void enter_module( module_t * m )
-{
-    var_hash_swap( &m->variables );
-}
-
-
-void exit_module( module_t * m )
-{
-    var_hash_swap( &m->variables );
+    return &root;
 }
 
 
@@ -196,11 +160,11 @@ void import_module( LIST * module_names, module_t * target_module )
 
     for ( ; module_names; module_names = module_names->next )
     {
-        char * s = module_names->string;
-        char * * ss = &s;
+        OBJECT * s = module_names->value;
+        OBJECT * * ss = &s;
         if( hashenter( h, (HASHDATA * *)&ss ) )
         {
-            *ss = copystr( s );
+            *ss = object_copy( s );
         }
     }
 
@@ -210,10 +174,10 @@ void import_module( LIST * module_names, module_t * target_module )
 
 static void add_module_name( void * r_, void * result_ )
 {
-    char * * r = (char * *)r_;
+    OBJECT * * r = (OBJECT * *)r_;
     LIST * * result = (LIST * *)result_;
 
-    *result = list_new( *result, copystr( *r ) );
+    *result = list_new( *result, object_copy( *r ) );
 }
 
 

@@ -58,7 +58,7 @@
 #endif
 
 #include "search.h"
-#include "newstr.h"
+#include "object.h"
 #include "make.h"
 #include "headers.h"
 #include "command.h"
@@ -106,7 +106,7 @@ static const char * target_bind[] =
  * make() - make a target, given its name.
  */
 
-int make( int n_targets, char const * * targets, int anyhow )
+int make( int n_targets, OBJECT * * targets, int anyhow )
 {
     int    i;
     COUNTS counts[ 1 ];
@@ -126,7 +126,11 @@ int make( int n_targets, char const * * targets, int anyhow )
     {
         PROFILE_ENTER( MAKE_MAKE0 );
         for ( i = 0; i < n_targets; ++i )
-            make0( bindtarget( targets[ i ] ), 0, 0, counts, anyhow );
+        {
+            TARGET * t = bindtarget( targets[ i ] );
+            if ( t->fate == T_FATE_INIT )
+                make0( t, 0, 0, counts, anyhow );
+        }
         PROFILE_EXIT( MAKE_MAKE0 );
     }
 
@@ -191,7 +195,7 @@ static void update_dependants( TARGET * t )
             if ( DEBUG_FATE )
             {
                 printf( "fate change  %s from %s to %s (as dependant of %s)\n",
-                        p->name, target_fate[ (int) fate0 ], target_fate[ (int) p->fate ], t->name );
+                        object_str( p->name ), target_fate[ (int) fate0 ], target_fate[ (int) p->fate ], object_str( t->name ) );
             }
 
             /* If we are done visiting it, go back and make sure its dependants
@@ -220,7 +224,7 @@ static void force_rebuilds( TARGET * t )
         {
             if ( DEBUG_FATE )
                 printf( "fate change  %s from %s to %s (by rebuild)\n",
-                        r->name, target_fate[ (int) r->fate ], target_fate[ T_FATE_REBUILD ] );
+                        object_str( r->name ), target_fate[ (int) r->fate ], target_fate[ T_FATE_REBUILD ] );
 
             /* Force rebuild it. */
             r->fate = T_FATE_REBUILD;
@@ -262,14 +266,14 @@ void make0
 #endif
 
     if ( DEBUG_MAKEPROG )
-        printf( "make\t--\t%s%s\n", spaces( depth ), t->name );
+        printf( "make\t--\t%s%s\n", spaces( depth ), object_str( t->name ) );
 
     /*
      * Step 1: initialize
      */
 
     if ( DEBUG_MAKEPROG )
-        printf( "make\t--\t%s%s\n", spaces( depth ), t->name );
+        printf( "make\t--\t%s%s\n", spaces( depth ), object_str( t->name ) );
 
     t->fate = T_FATE_MAKING;
 
@@ -280,13 +284,13 @@ void make0
 
     /* Step 2a: set "on target" variables. */
     s = copysettings( t->settings );
-    pushsettings( s );
+    pushsettings( root_module(), s );
 
     /* Step 2b: find and timestamp the target file (if it is a file). */
     if ( ( t->binding == T_BIND_UNBOUND ) && !( t->flags & T_FLAG_NOTFILE ) )
     {
-        char * another_target;
-        freestr( t->boundname );
+        OBJECT * another_target;
+        object_free( t->boundname );
         t->boundname = search( t->name, &t->time, &another_target,
                                t->flags & T_FLAG_ISFILE );
         /* If it was detected that this target refers to an already existing and
@@ -314,10 +318,10 @@ void make0
 
 #ifdef OPT_SEMAPHORE
     {
-        LIST * var = var_get( "JAM_SEMAPHORE" );
+        LIST * var = var_get( root_module(), constant_JAM_SEMAPHORE );
         if ( var )
         {
-            TARGET * semaphore = bindtarget( var->string );
+            TARGET * semaphore = bindtarget( var->value );
             semaphore->progress = T_MAKE_SEMAPHORE;
             t->semaphore = semaphore;
         }
@@ -329,7 +333,7 @@ void make0
         headers( t );
 
     /* Step 2d: reset "on target" variables. */
-    popsettings( s );
+    popsettings( root_module(), s );
     freesettings( s );
 
     /*
@@ -338,9 +342,9 @@ void make0
 
     if ( DEBUG_BIND )
     {
-        if ( strcmp( t->name, t->boundname ) )
+        if ( ! object_equal( t->name, t->boundname ) )
             printf( "bind\t--\t%s%s: %s\n",
-                spaces( depth ), t->name, t->boundname );
+                spaces( depth ), object_str( t->name ), object_str( t->boundname ) );
 
         switch ( t->binding )
         {
@@ -348,12 +352,12 @@ void make0
         case T_BIND_MISSING:
         case T_BIND_PARENTS:
             printf( "time\t--\t%s%s: %s\n",
-                spaces( depth ), t->name, target_bind[ (int) t->binding ] );
+                spaces( depth ), object_str( t->name ), target_bind[ (int) t->binding ] );
             break;
 
         case T_BIND_EXISTS:
             printf( "time\t--\t%s%s: %s",
-                spaces( depth ), t->name, ctime( &t->time ) );
+                spaces( depth ), object_str( t->name ), ctime( &t->time ) );
             break;
         }
     }
@@ -373,7 +377,7 @@ void make0
         if ( c->target->fate == T_FATE_INIT )
             make0( c->target, ptime, depth + 1, counts, anyhow );
         else if ( c->target->fate == T_FATE_MAKING && !internal )
-            printf( "warning: %s depends on itself\n", c->target->name );
+            printf( "warning: %s depends on itself\n", object_str( c->target->name ) );
     }
 
     /* Step 3b: recursively make0() internal includes node. */
@@ -417,8 +421,8 @@ void make0
         if ( DEBUG_FATE )
             if ( fate < c->target->fate )
                 printf( "fate change %s from %s to %s by dependency %s\n",
-                    t->name, target_fate[(int) fate], target_fate[(int) c->target->fate],
-                    c->target->name );
+                    object_str( t->name ), target_fate[(int) fate], target_fate[(int) c->target->fate],
+                    object_str( c->target->name ) );
 #endif
     }
 
@@ -442,8 +446,8 @@ void make0
 #ifdef OPT_GRAPH_DEBUG_EXT
         if ( DEBUG_FATE )
             if ( fate != T_FATE_STABLE )
-                printf( "fate change  %s back to stable, NOUPDATE.\n", t->name
-                    );
+                printf( "fate change  %s back to stable, NOUPDATE.\n",
+                    object_str( t->name ) );
 #endif
 
         last = 0;
@@ -538,10 +542,10 @@ void make0
     if ( DEBUG_FATE && ( fate != savedFate ) )
 	{
         if ( savedFate == T_FATE_STABLE )
-            printf( "fate change  %s set to %s%s\n", t->name,
+            printf( "fate change  %s set to %s%s\n", object_str( t->name ),
                 target_fate[ fate ], oldTimeStamp ? " (by timestamp)" : "" );
         else
-            printf( "fate change  %s from %s to %s%s\n", t->name,
+            printf( "fate change  %s from %s to %s%s\n", object_str( t->name ),
                 target_fate[ savedFate ], target_fate[ fate ],
                 oldTimeStamp ? " (by timestamp)" : "" );
 	}
@@ -561,13 +565,13 @@ void make0
             if ( DEBUG_FATE )
                 printf( "fate change %s to STABLE from %s, "
                     "no actions, no dependencies and do not care\n",
-                    t->name, target_fate[ fate ] );
+                    object_str( t->name ), target_fate[ fate ] );
 #endif
             fate = T_FATE_STABLE;
         }
         else
         {
-            printf( "don't know how to make %s\n", t->name );
+            printf( "don't know how to make %s\n", object_str( t->name ) );
             fate = T_FATE_CANTFIND;
         }
     }
@@ -634,7 +638,7 @@ void make0
 
     if ( DEBUG_MAKEPROG )
         printf( "made%s\t%s\t%s%s\n", flag, target_fate[ (int) t->fate ],
-            spaces( depth ), t->name );
+            spaces( depth ), object_str( t->name ) );
 }
 
 
@@ -645,10 +649,10 @@ static const char * target_name( TARGET * t )
     static char buf[ 1000 ];
     if ( t->flags & T_FLAG_INTERNAL )
     {
-        sprintf( buf, "%s (internal node)", t->name );
+        sprintf( buf, "%s (internal node)", object_str( t->name ) );
         return buf;
     }
-    return t->name;
+    return object_str( t->name );
 }
 
 
@@ -678,8 +682,8 @@ static void dependGraphOutput( TARGET * t, int depth )
         break;
     }
 
-    if ( strcmp( t->name, t->boundname ) )
-        printf( "  %s    Loc: %s\n", spaces( depth ), t->boundname );
+    if ( ! object_equal( t->name, t->boundname ) )
+        printf( "  %s    Loc: %s\n", spaces( depth ), object_str( t->boundname ) );
 
     switch ( t->fate )
     {
@@ -792,9 +796,9 @@ static TARGETS * make0sort( TARGETS * chain )
 static LIST * targets_to_update_ = 0;
 
 
-void mark_target_for_updating( char * target )
+void mark_target_for_updating( OBJECT * target )
 {
-    targets_to_update_ = list_new( targets_to_update_, newstr( target ) );
+    targets_to_update_ = list_new( targets_to_update_, object_copy( target ) );
 }
 
 

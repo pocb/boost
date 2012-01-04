@@ -263,7 +263,7 @@ rule find-jamfile (
     {
         errors.error Unable to load Jamfile.
             : Could not find a Jamfile in directory '$(dir)'.
-            : Attempted to find it with pattern '"$(JAMFILE:J=" ")"'.
+            : Attempted to find it with pattern '"$(JAMFILE:J= )"'.
             : Please consult the documentation at 'http://www.boost.org'. ;
     }
 
@@ -1109,7 +1109,8 @@ module project-rules
     
     rule option ( name : value )
     {
-        if $(__name__) != site-config && $(__name__) != user-config && $(__name__) != project-config
+        local m = [ CALLER_MODULE ] ;
+        if $(m) != site-config && $(m) != user-config && $(m) != project-config
         {
             import errors ;
             errors.error "The 'option' rule may be used only in site-config or user-config" ;

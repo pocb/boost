@@ -149,7 +149,7 @@ inline T log_min_value(const mpl::int_<0>& BOOST_MATH_APPEND_EXPLICIT_TEMPLATE_T
    BOOST_ASSERT(::std::numeric_limits<T>::is_specialized);
 #endif
    BOOST_MATH_STD_USING
-   static const T val = log((std::numeric_limits<T>::max)());
+   static const T val = log((std::numeric_limits<T>::min)());
    return val;
 }
 
@@ -180,6 +180,11 @@ inline T epsilon(const mpl::false_& BOOST_MATH_APPEND_EXPLICIT_TEMPLATE_TYPE(T))
 }
 
 } // namespace detail
+
+#ifdef BOOST_MSVC
+#pragma warning(push)
+#pragma warning(disable:4309)
+#endif
 
 template <class T>
 inline T log_max_value(BOOST_MATH_EXPLICIT_TEMPLATE_TYPE(T))
@@ -225,6 +230,10 @@ inline T log_min_value(BOOST_MATH_EXPLICIT_TEMPLATE_TYPE(T))
    return val;
 #endif
 }
+
+#ifdef BOOST_MSVC
+#pragma warning(pop)
+#endif
 
 template <class T>
 inline T epsilon(BOOST_MATH_EXPLICIT_TEMPLATE_TYPE_SPEC(T))

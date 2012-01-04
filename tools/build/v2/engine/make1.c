@@ -57,7 +57,7 @@
 #include "headers.h"
 
 #include "search.h"
-#include "newstr.h"
+#include "object.h"
 #include "make.h"
 #include "command.h"
 #include "execcmd.h"
@@ -72,7 +72,7 @@
 
 static CMD      * make1cmds    ( TARGET * );
 static LIST     * make1list    ( LIST *, TARGETS *, int flags );
-static SETTINGS * make1settings( LIST * vars );
+static SETTINGS * make1settings( struct module_t * module, LIST * vars );
 static void       make1bind    ( TARGET * );
 
 /* Ugly static - it is too hard to carry it through the callbacks. */
@@ -107,7 +107,7 @@ static void make1atail  ( state * );
 static void make1b      ( state * );
 static void make1c      ( state * );
 static void make1d      ( state * );
-static void make_closure( void * closure, int status, timing_info *, char *, char * );
+static void make_closure( void * closure, int status, timing_info *, const char *, const char * );
 
 typedef struct _stack
 {
@@ -281,6 +281,15 @@ static void make1a( state * pState )
                 ++pState->parent->asynccnt;
         }
 
+    /*
+     * If the target has been previously updated with -n in
+     * effect, and we're ignoring -n, update it for real.
+     */
+    if ( !globs.noexec && pState->t->progress == T_MAKE_NOEXEC_DONE )
+    {
+        pState->t->progress = T_MAKE_INIT;
+    }
+
     /* If this target is already being processed then do nothing. There is no
      * need to start processing the same target all over again.
      */
@@ -350,10 +359,10 @@ static void make1atail( state * pState )
 
 static void make1b( state * pState )
 {
-    TARGET  * t = pState->t;
-    TARGETS * c;
-    TARGET  * failed = 0;
-    char    * failed_name = "dependencies";
+    TARGET     * t = pState->t;
+    TARGETS    * c;
+    TARGET     * failed = 0;
+    const char * failed_name = "dependencies";
 
     /* If any dependencies are still outstanding, wait until they call make1b()
      * to signal their completion.
@@ -376,7 +385,7 @@ static void make1b( state * pState )
 
         if ( DEBUG_EXECCMD )
             printf( "SEM: %s is busy, delaying launch of %s\n",
-                t->semaphore->name, t->name );
+                object_str( t->semaphore->name ), object_str( t->name ) );
         pop_state( &state_stack );
         return;
     }
@@ -384,13 +393,21 @@ static void make1b( state * pState )
 
     /* Now ready to build target 't', if dependencies built OK. */
 
-    /* Collect status from dependencies. */
-    for ( c = t->depends; c; c = c->next )
-        if ( c->target->status > t->status && !( c->target->flags & T_FLAG_NOCARE ) )
-        {
-            failed = c->target;
-            pState->t->status = c->target->status;
-        }
+    /* Collect status from dependencies. If -n was passed then
+     * act as though all dependencies built correctly.  The only
+     * way they can fail is if UPDATE_NOW was called.  If
+     * the dependencies can't be found or we got an interrupt,
+     * we can't get here.
+     */
+    if ( !globs.noexec )
+    {
+        for ( c = t->depends; c; c = c->next )
+            if ( c->target->status > t->status && !( c->target->flags & T_FLAG_NOCARE ) )
+            {
+                failed = c->target;
+                pState->t->status = c->target->status;
+            }
+    }
     /* If an internal header node failed to build, we want to output the target
      * that it failed on.
      */
@@ -398,7 +415,7 @@ static void make1b( state * pState )
     {
         failed_name = failed->flags & T_FLAG_INTERNAL
             ? failed->failed
-            : failed->name;
+            : object_str( failed->name );
     }
     t->failed = failed_name;
 
@@ -410,11 +427,11 @@ static void make1b( state * pState )
         ++counts->skipped;
         if ( ( pState->t->flags & ( T_FLAG_RMOLD | T_FLAG_NOTFILE ) ) == T_FLAG_RMOLD )
         {
-            if ( !unlink( pState->t->boundname ) )
-                printf( "...removing outdated %s\n", pState->t->boundname );
+            if ( !unlink( object_str( pState->t->boundname ) ) )
+                printf( "...removing outdated %s\n", object_str( pState->t->boundname ) );
         }
         else
-            printf( "...skipped %s for lack of %s...\n", pState->t->name, failed_name );
+            printf( "...skipped %s for lack of %s...\n", object_str( pState->t->name ), failed_name );
     }
 
     if ( pState->t->status == EXEC_CMD_OK )
@@ -436,7 +453,7 @@ static void make1b( state * pState )
 
         case T_FATE_ISTMP:
             if ( DEBUG_MAKE )
-                printf( "...using %s...\n", pState->t->name );
+                printf( "...using %s...\n", object_str( pState->t->name ) );
             break;
 
         case T_FATE_TOUCHED:
@@ -467,7 +484,7 @@ static void make1b( state * pState )
 
             /* All possible fates should have been accounted for by now. */
         default:
-            printf( "ERROR: %s has bad fate %d", pState->t->name,
+            printf( "ERROR: %s has bad fate %d", object_str( pState->t->name ),
                 pState->t->fate );
             abort();
         }
@@ -484,8 +501,8 @@ static void make1b( state * pState )
     {
         ++pState->t->semaphore->asynccnt;
         if ( DEBUG_EXECCMD )
-            printf( "SEM: %s now used by %s\n", pState->t->semaphore->name,
-                pState->t->name );
+            printf( "SEM: %s now used by %s\n", object_str( pState->t->semaphore->name ),
+                object_str( pState->t->name ) );
     }
 #endif
 
@@ -508,16 +525,16 @@ static void make1c( state * pState )
 
     if ( cmd && ( pState->t->status == EXEC_CMD_OK ) )
     {
-        char * rule_name = 0;
-        char * target = 0;
+        const char * rule_name = 0;
+        const char * target = 0;
 
         if ( DEBUG_MAKEQ ||
             ( !( cmd->rule->actions->flags & RULE_QUIETLY ) && DEBUG_MAKE ) )
         {
-            rule_name = cmd->rule->name;
-            target = lol_get( &cmd->args, 0 )->string;
+            rule_name = object_str( cmd->rule->name );
+            target = object_str( lol_get( &cmd->args, 0 )->value );
             if ( globs.noexec )
-                out_action( rule_name, target, cmd->buf, "", "", EXIT_OK );
+                out_action( rule_name, target, cmd->buf->value, "", "", EXIT_OK );
         }
 
         if ( globs.noexec )
@@ -529,7 +546,7 @@ static void make1c( state * pState )
         {
             /* Pop state first because exec_cmd() could push state. */
             pop_state( &state_stack );
-            exec_cmd( cmd->buf, make_closure, pState->t, cmd->shell, rule_name,
+            exec_cmd( cmd->buf->value, make_closure, pState->t, cmd->shell, rule_name,
                 target );
         }
     }
@@ -560,7 +577,10 @@ static void make1c( state * pState )
             TARGET * t = pState->t;
             TARGET * additional_includes = NULL;
 
-            t->progress = T_MAKE_DONE;
+            if ( globs.noexec )
+                t->progress = T_MAKE_NOEXEC_DONE;
+            else
+                t->progress = T_MAKE_DONE;
 
             /* Target has been updated so rescan it for dependencies. */
             if ( ( t->fate >= T_FATE_MISSING ) &&
@@ -581,9 +601,9 @@ static void make1c( state * pState )
                 target_to_rescan->includes = 0;
 
                 s = copysettings( target_to_rescan->settings );
-                pushsettings( s );
+                pushsettings( root_module(), s );
                 headers( target_to_rescan );
-                popsettings( s );
+                popsettings( root_module(), s );
                 freesettings( s );
 
                 if ( target_to_rescan->includes )
@@ -631,7 +651,7 @@ static void make1c( state * pState )
                 --t->semaphore->asynccnt;
 
                 if ( DEBUG_EXECCMD )
-                    printf( "SEM: %s is now free\n", t->semaphore->name );
+                    printf( "SEM: %s is now free\n", object_str( t->semaphore->name ) );
 
                 /* If anything is waiting, notify the next target. There is no
                  * point in notifying waiting targets, since they will be
@@ -645,7 +665,7 @@ static void make1c( state * pState )
                     t->semaphore->parents = first->next;
 
                     if ( DEBUG_EXECCMD )
-                        printf( "SEM: placing %s on stack\n", first->target->name );
+                        printf( "SEM: placing %s on stack\n", object_str( first->target->name ) );
                     push_state( &temp_stack, first->target, NULL, T_STATE_MAKE1B );
                     BJAM_FREE( first );
                 }
@@ -672,9 +692,9 @@ static void call_timing_rule( TARGET * target, timing_info * time )
 {
     LIST * timing_rule;
 
-    pushsettings( target->settings );
-    timing_rule = var_get( "__TIMING_RULE__" );
-    popsettings( target->settings );
+    pushsettings( root_module(), target->settings );
+    timing_rule = var_get( root_module(), constant_TIMING_RULE );
+    popsettings( root_module(), target->settings );
 
     if ( timing_rule )
     {
@@ -688,7 +708,7 @@ static void call_timing_rule( TARGET * target, timing_info * time )
         lol_add( frame->args, list_copy( L0, timing_rule->next ) );
 
         /* target :: the name of the target */
-        lol_add( frame->args, list_new( L0, copystr( target->name ) ) );
+        lol_add( frame->args, list_new( L0, object_copy( target->name ) ) );
 
         /* start end user system :: info about the action command */
         lol_add( frame->args, list_new( list_new( list_new( list_new( L0,
@@ -698,7 +718,7 @@ static void call_timing_rule( TARGET * target, timing_info * time )
             outf_double( time->system ) ) );
 
         /* Call the rule. */
-        evaluate_rule( timing_rule->string, frame );
+        evaluate_rule( timing_rule->value, frame );
 
         /* Clean up. */
         frame_free( frame );
@@ -717,15 +737,15 @@ static void call_action_rule
     TARGET      * target,
     int           status,
     timing_info * time,
-    char        * executed_command,
-    char        * command_output
+    const char  * executed_command,
+    const char  * command_output
 )
 {
-    LIST * action_rule;
+    LIST   * action_rule;
 
-    pushsettings( target->settings );
-    action_rule = var_get( "__ACTION_RULE__" );
-    popsettings( target->settings );
+    pushsettings( root_module(), target->settings );
+    action_rule = var_get( root_module(), constant_ACTION_RULE );
+    popsettings( root_module(), target->settings );
 
     if ( action_rule )
     {
@@ -743,12 +763,12 @@ static void call_action_rule
         lol_add( frame->args, list_copy( L0, action_rule->next ) );
 
         /* target :: the name of the target */
-        lol_add( frame->args, list_new( L0, copystr( target->name ) ) );
+        lol_add( frame->args, list_new( L0, object_copy( target->name ) ) );
 
         /* command status start end user system :: info about the action command */
         lol_add( frame->args,
             list_new( list_new( list_new( list_new( list_new( list_new( L0,
-                newstr( executed_command ) ),
+                object_new( executed_command ) ),
                 outf_int( status ) ),
                 outf_time( time->start ) ),
                 outf_time( time->end ) ),
@@ -757,12 +777,12 @@ static void call_action_rule
 
         /* output ? :: the output of the action command */
         if ( command_output )
-            lol_add( frame->args, list_new( L0, newstr( command_output ) ) );
+            lol_add( frame->args, list_new( L0, object_new( command_output ) ) );
         else
             lol_add( frame->args, L0 );
 
         /* Call the rule. */
-        evaluate_rule( action_rule->string, frame );
+        evaluate_rule( action_rule->value, frame );
 
         /* Clean up. */
         frame_free( frame );
@@ -780,8 +800,8 @@ static void make_closure
     void        * closure,
     int           status,
     timing_info * time,
-    char        * executed_command,
-    char        * command_output
+    const char  * executed_command,
+    const char  * command_output
 )
 {
     TARGET * built = (TARGET *)closure;
@@ -811,7 +831,7 @@ static void make1d( state * pState )
     CMD    * cmd    = (CMD *)t->cmds;
     int      status = pState->status;
 
-    if ( t->flags & T_FLAG_FAIL_EXPECTED )
+    if ( t->flags & T_FLAG_FAIL_EXPECTED && !globs.noexec )
     {
         /* Invert execution result when FAIL_EXPECTED has been applied. */
         switch ( status )
@@ -833,9 +853,9 @@ static void make1d( state * pState )
     if ( ( status == EXEC_CMD_FAIL ) && DEBUG_MAKE )
     {
         if ( !DEBUG_EXEC )
-            printf( "%s\n", cmd->buf );
+            printf( "%s\n", cmd->buf->value );
 
-        printf( "...failed %s ", cmd->rule->name );
+        printf( "...failed %s ", object_str( cmd->rule->name ) );
         list_print( lol_get( &cmd->args, 0 ) );
         printf( "...\n" );
     }
@@ -855,13 +875,13 @@ static void make1d( state * pState )
         for ( ; targets; targets = list_next( targets ) )
         {
             int need_unlink = 1;
-            TARGET* t = bindtarget ( targets->string );
+            TARGET* t = bindtarget ( targets->value );
             if (t->flags & T_FLAG_PRECIOUS)
             {                
                 need_unlink = 0;
             }
-            if (need_unlink && !unlink( targets->string ) )
-                printf( "...removing %s\n", targets->string );
+            if (need_unlink && !unlink( object_str( targets->value ) ) )
+                printf( "...removing %s\n", object_str( targets->value ) );
         }
     }
 
@@ -888,29 +908,17 @@ static void swap_settings
     TARGET     * new_target
 )
 {
-    if ( new_module == root_module() )
-        new_module = 0;
-
     if ( ( new_target == *current_target ) && ( new_module == *current_module ) )
         return;
 
     if ( *current_target )
-        popsettings( (*current_target)->settings );
+        popsettings( *current_module, (*current_target)->settings );
 
-    if ( new_module != *current_module )
-    {
-        if ( *current_module )
-            exit_module( *current_module );
-
-        *current_module = new_module;
-
-        if ( new_module )
-            enter_module( new_module );
-    }
-
-    *current_target = new_target;
     if ( new_target )
-        pushsettings( new_target->settings );
+        pushsettings( new_module, new_target->settings );
+
+    *current_module = new_module;
+    *current_target = new_target;
 }
 
 
@@ -930,6 +938,7 @@ static CMD * make1cmds( TARGET * t )
     module_t * settings_module = 0;
     TARGET   * settings_target = 0;
     ACTIONS  * a0;
+    int running_flag = globs.noexec ? A_RUNNING_NOEXEC : A_RUNNING;
 
     /* Step through actions. Actions may be shared with other targets or grouped
      * using RULE_TOGETHER, so actions already seen are skipped.
@@ -949,10 +958,10 @@ static CMD * make1cmds( TARGET * t )
         /* Only do rules with commands to execute. If this action has already
          * been executed, use saved status.
          */
-        if ( !actions || a0->action->running )
+        if ( !actions || a0->action->running >= running_flag )
             continue;
 
-        a0->action->running = 1;
+        a0->action->running = running_flag;
 
         /* Make LISTS of targets and sources. If `execute together` has been
          * specified for this rule, tack on sources from each instance of this
@@ -962,10 +971,10 @@ static CMD * make1cmds( TARGET * t )
         ns = make1list( L0, a0->action->sources, actions->flags );
         if ( actions->flags & RULE_TOGETHER )
             for ( a1 = a0->next; a1; a1 = a1->next )
-                if ( a1->action->rule == rule && !a1->action->running )
+                if ( a1->action->rule == rule && a1->action->running < running_flag )
                 {
                     ns = make1list( ns, a1->action->sources, actions->flags );
-                    a1->action->running = 1;
+                    a1->action->running = running_flag;
                 }
 
         /* If doing only updated (or existing) sources, but none have been
@@ -979,11 +988,13 @@ static CMD * make1cmds( TARGET * t )
 
         swap_settings( &settings_module, &settings_target, rule->module, t );
         if ( !shell )
-            shell = var_get( "JAMSHELL" );  /* shell is per-target */
+        {
+            shell = var_get( rule->module, constant_JAMSHELL );  /* shell is per-target */
+        }
 
         /* If we had 'actions xxx bind vars' we bind the vars now. */
-        boundvars = make1settings( actions->bindlist );
-        pushsettings( boundvars );
+        boundvars = make1settings( rule->module, actions->bindlist );
+        pushsettings( rule->module, boundvars );
 
         /*
          * Build command, starting with all source args.
@@ -1028,14 +1039,14 @@ static CMD * make1cmds( TARGET * t )
             else
             {
                 /* Too long and not splittable. */
-                printf( "%s actions too long (max %d):\n", rule->name, MAXLINE
+                printf( "%s actions too long (max %d):\n", object_str( rule->name ), MAXLINE
                     );
 
                 /* Tell the user what didn't fit. */
                 cmd = cmd_new( rule, list_copy( L0, nt ),
                     list_sublist( ns, start, chunk ),
-                    list_new( L0, newstr( "%" ) ) );
-                fputs( cmd->buf, stdout );
+                    list_new( L0, object_copy( constant_percent ) ) );
+                fputs( cmd->buf->value, stdout );
                 exit( EXITBAD );
             }
         }
@@ -1048,7 +1059,7 @@ static CMD * make1cmds( TARGET * t )
         /* Free the variables whose values were bound by 'actions xxx bind
          * vars'.
          */
-        popsettings( boundvars );
+        popsettings( rule->module, boundvars );
         freesettings( boundvars );
     }
 
@@ -1089,14 +1100,14 @@ static LIST * make1list( LIST * l, TARGETS * targets, int flags )
         {
             LIST * m;
             for ( m = l; m; m = m->next )
-                if ( !strcmp( m->string, t->boundname ) )
+                if ( object_equal( m->value, t->boundname ) )
                     break;
             if ( m )
                 continue;
         }
 
         /* Build new list. */
-        l = list_new( l, copystr( t->boundname ) );
+        l = list_new( l, object_copy( t->boundname ) );
     }
 
     return l;
@@ -1107,29 +1118,29 @@ static LIST * make1list( LIST * l, TARGETS * targets, int flags )
  * make1settings() - for vars that get bound values, build up replacement lists.
  */
 
-static SETTINGS * make1settings( LIST * vars )
+static SETTINGS * make1settings( struct module_t * module, LIST * vars )
 {
     SETTINGS * settings = 0;
 
     for ( ; vars; vars = list_next( vars ) )
     {
-        LIST * l = var_get( vars->string );
+        LIST * l = var_get( module, vars->value );
         LIST * nl = 0;
 
         for ( ; l; l = list_next( l ) )
         {
-            TARGET * t = bindtarget( l->string );
+            TARGET * t = bindtarget( l->value );
 
             /* Make sure the target is bound. */
             if ( t->binding == T_BIND_UNBOUND )
                 make1bind( t );
 
             /* Build a new list. */
-            nl = list_new( nl, copystr( t->boundname ) );
+            nl = list_new( nl, object_copy( t->boundname ) );
         }
 
         /* Add to settings chain. */
-        settings = addsettings( settings, VAR_SET, vars->string, nl );
+        settings = addsettings( settings, VAR_SET, vars->value, nl );
     }
 
     return settings;
@@ -1148,9 +1159,9 @@ static void make1bind( TARGET * t )
     if ( t->flags & T_FLAG_NOTFILE )
         return;
 
-    pushsettings( t->settings );
-    freestr( t->boundname );
+    pushsettings( root_module(), t->settings );
+    object_free( t->boundname );
     t->boundname = search( t->name, &t->time, 0, ( t->flags & T_FLAG_ISFILE ) );
     t->binding = t->time ? T_BIND_EXISTS : T_BIND_MISSING;
-    popsettings( t->settings );
+    popsettings( root_module(), t->settings );
 }

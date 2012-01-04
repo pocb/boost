@@ -15,6 +15,7 @@
 #include <iterator>
 #include <limits>
 
+#include <boost/concept_check.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/type_traits/is_integral.hpp>
 #include <boost/type_traits/is_same.hpp>
@@ -32,7 +33,8 @@ namespace boost { namespace geometry
 {
 
 #ifndef DOXYGEN_NO_DETAIL
-namespace detail { namespace wkb {
+namespace detail { namespace wkb
+{
 
 template <typename T>
 struct value_parser
@@ -154,6 +156,10 @@ struct parsing_assigner<P, N, N>
     static void run(Iterator& it, Iterator end, P& point, byte_order_type::enum_t order)
     {
         // terminate
+        boost::ignore_unused_variable_warning(it);
+        boost::ignore_unused_variable_warning(end);
+        boost::ignore_unused_variable_warning(point);
+        boost::ignore_unused_variable_warning(order);
     }
 };
 

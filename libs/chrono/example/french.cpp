@@ -16,31 +16,31 @@
 #include <locale>
 
 
-#if defined BOOST_CHRONO_DONT_PROVIDE_DEPRECATED_IO_V1
+#if BOOST_CHRONO_VERSION==2
 #include <boost/chrono/io/duration_units.hpp>
 
     using namespace boost;
     using namespace boost::chrono;
 
-    template <typename CharT=char, class OutputIterator = std::ostreambuf_iterator<CharT> >
-    class duration_units_fr: public duration_units_default<CharT, OutputIterator>
+    template <typename CharT=char>
+    class duration_units_fr: public duration_units_default<CharT>
     {
     public:
       typedef CharT char_type;
-      typedef OutputIterator iter_type;
 
       explicit duration_units_fr(size_t refs = 0) :
-        duration_units_default<CharT, OutputIterator>(refs)
+        duration_units_default<CharT>(refs)
       {
       }
     protected:
 
+      using duration_units_default<CharT>::do_get_unit;
       std::size_t do_get_plural_form(boost::int_least64_t value) const
       {
         return (value == -1 || value == 0 || value == 1) ? 0 : 1;
       }
 
-      std::basic_string<CharT> do_get_plural_form(duration_style_type style, ratio<1> , std::size_t pf) const
+      std::basic_string<CharT> do_get_unit(duration_style_type style, ratio<1> , std::size_t pf) const
       {
         static const CharT t[] =
         { 's' };
@@ -59,7 +59,7 @@
         throw "exception";
       }
 
-      std::basic_string<CharT> do_get_plural_form(duration_style_type style, ratio<60> , std::size_t pf) const
+      std::basic_string<CharT> do_get_unit(duration_style_type style, ratio<60> , std::size_t pf) const
       {
         static const CharT t[] =
         { 'm', 'i', 'n' };
@@ -79,7 +79,7 @@
         throw "exception";
       }
 
-      std::basic_string<CharT> do_get_plural_form(duration_style_type style, ratio<3600> , std::size_t pf) const
+      std::basic_string<CharT> do_get_unit(duration_style_type style, ratio<3600> , std::size_t pf) const
       {
         static const CharT t[] =
         { 'h' };
@@ -107,7 +107,7 @@ int main()
     using namespace boost;
     using namespace boost::chrono;
 
-#if defined BOOST_CHRONO_DONT_PROVIDE_DEPRECATED_IO_V1
+#if BOOST_CHRONO_VERSION==2
     cout.imbue(locale(locale(), new duration_units_fr<>()));
 #else
     cout.imbue(locale(locale(), new duration_punct<char>
