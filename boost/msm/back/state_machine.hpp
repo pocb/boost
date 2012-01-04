@@ -17,8 +17,6 @@
 #include <numeric>
 #include <utility>
 
-#define BOOST_MPL_CFG_NO_PREPROCESSED_HEADERS
-
 #include <boost/mpl/contains.hpp>
 #include <boost/mpl/deref.hpp>
 #include <boost/mpl/assert.hpp>
@@ -1193,6 +1191,9 @@ private:
     // start the state machine (calls entry of the initial state)
     void start()
     {
+         // reinitialize our list of currently active states with the ones defined in Derived::initial_state
+         ::boost::mpl::for_each< seq_initial_states, ::boost::msm::wrap<mpl::placeholders::_1> >
+                        (init_states(m_states));
         // call on_entry on this SM
         (static_cast<Derived*>(this))->on_entry(fsm_initial_event(),*this);
         ::boost::mpl::for_each<initial_states, boost::msm::wrap<mpl::placeholders::_1> >
@@ -1206,6 +1207,9 @@ private:
     template <class Event>
     void start(Event const& incomingEvent)
     {
+        // reinitialize our list of currently active states with the ones defined in Derived::initial_state
+        ::boost::mpl::for_each< seq_initial_states, ::boost::msm::wrap<mpl::placeholders::_1> >
+                        (init_states(m_states));
         // call on_entry on this SM
         (static_cast<Derived*>(this))->on_entry(incomingEvent,*this);
         ::boost::mpl::for_each<initial_states, boost::msm::wrap<mpl::placeholders::_1> >
