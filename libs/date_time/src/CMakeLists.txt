@@ -1,5 +1,5 @@
 #----------------------------------------------------------------------------
-# CMake framework maintained by Denis Arnaud on git@github.com:pocb/boost
+# CMake framework maintained by Denis Arnaud on git://github.com/pocb/boost
 #----------------------------------------------------------------------------
 #
 add_definitions (-DBOOST_DATE_TIME_DYN_LINK=1 -DDATE_TIME_INLINE)

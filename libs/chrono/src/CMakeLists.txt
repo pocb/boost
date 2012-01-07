@@ -1,5 +1,5 @@
 #----------------------------------------------------------------------------
-# CMake framework maintained by Denis Arnaud on git@github.com:pocb/boost
+# CMake framework maintained by Denis Arnaud on git://github.com/pocb/boost
 #----------------------------------------------------------------------------
 #
 set (BOOST_CHRONO_EXTRA_SOURCES)
@@ -11,4 +11,5 @@ boost_add_library (chrono
   thread_clock.cpp
 
   SHARED_COMPILE_FLAGS "-DBOOST_CHRONO_DYN_LINK=1"
+  STATIC_COMPILE_FLAGS "-DBOOST_CHRONO_STATIC_LINK=1"
 )
