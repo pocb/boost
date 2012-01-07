@@ -1,8 +1,6 @@
-#
-# Copyright Troy D. Straszheim
-#
-# Distributed under the Boost Software License, Version 1.0.
-# See http://www.boost.org/LICENSE_1_0.txt
+#----------------------------------------------------------------------------
+# CMake framework maintained by Denis Arnaud on git://github.com/pocb/boost
+#----------------------------------------------------------------------------
 #
 add_definitions(-DBOOST_DATE_TIME_NO_LIB=1)
 boost_add_library(

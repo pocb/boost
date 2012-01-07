@@ -1,8 +1,6 @@
-#
-# Copyright Troy D. Straszheim
-#
-# Distributed under the Boost Software License, Version 1.0.
-# See http://www.boost.org/LICENSE_1_0.txt
+#----------------------------------------------------------------------------
+# CMake framework maintained by Denis Arnaud on git://github.com/pocb/boost
+#----------------------------------------------------------------------------
 #
 set(BOOST_CHRONO_EXTRA_SOURCES)
 set(BOOST_CHRONO_LIBRARIES)
@@ -16,4 +14,5 @@ boost_add_library(chrono
   thread_clock.cpp
 
   SHARED_COMPILE_FLAGS "-DBOOST_CHRONO_DYN_LINK=1"
-  )
+  STATIC_COMPILE_FLAGS "-DBOOST_CHRONO_STATIC_LINK=1"
+)
