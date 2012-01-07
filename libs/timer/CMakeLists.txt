@@ -1,27 +1,22 @@
-#
-# Copyright Troy D. Straszheim
-#
-# Distributed under the Boost Software License, Version 1.0.
-# See http://www.boost.org/LICENSE_1_0.txt
-#
 #----------------------------------------------------------------------------
-# This file was automatically generated from the original CMakeLists.txt file
+# CMake framework maintained by Denis Arnaud on http://github.com/pocb/boost
+#----------------------------------------------------------------------------
+#
 # Add a variable to hold the headers for the library
 set (lib_headers
     timer.hpp
-    
 )
 
 # Add a library target to the build system
-boost_library_project(
+boost_library_project (
   timer
-  #  SRCDIRS 
+  SRCDIRS  src
   TESTDIRS  test
   HEADERS ${lib_headers}
   #  DOCDIRS 
-  #  DESCRIPTION 
+  DESCRIPTION  "The timer library calculates how long C++ code takes to run."
   MODULARIZED 
-  #  AUTHORS 
+  AUTHORS  "Beman Dawes <bdawes - at - acm.org>"
   #  MAINTAINERS 
 )
 
