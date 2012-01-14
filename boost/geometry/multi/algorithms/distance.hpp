@@ -36,6 +36,12 @@ namespace detail { namespace distance
 
 template<typename Geometry, typename MultiGeometry, typename Strategy>
 struct distance_single_to_multi
+    : private dispatch::distance
+      <
+          Geometry,
+          typename range_value<MultiGeometry>::type,
+          Strategy
+      >
 {
     typedef typename strategy::distance::services::return_type<Strategy>::type return_type;
 
@@ -50,7 +56,13 @@ struct distance_single_to_multi
                 it != boost::end(multi);
                 ++it)
         {
-            return_type dist = geometry::distance(geometry, *it);
+            return_type dist = dispatch::distance
+                <
+                    Geometry,
+                    typename range_value<MultiGeometry>::type,
+                    Strategy
+                >::apply(geometry, *it, strategy);
+
             if (first || dist < mindist)
             {
                 mindist = dist;
@@ -64,6 +76,12 @@ struct distance_single_to_multi
 
 template<typename Multi1, typename Multi2, typename Strategy>
 struct distance_multi_to_multi
+    : private distance_single_to_multi
+      <
+          typename range_value<Multi1>::type,
+          Multi2,
+          Strategy
+      >
 {
     typedef typename strategy::distance::services::return_type<Strategy>::type return_type;
 
@@ -105,17 +123,27 @@ namespace dispatch
 
 template
 <
-    typename SingleGeometryTag,
     typename G1,
     typename G2,
-    typename Strategy
+    typename Strategy,
+    typename SingleGeometryTag
 >
-struct distance<SingleGeometryTag, multi_tag, G1, G2, strategy_tag_distance_point_point, Strategy>
+struct distance
+<
+    G1, G2, Strategy,
+    SingleGeometryTag, multi_tag, strategy_tag_distance_point_point,
+    false
+>
     : detail::distance::distance_single_to_multi<G1, G2, Strategy>
 {};
 
 template <typename G1, typename G2, typename Strategy>
-struct distance<multi_tag, multi_tag, G1, G2, strategy_tag_distance_point_point, Strategy>
+struct distance
+<
+    G1, G2, Strategy,
+    multi_tag, multi_tag, strategy_tag_distance_point_point,
+    false
+>
     : detail::distance::distance_multi_to_multi<G1, G2, Strategy>
 {};
 
