@@ -1,7 +1,7 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
 // Unit Test
 
-// Copyright (c) 2009-2011 Mateusz Loskot, London, UK.
+// Copyright (c) 2009-2012 Mateusz Loskot, London, UK.
 
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
@@ -24,9 +24,9 @@ template <typename P>
 void test_2d()
 {
     P p1;
-    bg::assign(p1, 20, 30);
+    bg::assign_values(p1, 20, 30);
     P p2;
-    bg::assign(p2, 45, 70);
+    bg::assign_values(p2, 45, 70);
     P c = bg::cross_product(p1, p2);
 
     typedef typename bg::coordinate_type<P>::type scalar_type;
@@ -37,9 +37,9 @@ template <typename P>
 void test_3d()
 {
     P p1;
-    bg::assign(p1, 20, 30, 10);
+    bg::assign_values(p1, 20, 30, 10);
     P p2;
-    bg::assign(p2, 45, 70, 20);
+    bg::assign_values(p2, 45, 70, 20);
     P c = bg::cross_product(p1, p2);
 
     typedef typename bg::coordinate_type<P>::type scalar_type;
@@ -53,9 +53,9 @@ template <typename P>
 void test_4d()
 {
     P p1;
-    bg::assign(p1, 20, 30, 10, 15);
+    bg::assign_values(p1, 20, 30, 10, 15);
     P p2;
-    bg::assign(p2, 45, 70, 20, 35);
+    bg::assign_values(p2, 45, 70, 20, 35);
     P c = bg::cross_product(p1, p2);
 }
 #endif

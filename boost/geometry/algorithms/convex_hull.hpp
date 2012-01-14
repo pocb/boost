@@ -1,8 +1,8 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
 
-// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
-// Copyright (c) 2008-2011 Bruno Lalande, Paris, France.
-// Copyright (c) 2009-2011 Mateusz Loskot, London, UK.
+// Copyright (c) 2007-2012 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2012 Bruno Lalande, Paris, France.
+// Copyright (c) 2009-2012 Mateusz Loskot, London, UK.
 
 // Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
 // (geolib/GGL), copyright (c) 1995-2010 Geodan, Amsterdam, the Netherlands.
@@ -27,11 +27,40 @@
 
 #include <boost/geometry/views/detail/range_type.hpp>
 
+#include <boost/geometry/algorithms/num_points.hpp>
 #include <boost/geometry/algorithms/detail/as_range.hpp>
 
 
 namespace boost { namespace geometry
 {
+
+#if ! defined(BOOST_GEOMETRY_CONVEX_HULL_NO_THROW)
+
+/*!
+\brief Convex Hull Exception
+\ingroup convex_hull
+\details The convex_hull_exception is thrown if the free convex hull function is called with
+    geometries for which the hull cannot be calculated. For example: a linestring
+    without points, a polygon without points, an empty multi-geometry.
+\qbk{
+[heading See also]
+\* [link geometry.reference.algorithms.convex_hull the convex_hull function]
+}
+
+ */
+class convex_hull_exception : public geometry::exception
+{
+public:
+
+    inline convex_hull_exception() {}
+
+    virtual char const* what() const throw()
+    {
+        return "Boost.Geometry Convex Hull calculation exception";
+    }
+};
+
+#endif
 
 #ifndef DOXYGEN_NO_DETAIL
 namespace detail { namespace convex_hull
@@ -63,11 +92,11 @@ struct hull_insert
 template
 <
     typename Geometry,
-    typename OutputGeometry,
     typename Strategy
 >
 struct hull_to_geometry
 {
+    template <typename OutputGeometry>
     static inline void apply(Geometry const& geometry, OutputGeometry& out,
             Strategy const& strategy)
     {
@@ -87,6 +116,17 @@ struct hull_to_geometry
 };
 
 
+// Helper metafunction for default strategy retrieval
+template <typename Geometry>
+struct default_strategy
+    : strategy_convex_hull
+          <
+              Geometry,
+              typename point_type<Geometry>::type
+          >
+{};
+
+
 }} // namespace detail::convex_hull
 #endif // DOXYGEN_NO_DETAIL
 
@@ -98,24 +138,21 @@ namespace dispatch
 
 template
 <
-    typename Tag1,
     typename Geometry,
-    typename Output,
-    typename Strategy
+    typename Strategy = typename detail::convex_hull::default_strategy<Geometry>::type
 >
 struct convex_hull
-    : detail::convex_hull::hull_to_geometry<Geometry, Output, Strategy>
+    : detail::convex_hull::hull_to_geometry<Geometry, Strategy>
 {};
 
 
 template
 <
-    typename GeometryTag,
     order_selector Order,
-    typename GeometryIn, typename Strategy
- >
+    typename Geometry, typename Strategy
+>
 struct convex_hull_insert
-    : detail::convex_hull::hull_insert<GeometryIn, Order, Strategy>
+    : detail::convex_hull::hull_insert<Geometry, Order, Strategy>
 {};
 
 
@@ -123,24 +160,29 @@ struct convex_hull_insert
 #endif // DOXYGEN_NO_DISPATCH
 
 
-template<typename Geometry1, typename Geometry2, typename Strategy>
-inline void convex_hull(Geometry1 const& geometry,
-            Geometry2& out, Strategy const& strategy)
+template<typename Geometry, typename OutputGeometry, typename Strategy>
+inline void convex_hull(Geometry const& geometry,
+            OutputGeometry& out, Strategy const& strategy)
 {
     concept::check_concepts_and_equal_dimensions
         <
-            const Geometry1,
-            Geometry2
+            const Geometry,
+            OutputGeometry
         >();
 
     BOOST_CONCEPT_ASSERT( (geometry::concept::ConvexHullStrategy<Strategy>) );
 
+    if (geometry::num_points(geometry) == 0)
+    {
+#if ! defined(BOOST_GEOMETRY_CONVEX_HULL_NO_THROW)
+        throw convex_hull_exception();
+#endif
+        return;
+    }
 
     dispatch::convex_hull
         <
-            typename tag<Geometry1>::type,
-            Geometry1,
-            Geometry2,
+            Geometry,
             Strategy
         >::apply(geometry, out, strategy);
 }
@@ -157,24 +199,17 @@ inline void convex_hull(Geometry1 const& geometry,
 
 \qbk{[include reference/algorithms/convex_hull.qbk]}
  */
-template<typename Geometry1, typename Geometry2>
-inline void convex_hull(Geometry1 const& geometry,
-            Geometry2& hull)
+template<typename Geometry, typename OutputGeometry>
+inline void convex_hull(Geometry const& geometry,
+            OutputGeometry& hull)
 {
     concept::check_concepts_and_equal_dimensions
         <
-            const Geometry1,
-            Geometry2
+            const Geometry,
+            OutputGeometry
         >();
 
-    typedef typename point_type<Geometry2>::type point_type;
-
-    typedef typename strategy_convex_hull
-        <
-            typename cs_tag<point_type>::type,
-            Geometry1,
-            point_type
-        >::type strategy_type;
+    typedef typename detail::convex_hull::default_strategy<Geometry>::type strategy_type;
 
     convex_hull(geometry, hull, strategy_type());
 }
@@ -196,7 +231,6 @@ inline OutputIterator convex_hull_insert(Geometry const& geometry,
 
     return dispatch::convex_hull_insert
         <
-            typename tag<Geometry>::type,
             geometry::point_order<Geometry>::value,
             Geometry, Strategy
         >::apply(geometry, out, strategy);
@@ -224,14 +258,7 @@ inline OutputIterator convex_hull_insert(Geometry const& geometry,
     concept::check<Geometry const>();
     concept::check<typename point_type<Geometry>::type>();
 
-    typedef typename point_type<Geometry>::type point_type;
-
-    typedef typename strategy_convex_hull
-        <
-            typename cs_tag<point_type>::type,
-            Geometry,
-            point_type
-        >::type strategy_type;
+    typedef typename detail::convex_hull::default_strategy<Geometry>::type strategy_type;
 
     return convex_hull_insert(geometry, out, strategy_type());
 }
