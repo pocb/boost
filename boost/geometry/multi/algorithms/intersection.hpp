@@ -1,6 +1,6 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
 
-// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2007-2012 Barend Gehrels, Amsterdam, the Netherlands.
 
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
@@ -181,7 +181,7 @@ template
 struct clip_multi_linestring
 {
     static inline OutputIterator apply(MultiLinestring const& multi_linestring,
-            Box const& box, OutputIterator out, Strategy const& strategy)
+            Box const& box, OutputIterator out, Strategy const& )
     {
         typedef typename point_type<LinestringOut>::type point_type;
         strategy::intersection::liang_barsky<Box, point_type> lb_strategy;

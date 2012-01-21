@@ -659,20 +659,13 @@
                 <toolset name="msvc-8.0*"/>
                 <toolset name="msvc-9.0*"/>
                 <toolset name="msvc-10.0*"/>
+                <toolset name="msvc-11.0*"/>
                 <toolset name="msvc-7.1*"/>
                 <toolset name="vacpp-10.1"/>
                 <toolset name="qcc-4*"/>
                 <toolset name="acc"/>
                 <note author="Alexander Nasonov">
                     Conversion double-string-double may give a different value (or even throw) on many compilers
-                </note>
-            </mark-failure>
-        </test>
-        <test name="lexical_cast_typedefed_wchar_test_runtime">
-            <mark-failure>
-                <toolset name="msvc-10.0*"/>
-                <note author="Antony Polukhin">
-                    Some VC compilers take too long to compile and link this test.
                 </note>
             </mark-failure>
         </test>
@@ -1402,6 +1395,32 @@
         </mark-expected-failures>
 
         <mark-expected-failures>
+            <test name="correctly_disable"/>
+            <toolset name="gcc-4.2*"/>
+            <toolset name="gcc-4.3*"/>
+            <toolset name="gcc-4.4*"/>
+            <toolset name="gcc-4.5*"/>
+            <toolset name="gcc-4.6*"/>
+            <toolset name="gcc-4.7*"/>
+            <toolset name="gcc-mingw-*"/>
+            <toolset name="darwin-4.2*"/>
+            <toolset name="darwin-4.3*"/>
+            <toolset name="darwin-4.4*"/>
+            <toolset name="clang-darwin-trunk"/>
+            <toolset name="clang-darwin-normal"/>
+            <toolset name="clang-darwin-linux-2.9"/>
+            <toolset name="intel-linux-*"/>
+            <toolset name="intel-darwin-*"/>
+            <note author="Daniel James">
+                GCC's libstdc++ has a versioned namespace feature which breaks
+                container forwarding. I don't know how to detect it so I'm just
+                always disabling it, which means that a lot of setups which
+                means that it's disabled for a lot of setups where it could
+                work - which is what these failures represent.
+            </note>
+        </mark-expected-failures>
+
+        <mark-expected-failures>
             <test name="container_fwd"/>
             <test name="container_fwd_debug"/>
             <test name="container_no_fwd_test"/>
@@ -1424,6 +1443,7 @@
             <test name="container_fwd_debug"/>
             <toolset name="clang-darwin-0x"/>
             <toolset name="clang-darwin-normal"/>
+            <toolset name="clang-darwin-trunk"/>
             <note author="Daniel James">
             Some old versions of GCC's libstdc++ don't work on clang with
             _GLIBCXX_DEBUG defined.

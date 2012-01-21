@@ -1,6 +1,6 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
 
-// Copyright (c) 1995, 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 1995, 2007-2012 Barend Gehrels, Amsterdam, the Netherlands.
 // Copyright (c) 1995 Maarten Hilferink, Amsterdam, the Netherlands
 
 // Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
@@ -60,8 +60,7 @@ namespace detail
         {}
 
         // Necessary for proper compilation
-        inline douglas_peucker_point<Point> operator=(
-                    douglas_peucker_point<Point> const& other)
+        inline douglas_peucker_point<Point> operator=(douglas_peucker_point<Point> const& )
         {
             return douglas_peucker_point<Point>(*this);
         }

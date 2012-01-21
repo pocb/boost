@@ -1,9 +1,9 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
 // Unit Test
 
-// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
-// Copyright (c) 2008-2011 Bruno Lalande, Paris, France.
-// Copyright (c) 2009-2011 Mateusz Loskot, London, UK.
+// Copyright (c) 2007-2012 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2012 Bruno Lalande, Paris, France.
+// Copyright (c) 2009-2012 Mateusz Loskot, London, UK.
 
 // Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
 // (geolib/GGL), copyright (c) 1995-2010 Geodan, Amsterdam, the Netherlands.
@@ -58,9 +58,9 @@ void test_distance(
     //typedef bg::strategy::distance::andoyer<Point, Point> andoyer_type;
 
     Point p1, p2, p3;
-    bg::assign(p1, lon1, lat1);
-    bg::assign(p2, lon2, lat2);
-    bg::assign(p3, lon3, lat3);
+    bg::assign_values(p1, lon1, lat1);
+    bg::assign_values(p2, lon2, lat2);
+    bg::assign_values(p3, lon3, lat3);
 
     strategy_type strategy;
     return_type d = strategy.apply(p1, p2, p3);

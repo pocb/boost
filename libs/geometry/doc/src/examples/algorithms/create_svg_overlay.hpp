@@ -1,6 +1,6 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
 
-// Copyright (c) 2011 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2011-2012 Barend Gehrels, Amsterdam, the Netherlands.
 
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
@@ -44,6 +44,11 @@ void create_svg(std::string const& filename, Geometry const& a, Geometry const& 
         mapper.text(boost::geometry::return_centroid<point_type>(g), out.str(),
                     "fill:rgb(0,0,0);font-family:Arial;font-size:10px");
     }
+#else
+    boost::ignore_unused_variable_warning(filename);
+    boost::ignore_unused_variable_warning(a);
+    boost::ignore_unused_variable_warning(b);
+    boost::ignore_unused_variable_warning(range);
 #endif    
 }
 

@@ -1,8 +1,8 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
 
-// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
-// Copyright (c) 2008-2011 Bruno Lalande, Paris, France.
-// Copyright (c) 2009-2011 Mateusz Loskot, London, UK.
+// Copyright (c) 2007-2012 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2012 Bruno Lalande, Paris, France.
+// Copyright (c) 2009-2012 Mateusz Loskot, London, UK.
 
 // Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
 // (geolib/GGL), copyright (c) 1995-2010 Geodan, Amsterdam, the Netherlands.
@@ -73,7 +73,7 @@ struct covered_by<box_tag, box_tag, Box1, Box2, Strategy>
 template <typename Point, typename Ring, typename Strategy>
 struct covered_by<point_tag, ring_tag, Point, Ring, Strategy>
 {
-    static inline bool apply(Point const& point, Ring const& ring, Strategy const& strategy)
+    static inline bool apply(Point const& point, Ring const& ring, Strategy const& )
     {
         return detail::within::point_in_ring
             <

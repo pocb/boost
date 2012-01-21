@@ -1,6 +1,6 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
 
-// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2007-2012 Barend Gehrels, Amsterdam, the Netherlands.
 
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
@@ -241,7 +241,7 @@ struct segments_direction
         return return_type('p', false);
     }
 
-    static inline return_type error(std::string const& msg)
+    static inline return_type error(std::string const&)
     {
         // msg
         return return_type('d', false);
