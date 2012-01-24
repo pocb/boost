@@ -1,8 +1,8 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
 
-// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
-// Copyright (c) 2008-2011 Bruno Lalande, Paris, France.
-// Copyright (c) 2009-2011 Mateusz Loskot, London, UK.
+// Copyright (c) 2007-2012 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2012 Bruno Lalande, Paris, France.
+// Copyright (c) 2009-2012 Mateusz Loskot, London, UK.
 
 // Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
 // (geolib/GGL), copyright (c) 1995-2010 Geodan, Amsterdam, the Netherlands.
@@ -11,8 +11,8 @@
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef BOOST_GEOMETRY_MULTI_UTIL_WRITE_DSV_HPP
-#define BOOST_GEOMETRY_MULTI_UTIL_WRITE_DSV_HPP
+#ifndef BOOST_GEOMETRY_MULTI_IO_DSV_WRITE_HPP
+#define BOOST_GEOMETRY_MULTI_IO_DSV_WRITE_HPP
 
 #include <boost/range.hpp>
 
@@ -25,10 +25,24 @@ namespace boost { namespace geometry
 namespace detail { namespace dsv
 {
 
-
 template <typename MultiGeometry>
 struct dsv_multi
 {
+    typedef dispatch::dsv
+                <
+                    typename single_tag_of
+                        <
+                            typename tag<MultiGeometry>::type
+                        >::type,
+                    typename boost::range_value<MultiGeometry>::type
+                > dispatch_one;
+
+    typedef typename boost::range_iterator
+        <
+            MultiGeometry const
+        >::type iterator;
+
+
     template <typename Char, typename Traits>
     static inline void apply(std::basic_ostream<Char, Traits>& os,
                 MultiGeometry const& multi,
@@ -36,22 +50,17 @@ struct dsv_multi
     {
         os << settings.list_open;
 
-        typedef typename boost::range_iterator
-            <
-                MultiGeometry const
-            >::type iterator;
+        bool first = true;
         for(iterator it = boost::begin(multi);
             it != boost::end(multi);
-            ++it)
+            ++it, first = false)
         {
-            os << geometry::dsv(*it);
+            os << (first ? "" : settings.list_separator);
+            dispatch_one::apply(os, *it, settings);
         }
         os << settings.list_close;
     }
 };
-
-
-
 
 }} // namespace detail::dsv
 #endif // DOXYGEN_NO_DETAIL
@@ -61,18 +70,14 @@ struct dsv_multi
 namespace dispatch
 {
 
-
 template <typename Geometry>
 struct dsv<multi_tag, Geometry>
     : detail::dsv::dsv_multi<Geometry>
 {};
 
-
 } // namespace dispatch
 #endif // DOXYGEN_NO_DISPATCH
 
-
-
 }} // namespace boost::geometry
 
-#endif // BOOST_GEOMETRY_MULTI_UTIL_WRITE_DSV_HPP
+#endif // BOOST_GEOMETRY_MULTI_IO_DSV_WRITE_HPP
