@@ -25,6 +25,7 @@
 #include <boost/geometry/core/tag_cast.hpp>
 
 #include <boost/geometry/algorithms/not_implemented.hpp>
+#include <boost/geometry/algorithms/detail/throw_on_empty_input.hpp>
 
 #include <boost/geometry/geometries/segment.hpp>
 #include <boost/geometry/geometries/concepts/check.hpp>
@@ -63,7 +64,7 @@ template<typename Point, typename Segment, typename Strategy>
 struct point_to_segment
 {
     static inline typename return_type<Strategy>::type apply(Point const& point,
-                Segment const& segment, Strategy const& strategy)
+                Segment const& segment, Strategy const& )
     {
         typename strategy::distance::services::default_strategy
             <
@@ -549,6 +550,9 @@ inline typename strategy::distance::services::return_type<Strategy>::type distan
 {
     concept::check<Geometry1 const>();
     concept::check<Geometry2 const>();
+    
+    detail::throw_on_empty_input(geometry1);
+    detail::throw_on_empty_input(geometry2);
 
     return dispatch::distance
                <

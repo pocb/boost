@@ -80,7 +80,7 @@ struct correct_box_loop
 template <typename Box, std::size_t DimensionCount>
 struct correct_box_loop<Box, DimensionCount, DimensionCount>
 {
-    static inline void apply(Box& box)
+    static inline void apply(Box& )
     {}
 
 };
@@ -193,39 +193,33 @@ struct correct_polygon
 namespace dispatch
 {
 
-template <typename Tag, typename Geometry>
-struct correct
-{
-    BOOST_MPL_ASSERT_MSG
-        (
-            false, NOT_OR_NOT_YET_IMPLEMENTED_FOR_THIS_GEOMETRY_TYPE
-            , (types<Geometry>)
-        );
-};
+template <typename Geometry, typename Tag = typename tag<Geometry>::type>
+struct correct: not_implemented<Tag>
+{};
 
 template <typename Point>
-struct correct<point_tag, Point>
+struct correct<Point, point_tag>
     : detail::correct::correct_nop<Point>
 {};
 
 template <typename LineString>
-struct correct<linestring_tag, LineString>
+struct correct<LineString, linestring_tag>
     : detail::correct::correct_nop<LineString>
 {};
 
 template <typename Segment>
-struct correct<segment_tag, Segment>
+struct correct<Segment, segment_tag>
     : detail::correct::correct_nop<Segment>
 {};
 
 
 template <typename Box>
-struct correct<box_tag, Box>
+struct correct<Box, box_tag>
     : detail::correct::correct_box<Box>
 {};
 
 template <typename Ring>
-struct correct<ring_tag, Ring>
+struct correct<Ring, ring_tag>
     : detail::correct::correct_ring
         <
             Ring,
@@ -234,7 +228,7 @@ struct correct<ring_tag, Ring>
 {};
 
 template <typename Polygon>
-struct correct<polygon_tag, Polygon>
+struct correct<Polygon, polygon_tag>
     : detail::correct::correct_polygon<Polygon>
 {};
 
@@ -260,7 +254,7 @@ inline void correct(Geometry& geometry)
 {
     concept::check<Geometry const>();
 
-    dispatch::correct<typename tag<Geometry>::type, Geometry>::apply(geometry);
+    dispatch::correct<Geometry>::apply(geometry);
 }
 
 

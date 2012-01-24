@@ -47,5 +47,18 @@ void test_geometry(std::string const& wkt, double expected_perimeter)
     test_perimeter(geometry, expected_perimeter);
 }
 
+template <typename Geometry>
+void test_empty_input(Geometry const& geometry)
+{
+    try
+    {
+        bg::perimeter(geometry);
+    }
+    catch(bg::empty_input_exception const& )
+    {
+        return;
+    }
+    BOOST_CHECK_MESSAGE(false, "A empty_input_exception should have been thrown" );
+}
 
 #endif

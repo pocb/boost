@@ -44,5 +44,18 @@ void test_geometry(std::string const& wkt, double expected_length)
     test_length(geometry, expected_length);
 }
 
+template <typename Geometry>
+void test_empty_input(Geometry const& geometry)
+{
+    try
+    {
+        bg::length(geometry);
+    }
+    catch(bg::empty_input_exception const& )
+    {
+        return;
+    }
+    BOOST_CHECK_MESSAGE(false, "A empty_input_exception should have been thrown" );
+}
 
 #endif

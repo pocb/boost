@@ -14,7 +14,7 @@
 #ifndef BOOST_GEOMETRY_ALGORITHMS_CONVEX_HULL_HPP
 #define BOOST_GEOMETRY_ALGORITHMS_CONVEX_HULL_HPP
 
-
+#include <boost/array.hpp>
 
 #include <boost/geometry/core/cs.hpp>
 #include <boost/geometry/core/point_order.hpp>
@@ -29,38 +29,12 @@
 
 #include <boost/geometry/algorithms/num_points.hpp>
 #include <boost/geometry/algorithms/detail/as_range.hpp>
+#include <boost/geometry/algorithms/detail/assign_box_corners.hpp>
 
 
 namespace boost { namespace geometry
 {
 
-#if ! defined(BOOST_GEOMETRY_CONVEX_HULL_NO_THROW)
-
-/*!
-\brief Convex Hull Exception
-\ingroup convex_hull
-\details The convex_hull_exception is thrown if the free convex hull function is called with
-    geometries for which the hull cannot be calculated. For example: a linestring
-    without points, a polygon without points, an empty multi-geometry.
-\qbk{
-[heading See also]
-\* [link geometry.reference.algorithms.convex_hull the convex_hull function]
-}
-
- */
-class convex_hull_exception : public geometry::exception
-{
-public:
-
-    inline convex_hull_exception() {}
-
-    virtual char const* what() const throw()
-    {
-        return "Boost.Geometry Convex Hull calculation exception";
-    }
-};
-
-#endif
 
 #ifndef DOXYGEN_NO_DETAIL
 namespace detail { namespace convex_hull
@@ -139,11 +113,40 @@ namespace dispatch
 template
 <
     typename Geometry,
-    typename Strategy = typename detail::convex_hull::default_strategy<Geometry>::type
+    typename Strategy = typename detail::convex_hull::default_strategy<Geometry>::type,
+    typename Tag = typename tag<Geometry>::type
 >
 struct convex_hull
     : detail::convex_hull::hull_to_geometry<Geometry, Strategy>
 {};
+
+template
+<
+    typename Box,
+    typename Strategy
+>
+struct convex_hull<Box, Strategy, box_tag>
+{
+    template <typename OutputGeometry>
+    static inline void apply(Box const& box, OutputGeometry& out,
+            Strategy const& )
+    {
+        static bool const Close
+            = geometry::closure<OutputGeometry>::value == closed;
+        static bool const Reverse
+            = geometry::point_order<OutputGeometry>::value == counterclockwise;
+
+        // A hull for boxes is trivial. Any strategy is (currently) skipped.
+        boost::array<typename point_type<Box>::type, 4> range;
+        geometry::detail::assign_box_corners_oriented<Reverse>(box, range);
+        geometry::append(out, range);
+        if (Close)
+        {
+            geometry::append(out, *boost::begin(range));
+        }
+    }
+};
+
 
 
 template
@@ -174,9 +177,7 @@ inline void convex_hull(Geometry const& geometry,
 
     if (geometry::num_points(geometry) == 0)
     {
-#if ! defined(BOOST_GEOMETRY_CONVEX_HULL_NO_THROW)
-        throw convex_hull_exception();
-#endif
+        // Leave output empty
         return;
     }
 
