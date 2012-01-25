@@ -26,20 +26,6 @@ boost_add_library(math_tr1f
 	COMPILE_FLAGS "-I${CMAKE_CURRENT_SOURCE_DIR}"
 )
 
-boost_add_library(math_tr1l
-
-	assoc_laguerrel.cpp assoc_legendrel.cpp betal.cpp
-	comp_ellint_1l.cpp comp_ellint_2l.cpp comp_ellint_3l.cpp
-	cyl_bessel_il.cpp cyl_bessel_jl.cpp cyl_bessel_kl.cpp
-	cyl_neumannl.cpp ellint_1l.cpp ellint_2l.cpp ellint_3l.cpp
-	expintl.cpp hermitel.cpp laguerrel.cpp legendrel.cpp
-	riemann_zetal.cpp sph_bessell.cpp sph_legendrel.cpp
-	sph_neumannl.cpp
-
-	SHARED_COMPILE_FLAGS "-DBOOST_MATH_TR1_DYN_LINK=1"
-	COMPILE_FLAGS "-I${CMAKE_CURRENT_SOURCE_DIR}"
-)
-
 boost_add_library(math_c99
 
 	acosh.cpp asinh.cpp atanh.cpp cbrt.cpp copysign.cpp erfc.cpp
@@ -63,14 +49,36 @@ boost_add_library(math_c99f
 	COMPILE_FLAGS "-I${CMAKE_CURRENT_SOURCE_DIR}"
 )
 
-boost_add_library(math_c99l
+try_compile(HAS_LONG_DOUBLE_SUPPORT
+	${CMAKE_CURRENT_SOURCE_DIR}/../../config/
+	${CMAKE_CURRENT_SOURCE_DIR}/../../config/has_long_double_support.cpp)
 
-	acoshl.cpp asinhl.cpp atanhl.cpp cbrtl.cpp copysignl.cpp
-	erfcl.cpp erfl.cpp expm1l.cpp fmaxl.cpp fminl.cpp
-	fpclassifyl.cpp hypotl.cpp lgammal.cpp llroundl.cpp log1pl.cpp
-	lroundl.cpp nextafterl.cpp nexttowardl.cpp roundl.cpp
-	tgammal.cpp truncl.cpp
+IF (HAS_LONG_DOUBLE_SUPPORT)
+	boost_add_library(math_tr1l
 
-	SHARED_COMPILE_FLAGS "-DBOOST_MATH_TR1_DYN_LINK=1"
-	COMPILE_FLAGS "-I${CMAKE_CURRENT_SOURCE_DIR}"
-)
+		assoc_laguerrel.cpp assoc_legendrel.cpp betal.cpp
+		comp_ellint_1l.cpp comp_ellint_2l.cpp comp_ellint_3l.cpp
+		cyl_bessel_il.cpp cyl_bessel_jl.cpp cyl_bessel_kl.cpp
+		cyl_neumannl.cpp ellint_1l.cpp ellint_2l.cpp ellint_3l.cpp
+		expintl.cpp hermitel.cpp laguerrel.cpp legendrel.cpp
+		riemann_zetal.cpp sph_bessell.cpp sph_legendrel.cpp
+		sph_neumannl.cpp
+
+		SHARED_COMPILE_FLAGS "-DBOOST_MATH_TR1_DYN_LINK=1"
+		COMPILE_FLAGS "-I${CMAKE_CURRENT_SOURCE_DIR}"
+	)
+
+	boost_add_library(math_c99l
+
+		acoshl.cpp asinhl.cpp atanhl.cpp cbrtl.cpp copysignl.cpp
+		erfcl.cpp erfl.cpp expm1l.cpp fmaxl.cpp fminl.cpp
+		fpclassifyl.cpp hypotl.cpp lgammal.cpp llroundl.cpp log1pl.cpp
+		lroundl.cpp nextafterl.cpp nexttowardl.cpp roundl.cpp
+		tgammal.cpp truncl.cpp
+
+		SHARED_COMPILE_FLAGS "-DBOOST_MATH_TR1_DYN_LINK=1"
+		COMPILE_FLAGS "-I${CMAKE_CURRENT_SOURCE_DIR}"
+	)
+ELSE ()
+	colormsg(RED "+-- long double not supported, skipping math_*l libraries.")
+ENDIF ()
