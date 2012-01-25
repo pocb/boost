@@ -51,7 +51,8 @@ boost_add_library(math_c99f
 
 try_compile(HAS_LONG_DOUBLE_SUPPORT
 	${CMAKE_CURRENT_SOURCE_DIR}/../../config/
-	${CMAKE_CURRENT_SOURCE_DIR}/../../config/has_long_double_support.cpp)
+	${CMAKE_CURRENT_SOURCE_DIR}/../../config/
+	has_long_double_support)
 
 IF (HAS_LONG_DOUBLE_SUPPORT)
 	boost_add_library(math_tr1l
