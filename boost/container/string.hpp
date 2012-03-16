@@ -1021,7 +1021,7 @@ class basic_string
    bool empty() const
    { return !this->priv_size(); }
 
-   //! <b>Requires</b>: size() < n.
+   //! <b>Requires</b>: size() > n.
    //!
    //! <b>Effects</b>: Returns a reference to the nth element 
    //!   from the beginning of the container.
@@ -1032,7 +1032,7 @@ class basic_string
    reference operator[](size_type n)
       { return *(this->priv_addr() + n); }
 
-   //! <b>Requires</b>: size() < n.
+   //! <b>Requires</b>: size() > n.
    //!
    //! <b>Effects</b>: Returns a const reference to the nth element 
    //!   from the beginning of the container.
@@ -1043,7 +1043,7 @@ class basic_string
    const_reference operator[](size_type n) const
       { return *(this->priv_addr() + n); }
 
-   //! <b>Requires</b>: size() < n.
+   //! <b>Requires</b>: size() > n.
    //!
    //! <b>Effects</b>: Returns a reference to the nth element 
    //!   from the beginning of the container.
@@ -1057,7 +1057,7 @@ class basic_string
       return *(this->priv_addr() + n);
    }
 
-   //! <b>Requires</b>: size() < n.
+   //! <b>Requires</b>: size() > n.
    //!
    //! <b>Effects</b>: Returns a const reference to the nth element 
    //!   from the beginning of the container.
@@ -2045,7 +2045,7 @@ class basic_string
    //!
    //! <b>Returns</b>: basic_string(*this, pos, n1).compare(basic_string(s, n2)).
    int compare(size_type pos1, size_type n1,
-               const CharT* s, size_type n2 = npos) const 
+               const CharT* s, size_type n2) const 
    {
       if (pos1 > size())
          this->throw_out_of_range();

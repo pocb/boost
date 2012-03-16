@@ -13,13 +13,13 @@
 #include <boost/shared_ptr.hpp>
 
 #include <boost/geometry/core/coordinate_dimension.hpp>
-#include <boost/geometry/algorithms/convert.hpp>
+#include <boost/geometry/algorithms/detail/convert_point_to_point.hpp>
 #include <boost/geometry/extensions/gis/projections/factory.hpp>
 #include <boost/geometry/extensions/gis/projections/parameters.hpp>
 
 
 
-namespace boost { namespace geometry { namespace projection
+namespace boost { namespace geometry { namespace projections
 {
 /*!
     \brief Transformation strategy to do transform using a Map Projection
@@ -52,14 +52,14 @@ struct project_transformer
     {
         // Latlong (LatLong -> Cartesian) will be projected, rest will be copied.
         // So first copy third or higher dimensions
-        geometry::detail::convert::point_to_point<LatLong, Cartesian, 2,
-                geometry::dimension<Cartesian>::value> ::copy(p1, p2);
+        geometry::detail::conversion::point_to_point<LatLong, Cartesian, 2,
+                geometry::dimension<Cartesian>::value> ::apply(p1, p2);
         return m_prj->forward(p1, p2);
     }
 
 };
 
-}}} // namespace boost::geometry::projection
+}}} // namespace boost::geometry::projections
 
 
 #endif // BOOST_GEOMETRY_STRATEGY_PROJECT_TRANSFORMER_HPP

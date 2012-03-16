@@ -8,9 +8,9 @@
 //
 // Projection example 2, using factory
 
-#include <boost/geometry/geometry.hpp>
+#include <boost/geometry.hpp>
 #include <boost/geometry/geometries/point_xy.hpp>
-#include <boost/geometry/io/wkt/iomanip.hpp>
+
 #include <boost/geometry/extensions/gis/latlong/latlong.hpp>
 #include <boost/geometry/extensions/gis/projections/parameters.hpp>
 #include <boost/geometry/extensions/gis/projections/factory.hpp>
@@ -22,7 +22,7 @@ int main()
     using namespace boost::geometry;
 
     // Initialize projection parameters. For construction using a factory the projection name is required.
-    projection::parameters par = projection::init("+proj=robin +ellps=WGS84 +units=m");
+    projections::parameters par = projections::init("+proj=robin +ellps=WGS84 +units=m");
 
     // Construct the specified projection, using specified point types
     // Note that this is the only difference from p01_projection_example. It constructs a projection
@@ -30,8 +30,8 @@ int main()
     // convenience we use a boost shared pointer here.
     typedef model::ll::point<degree> point_ll_deg;
     typedef model::d2::point_xy<double> point_xy;
-    projection::factory<point_ll_deg, point_xy> fac;
-    boost::shared_ptr<projection::projection<point_ll_deg, point_xy> > prj(fac.create_new(par));
+    projections::factory<point_ll_deg, point_xy> fac;
+    boost::shared_ptr<projections::projection<point_ll_deg, point_xy> > prj(fac.create_new(par));
 
     // Define Amsterdam / Barcelona in decimal degrees / degrees/minutes
     point_ll_deg amsterdam(longitude<>(5.9), latitude<>(52.4));
@@ -45,7 +45,7 @@ int main()
     // Do the forward projection
     if (prj->forward(amsterdam, pa) && prj->forward(barcelona, pb))
     {
-        std::cout << "Amsterdam: " << pa << std::endl << "Barcelona: " << pb << std::endl;
+        std::cout << "Amsterdam: " << wkt(pa) << std::endl << "Barcelona: " << wkt(pb) << std::endl;
 
         std::cout << "Distance (unprojected):" << distance(amsterdam, barcelona) / 1000.0 << " km" << std::endl;
         std::cout << "Distance (  projected):" << distance(pa, pb) / 1000.0 << " km" << std::endl;
@@ -54,8 +54,8 @@ int main()
         point_ll_deg a1;
         if (prj->inverse(pa, a1))
         {
-            std::cout << "Amsterdam (original): " << amsterdam  << std::endl
-                << "Amsterdam (projected, and back):" << a1 << std::endl;
+            std::cout << "Amsterdam (original): " << wkt(amsterdam)  << std::endl
+                << "Amsterdam (projected, and back):" << wkt(a1) << std::endl;
             std::cout << "Distance a-a': " << distance(amsterdam, a1) << " meter" << std::endl;
         }
     }

@@ -9,12 +9,12 @@
 #ifndef BOOST_GEOMETRY_EXTENSIONS_ALGORITHMS_OFFSET_HPP
 #define BOOST_GEOMETRY_EXTENSIONS_ALGORITHMS_OFFSET_HPP
 
+#include <boost/config.hpp>
 
 #include <boost/range/functions.hpp>
-#include <boost/range/metafunctions.hpp>
 
 #include <boost/geometry/core/point_type.hpp>
-#include <boost/geometry/extensions/algorithms/buffer/line_line_intersection.hpp>
+#include <boost/geometry/extensions/algorithms/buffer/buffer_inserter.hpp>
 #include <boost/geometry/algorithms/detail/disjoint.hpp>
 #include <boost/geometry/geometries/concepts/check.hpp>
 
@@ -32,91 +32,27 @@ namespace detail { namespace offset
 template
 <
     typename Range,
-    typename RangeOut,
-    typename JoinStrategy,
-    typename Distance
+    typename RangeOut
 >
 struct offset_range
+    : public geometry::detail::buffer::buffer_range
+        <
+            RangeOut, 
+            linestring_tag
+        >
 {
-    typedef typename coordinate_type<RangeOut>::type coordinate_type;
-    typedef typename point_type<RangeOut>::type output_point_type;
-    typedef model::referring_segment<output_point_type const> segment_type;
-    typedef typename boost::range_iterator<Range const>::type iterator_type;
-
-    static inline void apply(Range const& range,
-                RangeOut& out,
-                JoinStrategy const& join,
-                Distance const& distance)
+    template
+    <
+        typename Collection, typename DistanceStrategy, typename JoinStrategy
+    >
+    static inline void apply(Collection& collection, Range const& range,
+                DistanceStrategy const& distance,
+                JoinStrategy const& join)
     {
-        output_point_type previous_p1, previous_p2;
-        output_point_type first_p1, first_p2;
-
-        bool first = true;
-
-        iterator_type it = boost::begin(range);
-        for (iterator_type prev = it++; it != boost::end(range); ++it)
-        {
-            if (! detail::equals::equals_point_point(*prev, *it))
-            {
-                bool skip = false;
-
-                // Simulate a vector d (dx,dy)
-                coordinate_type dx = get<0>(*it) - get<0>(*prev);
-                coordinate_type dy = get<1>(*it) - get<1>(*prev);
-
-                // For normalization [0,1] (=dot product d.d, sqrt)
-                coordinate_type length = sqrt(dx * dx + dy * dy);
-
-                // Because coordinates are not equal, length should not be zero
-                BOOST_ASSERT((! geometry::math::equals(length, 0)));
-
-                // Generate the normalized perpendicular p, to the left (ccw)
-                coordinate_type px = -dy / length;
-                coordinate_type py = dx / length;
-
-                output_point_type p1, p2;
-
-                set<0>(p2, get<0>(*it) + px * distance);
-                set<1>(p2, get<1>(*it) + py * distance);
-
-                set<0>(p1, get<0>(*prev) + px * distance);
-                set<1>(p1, get<1>(*prev) + py * distance);
-
-                if (! first)
-                {
-                    output_point_type p;
-                    segment_type s1(p1, p2);
-                    segment_type s2(previous_p1, previous_p2);
-                    if (detail::buffer::line_line_intersection<output_point_type, segment_type>::apply(s1, s2, p))
-                    {
-                        join.apply(p, *prev, previous_p2, p1, distance, out);
-                    }
-                    else
-                    {
-                        skip = false;
-                    }
-                }
-                else
-                {
-                    first = false;
-                    first_p1 = p1;
-                    first_p2 = p2;
-
-                    out.push_back(p1);
-                }
-
-                if (! skip)
-                {
-                    previous_p1 = p1;
-                    previous_p2 = p2;
-                    prev = it;
-                }
-            }
-        }
-
-        // Last one
-        out.push_back(previous_p2);
-
+        collection.add_input();
+        iterate(collection, boost::begin(range), boost::end(range), 
+            buffer_side_left,
+            distance, join);
     }
 };
 
@@ -134,9 +70,7 @@ template
     typename GeometryTag,
     typename GeometryOutTag,
     typename Geometry,
-    typename GeometryOut,
-    typename JoinStrategy,
-    typename Distance
+    typename GeometryOut
 >
 struct offset
 {};
@@ -145,25 +79,19 @@ struct offset
 template
 <
     typename Geometry,
-    typename GeometryOut,
-    typename JoinStrategy,
-    typename Distance
+    typename GeometryOut
 >
 struct offset
     <
         linestring_tag,
         linestring_tag,
         Geometry,
-        GeometryOut,
-        JoinStrategy,
-        Distance
+        GeometryOut
     >
     : detail::offset::offset_range
         <
             Geometry,
-            GeometryOut,
-            JoinStrategy,
-            Distance
+            GeometryOut
         >
 {};
 
@@ -186,15 +114,26 @@ inline void offset(Geometry const& geometry, GeometryOut& out,
     concept::check<Geometry const>();
     concept::check<GeometryOut>();
 
+    typedef strategy::buffer::distance_assymetric
+        <
+            typename geometry::coordinate_type<Geometry>::type
+        > distance_strategy_type;
+    distance_strategy_type distance_strategy(distance, distance);
+
+    detail::buffer::buffered_piece_collection
+        <
+            //typename geometry::ring_type<GeometryOut>::type
+            // TODO the piece collection will not require a polygonal argument
+            model::ring<typename point_type<Geometry>::type> 
+        > collection;
+
     dispatch::offset
     <
         typename tag<Geometry>::type,
         typename tag<GeometryOut>::type,
         Geometry,
-        GeometryOut,
-        JoinStrategy,
-        Distance
-    >::apply(geometry, out, join, distance);
+        GeometryOut
+    >::apply(collection, geometry, distance_strategy, join);
 }
 
 

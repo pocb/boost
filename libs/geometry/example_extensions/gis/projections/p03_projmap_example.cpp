@@ -6,16 +6,16 @@
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 //
-// Projection example 3, combined with shapelib and GD
+// Projection example 3, combined with shapelib and SVG
 
 #include <fstream>
 
-#include <boost/geometry/geometry.hpp>
+#include <boost/geometry.hpp>
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/geometry/geometries/register/point.hpp>
 #include <boost/geometry/multi/geometries/multi_polygon.hpp>
+
 #include <boost/geometry/extensions/io/svg/write_svg.hpp>
-#include <boost/geometry/multi/io/wkt/read.hpp>
 #include <boost/geometry/extensions/gis/latlong/latlong.hpp>
 #include <boost/geometry/extensions/gis/projections/project_transformer.hpp>
 
@@ -61,7 +61,7 @@ void read_wkt_and_project_and_write_svg(std::string const& wkt_filename,
     std::vector<model::polygon<point_xy> > xy_polygons;
 
     // Declare transformation strategy which contains a projection
-    projection::project_transformer
+    projections::project_transformer
         <
             point_ll_deg,
             point_xy
@@ -109,7 +109,7 @@ void read_wkt_and_project_and_write_svg(std::string const& wkt_filename,
 
     // Create the background
     boost::geometry::model::box<svg_point> box;
-    boost::geometry::assign(box, 0, 0, 800, 600);
+    boost::geometry::assign_values(box, 0, 0, 800, 600);
     out << boost::geometry::svg(box, "fill:rgb(0,0,255)") << std::endl;
 
     for (std::vector<model::polygon<point_xy> >::const_iterator it = xy_polygons.begin();
@@ -132,7 +132,7 @@ int main(int argc, char** argv)
         // Note, file location: trunk/libs/geometry/example/data
         // update path below if necessary
         read_wkt_and_project_and_write_svg(
-            "../../../data/world.wkt",
+            "../../../example/data/world.wkt",
             "+proj=moll +ellps=clrk66",
             "world.svg");
     }

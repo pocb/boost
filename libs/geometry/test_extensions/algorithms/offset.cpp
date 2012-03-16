@@ -10,6 +10,8 @@
 #include <iostream>
 #include <string>
 
+#define TEST_WITH_SVG
+
 #include <geometry_test_common.hpp>
 
 #include <boost/geometry/geometries/geometries.hpp>
@@ -65,7 +67,6 @@ void test_offset(std::string const& caseid, Geometry const& geometry,
 
     //BOOST_CHECK_EQUAL(holes, expected_hole_count);
     BOOST_CHECK_CLOSE(length, expected_length, percentage);
-
 
 #if defined(TEST_WITH_SVG)
     {

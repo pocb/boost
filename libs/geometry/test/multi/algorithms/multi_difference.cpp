@@ -13,6 +13,11 @@
 // #define BOOST_GEOMETRY_DEBUG_ASSEMBLE
 //#define BOOST_GEOMETRY_CHECK_WITH_SQLSERVER
 
+//#define BOOST_GEOMETRY_DEBUG_SEGMENT_IDENTIFIER
+//#define BOOST_GEOMETRY_DEBUG_FOLLOW
+//#define BOOST_GEOMETRY_DEBUG_TRAVERSE
+
+
 #include <algorithms/test_difference.hpp>
 #include <algorithms/test_overlay.hpp>
 #include <multi/algorithms/overlay/multi_overlay_cases.hpp>
@@ -151,10 +156,25 @@ void test_areal_linear()
     typedef typename bg::point_type<Polygon>::type Point;
     typedef bg::model::ring<Point> Ring;
 
-    test_one_lp<LineString, LineString, MultiPolygon>("case_mp_ls_1", "LINESTRING(2 0,2 5)", case_multi_simplex[0], 3, 5, 1.30);
+    test_one_lp<LineString, LineString, MultiPolygon>("case_mp_ls_1", "LINESTRING(2 0,2 5)", case_multi_simplex[0], 2, 4, 1.30);
     test_one_lp<LineString, MultiLineString, Polygon>("case_p_mls_1", "MULTILINESTRING((2 0,2 5),(3 0,3 5))", case_single_simplex, 3, 6, 2.5);
-    test_one_lp<LineString, MultiLineString, MultiPolygon>("case_mp_mls_1", "MULTILINESTRING((2 0,2 5),(3 0,3 5))", case_multi_simplex[0], 6, 11, 3.1666667);
+    test_one_lp<LineString, MultiLineString, MultiPolygon>("case_mp_mls_1", "MULTILINESTRING((2 0,2 5),(3 0,3 5))", case_multi_simplex[0], 5, 10, 3.1666667);
     test_one_lp<LineString, MultiLineString, Ring>("case_r_mls_1", "MULTILINESTRING((2 0,2 5),(3 0,3 5))", case_single_simplex, 3, 6, 2.5);
+
+    // Collinear cases, with multiple turn points at the same location
+    test_one_lp<LineString, LineString, MultiPolygon>("case_mp_ls_2a", "LINESTRING(1 0,1 1,2 1,2 0)", "MULTIPOLYGON(((0 0,0 1,1 1,1 0,0 0)),((1 1,1 2,2 2,2 1,1 1)))", 1, 2, 1.0);
+    test_one_lp<LineString, LineString, MultiPolygon>("case_mp_ls_2b", "LINESTRING(1 0,1 1,2 1,2 0)", "MULTIPOLYGON(((1 1,1 2,2 2,2 1,1 1)),((0 0,0 1,1 1,1 0,0 0)))", 1, 2, 1.0);
+
+    test_one_lp<LineString, LineString, MultiPolygon>("case_mp_ls_3", 
+            "LINESTRING(6 6,6 7,7 7,7 6,8 6,8 7,9 7,9 6)", 
+            "MULTIPOLYGON(((5 7,5 8,6 8,6 7,5 7)),((6 6,6 7,7 7,7 6,6 6)),((8 8,9 8,9 7,8 7,7 7,7 8,8 8)))", 2, 5, 3.0);
+
+    return;
+
+    // TODO: this case contains collinearities and should still be solved
+    test_one_lp<LineString, LineString, MultiPolygon>("case_mp_ls_4", 
+            "LINESTRING(0 5,0 6,1 6,1 5,2 5,2 6,3 6,3 5,3 4,3 3,2 3,2 4,1 4,1 3,0 3,0 4)", 
+            "MULTIPOLYGON(((0 2,0 3,1 2,0 2)),((2 5,3 6,3 5,2 5)),((1 5,1 6,2 6,2 5,1 5)),((2 3,2 4,3 4,2 3)),((0 3,1 4,1 3,0 3)),((4 3,3 3,3 5,4 5,4 4,4 3)))", 5, 11, 6.0);
 }
 
 
@@ -175,7 +195,8 @@ int test_main(int, char* [])
     test_all<bg::model::d2::point_xy<double> >();
 
 #ifdef HAVE_TTMATH
-    //test_all<bg::model::d2::point_xy<ttmath_big> >();
+    std::cout << "Testing TTMATH" << std::endl;
+    test_all<bg::model::d2::point_xy<ttmath_big> >();
 #endif
 
     return 0;

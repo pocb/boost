@@ -21,25 +21,16 @@
 #include <boost/geometry/strategies/tags.hpp>
 #include <boost/geometry/strategies/side.hpp>
 #include <boost/geometry/util/math.hpp>
+#include <boost/geometry/util/select_most_precise.hpp>
 
 #include <boost/geometry/extensions/strategies/buffer_side.hpp>
-
-
-// This should NOT be defined, it omits essential points in concavities.
-// Code is commented now
-// #define BOOST_GEOMETRY_BUFFER_NO_HELPER_POINTS
 
 
 namespace boost { namespace geometry
 {
 
-
-
-
 namespace strategy { namespace buffer
 {
-
-
 
 /*
 
@@ -69,45 +60,8 @@ namespace strategy { namespace buffer
 */
 
 
-#ifdef BOOST_GEOMETRY_DEBUG_WITH_MAPPER
-template
-<
-    typename PointIn, typename Mapper
->
-struct join_mapper
-{
-    Mapper const& m_mapper;
-    join_mapper(Mapper const& mapper)
-        : m_mapper(mapper)
-    {}
 
-    template <typename Ring>
-    inline void map(PointIn const& ip, PointIn const& vertex,
-                PointIn const& perp1, PointIn const& perp2) const
-    {
-        Ring corner;
-        corner.push_back(vertex);
-        corner.push_back(perp1);
-        corner.push_back(ip);
-        corner.push_back(perp2);
-        corner.push_back(vertex);
-
-        const_cast<Mapper&>(m_mapper).map(corner,
-            "opacity:0.4;fill:rgb(255,0,0);stroke:rgb(0,0,0);stroke-width:1");
-    }
-};
-#endif
-
-
-
-#ifdef BOOST_GEOMETRY_DEBUG_WITH_MAPPER
-// Forget this, it will go
-template<typename PointIn, typename PointOut, typename Mapper>
-struct join_miter : public join_mapper<PointIn, Mapper>
-{
-    join_miter(Mapper const& mapper) : join_mapper(mapper) {}
-#else
-
+// TODO: merge join_miter with join_round, lot of duplicate code
 
 template
 <
@@ -116,41 +70,23 @@ template
 >
 struct join_miter
 {
-
-#endif
     typedef typename strategy::side::services::default_strategy<typename cs_tag<PointIn>::type>::type side;
     typedef typename coordinate_type<PointIn>::type coordinate_type;
 
 
-    template <typename Ring>
+    template <typename RangeOut>
     inline void apply(PointIn const& ip, PointIn const& vertex,
                 PointIn const& perp1, PointIn const& perp2,
                 coordinate_type const& buffer_distance,
-                Ring& buffered) const
+                RangeOut& range_out) const
     {
         coordinate_type zero = 0;
-        int signum = buffer_distance > zero
-            ? 1
-            : buffer_distance < zero
-                ? -1
-                : 0;
+        int signum = buffer_distance > zero ? 1
+                   : buffer_distance < zero ? -1
+                   : 0;
 
         if (side::apply(perp1, ip, perp2) == signum)
         {
-
-//#ifdef BOOST_GEOMETRY_BUFFER_NO_HELPER_POINTS
-            // Because perp1 crosses perp2 at IP, it is not necessary to
-            // include IP
-            //buffered.push_back(ip);
-//#else
-            // If it is concave (corner to left), add helperline
-            // The helper-line IS essential for buffering holes. Without,
-            // holes might be generated, while they should NOT be there.
-            // DOES NOT WORK ALWAYS buffered.push_back(ip);
-            // We might consider to make it optional (because more efficient)
-            buffered.push_back(perp1);
-            buffered.push_back(perp2);
-//#endif
         }
         else
         {
@@ -181,25 +117,13 @@ struct join_miter
 #endif
             }
 
-            buffered.push_back(p);
-
-#ifdef BOOST_GEOMETRY_DEBUG_WITH_MAPPER
-            map<Ring>(ip, vertex, perp1, perp2);
-#endif
+            range_out.push_back(perp1);
+            range_out.push_back(p);
+            range_out.push_back(perp2);
         }
-
 
     }
 };
-
-
-#ifdef BOOST_GEOMETRY_DEBUG_WITH_MAPPER
-// Forget this, it will go
-template<typename PointIn, typename PointOut, typename Mapper>
-struct join_bevel : public join_mapper<PointIn, Mapper>
-{
-    join_bevel(Mapper const& mapper) : join_mapper(mapper) {}
-#else
 
 
 template
@@ -209,37 +133,16 @@ template
 >
 struct join_bevel
 {
-#endif
-
-
     typedef typename coordinate_type<PointIn>::type coordinate_type;
 
-    template <typename Ring>
+    template <typename RangeOut>
     inline void apply(PointIn const& ip, PointIn const& vertex,
                 PointIn const& perp1, PointIn const& perp2,
                 coordinate_type const& buffer_distance,
-                Ring& buffered) const
+                RangeOut& range_out) const
     {
-        buffered.push_back(perp1);
-        buffered.push_back(perp2);
-
-#ifdef BOOST_GEOMETRY_DEBUG_WITH_MAPPER
-            map<Ring>(ip, vertex, perp1, perp2);
-#endif
     }
 };
-
-
-#ifdef BOOST_GEOMETRY_DEBUG_WITH_MAPPER
-// Forget this, it will go
-template<typename PointIn, typename PointOut, typename Mapper>
-struct join_round : public join_mapper<PointIn, Mapper>
-{
-    join_round(Mapper const& mapper, int max_level = 4)
-        : join_mapper(mapper)
-        , m_max_level(max_level)
-    {}
-#else
 
 
 template
@@ -252,18 +155,28 @@ struct join_round
     inline join_round(int max_level = 4)
         : m_max_level(max_level)
     {}
-#endif
 
     typedef typename strategy::side::services::default_strategy<typename cs_tag<PointIn>::type>::type side;
     typedef typename coordinate_type<PointOut>::type coordinate_type;
+
+    typedef typename geometry::select_most_precise
+        <
+            typename geometry::select_most_precise
+                <
+                    typename geometry::coordinate_type<PointIn>::type,
+                    typename geometry::coordinate_type<PointOut>::type
+                >::type,
+            double
+        >::type promoted_type;
+
     int m_max_level;
 
-
-    template <typename Ring>
+#ifdef BOOST_GEOMETRY_BUFFER_USE_MIDPOINTS
+    template <typename RangeOut>
     inline void mid_points(PointIn const& vertex,
                 PointIn const& p1, PointIn const& p2,
                 coordinate_type const& buffer_distance,
-                Ring& buffered,
+                RangeOut& range_out,
                 int level = 1) const
     {
         // Generate 'vectors'
@@ -288,39 +201,82 @@ struct join_round
 
         if (level < m_max_level)
         {
-            mid_points(vertex, p1, mid_point, buffer_distance, buffered, level + 1);
+            mid_points(vertex, p1, mid_point, buffer_distance, range_out, level + 1);
         }
-        buffered.push_back(mid_point);
+        range_out.push_back(mid_point);
         if (level < m_max_level)
         {
-            mid_points(vertex, mid_point, p2, buffer_distance, buffered, level + 1);
+            mid_points(vertex, mid_point, p2, buffer_distance, range_out, level + 1);
         }
+    }
+#endif
 
+    template <typename RangeOut>
+    inline void generate_points(PointIn const& vertex,
+                PointIn const& perp1, PointIn const& perp2,
+                promoted_type const& buffer_distance,
+                RangeOut& range_out) const
+    {
+        promoted_type dx1 = get<0>(perp1) - get<0>(vertex);
+        promoted_type dy1 = get<1>(perp1) - get<1>(vertex);
+        promoted_type dx2 = get<0>(perp2) - get<0>(vertex);
+        promoted_type dy2 = get<1>(perp2) - get<1>(vertex);
+
+        dx1 /= buffer_distance;
+        dy1 /= buffer_distance;
+        dx2 /= buffer_distance;
+        dy2 /= buffer_distance;
+
+        promoted_type angle_diff = std::acos(dx1 * dx2 + dy1 * dy2);
+
+        // Default might be 100 steps for a full circle (2 pi)
+        promoted_type const steps_per_circle = 100.0;
+        int n = int(steps_per_circle * angle_diff 
+                    / (2.0 * geometry::math::pi<promoted_type>()));
+
+		if (n > 1000)
+		{
+			std::cout << dx1 << ", " << dy1 << " .. " << dx2 << ", " << dy2 << std::endl;
+			std::cout << angle_diff << " -> " << n << std::endl;
+			n = 1000;
+		}
+		else if (n <= 1)
+		{
+			return;
+		}
+
+        promoted_type const angle1 = std::atan2(dy1, dx1);
+        promoted_type diff = angle_diff / promoted_type(n);
+        promoted_type a = angle1 - diff;
+
+        for (int i = 0; i < n - 1; i++, a -= diff)
+        {
+            PointIn p;
+            set<0>(p, get<0>(vertex) + buffer_distance * cos(a));
+            set<1>(p, get<1>(vertex) + buffer_distance * sin(a));
+            range_out.push_back(p);
+        }
     }
 
-
-    template <typename Ring>
+    template <typename RangeOut>
     inline void apply(PointIn const& ip, PointIn const& vertex,
                 PointIn const& perp1, PointIn const& perp2,
                 coordinate_type const& buffer_distance,
-                Ring& buffered) const
+                RangeOut& range_out) const
     {
+		if (geometry::equals(perp1, perp2))
+		{
+			//std::cout << "Corner for equal points " << geometry::wkt(ip) << " " << geometry::wkt(perp1) << std::endl;
+			return;
+		}
+
         coordinate_type zero = 0;
-        int signum = buffer_distance > zero
-            ? 1
-            : buffer_distance < zero
-                ? -1
-                : 0;
+        int signum = buffer_distance > zero ? 1
+                   : buffer_distance < zero ? -1
+                   : 0;
 
         if (side::apply(perp1, ip, perp2) == signum)
         {
-//#ifdef BOOST_GEOMETRY_BUFFER_NO_HELPER_POINTS
-//            buffered.push_back(ip);
-//#else
-            // If it is concave (corner to left), add helperline
-            buffered.push_back(perp1);
-            buffered.push_back(perp2);
-//#endif
         }
         else
         {
@@ -338,26 +294,27 @@ struct join_round
             set<0>(bp, get<0>(vertex) + vix * prop);
             set<1>(bp, get<1>(vertex) + viy * prop);
 
+            range_out.push_back(perp1);
+
+#ifdef BOOST_GEOMETRY_BUFFER_USE_MIDPOINTS
             if (m_max_level <= 1)
             {
-                buffered.push_back(perp1);
                 if (m_max_level == 1)
                 {
-                    buffered.push_back(bp);
+                    range_out.push_back(bp);
                 }
-                buffered.push_back(perp2);
             }
             else
             {
-                buffered.push_back(perp1);
-                mid_points(vertex, perp1, bp, bd, buffered);
-                mid_points(vertex, bp, perp2, bd, buffered);
-                buffered.push_back(perp2);
+                mid_points(vertex, perp1, bp, bd, range_out);
+                range_out.push_back(bp);
+                mid_points(vertex, bp, perp2, bd, range_out);
             }
-
-#ifdef BOOST_GEOMETRY_DEBUG_WITH_MAPPER
-            map<Ring>(bp, vertex, perp1, perp2);
+#else
+            generate_points(vertex, perp1, perp2, bd, range_out);
 #endif
+
+            range_out.push_back(perp2);
         }
     }
 };
@@ -382,6 +339,11 @@ public :
                 buffer_side_selector side)  const
     {
         return side == buffer_side_left ? m_left : m_right;
+    }
+    
+    inline int factor() const
+    {
+        return m_left < 0 ? -1 : 1;
     }
 
 private :

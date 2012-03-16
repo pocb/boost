@@ -20,7 +20,7 @@
 #include <boost/geometry/extensions/gis/projections/impl/pj_fwd.hpp>
 #include <boost/geometry/extensions/gis/projections/impl/pj_inv.hpp>
 
-namespace boost { namespace geometry { namespace projection
+namespace boost { namespace geometry { namespace projections
 {
 
 
@@ -33,6 +33,9 @@ template <typename Prj, typename LL, typename XY, typename P>
 struct base_t_f
 {
 public:
+
+    typedef LL geographic_point_type; ///< latlong point type
+    typedef XY cartesian_point_type;  ///< xy point type
 
     inline base_t_f(Prj const& prj, P const& params)
         : m_par(params), m_prj(prj)
@@ -99,7 +102,7 @@ public :
 #endif // DOXYGEN_NO_DETAIL
 
 
-}}} // namespace boost::geometry::projection
+}}} // namespace boost::geometry::projections
 
 
 #endif // BOOST_GEOMETRY_PROJECTIONS_IMPL_BASE_STATIC_HPP

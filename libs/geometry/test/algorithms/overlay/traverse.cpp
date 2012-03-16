@@ -7,6 +7,9 @@
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
+#define BOOST_GEOMETRY_TEST_ONLY_ONE_TYPE
+// #define BOOST_GEOMETRY_OVERLAY_NO_THROW
+// #define TEST_WITH_SVG
 
 #include <iostream>
 #include <iomanip>
@@ -23,16 +26,18 @@
 #include <geometry_test_common.hpp>
 
 
-//#define BOOST_GEOMETRY_DEBUG_ENRICH
+// #define BOOST_GEOMETRY_DEBUG_ENRICH
 //#define BOOST_GEOMETRY_DEBUG_RELATIVE_ORDER
 
-#define BOOST_GEOMETRY_REPORT_OVERLAY_ERROR
-#define BOOST_GEOMETRY_DEBUG_SEGMENT_IDENTIFIER
+// #define BOOST_GEOMETRY_REPORT_OVERLAY_ERROR
+// #define BOOST_GEOMETRY_DEBUG_SEGMENT_IDENTIFIER
 
 
 #define BOOST_GEOMETRY_TEST_OVERLAY_NOT_EXCHANGED
 
-
+#ifdef BOOST_GEOMETRY_DEBUG_ENRICH
+#  define BOOST_GEOMETRY_DEBUG_IDENTIFIER
+#endif
 
 #include <boost/geometry/algorithms/detail/overlay/turn_info.hpp>
 #include <boost/geometry/algorithms/detail/overlay/enrichment_info.hpp>
@@ -756,11 +761,11 @@ void test_all(bool test_self_tangencies = true, bool test_mixed = false)
         test_traverse<polygon, polygon, operation_union>::apply("hv3", 1, 1624.22079205664, hv_3[0], hv_3[1], deviation);
         test_traverse<polygon, polygon, operation_intersection>::apply("hv3", 1, 1623.8265057282042, hv_3[0], hv_3[1], deviation);
 
-        test_traverse<polygon, polygon, operation_union>::apply("hv4", 1, 1626.5146964146334, hv_4[0], hv_4[1], deviation);
-        test_traverse<polygon, polygon, operation_intersection>::apply("hv4", 1, 1626.2580370864305, hv_4[0], hv_4[1], deviation);
 
         if (! is_float)
         {
+            test_traverse<polygon, polygon, operation_union>::apply("hv4", 1, 1626.5146964146334, hv_4[0], hv_4[1], deviation);
+            test_traverse<polygon, polygon, operation_intersection>::apply("hv4", 1, 1626.2580370864305, hv_4[0], hv_4[1], deviation);
             test_traverse<polygon, polygon, operation_union>::apply("hv5", 1, 1624.2158307261871, hv_5[0], hv_5[1], deviation);
             test_traverse<polygon, polygon, operation_intersection>::apply("hv5", 1, 1623.4506071521519, hv_5[0], hv_5[1], deviation);
 
@@ -830,13 +835,12 @@ void test_all(bool test_self_tangencies = true, bool test_mixed = false)
             and STUnion
         */
 
-        // Boost.List during Formal Review, isovists Brandon
         // For FP, they may deviate more.
         test_traverse<polygon, polygon, operation_intersection>::apply("isov",
-                1, 88.1920416352664, isovist[0], isovist[1],
+                1, 88.2558788829, isovist[0], isovist[1],
                 float_might_deviate_more);
         test_traverse<polygon, polygon, operation_union>::apply("isov",
-                1, 313.360374193241, isovist[0], isovist[1],
+                1, 313.29652252, isovist[0], isovist[1],
                 float_might_deviate_more);
     }
 
@@ -884,16 +888,72 @@ void test_all(bool test_self_tangencies = true, bool test_mixed = false)
     test_traverse<polygon, polygon, operation_union>::apply("geos_4",
             1, 2304.41633605957,
             geos_4[0], geos_4[1]);
+	
+    if (! is_float)
+    {
 
-    return;
+#if defined(_MSC_VER)
+        double const expected = if_typed_tt<T>(3.63794e-17, 0.0);
+#else
+        double const expected = if_typed<T, long double>(2.77555756156289135106e-17, 0.0);
+#endif
 
-    // Cases below still have errors
+        // Calculate intersection/union of two triangles. Robustness case.
+        // ttmath can form a very small intersection triangle 
+        // (which is even not accomplished by SQL Server/PostGIS)
+        std::string const caseid = "ggl_list_20110820_christophe";
+        test_traverse<polygon, polygon, operation_intersection>::apply(caseid, 
+            1, expected,
+            ggl_list_20110820_christophe[0], ggl_list_20110820_christophe[1]);
+        test_traverse<polygon, polygon, operation_union>::apply(caseid, 
+            1, 67.3550722317627, 
+            ggl_list_20110820_christophe[0], ggl_list_20110820_christophe[1]);
+    }
 
-    // ticket#17
-    test_traverse<polygon, box, operation_intersection>::apply("ticket_17", 2, 2.687433027e-006,
-                ticket_17[0], ticket_17[1], 0.1);
-    test_traverse<polygon, box, operation_union>::apply("ticket_17", 3, 0.00922511561516,
-                ticket_17[0], ticket_17[1], 0.1);
+    test_traverse<polygon, polygon, operation_union>::apply("buffer_rt_f", 
+        1, 4.60853, 
+        buffer_rt_f[0], buffer_rt_f[1]);
+    test_traverse<polygon, polygon, operation_intersection>::apply("buffer_rt_f", 
+        1, 0.0002943725152286, 
+        buffer_rt_f[0], buffer_rt_f[1]);
+
+    test_traverse<polygon, polygon, operation_union>::apply("buffer_rt_g", 
+        1, 16.571, 
+        buffer_rt_g[0], buffer_rt_g[1]);
+
+    test_traverse<polygon, polygon, operation_union>::apply("buffer_rt_g_boxes1", 
+        1, 20, 
+        buffer_rt_g_boxes[0], buffer_rt_g_boxes[1]);
+    test_traverse<polygon, polygon, operation_union>::apply("buffer_rt_g_boxes2", 
+        1, 24, 
+        buffer_rt_g_boxes[0], buffer_rt_g_boxes[2]);
+    test_traverse<polygon, polygon, operation_union>::apply("buffer_rt_g_boxes3", 
+        1, 28, 
+        buffer_rt_g_boxes[0], buffer_rt_g_boxes[3]);
+
+    test_traverse<polygon, polygon, operation_union>::apply("buffer_rt_g_boxes43", 
+        1, 30, 
+        buffer_rt_g_boxes[4], buffer_rt_g_boxes[3]);
+
+#ifdef BOOST_GEOMETRY_OVERLAY_NO_THROW
+    {
+        // NOTE: currently throws (normally)
+        std::string caseid = "ggl_list_20120229_volker";
+        test_traverse<polygon, polygon, operation_union>::apply(caseid, 
+            1, 99, 
+            ggl_list_20120229_volker[0], ggl_list_20120229_volker[1]);
+        test_traverse<polygon, polygon, operation_intersection>::apply(caseid, 
+            1, 99, 
+            ggl_list_20120229_volker[0], ggl_list_20120229_volker[1]);
+        caseid = "ggl_list_20120229_volker_2";
+        test_traverse<polygon, polygon, operation_union>::apply(caseid, 
+            1, 99, 
+            ggl_list_20120229_volker[2], ggl_list_20120229_volker[1]);
+        test_traverse<polygon, polygon, operation_intersection>::apply(caseid, 
+            1, 99, 
+            ggl_list_20120229_volker[2], ggl_list_20120229_volker[1]);
+    }
+#endif
 }
 
 template <typename T>

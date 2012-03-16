@@ -1,0 +1,60 @@
+
+# Copyright (C) 2009-2012 Lorenzo Caminiti
+# Distributed under the Boost Software License, Version 1.0
+# (see accompanying file LICENSE_1_0.txt or a copy at
+# http://www.boost.org/LICENSE_1_0.txt)
+# Home at http://www.boost.org/libs/local_function
+
+import testing ;
+
+project : requirements <library>/boost//unit_test_framework ;
+
+# Run variadic and sequence syntax (also forcing no variadic macros).
+rule run-vaseq ( file_name )
+{
+    run $(file_name).cpp ;
+    run $(file_name)_seq.cpp ;
+    run $(file_name)_seq.cpp : : : <define>BOOST_NO_VARIADIC_MACROS :
+            $(file_name)_seq_nova : ;
+}
+
+# Compile-fail variadic and sequence syntax (also forcing no variadic macros).
+rule compile-fail-vaseq ( file_name )
+{
+    compile-fail $(file_name).cpp ;
+    compile-fail $(file_name)_seq.cpp ;
+    compile-fail $(file_name)_seq.cpp : <define>BOOST_NO_VARIADIC_MACROS :
+            $(file_name)_seq_nova ;
+}
+
+run-vaseq add ;
+run-vaseq add_classifiers ;
+run-vaseq add_default ;
+run-vaseq add_except ;
+run-vaseq add_inline ;
+run add_lambda.cpp ;
+run-vaseq add_params_only ;
+run-vaseq add_template ;
+run-vaseq add_this ;
+run-vaseq add_typed ;
+run-vaseq add_with_default ;
+run-vaseq all_decl ;
+run-vaseq factorial ;
+run-vaseq goto ;
+compile-fail-vaseq goto_error ;
+run-vaseq macro_commas ;
+run-vaseq nesting ;
+run-vaseq operator ;
+compile-fail-vaseq operator_error ;
+run-vaseq overload ;
+run-vaseq return_assign ;
+run-vaseq return_derivative ;
+run-vaseq return_inc ;
+run-vaseq return_setget ;
+run-vaseq return_this ;
+run ten_void.cpp ;
+run ten_void.cpp : : : <define>BOOST_NO_VARIADIC_MACROS : ten_void_nova : ;
+run-vaseq transform ;
+run-vaseq typeof ;
+run-vaseq typeof_template ;
+
