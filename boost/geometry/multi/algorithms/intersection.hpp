@@ -14,6 +14,7 @@
 #include <boost/geometry/multi/core/geometry_id.hpp>
 #include <boost/geometry/multi/core/is_areal.hpp>
 #include <boost/geometry/multi/core/point_order.hpp>
+#include <boost/geometry/multi/algorithms/covered_by.hpp>
 #include <boost/geometry/multi/algorithms/envelope.hpp>
 #include <boost/geometry/multi/algorithms/num_points.hpp>
 #include <boost/geometry/multi/algorithms/detail/overlay/get_ring.hpp>
@@ -181,7 +182,7 @@ template
 struct clip_multi_linestring
 {
     static inline OutputIterator apply(MultiLinestring const& multi_linestring,
-            Box const& box, OutputIterator out, Strategy const& strategy)
+            Box const& box, OutputIterator out, Strategy const& )
     {
         typedef typename point_type<LinestringOut>::type point_type;
         strategy::intersection::liang_barsky<Box, point_type> lb_strategy;

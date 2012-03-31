@@ -22,6 +22,7 @@
 #include <boost/geometry/core/reverse_dispatch.hpp>
 #include <boost/geometry/geometries/concepts/check.hpp>
 #include <boost/geometry/algorithms/convert.hpp>
+#include <boost/geometry/algorithms/detail/point_on_border.hpp>
 #include <boost/geometry/algorithms/detail/overlay/clip_linestring.hpp>
 #include <boost/geometry/algorithms/detail/overlay/get_intersection_points.hpp>
 #include <boost/geometry/algorithms/detail/overlay/overlay.hpp>
@@ -50,7 +51,7 @@ struct intersection_segment_segment_point
 {
     static inline OutputIterator apply(Segment1 const& segment1,
             Segment2 const& segment2, OutputIterator out,
-            Strategy const& strategy)
+            Strategy const& )
     {
         typedef typename point_type<PointOut>::type point_type;
 
@@ -86,7 +87,7 @@ struct intersection_linestring_linestring_point
 {
     static inline OutputIterator apply(Linestring1 const& linestring1,
             Linestring2 const& linestring2, OutputIterator out,
-            Strategy const& strategy)
+            Strategy const& )
     {
         typedef typename point_type<PointOut>::type point_type;
 
@@ -146,7 +147,7 @@ struct intersection_of_linestring_with_areal
 
     static inline OutputIterator apply(LineString const& linestring, Areal const& areal,
             OutputIterator out,
-            Strategy const& strategy)
+            Strategy const& )
     {
         if (boost::size(linestring) == 0)
         {
@@ -171,7 +172,17 @@ struct intersection_of_linestring_with_areal
             // No intersection points, it is either completely 
             // inside (interior + borders)
             // or completely outside
-            if (follower::included(*boost::begin(linestring), areal))
+
+            // Use border point (on a segment) to check this
+            // (because turn points might skip some cases)
+            point_type border_point;
+            if (! geometry::point_on_border(border_point, linestring, true))
+            {
+                return out;
+            }
+
+
+            if (follower::included(border_point, areal))
             {
                 LineStringOut copy;
                 geometry::convert(linestring, copy);
@@ -351,7 +362,7 @@ struct intersection_insert
     >
 {
     static inline OutputIterator apply(Linestring const& linestring,
-            Box const& box, OutputIterator out, Strategy const& strategy)
+            Box const& box, OutputIterator out, Strategy const& )
     {
         typedef typename point_type<GeometryOut>::type point_type;
         strategy::intersection::liang_barsky<Box, point_type> lb_strategy;
@@ -436,7 +447,7 @@ struct intersection_insert
     >
 {
     static inline OutputIterator apply(Segment const& segment,
-            Box const& box, OutputIterator out, Strategy const& strategy)
+            Box const& box, OutputIterator out, Strategy const& )
     {
         geometry::segment_view<Segment> range(segment);
 
@@ -469,7 +480,7 @@ struct intersection_insert
     >
 {
     static inline OutputIterator apply(Geometry1 const& geometry1,
-            Geometry2 const& geometry2, OutputIterator out, Strategy const& strategy)
+            Geometry2 const& geometry2, OutputIterator out, Strategy const& )
     {
 
         typedef detail::overlay::turn_info<PointOut> turn_info;
