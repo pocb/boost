@@ -1,6 +1,8 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
 
 // Copyright (c) 2009-2012 Mateusz Loskot, London, UK.
+// Copyright (c) 2008-2012 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2012 Bruno Lalande, Paris, France.
 
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
@@ -11,8 +13,6 @@
 
 
 #include <cstddef>
-
-#include <boost/concept/requires.hpp>
 
 #include <boost/geometry/core/access.hpp>
 #include <boost/geometry/geometries/concepts/point_concept.hpp>
@@ -83,13 +83,13 @@ struct cross_product<P1, P2, 3>
 // -- selection of lower dimension
 
 /*!
-    \brief Computes the cross product of two vector.
-    \details Both vectors shall be of the same type.
-             This type also determines type of result vector.
-    \ingroup arithmetic
-    \param p1 first vector
-    \param p2 second vector
-    \return the cross product vector
+\brief Computes the cross product of two vectors.
+\details Both vectors shall be of the same type.
+         This type also determines type of result vector.
+\ingroup arithmetic
+\param p1 first vector
+\param p2 second vector
+\return the cross product vector
  */
 template <typename P1, typename P2>
 inline P1 cross_product(P1 const& p1, P2 const& p2)
@@ -103,6 +103,7 @@ inline P1 cross_product(P1 const& p1, P2 const& p2)
             dimension<P1>::type::value
         >::apply(p1, p2);
 }
+
 
 }} // namespace boost::geometry
 

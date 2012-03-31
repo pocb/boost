@@ -8,10 +8,10 @@
 //
 // Projection example 1, direct
 
-#include <boost/geometry/geometry.hpp>
+#include <boost/geometry.hpp>
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/geometry/extensions/algorithms/parse.hpp>
-#include <boost/geometry/io/wkt/iomanip.hpp>
+
 #include <boost/geometry/extensions/gis/latlong/latlong.hpp>
 #include <boost/geometry/extensions/gis/projections/parameters.hpp>
 #include <boost/geometry/extensions/gis/projections/proj/robin.hpp>
@@ -21,14 +21,14 @@ int main()
     using namespace boost::geometry;
 
     // Initialize projection parameters
-    projection::parameters par = projection::init("+ellps=WGS84 +units=m");
+    projections::parameters par = projections::init("+ellps=WGS84 +units=m");
 
     // Construct a Robinson projection, using specified point types
     // (This delivers a projection without virtual methods. Note that in p02 example
     //  the projection is created using a factory, which delivers a projection with virtual methods)
     typedef model::ll::point<degree> point_ll_deg;
     typedef model::d2::point_xy<double> point_xy;
-    projection::robin_spheroid<point_ll_deg, point_xy> prj(par);
+    projections::robin_spheroid<point_ll_deg, point_xy> prj(par);
 
     // Define Amsterdam / Barcelona in decimal degrees / degrees/minutes
     point_ll_deg amsterdam = parse<point_ll_deg>("52.4N", "5.9E");
@@ -41,7 +41,7 @@ int main()
     // Therefore the forward function does not throw but returns false)
     if (prj.forward(amsterdam, pa) && prj.forward(barcelona, pb))
     {
-        std::cout << "Amsterdam: " << pa << std::endl << "Barcelona: " << pb << std::endl;
+        std::cout << "Amsterdam: " << wkt(pa) << std::endl << "Barcelona: " << wkt(pb) << std::endl;
 
         std::cout << "Distance (unprojected):" << distance(amsterdam, barcelona) / 1000.0 << " km" << std::endl;
         std::cout << "Distance (  projected):" << distance(pa, pb) / 1000.0 << " km" << std::endl;
@@ -52,8 +52,8 @@ int main()
         point_ll_deg a1;
         if (prj.inverse(pa, a1))
         {
-            std::cout << "Amsterdam (original): " << amsterdam  << std::endl
-                << "Amsterdam (projected, and back):" << a1 << std::endl;
+            std::cout << "Amsterdam (original): " << wkt(amsterdam)  << std::endl
+                << "Amsterdam (projected, and back):" << wkt(a1) << std::endl;
             std::cout << "Distance a-a': " << distance(amsterdam, a1) << " meter" << std::endl;
         }
     }

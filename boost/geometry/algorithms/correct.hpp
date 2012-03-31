@@ -147,7 +147,8 @@ struct correct_ring
         }
         // Check area
         Predicate predicate;
-        coordinate_type const zero = 0;
+        typedef typename default_area_result<Ring>::type area_result_type;
+        area_result_type const zero = area_result_type();
         if (predicate(ring_area_type::apply(r, strategy_type()), zero))
         {
             std::reverse(boost::begin(r), boost::end(r));
@@ -161,14 +162,14 @@ template <typename Polygon>
 struct correct_polygon
 {
     typedef typename ring_type<Polygon>::type ring_type;
-    typedef typename coordinate_type<Polygon>::type coordinate_type;
+    typedef typename default_area_result<Polygon>::type area_result_type;
 
     static inline void apply(Polygon& poly)
     {
         correct_ring
             <
                 ring_type,
-                std::less<coordinate_type>
+                std::less<area_result_type>
             >::apply(exterior_ring(poly));
 
         typename interior_return_type<Polygon>::type rings
@@ -178,7 +179,7 @@ struct correct_polygon
             correct_ring
                 <
                     ring_type,
-                    std::greater<coordinate_type>
+                    std::greater<area_result_type>
                 >::apply(*it);
         }
     }
@@ -223,7 +224,7 @@ struct correct<Ring, ring_tag>
     : detail::correct::correct_ring
         <
             Ring,
-            std::less<typename coordinate_type<Ring>::type>
+            std::less<typename default_area_result<Ring>::type>
         >
 {};
 

@@ -68,7 +68,7 @@ def cs_to_quickbook(section):
 call_doxygen()
 
 algorithms = ["append", "assign", "make", "clear"
-    , "area", "buffer", "centroid", "convert", "correct"
+    , "area", "buffer", "centroid", "convert", "correct", "covered_by"
     , "convex_hull", "difference", "disjoint", "distance" 
     , "envelope", "equals", "expand", "for_each", "intersection", "intersects" 
     , "length", "num_geometries", "num_interior_rings", "num_points" 
@@ -148,4 +148,5 @@ group_to_quickbook("arithmetic")
 group_to_quickbook("register")
 group_to_quickbook("enum")
 
+# Use either bjam or b2 or ../../../b2 (the last should be done on Release branch)
 os.system("bjam") 

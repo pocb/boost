@@ -70,6 +70,7 @@
 #include <boost/geometry/extensions/gis/projections/proj/mill.hpp>
 #include <boost/geometry/extensions/gis/projections/proj/mod_ster.hpp>
 #include <boost/geometry/extensions/gis/projections/proj/moll.hpp>
+#include <boost/geometry/extensions/gis/projections/proj/natearth.hpp>
 #include <boost/geometry/extensions/gis/projections/proj/nell.hpp>
 #include <boost/geometry/extensions/gis/projections/proj/nell_h.hpp>
 #include <boost/geometry/extensions/gis/projections/proj/nocol.hpp>
@@ -109,7 +110,7 @@
 #include <boost/geometry/extensions/gis/projections/proj/wink1.hpp>
 #include <boost/geometry/extensions/gis/projections/proj/wink2.hpp>
 
-namespace boost { namespace geometry { namespace projection
+namespace boost { namespace geometry { namespace projections
 {
 
 template <typename LatLong, typename Cartesian, typename Parameters = parameters>
@@ -190,6 +191,7 @@ public:
         detail::mill_init(*this);
         detail::mod_ster_init(*this);
         detail::moll_init(*this);
+        detail::natearth_init(*this);
         detail::nell_init(*this);
         detail::nell_h_init(*this);
         detail::nocol_init(*this);
@@ -250,6 +252,6 @@ public:
     }
 };
 
-}}} // namespace boost::geometry::projection
+}}} // namespace boost::geometry::projections
 
 #endif // BOOST_GEOMETRY_PROJECTIONS_FACTORY_HPP

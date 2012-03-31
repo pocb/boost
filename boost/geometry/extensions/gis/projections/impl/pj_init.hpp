@@ -55,7 +55,7 @@
 #include <boost/geometry/extensions/gis/geographic/strategies/dms_parser.hpp>
 
 
-namespace boost { namespace geometry { namespace projection
+namespace boost { namespace geometry { namespace projections
 {
 
 
@@ -257,7 +257,7 @@ parameters pj_init(R const& arguments, bool use_defaults = true)
 
 inline parameters pj_init_plus(std::string const& definition, bool use_defaults = true)
 {
-    static const char* sep = " +";
+    const char* sep = " +";
 
     /* split into arguments based on '+' and trim white space */
 
@@ -296,6 +296,6 @@ inline parameters pj_init_plus(std::string const& definition, bool use_defaults 
 }
 
 } // namespace detail
-}}} // namespace boost::geometry::projection
+}}} // namespace boost::geometry::projections
 
 #endif // BOOST_GEOMETRY_PROJECTIONS_IMPL_PJ_INIT_HPP

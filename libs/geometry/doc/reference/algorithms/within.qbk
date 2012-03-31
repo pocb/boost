@@ -10,8 +10,16 @@
   http://www.boost.org/LICENSE_1_0.txt)
 =============================================================================/]
 
-[include generated/within_status.qbk]
+[def __this_function__ within]
 
+[heading_conformance_ogc __this_function__..Within]
+[note OGC defines within as completely within and not on the border. See the notes for within / on the border]
+
+[include generated/within_status.qbk]
+[note In this status matrix above: columns are types of first parameter
+  and rows are types of second parameter. So a point can be checked to be 
+  within a polygon, but not vice versa.]
+  
 [heading Notes]
 If a point is located exactly on the border of a geometry, the result depends on the strategy.
 The default strategy ([link geometry.reference.strategies.strategy_within_winding Winding (coordinate system agnostic)]) 
@@ -23,3 +31,5 @@ The default strategy returns still true if a point is completely within the reve
 [heading Complexity]
 Linear
 
+[heading See also]
+* [link geometry.reference.algorithms.covered_by covered_by]
