@@ -4,9 +4,10 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include "../helpers/prefix.hpp"
-
 #include <boost/unordered_set.hpp>
 #include <boost/unordered_map.hpp>
+#include "../helpers/postfix.hpp"
+
 #include "../helpers/test.hpp"
 #include "../objects/test.hpp"
 #include "../helpers/random_values.hpp"
@@ -16,7 +17,7 @@
 namespace find_tests
 {
 
-test::seed_t seed(78937);
+test::seed_t initialize_seed(78937);
 
 template <class X>
 void find_tests1(X*, test::random_generator generator = test::default_generator)

@@ -62,25 +62,28 @@ headers( TARGET * t )
     LIST   * hdrscan;
     LIST   * hdrrule;
 	#ifndef OPT_HEADER_CACHE_EXT
-    LIST   * headlist = 0;
+    LIST   * headlist = L0;
 	#endif
     regexp * re[ MAXINC ];
     int rec = 0;
+    LISTITER iter, end;
 
-    if ( !( hdrscan = var_get( root_module(), constant_HDRSCAN ) ) )
+    hdrscan = var_get( root_module(), constant_HDRSCAN );
+    if ( list_empty( hdrscan ) )
         return;
 
-    if ( !( hdrrule = var_get( root_module(), constant_HDRRULE ) ) )
+    hdrrule = var_get( root_module(), constant_HDRRULE );
+    if ( list_empty( hdrrule ) )
         return;
 
     if ( DEBUG_HEADER )
         printf( "header scan %s\n", object_str( t->name ) );
 
     /* Compile all regular expressions in HDRSCAN */
-    while ( ( rec < MAXINC ) && hdrscan )
+    iter = list_begin( hdrscan ), end = list_end( hdrscan );
+    for ( ; ( rec < MAXINC ) && iter != end; iter = list_next( iter ) )
     {
-        re[ rec++ ] = regex_compile( hdrscan->value );
-        hdrscan = list_next( hdrscan );
+        re[ rec++ ] = regex_compile( list_item( iter ) );
     }
 
     /* Doctor up call to HDRRULE rule */
@@ -88,7 +91,7 @@ headers( TARGET * t )
     {
         FRAME   frame[1];
         frame_init( frame );
-        lol_add( frame->args, list_new( L0, object_copy( t->name ) ) );
+        lol_add( frame->args, list_new( object_copy( t->name ) ) );
 #ifdef OPT_HEADER_CACHE_EXT
         lol_add( frame->args, hcache( t, rec, re, hdrscan ) );
 #else
@@ -99,9 +102,9 @@ headers( TARGET * t )
         {
             /* The third argument to HDRRULE is the bound name of
              * $(<) */
-            lol_add( frame->args, list_new( L0, object_copy( t->boundname ) ) );
+            lol_add( frame->args, list_new( object_copy( t->boundname ) ) );
 
-            list_free( evaluate_rule( hdrrule->value, frame ) );
+            list_free( evaluate_rule( list_front( hdrrule ), frame ) );
         }
 
         /* Clean up. */
@@ -134,7 +137,10 @@ headers1(
     static int count = 0;
     ++count;
     if ( ((count == 100) || !( count % 1000 )) && DEBUG_MAKE )
+    {
         printf("...patience...\n");
+        fflush(stdout);
+    }
 #endif
 
     /* the following regexp is used to detect cases where a  */
@@ -170,7 +176,7 @@ headers1(
                 if ( DEBUG_HEADER )
                     printf( "header found: %s\n", re[i]->startp[1] );
 
-                l = list_new( l, object_new( re[i]->startp[1] ) );
+                l = list_push_back( l, object_new( re[i]->startp[1] ) );
             }
 
         /* special treatment for #include MACRO */
@@ -191,7 +197,7 @@ headers1(
             {
                 if ( DEBUG_HEADER )
                     printf( " resolved to '%s'\n", object_str( header_filename ) );
-                l = list_new( l, object_copy( header_filename ) );
+                l = list_push_back( l, object_copy( header_filename ) );
             }
             else
             {

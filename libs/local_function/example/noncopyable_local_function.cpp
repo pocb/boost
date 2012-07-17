@@ -7,6 +7,8 @@
 
 #include <boost/local_function.hpp>
 #include <boost/noncopyable.hpp>
+#include <boost/typeof/typeof.hpp>
+#include BOOST_TYPEOF_INCREMENT_REGISTRATION_GROUP()
 #include <cassert>
 
 //[noncopyable_local_function
@@ -14,12 +16,13 @@ struct n: boost::noncopyable {
     int i;
     n(int _i): i(_i) {}
 };
+BOOST_TYPEOF_REGISTER_TYPE(n) // Register for `bind& x` below.
 
-int main() {
+int main(void) {
     n x(-1);
 
     void BOOST_LOCAL_FUNCTION(const bind& x) {  // OK: No copy
-        assert( x.i == -1 );                    // and constant.
+        assert(x.i == -1);                      // and constant.
     } BOOST_LOCAL_FUNCTION_NAME(f)
     f();
 

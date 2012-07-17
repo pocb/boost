@@ -7,7 +7,10 @@
 
 import testing ;
 
-project : requirements <library>/boost//unit_test_framework ;
+# Sun does not automatically detect type-of emulation (force it).
+project : requirements <toolset>sun:<define>BOOST_TYPEOF_EMULATION ;
 
-run identity.cpp ;
+run functor.cpp ;
+run make_decl.cpp ;
+run make_call.cpp ;
 

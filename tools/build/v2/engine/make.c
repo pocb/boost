@@ -106,9 +106,8 @@ static const char * target_bind[] =
  * make() - make a target, given its name.
  */
 
-int make( int n_targets, OBJECT * * targets, int anyhow )
+int make( LIST * targets, int anyhow )
 {
-    int    i;
     COUNTS counts[ 1 ];
     int    status = 0;     /* 1 if anything fails */
 
@@ -124,20 +123,24 @@ int make( int n_targets, OBJECT * * targets, int anyhow )
     bind_explicitly_located_targets();
 
     {
+        LISTITER iter, end;
         PROFILE_ENTER( MAKE_MAKE0 );
-        for ( i = 0; i < n_targets; ++i )
+        for ( iter = list_begin( targets ), end = list_end( targets ); iter != end; iter = list_next( iter ) )
         {
-            TARGET * t = bindtarget( targets[ i ] );
+            TARGET * t = bindtarget( list_item( iter ) );
             if ( t->fate == T_FATE_INIT )
-                make0( t, 0, 0, counts, anyhow );
+                make0( t, 0, 0, counts, anyhow, 0 );
         }
         PROFILE_EXIT( MAKE_MAKE0 );
     }
 
 #ifdef OPT_GRAPH_DEBUG_EXT
     if ( DEBUG_GRAPH )
-        for ( i = 0; i < n_targets; ++i )
-            dependGraphOutput( bindtarget( targets[ i ] ), 0 );
+    {
+        LISTITER iter, end;
+        for ( iter = list_begin( targets ), end = list_end( targets ); iter != end; iter = list_next( iter ) )
+           dependGraphOutput( bindtarget( list_item( iter ) ), 0 );
+    }
 #endif
 
     if ( DEBUG_MAKE )
@@ -162,9 +165,10 @@ int make( int n_targets, OBJECT * * targets, int anyhow )
     status = counts->cantfind || counts->cantmake;
 
     {
+        LISTITER iter, end;
         PROFILE_ENTER( MAKE_MAKE1 );
-        for ( i = 0; i < n_targets; ++i )
-            status |= make1( bindtarget( targets[ i ] ) );
+        for ( iter = list_begin( targets ), end = list_end( targets ); iter != end; iter = list_next( iter ) )
+            status |= make1( bindtarget( list_item( iter ) ) );
         PROFILE_EXIT( MAKE_MAKE1 );
     }
 
@@ -236,6 +240,48 @@ static void force_rebuilds( TARGET * t )
 }
 
 
+int make0rescan( TARGET * t, TARGET * rescanning )
+{
+    int result = 0;
+    TARGETS * c;
+    /* Check whether we've already found a cycle. */
+    if( target_scc( t ) == rescanning )
+    {
+        return 1;
+    }
+    /* If we've already visited this node, ignore it. */
+    if ( t->rescanning == rescanning )
+        return 0;
+
+    /* If t is already updated, ignore it. */
+    if ( t->scc_root == NULL &&
+        t->progress != T_MAKE_INIT &&
+        t->progress != T_MAKE_ONSTACK &&
+        t->progress != T_MAKE_ACTIVE )
+        return 0;
+
+    t->rescanning = rescanning;
+    for ( c = t->depends; c; c = c->next )
+    {
+        TARGET * dependency = c->target;
+        /* Always start at the root of each new strongly connected component. */
+        if ( target_scc( dependency ) != target_scc( t ) )
+            dependency = target_scc( dependency );
+        result |= make0rescan( dependency, rescanning );
+
+        /* Make sure that we pick up the new include node. */
+        if ( c->target->includes == rescanning )
+            result = 1;
+    }
+    if ( result && t->scc_root == NULL )
+    {
+        t->scc_root = rescanning;
+        rescanning->depends = targetentry( rescanning->depends, t );
+    }
+    return result;
+}
+
+
 /*
  * make0() - bind and scan everything to make a TARGET.
  *
@@ -249,11 +295,13 @@ void make0
     TARGET * p,       /* parent */
     int      depth,   /* for display purposes */
     COUNTS * counts,  /* for reporting */
-    int      anyhow
+    int      anyhow,
+    TARGET * rescanning
 )  /* forcibly touch all (real) targets */
 {
     TARGETS    * c;
     TARGET     * ptime = t;
+    TARGET     * located_target = 0;
     time_t       last;
     time_t       leaf;
     time_t       hlast;
@@ -276,6 +324,7 @@ void make0
         printf( "make\t--\t%s%s\n", spaces( depth ), object_str( t->name ) );
 
     t->fate = T_FATE_MAKING;
+    t->depth = depth;
 
     /*
      * Step 2: under the influence of "on target" variables,
@@ -294,11 +343,11 @@ void make0
         t->boundname = search( t->name, &t->time, &another_target,
                                t->flags & T_FLAG_ISFILE );
         /* If it was detected that this target refers to an already existing and
-         * bound one, we add an include dependency, so that every target
+         * bound one, we add a dependency, so that every target
          * depending on us will depend on that other target as well.
          */
         if ( another_target )
-            target_include( t, bindtarget( another_target ) );
+            located_target = bindtarget( another_target );
 
         t->binding = t->time ? T_BIND_EXISTS : T_BIND_MISSING;
     }
@@ -319,9 +368,9 @@ void make0
 #ifdef OPT_SEMAPHORE
     {
         LIST * var = var_get( root_module(), constant_JAM_SEMAPHORE );
-        if ( var )
+        if ( !list_empty( var ) )
         {
-            TARGET * semaphore = bindtarget( var->value );
+            TARGET * semaphore = bindtarget( list_front( var ) );
             semaphore->progress = T_MAKE_SEMAPHORE;
             t->semaphore = semaphore;
         }
@@ -375,14 +424,26 @@ void make0
          * other alot.
          */
         if ( c->target->fate == T_FATE_INIT )
-            make0( c->target, ptime, depth + 1, counts, anyhow );
+            make0( c->target, ptime, depth + 1, counts, anyhow, rescanning );
         else if ( c->target->fate == T_FATE_MAKING && !internal )
             printf( "warning: %s depends on itself\n", object_str( c->target->name ) );
+        else if ( c->target->fate != T_FATE_MAKING && rescanning )
+            make0rescan( c->target, rescanning );
+        if ( rescanning && c->target->includes && c->target->includes->fate != T_FATE_MAKING )
+            make0rescan( target_scc( c->target->includes ), rescanning );
+    }
+
+    if ( located_target )
+    {
+        if ( located_target->fate == T_FATE_INIT )
+            make0( located_target, ptime, depth + 1, counts, anyhow, rescanning );
+        else if ( located_target->fate != T_FATE_MAKING && rescanning )
+            make0rescan( located_target, rescanning );
     }
 
     /* Step 3b: recursively make0() internal includes node. */
     if ( t->includes )
-        make0( t->includes, p, depth + 1, counts, anyhow );
+        make0( t->includes, p, depth + 1, counts, anyhow, rescanning );
 
     /* Step 3c: add dependencies' includes to our direct dependencies. */
     {
@@ -391,6 +452,28 @@ void make0
             if ( c->target->includes )
                 incs = targetentry( incs, c->target->includes );
         t->depends = targetchain( t->depends, incs );
+    }
+
+    if ( located_target )
+        t->depends = targetentry( t->depends, located_target );
+
+    /* Step 3d: detect cycles. */
+    {
+        int cycle_depth = depth;
+        for ( c = t->depends; c; c = c->next )
+        {
+            TARGET * scc_root = target_scc( c->target );
+            if ( scc_root->fate == T_FATE_MAKING &&
+                ( !scc_root->includes ||
+                  scc_root->includes->fate != T_FATE_MAKING ) )
+            {
+                if ( scc_root->depth < cycle_depth )
+                {
+                    cycle_depth = scc_root->depth;
+                    t->scc_root = scc_root;
+                }
+            }
+        }
     }
 
     /*
@@ -403,6 +486,20 @@ void make0
     fate = T_FATE_STABLE;
     for ( c = t->depends; c; c = c->next )
     {
+        /* If we're in a different strongly connected component,
+         * pull timestamps from the root.
+         */
+        if ( c->target->scc_root )
+        {
+            TARGET * scc_root = target_scc( c->target );
+            if ( scc_root != t->scc_root )
+            {
+                c->target->leaf = max( c->target->leaf, scc_root->leaf );
+                c->target->time = max( c->target->time, scc_root->time );
+                c->target->fate = max( c->target->fate, scc_root->fate );
+            }
+        }
+
         /* If LEAVES has been applied, we only heed the timestamps of the leaf
          * source nodes.
          */
@@ -617,7 +714,10 @@ void make0
         ++counts->targets;
 #else
         if ( !( ++counts->targets % 1000 ) && DEBUG_MAKE )
+        {
             printf( "...patience...\n" );
+            fflush(stdout);
+        }
 #endif
 
         if ( fate == T_FATE_ISTMP )
@@ -793,12 +893,12 @@ static TARGETS * make0sort( TARGETS * chain )
 }
 
 
-static LIST * targets_to_update_ = 0;
+static LIST * targets_to_update_ = L0;
 
 
 void mark_target_for_updating( OBJECT * target )
 {
-    targets_to_update_ = list_new( targets_to_update_, object_copy( target ) );
+    targets_to_update_ = list_push_back( targets_to_update_, object_copy( target ) );
 }
 
 
@@ -811,5 +911,5 @@ LIST * targets_to_update()
 void clear_targets_to_update()
 {
     list_free( targets_to_update_ );
-    targets_to_update_ = 0;
+    targets_to_update_ = L0;
 }

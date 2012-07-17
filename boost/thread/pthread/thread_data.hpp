@@ -4,6 +4,7 @@
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 // (C) Copyright 2007 Anthony Williams
+// (C) Copyright 2011-2012 Vicente J. Botet Escriba
 
 #include <boost/thread/detail/config.hpp>
 #include <boost/thread/exceptions.hpp>
@@ -25,7 +26,7 @@ namespace boost
 {
     class thread_attributes {
     public:
-        thread_attributes() {
+        thread_attributes() BOOST_NOEXCEPT {
             int res = pthread_attr_init(&val_);
             BOOST_VERIFY(!res && "pthread_attr_init failed");
         }
@@ -34,7 +35,7 @@ namespace boost
           BOOST_VERIFY(!res && "pthread_attr_destroy failed");
         }
         // stack
-        void set_stack_size(std::size_t size) {
+        void set_stack_size(std::size_t size) BOOST_NOEXCEPT {
           if (size==0) return;
           std::size_t page_size = getpagesize();
 #ifdef PTHREAD_STACK_MIN
@@ -45,18 +46,19 @@ namespace boost
           BOOST_VERIFY(!res && "pthread_attr_setstacksize failed");
         }
 
-        std::size_t get_stack_size() const {
+        std::size_t get_stack_size() const BOOST_NOEXCEPT {
             std::size_t size;
             int res = pthread_attr_getstacksize(&val_, &size);
             BOOST_VERIFY(!res && "pthread_attr_getstacksize failed");
             return size;
         }
+#define BOOST_THREAD_DEFINES_THREAD_ATTRIBUTES_NATIVE_HANDLE
 
         typedef pthread_attr_t native_handle_type;
-        native_handle_type* native_handle() {
+        native_handle_type* native_handle() BOOST_NOEXCEPT {
           return &val_;
         }
-        const native_handle_type* native_handle() const {
+        const native_handle_type* native_handle() const BOOST_NOEXCEPT {
           return &val_;
         }
 

@@ -15,7 +15,7 @@ doxygen reference : ../../../../boost/utility/identity_type.hpp
         <doxygen:param>WARN_IF_UNDOCUMENTED=NO
         <doxygen:param>HIDE_UNDOC_MEMBERS=YES
         <doxygen:param>HIDE_UNDOC_CLASSES=YES
-        <doxygen:param>ALIASES=" Params=\"<b>Parameters:</b> <table border="0">\" Param{2}=\"<tr><td><b><tt>\\1</tt></b></td><td>\\2</td></tr>\" EndParams=\"</table>\" Returns=\"<b>Returns:</b>\" Note=\"<b>Note:</b>\" Warning=\"<b>Warning:</b>\" See=\"<b>See:</b>\" RefSect{1}=\"\\xmlonly<link linkend='boost_utility_identitytype.\\1'>\\1</link>\\endxmlonly\" RefSectId{2}=\"\\xmlonly<link linkend='boost_utility_identitytype.\\1'>\\2</link>\\endxmlonly\" RefClass{1}=\"\\xmlonly<computeroutput><classname alt='\\1'>\\1</classname></computeroutput>\\endxmlonly\" RefFunc{1}=\"\\xmlonly<computeroutput><functionname alt='\\1'>\\1</functionname></computeroutput>\\endxmlonly\" RefMacro{1}=\"\\xmlonly<computeroutput><macroname alt='\\1'>\\1</macroname></computeroutput>\\endxmlonly\" "
+        <doxygen:param>ALIASES=" Params=\"<b>Parameters:</b> <table border="0">\" Param{2}=\"<tr><td><b><tt>\\1</tt></b></td><td>\\2</td></tr>\" EndParams=\"</table>\" Returns=\"<b>Returns:</b>\" Note=\"<b>Note:</b>\" Warning=\"<b>Warning:</b>\" See=\"<b>See:</b>\" RefSect{2}=\"\\xmlonly<link linkend='boost_utility_identitytype.\\1'>\\2</link>\\endxmlonly\" RefClass{1}=\"\\xmlonly<computeroutput><classname alt='\\1'>\\1</classname></computeroutput>\\endxmlonly\" RefFunc{1}=\"\\xmlonly<computeroutput><functionname alt='\\1'>\\1</functionname></computeroutput>\\endxmlonly\" RefMacro{1}=\"\\xmlonly<computeroutput><macroname alt='\\1'>\\1</macroname></computeroutput>\\endxmlonly\" "
     ;
 
 # This target must be called "index" so to generate "index.html" file.
@@ -29,3 +29,16 @@ boostbook doc : index
         <xsl:param>boost.root=../../../../..
     ;
 
+#
+# This is very imperfect - it results in both html and pdf docs being built,
+# for some reason I can't get the "onehtml" format specified above to play nice
+# with the usual incantations for mixed pdf/html builds. JM 06/2012.
+#
+boostbook pdf_doc : index
+    :
+       <format>pdf
+       <format>html:<build>no
+    ;
+
+install pdf_doc_install : pdf_doc : <location>. <name>identity_type.pdf <install-type>PDF ;
+explicit pdf_doc_install ;

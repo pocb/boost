@@ -10,9 +10,10 @@ Boost.Math provides a collection of mathematical constants.
 ``double area = pi * r * r;``
 (If that's all you want, jump direct to [link math_toolkit.constants.tutorial.non_templ use in non-template code]!)
 * Effortless - avoiding a search of reference sources.
+* Usable with both builtin floating point types, and user-defined, possibly extended precision, types such as
+NTL, MPFR/GMP, mp_float: in the latter case the constants are computed to the necessary precision and then cached.
 * Accurate - ensuring that the values are as accurate as possible for the 
-chosen floating-point type (both built-in and multiprecision user-defined type (UDT)
-floating-point like NTL, MPFR/GMP, mp_float).
+chosen floating-point type 
   * No loss of accuracy from repeated rounding of intermediate computations.
   * Result is computed with higher precision and only rounded once.
   * Less risk of inaccurate result from functions pow, trig and log at [@http://en.wikipedia.org/wiki/Corner_case corner cases].
@@ -33,26 +34,27 @@ see [link math_toolkit.constants.tutorial.templ use in template code].
 [section:non_templ Use in non-template code]
 
 When using the math constants at your chosen fixed precision in non-template code,
-you can simply add a `using` declaration, for example, `using boost::math::double_constants`,
+you can simply add a `using namespace` declaration, for example,
+`using namespace boost::math::double_constants`,
 to make the constants of the correct precision for your code
-visible in the current scope, and then use each constant ['as a simple variable]:
+visible in the current scope, and then use each constant ['as a simple variable - sans brackets]:
 
-   #include <boost/math/constants.hpp>
+   #include <boost/math/constants/constants.hpp>
 
    double area(double r)
    {
-      using boost::math::double_constants;
+      using namespace boost::math::double_constants;
       return pi * r * r;
    }
 
 Had our function been written as taking a `float` rather than a `double`,
 we could have written instead:
 
-   #include <boost/math/constants.hpp>
+   #include <boost/math/constants/constants.hpp>
 
    float area(float r)
    {
-      using boost::math::float_constants;
+      using namespace boost::math::float_constants;
       return pi * r * r;
    }
 
@@ -60,6 +62,8 @@ Likewise, constants that are suitable for use at `long double` precision
 are available in the namespace `boost::math::long_double_constants`.
 
 You can see the full list of available constants at [link math_toolkit.constants.constants].
+
+Some examples of using constants are at [@../../../example/constants_eg1.cpp constants_eg1].
 
 [endsect]
  
@@ -70,7 +74,7 @@ we use a constant of the correct precision for our template parameters.
 We can do this by calling the function-template versions, `pi<FPType>()`, of the constants
 like this:
 
-   #include <boost/math/constants.hpp>
+   #include <boost/math/constants/constants.hpp>
 
    template <class Real>
    Real area(Real r)
@@ -138,7 +142,7 @@ You can also avoid this by being explicit about the type of `Area`.
 The syntax for using the function-call constants with user-defined types is the same
 as it is in the template class, which is to say we use:
 
-   #include <boost/math/constants.hpp>
+   #include <boost/math/constants/constants.hpp>
 
    boost::math::constants::pi<UserDefinedType>();
 
@@ -282,8 +286,9 @@ This section lists the mathematical constants, their use(s) (and sometimes ratio
 [[root_two] [[radic]2] [1.41421] [] ]
 [[root_three] [[radic]3] [1.73205] [] ]
 [[half_root_two] [[radic]2 /2] [0.707106] [] ]
-[[ln_two] [ln(2)] [6.93147] [] ]
-[[ln_ln_two] [ln(ln(2))] [-3.66512] [Gumbel distribution median] ]
+[[ln_two] [ln(2)] [0.693147] [] ]
+[[ln_ten] [ln(10)] [2.30258] [] ]
+[[ln_ln_two] [ln(ln(2))] [-0.366512] [Gumbel distribution median] ]
 [[root_ln_four] [[radic]ln(4)] [1.177410] [] ]
 [[one_div_root_two] [1/[radic]2] [0.707106] [] ]
 
@@ -319,8 +324,8 @@ This section lists the mathematical constants, their use(s) (and sometimes ratio
 [[exp_minus_half] [e [super -1/2]] [0.606530] [] ]
 [[e_pow_pi] [e [super [pi]]] [23.14069] [] ] 
 [[root_e] [[radic] e] [1.64872] [] ]
-[[log10_e] [ln(e)] [0.434294] [] ]
-[[one_div_log10_e] [1/ln(e)] [2.30258] [] ]
+[[log10_e] [log10(e)] [0.434294] [] ]
+[[one_div_log10_e] [1/log10(e)] [2.30258] [] ]
 
 [[[*Trigonometric]] [] [] [] ]
 [[degree] [radians = [pi] / 180] [0.017453] [] ]
@@ -391,7 +396,7 @@ Then define a placeholder for the constant itself:
 
    namespace boost{ namespace math{ namespace constants{
 
-   BOOST_DEFINE_MATH_CONSTANT(my_constant, 0, "0");
+   BOOST_DEFINE_MATH_CONSTANT(my_constant, 0.0, "0");
 
    }}}
 
@@ -408,23 +413,36 @@ For example, to calculate [pi]/2, add to `boost/math/constants/calculate_constan
 
 Then to `boost/math/constants/constants.hpp` add:
 
-   BOOST_DEFINE_MATH_CONSTANT(half_pi, 0, "0");  // actual values are temporary, we'll replace them later
+   BOOST_DEFINE_MATH_CONSTANT(half_pi, 0.0, "0");  // Actual values are temporary, we'll replace them later.
 
-[note Previously defined constants like pi and e can be used, but by not simply calling `pi<T>()`;
-specifying the precision via the policy is essential to ensure full accuracy.]
+[note Previously defined constants like pi and e can be used, but by *not simply calling* `pi<T>()`;
+specifying the precision via the policy 
+`pi<T, policies::policy<policies::digits2<N> > >()`
+is essential to ensure full accuracy.]
 
-[note Newly defined constants can only be used once they are included in
- `boost/math/constants/constants.hpp`. So if you add 
-`template <class T, class N> T calculate_new_constant{...}`,
-then you cannot define `calculate_one_div_new_constant`
-until you add the `BOOST_DEFINE_MATH_CONSTANT(new_constant, 1.234...)`.]
+[warning Newly defined constants can only be used once they are included in
+`boost/math/constants/constants.hpp`. So if you add 
+`template <class T, class N> T constant_my_constant{...}`,
+then you cannot define `constant_my_constant`
+until you add the temporary `BOOST_DEFINE_MATH_CONSTANT(my_constant, 0.0, "0")`.
+Failing to do this will result in surprising compile errors:
+``
+  error C2143: syntax error : missing ';' before '<'
+  error C2433: 'constant_root_two_div_pi' : 'inline' not permitted on data declarations
+  error C2888: 'T constant_root_two_div_pi' : symbol cannot be defined within namespace 'detail'
+  error C2988: unrecognizable template declaration/definition
+``
+]
 
-2. [*You will need an arbitary precision type to use to calculate the value]. This library
+2. [*You will need an arbitrary precision type to use to calculate the value]. This library
 currently supports either `cpp_float`, `NTL::RR` or `mpfr_class` used via the bindings in `boost/math/bindings`.
 The default is to use `NTL::RR` unless you define an alternate macro, for example,
 `USE_MPFR` or `USE_CPP_FLOAT` at the start of your program.
 
-3. The complete program to generate the constant `half_pi` using function `calculate_half_pi` is then:
+3. It is necessary to link to the Boost.Regex library,
+and probably to your chosen arbitrary precision type library.
+
+4. The complete program to generate the constant `half_pi` using function `calculate_half_pi` is then:
 
    #define USE_CPP_FLOAT // If required.
    #include <boost/math/constants/generate.hpp>
@@ -641,7 +659,7 @@ This class is used in Boost.Math and an option when using big_number projects to
 but are licensed under the [@http://www.gnu.org/copyleft/lesser.html Lesser GPL license]
 and are [*not licensed for commercial use].
 
-[h5 What happened to a previous collection of constants proposed for Boost?]
+[h4 What happened to a previous collection of constants proposed for Boost?]
 
 A review concluded that the way in which the constants were presented did not meet many peoples needs.
 None of the methods proposed met many users' essential requirement to allow writing simply `pi` rather than `pi()`.
@@ -654,14 +672,14 @@ has been added to allow users to have convenient access to float, double and lon
 but combined with template struct and functions to allow simultaneous use
 with other non-built-in floating-point types.
 
-[h5 Why do the constants (internally) have a struct rather than a simple function?]
+[h4 Why do the constants (internally) have a struct rather than a simple function?]
 
 A function mechanism was provided by in previous versions of Boost.Math.
 
 The new mechanism is to permit partial specialization. See Custom Specializing a constant above.
 It should also allow use with other packages like [@http://www.ttmath.org/ ttmath Bignum C++ library.]
 
-[h5 Where can I find other high precision constants?]
+[h4 Where can I find other high precision constants?]
 
 # Constants with very high precision and good accuracy (>40 decimal digits)
 from Simon Plouffe's web based collection [@http://pi.lacim.uqam.ca/eng/].

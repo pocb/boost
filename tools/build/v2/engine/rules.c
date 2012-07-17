@@ -45,7 +45,7 @@
  */
 
 static void set_rule_actions( RULE *, rule_actions * );
-static void set_rule_body   ( RULE *, argument_list *, FUNCTION * procedure );
+static void set_rule_body   ( RULE *, FUNCTION * procedure );
 
 static struct hash * targethash = 0;
 
@@ -86,12 +86,8 @@ static RULE * enter_rule( OBJECT * rulename, module_t * target_module )
         r->procedure = 0;
         r->module = 0;
         r->actions = 0;
-        r->arguments = 0;
         r->exported = 0;
         r->module = target_module;
-#ifdef HAVE_PYTHON
-        r->python_function = 0;
-#endif
     }
     return r;
 }
@@ -113,7 +109,7 @@ static RULE * define_rule
     RULE * r = enter_rule( rulename, target_module );
     if ( r->module != src_module ) /* if the rule was imported from elsewhere, clear it now */
     {
-        set_rule_body( r, 0, 0 );
+        set_rule_body( r, 0 );
         set_rule_actions( r, 0 );
         r->module = src_module; /* r will be executed in the source module */
     }
@@ -128,17 +124,9 @@ void rule_free( RULE * r )
     if ( r->procedure )
         function_free( r->procedure );
     r->procedure = 0;
-    if ( r->arguments )
-        args_free( r->arguments );
-    r->arguments = 0;
     if ( r->actions )
         actions_free( r->actions );
     r->actions = 0;
-#ifdef HAVE_PYTHON
-    if ( r->python_function )
-        Py_DECREF( r->python_function );
-    r->python_function = 0;
-#endif
 }
 
 
@@ -226,6 +214,26 @@ void touch_target( OBJECT * t )
     bindtarget( t )->flags |= T_FLAG_TOUCHED;
 }
 
+/*
+ * target_scc() - returns the root of the strongly
+ *                connected component that this target
+ *                is a part of.
+ */
+TARGET * target_scc( TARGET * t )
+{
+    TARGET * result = t;
+    TARGET * tmp;
+    while ( result->scc_root )
+        result = result->scc_root;
+    while ( t->scc_root )
+    {
+        tmp = t->scc_root;
+        t->scc_root = result;
+        t = tmp;
+    }
+    return result;
+}
+
 
 /*
  * targetlist() - turn list of target names into a TARGET chain.
@@ -237,8 +245,9 @@ void touch_target( OBJECT * t )
 
 TARGETS * targetlist( TARGETS * chain, LIST * target_names )
 {
-    for ( ; target_names; target_names = list_next( target_names ) )
-        chain = targetentry( chain, bindtarget( target_names->value ) );
+    LISTITER iter = list_begin( target_names ), end = list_end( target_names );
+    for ( ; iter != end; iter = list_next( iter ) )
+        chain = targetentry( chain, bindtarget( list_item( iter ) ) );
     return chain;
 }
 
@@ -354,7 +363,6 @@ SETTINGS * addsettings( SETTINGS * head, int flag, OBJECT * symbol, LIST * value
         v->symbol = object_copy( symbol );
         v->value = value;
         v->next = head;
-        v->multiple = 0;
         head = v;
     }
     else if ( flag == VAR_APPEND )
@@ -404,7 +412,7 @@ SETTINGS * copysettings( SETTINGS * head )
     SETTINGS * copy = 0;
     SETTINGS * v;
     for ( v = head; v; v = v->next )
-        copy = addsettings( copy, VAR_SET, v->symbol, list_copy( 0, v->value ) );
+        copy = addsettings( copy, VAR_SET, v->symbol, list_copy( v->value ) );
     return copy;
 }
 
@@ -483,50 +491,16 @@ static void freetarget( void * xt, void * data )
 
 void rules_done()
 {
-    hashenumerate( targethash, freetarget, 0 );
-    hashdone( targethash );
+    if ( targethash )
+    {
+        hashenumerate( targethash, freetarget, 0 );
+        hashdone( targethash );
+    }
     while ( settings_freelist )
     {
         SETTINGS * n = settings_freelist->next;
         BJAM_FREE( settings_freelist );
         settings_freelist = n;
-    }
-}
-
-
-/*
- * args_new() - make a new reference-counted argument list.
- */
-
-argument_list * args_new()
-{
-    argument_list * r = (argument_list *)BJAM_MALLOC( sizeof(argument_list) );
-    r->reference_count = 0;
-    lol_init( r->data );
-    return r;
-}
-
-
-/*
- * args_refer() - add a new reference to the given argument list.
- */
-
-void args_refer( argument_list * a )
-{
-    ++a->reference_count;
-}
-
-
-/*
- * args_free() - release a reference to the given argument list.
- */
-
-void args_free( argument_list * a )
-{
-    if ( --a->reference_count <= 0 )
-    {
-        lol_free( a->data );
-        BJAM_FREE( a );
     }
 }
 
@@ -555,19 +529,12 @@ void actions_free( rule_actions * a )
     }
 }
 
-
 /*
  * set_rule_body() - set the argument list and procedure of the given rule.
  */
 
-static void set_rule_body( RULE * rule, argument_list * args, FUNCTION * procedure )
+static void set_rule_body( RULE * rule, FUNCTION * procedure )
 {
-    if ( args )
-        args_refer( args );
-    if ( rule->arguments )
-        args_free( rule->arguments );
-    rule->arguments = args;
-
     if ( procedure )
         function_refer( procedure );
     if ( rule->procedure )
@@ -624,11 +591,11 @@ static RULE * global_rule( RULE * r )
  * exported to the global module as modulename.rulename.
  */
 
-RULE * new_rule_body( module_t * m, OBJECT * rulename, argument_list * args, FUNCTION * procedure, int exported )
+RULE * new_rule_body( module_t * m, OBJECT * rulename, FUNCTION * procedure, int exported )
 {
     RULE * local = define_rule( m, rulename, m );
     local->exported = exported;
-    set_rule_body( local, args, procedure );
+    set_rule_body( local, procedure );
 
     /* Mark the procedure with the global rule name, regardless of whether the
      * rule is exported. That gives us something reasonably identifiable that we
@@ -757,7 +724,21 @@ RULE * bindrule( OBJECT * rulename, module_t * m )
 RULE * import_rule( RULE * source, module_t * m, OBJECT * name )
 {
     RULE * dest = define_rule( source->module, name, m );
-    set_rule_body( dest, source->arguments, source->procedure );
+    set_rule_body( dest, source->procedure );
     set_rule_actions( dest, source->actions );
     return dest;
 }
+
+
+void rule_localize( RULE * rule, module_t * m )
+{
+    rule->module = m;
+    if ( rule->procedure )
+    {
+        FUNCTION * procedure = function_unbind_variables( rule->procedure );
+        function_refer( procedure );
+        function_free( rule->procedure );
+        rule->procedure = procedure;
+    }
+}
+

@@ -1,12 +1,12 @@
 #ifndef BOOST_THREAD_PTHREAD_MUTEX_HPP
 #define BOOST_THREAD_PTHREAD_MUTEX_HPP
 // (C) Copyright 2007-8 Anthony Williams
+// (C) Copyright 2011-2012 Vicente J. Botet Escriba
 // Distributed under the Boost Software License, Version 1.0. (See
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
 #include <pthread.h>
-#include <boost/utility.hpp>
 #include <boost/throw_exception.hpp>
 #include <boost/thread/exceptions.hpp>
 #include <boost/thread/locks.hpp>
@@ -20,6 +20,7 @@
 #include <boost/chrono/system_clocks.hpp>
 #include <boost/chrono/ceil.hpp>
 #endif
+#include <boost/thread/detail/delete.hpp>
 
 #ifdef _POSIX_TIMEOUTS
 #if _POSIX_TIMEOUTS >= 0 && _POSIX_C_SOURCE>=200112L
@@ -33,18 +34,11 @@ namespace boost
 {
     class mutex
     {
-#ifndef BOOST_NO_DELETED_FUNCTIONS
-    public:
-      mutex(mutex const&) = delete;
-      mutex& operator=(mutex const&) = delete;
-#else // BOOST_NO_DELETED_FUNCTIONS
-  private:
-      mutex(mutex const&);
-      mutex& operator=(mutex const&);
-#endif // BOOST_NO_DELETED_FUNCTIONS
     private:
         pthread_mutex_t m;
     public:
+        BOOST_THREAD_NO_COPYABLE(mutex)
+
         mutex()
         {
             int const res=pthread_mutex_init(&m,NULL);
@@ -97,7 +91,7 @@ namespace boost
                 // The following throw_exception has been replaced by an assertion and just return false,
                 // as this is an internal error and the user can do nothing with the exception.
                 //boost::throw_exception(lock_error(res,"boost: mutex try_lock failed in pthread_mutex_trylock"));
-                BOOST_ASSERT(false && "boost: mutex try_lock failed in pthread_mutex_trylock");
+                BOOST_ASSERT_MSG(false ,"boost: mutex try_lock failed in pthread_mutex_trylock");
                 return false;
             }
 
@@ -119,16 +113,6 @@ namespace boost
 
     class timed_mutex
     {
-#ifndef BOOST_NO_DELETED_FUNCTIONS
-    public:
-      timed_mutex(timed_mutex const&) = delete;
-      timed_mutex& operator=(timed_mutex const&) = delete;
-#else // BOOST_NO_DELETED_FUNCTIONS
-    private:
-      timed_mutex(timed_mutex const&);
-      timed_mutex& operator=(timed_mutex const&);
-    public:
-#endif // BOOST_NO_DELETED_FUNCTIONS
     private:
         pthread_mutex_t m;
 #ifndef BOOST_PTHREAD_HAS_TIMEDLOCK
@@ -136,6 +120,7 @@ namespace boost
         bool is_locked;
 #endif
     public:
+        BOOST_THREAD_NO_COPYABLE(timed_mutex)
         timed_mutex()
         {
             int const res=pthread_mutex_init(&m,NULL);

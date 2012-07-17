@@ -4,6 +4,7 @@
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 // (C) Copyright 2008 Anthony Williams
+// (C) Copyright 2011-2012 Vicente J. Botet Escriba
 
 #include <boost/thread/detail/config.hpp>
 #include <boost/intrusive_ptr.hpp>
@@ -19,18 +20,18 @@ namespace boost
 {
   class thread_attributes {
   public:
-      thread_attributes() {
+      thread_attributes() BOOST_NOEXCEPT {
         val_.stack_size = 0;
         //val_.lpThreadAttributes=0;
       }
       ~thread_attributes() {
       }
       // stack size
-      void set_stack_size(std::size_t size) {
+      void set_stack_size(std::size_t size) BOOST_NOEXCEPT {
         val_.stack_size = size;
       }
 
-      std::size_t get_stack_size() const {
+      std::size_t get_stack_size() const BOOST_NOEXCEPT {
           return val_.stack_size;
       }
 

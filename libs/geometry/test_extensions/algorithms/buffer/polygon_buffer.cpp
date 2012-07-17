@@ -19,6 +19,9 @@ static std::string const simplex
     = "POLYGON ((0 0,1 5,6 1,0 0))";
 static std::string const concave_simplex
     = "POLYGON ((0 0,3 5,3 3,5 3,0 0))";
+static std::string const chained_box
+    = "POLYGON((0 0,0 4,4 4,8 4,12 4,12 0,8 0,4 0,0 0))";
+
 static std::string const donut_simplex
     = "POLYGON ((0 0,1 9,8 1,0 0),(1 1,4 1,1 4,1 1))";
 static std::string const letter_L
@@ -54,6 +57,10 @@ static std::string const saw
 static std::string const bowl
     = "POLYGON((1 2,1 7,2 7,3 5,5 4,7 5,8 7,9 7,9 2,1 2))";
 
+// Triangle with segmented sides, closing point at longest side
+static std::string const triangle
+    = "POLYGON((4 5,5 4,4 4,3 4,3 5,3 6,4 5))";
+
 
 static std::string const county1
     = "POLYGON((-111.700 41.200 ,-111.681388 41.181739 ,-111.682453 41.181506 ,-111.684052 41.180804 ,-111.685295 41.180538 ,-111.686318 41.180776 ,-111.687517 41.181416 ,-111.688982 41.181520 ,-111.690670 41.181523 ,-111.692135 41.181460 ,-111.693646 41.182034 ,-111.695156 41.182204 ,-111.696489 41.182274 ,-111.697775 41.182075 ,-111.698974 41.181539 ,-111.700485 41.182348 ,-111.701374 41.182955 ,-111.700 41.200))";
@@ -65,12 +72,17 @@ void test_all()
 
     typedef bg::model::polygon<P> polygon_type;
 
-    test_one<polygon_type, buf::join_miter, polygon_type>("L", letter_L, 'm', 14.0, 0.5);
-    test_one<polygon_type, buf::join_round, polygon_type>("L", letter_L, 'r', 13.7314, 0.5);
-    test_one<polygon_type, buf::join_miter, polygon_type>("simplex", simplex, 'm', 52.8733, 1.5);
     test_one<polygon_type, buf::join_round, polygon_type>("simplex", simplex, 'r', 47.9408, 1.5);
-    test_one<polygon_type, buf::join_miter, polygon_type>("concave_simplex", concave_simplex, 'm', 16.3861, 0.5);
+    test_one<polygon_type, buf::join_miter, polygon_type>("simplex", simplex, 'm', 52.8733, 1.5);
     test_one<polygon_type, buf::join_round, polygon_type>("concave_simplex", concave_simplex, 'r', 14.5616, 0.5);
+    test_one<polygon_type, buf::join_miter, polygon_type>("concave_simplex", concave_simplex, 'm', 16.3861, 0.5);
+    test_one<polygon_type, buf::join_round, polygon_type>("chained_box", chained_box, 'r', 83.1403, 1.0);
+    test_one<polygon_type, buf::join_miter, polygon_type>("chained_box", chained_box, 'm', 84, 1.0);
+    test_one<polygon_type, buf::join_round, polygon_type>("L", letter_L, 'r', 13.7314, 0.5);
+    test_one<polygon_type, buf::join_miter, polygon_type>("L", letter_L, 'm', 14.0, 0.5);
+
+    test_one<polygon_type, buf::join_miter, polygon_type>("chained_box", chained_box, 'm', 84, 1.0);
+    test_one<polygon_type, buf::join_round, polygon_type>("chained_box", chained_box, 'r', 83.1403, 1.0);
 
     test_one<polygon_type, buf::join_miter, polygon_type>("indentation4", indentation, 'm', 25.7741, 0.4);
     test_one<polygon_type, buf::join_round, polygon_type>("indentation4", indentation, 'r', 25.5695, 0.4);
@@ -138,6 +150,7 @@ void test_all()
     test_one<polygon_type, buf::join_miter, polygon_type>("fork_a1", fork_a, 'm', 88, 1);
     test_one<polygon_type, buf::join_miter, polygon_type>("fork_b1", fork_b, 'm', 154, 1);
     test_one<polygon_type, buf::join_miter, polygon_type>("fork_c1", fork_c, 'm', 152, 1);
+    test_one<polygon_type, buf::join_miter, polygon_type>("triangle", triangle, 'm', 14.6569, 1.0);
 
     test_one<polygon_type, buf::join_miter, polygon_type>("gammagate2", gammagate, 'm', 130, 2);
 

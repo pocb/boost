@@ -6,9 +6,16 @@
 // Home at http://www.boost.org/libs/local_function
 
 #include <boost/config.hpp>
-#ifndef BOOST_NO_VARIADIC_MACROS
+#ifdef BOOST_NO_VARIADIC_MACROS
+#   error "variadic macros required"
+#else
 
 #include <boost/local_function.hpp>
+#include <boost/typeof/typeof.hpp>
+#include BOOST_TYPEOF_INCREMENT_REGISTRATION_GROUP()
+
+struct s;
+BOOST_TYPEOF_REGISTER_TYPE(s) // Register before binding `this_` below.
 
 // Compile all local function declaration combinations.
 struct s {
@@ -166,9 +173,5 @@ int main(void) {
     return 0;
 }
 
-#else
-
-int main(void) { return 0; }
-
-#endif
+#endif // VARIADIC_MACROS
 

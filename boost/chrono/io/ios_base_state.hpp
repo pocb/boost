@@ -32,11 +32,11 @@ namespace boost
         uses_local  = 1 << 1
       };
 
-      inline duration_style::type get_duration_style()
+      inline duration_style get_duration_style()
       {
         return (flags() & uses_symbol) ? duration_style::symbol : duration_style::prefix;
       }
-      inline void set_duration_style(duration_style::type style)
+      inline void set_duration_style(duration_style style)
       {
         if (style == duration_style::symbol)
           setf(uses_symbol);
@@ -44,11 +44,11 @@ namespace boost
           unsetf(uses_symbol);
       }
 
-      inline timezone_type get_timezone()
+      inline timezone get_timezone()
       {
         return (flags() & uses_local) ? timezone::local : timezone::utc;
       }
-      inline void set_timezone(timezone_type tz)
+      inline void set_timezone(timezone tz)
       {
         if (tz == timezone::local)
           setf(uses_local);
@@ -56,19 +56,18 @@ namespace boost
           unsetf(uses_local);
       }
     };
-
     namespace detail
     {
       namespace /**/ {
-        xalloc_key_initializer_t<ios_flags<fmt_masks> > fmt_masks_xalloc_key_initializer;
+        xalloc_key_initializer<fmt_masks > fmt_masks_xalloc_key_initializer;
       } // namespace
     } // namespace detail
 
-    inline duration_style::type get_duration_style(std::ios_base & ios)
+    inline duration_style get_duration_style(std::ios_base & ios)
     {
       return fmt_masks(ios).get_duration_style();
     }
-    inline void set_duration_style(std::ios_base& ios, duration_style::type style)
+    inline void set_duration_style(std::ios_base& ios, duration_style style)
     {
       fmt_masks(ios).set_duration_style(style);
     }
@@ -83,11 +82,11 @@ namespace boost
       return ios;
     }
 
-    inline timezone_type get_timezone(std::ios_base & ios)
+    inline timezone get_timezone(std::ios_base & ios)
     {
       return fmt_masks(ios).get_timezone();
     }
-    inline void set_timezone(std::ios_base& ios, timezone_type tz)
+    inline void set_timezone(std::ios_base& ios, timezone tz)
     {
       fmt_masks(ios).set_timezone(tz);
     }
@@ -119,16 +118,14 @@ namespace boost
         {
         }
       };
-
-    } // detail
-    namespace detail
-    {
+      template<typename CharT>
+      struct ios_base_data  {};
       namespace /**/ {
-        xalloc_key_initializer_t<ios_state_not_null_ptr<detail::ios_base_data_aux<char> >  > ios_base_data_aux_xalloc_key_initializer;
-        xalloc_key_initializer_t<ios_state_not_null_ptr<detail::ios_base_data_aux<wchar_t> >  > wios_base_data_aux_xalloc_key_initializer;
+        xalloc_key_initializer<detail::ios_base_data<char>      > ios_base_data_aux_xalloc_key_initializer;
+        xalloc_key_initializer<detail::ios_base_data<wchar_t>   > wios_base_data_aux_xalloc_key_initializer;
 #if BOOST_CHRONO_HAS_UNICODE_SUPPORT
-        xalloc_key_initializer_t<ios_state_not_null_ptr<detail::ios_base_data_aux<char16_t> >  > u16ios_base_data_aux_xalloc_key_initializer;
-        xalloc_key_initializer_t<ios_state_not_null_ptr<detail::ios_base_data_aux<char32_t> >  > u32ios_base_data_aux_xalloc_key_initializer;
+        xalloc_key_initializer<detail::ios_base_data<char16_t>  > u16ios_base_data_aux_xalloc_key_initializer;
+        xalloc_key_initializer<detail::ios_base_data<char32_t>  > u32ios_base_data_aux_xalloc_key_initializer;
 #endif
       } // namespace
     } // namespace detail
@@ -136,14 +133,14 @@ namespace boost
     template<typename CharT>
     static inline std::basic_string<CharT> get_time_fmt(std::ios_base & ios)
     {
-      ios_state_not_null_ptr<detail::ios_base_data_aux<CharT> > ptr(ios);
+      ios_state_not_null_ptr<detail::ios_base_data<CharT>, detail::ios_base_data_aux<CharT> > ptr(ios);
       return ptr->time_fmt;
     }
     template<typename CharT>
     static inline void set_time_fmt(std::ios_base& ios, std::basic_string<
         CharT> const& fmt)
     {
-      ios_state_not_null_ptr<detail::ios_base_data_aux<CharT> > ptr(ios);
+      ios_state_not_null_ptr<detail::ios_base_data<CharT>, detail::ios_base_data_aux<CharT> > ptr(ios);
       ptr->time_fmt = fmt;
     }
 

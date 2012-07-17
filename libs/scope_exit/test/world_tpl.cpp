@@ -7,18 +7,19 @@
 // Home at http://www.boost.org/libs/scope_exit
 
 #include <boost/config.hpp>
-#ifndef BOOST_NO_VARIADIC_MACROS
+#ifdef BOOST_NO_VARIADIC_MACROS
+#   error "variadic macro required"
+#else
 
 #include <boost/scope_exit.hpp>
 #include <boost/typeof/typeof.hpp>
 #include <boost/typeof/std/vector.hpp>
 #include BOOST_TYPEOF_INCREMENT_REGISTRATION_GROUP()
-#define BOOST_TEST_MODULE TestWorldTpl
-#include <boost/test/unit_test.hpp>
+#include <boost/detail/lightweight_test.hpp>
 #include <vector>
 
 struct person {};
-BOOST_TYPEOF_REGISTER_TYPE(peron)
+BOOST_TYPEOF_REGISTER_TYPE(person)
 
 template<typename Person>
 struct world {
@@ -46,16 +47,13 @@ void world<Person>::add_person(Person const& a_person) {
 }
 //]
 
-BOOST_AUTO_TEST_CASE(test_world_tpl) {
+int main(void) {
     world<person> w;
     person p;
     w.add_person(p);
-    BOOST_CHECK(w.population() == 1);
+    BOOST_TEST(w.population() == 1);
+    return boost::report_errors();
 }
 
-#else
-
-int main(void) { return 0; } // Trivial test.
-
-#endif
+#endif // variadic macros
 

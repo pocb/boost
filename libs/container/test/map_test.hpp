@@ -48,7 +48,7 @@ int map_test ()
       MyBoostMultiMap *boostmultimap = new MyBoostMultiMap;
       MyStdMultiMap *stdmultimap = new MyStdMultiMap;
 
-      //Test construction from a range   
+      //Test construction from a range  
       {
          //This is really nasty, but we have no other simple choice
          IntPairType aux_vect[50];
@@ -105,7 +105,7 @@ int map_test ()
          if(!CheckEqualContainers(boostmultimap2, stdmultimap2)) return 1;
 
 /*
-         MyBoostMap *boostmap3 = new MyBoostMap 
+         MyBoostMap *boostmap3 = new MyBoostMap
                ( ordered_unique_range
                , boost::make_move_iterator(&aux_vect[0])
                , boost::make_move_iterator(aux_vect + 50));
@@ -387,10 +387,17 @@ int map_test ()
                return 1;
             if(!CheckEqualPairContainers(boostmultimap, stdmultimap))
                return 1;
-            {
-               IntType i1(i);
-               IntType i2(i);
-               new(&intpair)IntPairType(boost::move(i1), boost::move(i2));
+            {  //Check equal_range
+               std::pair<typename MyBoostMultiMap::iterator, typename MyBoostMultiMap::iterator> bret =
+                  boostmultimap->equal_range(boostmultimap->begin()->first);
+
+               std::pair<typename MyStdMultiMap::iterator, typename MyStdMultiMap::iterator>   sret =
+                  stdmultimap->equal_range(stdmultimap->begin()->first);
+        
+               if( std::distance(bret.first, bret.second) !=
+                   std::distance(sret.first, sret.second) ){
+                  return 1;
+               }
             }
             {
                IntType i1(i);
@@ -516,7 +523,7 @@ int map_test_copyable ()
          stdmapcopy  = *stdmap;
          boostmmapcopy = *boostmultimap;
          stdmmapcopy = *stdmultimap;
-         
+        
          if(!CheckEqualContainers(&boostmapcopy, &stdmapcopy))
             return 1;
          if(!CheckEqualContainers(&boostmmapcopy, &stdmmapcopy))

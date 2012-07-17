@@ -136,7 +136,7 @@ void file_dirscan( OBJECT * dir, scanback func, void * closure )
             string_truncate( filename, 0 );
             path_build( &f, filename );
 
-            files = list_new( files, object_new(filename->value) );
+            files = list_push_back( files, object_new(filename->value) );
             ff = file_info( filename->value );
             ff->is_file = finfo->ff_attrib & FA_DIREC ? 0 : 1;
             ff->is_dir = finfo->ff_attrib & FA_DIREC ? 1 : 0;
@@ -170,7 +170,7 @@ void file_dirscan( OBJECT * dir, scanback func, void * closure )
 
             filename_obj = object_new( filename->value );
             path_add_key( filename_obj );
-            files = list_new( files, filename_obj );
+            files = list_push_back( files, filename_obj );
             ff = file_info( filename_obj );
             ff->is_file = finfo->attrib & _A_SUBDIR ? 0 : 1;
             ff->is_dir = finfo->attrib & _A_SUBDIR ? 1 : 0;
@@ -226,14 +226,14 @@ void file_dirscan( OBJECT * dir, scanback func, void * closure )
     }
 
     /* Now enter contents of directory */
-    if ( d->files )
+    if ( !list_empty( d->files ) )
     {
         LIST * files = d->files;
-        while ( files )
+        LISTITER iter = list_begin( files ), end = list_end( files );
+        for ( ; iter != end; iter = list_next( iter ) )
         {
-            file_info_t * ff = file_info( files->value );
-            (*func)( closure, files->value, 1 /* stat()'ed */, ff->time );
-            files = list_next( files );
+            file_info_t * ff = file_info( list_item( iter ) );
+            (*func)( closure, list_item( iter ), 1 /* stat()'ed */, ff->time );
         }
     }
 

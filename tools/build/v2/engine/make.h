@@ -14,7 +14,7 @@
 #include "lists.h"
 #include "object.h"
 
-int make( int n_targets, OBJECT * * targets, int anyhow );
+int make( LIST * targets, int anyhow );
 int make1( TARGET * t );
 
 typedef struct {
@@ -28,7 +28,7 @@ typedef struct {
 
 
 void make0( TARGET *t, TARGET  *p, int depth,
-            COUNTS *counts, int anyhow );
+            COUNTS *counts, int anyhow, TARGET * rescanning );
 
 
 /*

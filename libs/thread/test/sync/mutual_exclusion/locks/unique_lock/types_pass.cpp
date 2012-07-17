@@ -16,26 +16,23 @@
 
 // <mutex>
 
-// struct defer_lock_t {};
-// struct try_to_lock_t {};
-// struct adopt_lock_t {};
-//
-// constexpr defer_lock_t  defer_lock{};
-// constexpr try_to_lock_t try_to_lock{};
-// constexpr adopt_lock_t  adopt_lock{};
+// template <class Mutex>
+// class unique_lock
+// {
+// public:
+//     typedef Mutex mutex_type;
+//     ...
+// };
+
 
 #include <boost/thread/mutex.hpp>
+#include <boost/static_assert.hpp>
 #include <boost/detail/lightweight_test.hpp>
 
 int main()
 {
-  typedef boost::defer_lock_t T1;
-  typedef boost::try_to_lock_t T2;
-  typedef boost::adopt_lock_t T3;
-
-  T1 t1 = boost::defer_lock;
-  T2 t2 = boost::try_to_lock;
-  T3 t3 = boost::adopt_lock;
+  BOOST_STATIC_ASSERT_MSG((boost::is_same<boost::unique_lock<boost::mutex>::mutex_type,
+      boost::mutex>::value), "");
 
   return boost::report_errors();
 }

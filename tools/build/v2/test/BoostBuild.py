@@ -31,7 +31,7 @@ annotations = []
 def print_annotation(name, value, xml):
     """Writes some named bits of information about test run.
     """
-    if xml:      
+    if xml:
         print escape(name) + " {{{"
         print escape(value)
         print "}}}"
@@ -39,7 +39,7 @@ def print_annotation(name, value, xml):
         print name + " {{{"
         print value
         print "}}}"
-        
+
 def flush_annotations(xml=0):
     global annotations
     for ann in annotations:
@@ -58,6 +58,14 @@ def set_defer_annotations(n):
     defer_annotations = n
 
 
+def annotate_stack_trace(tb=None):
+    if tb is None:
+        trace = TestCmd.caller(traceback.extract_stack(), 1)
+    else:
+        trace = TestCmd.caller(traceback.extract_tb(tb), 0)
+    annotation("stacktrace", trace)
+
+
 def annotation(name, value):
     """Records an annotation about the test run.
     """
@@ -67,7 +75,7 @@ def annotation(name, value):
 
 
 def get_toolset():
-    toolset = None;
+    toolset = None
     for arg in sys.argv[1:]:
         if not arg.startswith('-'):
             toolset = arg
@@ -113,7 +121,7 @@ def prepare_suffix_map(toolset):
             suffixes['.implib'] = '.lib'
     if os.__dict__.has_key('uname') and (os.uname()[0] == 'Darwin'):
         suffixes['.dll'] = '.dylib'
-    
+
     lib_prefix = "lib"
     dll_prefix = "lib"
     if cygwin:
@@ -210,7 +218,8 @@ class Tester(TestCmd.TestCmd):
 
         self.original_workdir = os.getcwd()
         if workdir != '' and not os.path.isabs(workdir):
-            raise "Parameter workdir <"+workdir+"> must point to an absolute directory: "
+            raise ("Parameter workdir <%s> must point to an absolute "
+                "directory: " % workdir)
 
         self.last_build_time_start = 0
         self.last_build_time_finish = 0
@@ -230,13 +239,15 @@ class Tester(TestCmd.TestCmd):
             elif (os.name == 'posix') and os.__dict__.has_key('uname'):
                 if os.uname()[0].lower().startswith('cygwin'):
                     jam_build_dir = "bin.cygwinx86"
-                    if 'TMP' in os.environ and os.environ['TMP'].find('~') != -1:
-                        print 'Setting $TMP to /tmp to get around problem with short path names'
+                    if ('TMP' in os.environ and
+                        os.environ['TMP'].find('~') != -1):
+                        print('Setting $TMP to /tmp to get around problem '
+                            'with short path names')
                         os.environ['TMP'] = '/tmp'
                 elif os.uname()[0] == 'Linux':
                     cpu = os.uname()[4]
                     if re.match("i.86", cpu):
-                        jam_build_dir = "bin.linuxx86";
+                        jam_build_dir = "bin.linuxx86"
                     else:
                         jam_build_dir = "bin.linux" + os.uname()[4]
                 elif os.uname()[0] == 'SunOS':
@@ -262,8 +273,7 @@ class Tester(TestCmd.TestCmd):
             # Find where jam_src is located. Try for the debug version if it is
             # lying around.
             dirs = [os.path.join('../engine', jam_build_dir + '.debug'),
-                    os.path.join('../engine', jam_build_dir),
-                    ]
+                    os.path.join('../engine', jam_build_dir)]
             for d in dirs:
                 if os.path.exists(d):
                     jam_build_dir = d
@@ -359,7 +369,7 @@ class Tester(TestCmd.TestCmd):
             pass
 
         os.rename(old, new)
-        self.touch(new);
+        self.touch(new)
 
     def copy(self, src, dst):
         self.wait_for_time_change_since_last_build()
@@ -381,9 +391,16 @@ class Tester(TestCmd.TestCmd):
             os.utime(self.native_file_name(name), None)
 
     def rm(self, names):
-        self.wait_for_time_change_since_last_build()
         if not type(names) == types.ListType:
             names = [names]
+
+        if names == ["."]:
+            # If we're deleting the entire workspace, there's no
+            # need to wait for a clock tick.
+            self.last_build_time_start = 0
+            self.last_build_time_finish = 0
+
+        self.wait_for_time_change_since_last_build()
 
         # Avoid attempts to remove the current directory.
         os.chdir(self.original_workdir)
@@ -405,8 +422,7 @@ class Tester(TestCmd.TestCmd):
         os.chdir(self.workdir)
 
     def expand_toolset(self, name):
-        """Expands $toolset in the given file to tested toolset.
-        """
+        """Expands $toolset in the given file to tested toolset."""
         content = self.read(name)
         content = string.replace(content, "$toolset", self.toolset)
         self.write(name, content)
@@ -426,9 +442,8 @@ class Tester(TestCmd.TestCmd):
 
         try:
             if os.path.isabs(subdir):
-                if stderr:
-                    print "You must pass a relative directory to subdir <"+subdir+">."
-                status = 1
+                print("You must pass a relative directory to subdir <%s>." %
+                    subdir)
                 return
 
             self.previous_tree = tree.build_tree(self.workdir)
@@ -475,7 +490,7 @@ class Tester(TestCmd.TestCmd):
 
             annotation("failure", '"%s" returned %d%s'
                 % (kw['program'], _status(self), expect))
-            
+
             annotation("reason", "unexpected status returned by bjam")
             self.fail_test(1)
 
@@ -502,7 +517,7 @@ class Tester(TestCmd.TestCmd):
             self.fail_test(1, dump_stdio=False)
 
         if not expected_duration is None:
-            actual_duration = self.last_build_time_finish - self.last_build_time_start 
+            actual_duration = self.last_build_time_finish - self.last_build_time_start
             if (actual_duration > expected_duration):
                 print "Test run lasted %f seconds while it was expected to " \
                     "finish in under %f seconds." % (actual_duration,
@@ -511,6 +526,10 @@ class Tester(TestCmd.TestCmd):
 
         self.tree = tree.build_tree(self.workdir)
         self.difference = tree.trees_difference(self.previous_tree, self.tree)
+        if self.difference.empty():
+            # If nothing was changed, there's no need to wait
+            self.last_build_time_start = 0
+            self.last_build_time_finish = 0
         self.difference.ignore_directories()
         self.unexpected_difference = copy.deepcopy(self.difference)
 
@@ -549,16 +568,17 @@ class Tester(TestCmd.TestCmd):
         f = open(self.glob_file(name), "rb")
         lines = f.readlines()
         result = string.join(map(string.rstrip, lines), "\n")
-        if lines and lines[-1][-1] == '\n':
+        if lines and lines[-1][-1] != '\n':
             return result + '\n'
         else:
             return result
 
-    def fail_test(self, condition, dump_stdio=True, *args):
+    def fail_test(self, condition, dump_difference=True, dump_stdio=True,
+        dump_stack=True):
         if not condition:
             return
 
-        if hasattr(self, 'difference'):
+        if dump_difference and hasattr(self, 'difference'):
             f = StringIO.StringIO()
             self.difference.pprint(f)
             annotation("changes caused by the last build command", f.getvalue())
@@ -574,13 +594,13 @@ class Tester(TestCmd.TestCmd):
             if os.path.isdir(path):
                 shutil.rmtree(path, ignore_errors=False)
             elif os.path.exists(path):
-                raise "Path " + path + " already exists and is not a directory";
+                raise "Path " + path + " already exists and is not a directory"
             shutil.copytree(self.workdir, path)
             print "The failed command was:"
             print ' '.join(self.last_program_invocation)
 
-        at = TestCmd.caller(traceback.extract_stack(), 0)
-        annotation("stacktrace", at)
+        if dump_stack:
+            annotate_stack_trace()
         sys.exit(1)
 
     # A number of methods below check expectations with actual difference
@@ -682,7 +702,7 @@ class Tester(TestCmd.TestCmd):
             self.ignore('*.pdb')       # MSVC program database files.
             self.ignore('*.rsp')       # Response files.
             self.ignore('*.tds')       # Borland debug symbols.
-            self.ignore('*.manifest')  # MSVC DLL manifests.            
+            self.ignore('*.manifest')  # MSVC DLL manifests.
 
         # Debug builds of bjam built with gcc produce this profiling data.
         self.ignore('gmon.out')
@@ -771,13 +791,17 @@ class Tester(TestCmd.TestCmd):
             self.fail_test(1)
 
     def maybe_do_diff(self, actual, expected):
-        if os.environ.has_key("DO_DIFF") and os.environ["DO_DIFF"] != '':
+        if os.environ.get("DO_DIFF"):
             e = tempfile.mktemp("expected")
             a = tempfile.mktemp("actual")
             open(e, "w").write(expected)
             open(a, "w").write(actual)
             print "DIFFERENCE"
-            if os.system("diff -u " + e + " " + a):
+            # Current diff should return 1 to indicate 'different input files'
+            # but some older diff versions may return 0 and depending on the
+            # exact Python/OS platform os.system() call may gobble out the
+            # external process's return code and return 0 itself.
+            if os.system("diff -u %s %s" % (e, a)) not in [0, 1]:
                 print "Unable to compute difference: diff -u %s %s" % (e, a)
             os.unlink(e)
             os.unlink(a)
@@ -882,11 +906,11 @@ class List:
     def __init__(self, s=""):
         elements = []
         if isinstance(s, type("")):
-            # Have to handle espaced spaces correctly.
+            # Have to handle escaped spaces correctly.
             s = string.replace(s, "\ ", '\001')
             elements = string.split(s)
         else:
-            elements = s;
+            elements = s
 
         self.l = []
         for e in elements:
@@ -930,6 +954,7 @@ class List:
         result = List()
         result.l = self.l[:] + other.l[:]
         return result
+
 
 # Quickie tests. Should use doctest instead.
 if __name__ == '__main__':

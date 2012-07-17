@@ -45,20 +45,16 @@ namespace boost { namespace algorithm {
     
     \struct non_hex_input    
     \brief  Thrown when a non-hex value (0-9, A-F) encountered when decoding.
-    			Contains the offending character
+                Contains the offending character
     
     \struct not_enough_input 
     \brief  Thrown when the input sequence unexpectedly ends
     
 */
-struct hex_decode_error: virtual boost::exception, virtual std::exception {};
-struct not_enough_input : public hex_decode_error {};
-struct non_hex_input : public hex_decode_error {
-    non_hex_input ( char ch ) : bad_char ( ch ) {}
-    char bad_char;
-private:
-    non_hex_input ();       // don't allow creation w/o a char
-    };
+struct hex_decode_error : virtual boost::exception, virtual std::exception {};
+struct not_enough_input : virtual hex_decode_error {};
+struct non_hex_input    : virtual hex_decode_error {};
+typedef boost::error_info<struct bad_char_,char> bad_char;
 
 namespace detail {
 /// \cond DOXYGEN_HIDE
@@ -77,7 +73,7 @@ namespace detail {
         if ( c >= '0' && c <= '9' ) return c - '0';
         if ( c >= 'A' && c <= 'F' ) return c - 'A' + 10;
         if ( c >= 'a' && c <= 'f' ) return c - 'a' + 10;
-        BOOST_THROW_EXCEPTION (non_hex_input (c));
+        BOOST_THROW_EXCEPTION (non_hex_input() << bad_char (c));
         return 0;   // keep dumb compilers happy
         }
     
@@ -158,6 +154,7 @@ namespace detail {
 /// \param first    The start of the input sequence
 /// \param last     One past the end of the input sequence
 /// \param out      An output iterator to the results into
+/// \return         The updated output iterator
 /// \note           Based on the MySQL function of the same name
 template <typename InputIterator, typename OutputIterator>
 typename boost::enable_if<boost::is_integral<typename detail::hex_iterator_traits<InputIterator>::value_type>, OutputIterator>::type
@@ -226,15 +223,13 @@ OutputIterator unhex ( const T *ptr, OutputIterator out ) {
 //  If we run into the terminator while decoding, we will throw a
 //      malformed input exception. It would be nicer to throw a 'Not enough input'
 //      exception - but how much extra work would that require?
-//  I just make up an "end iterator" which we will never get to - 
-//      two Ts per byte of the output type.
     while ( *ptr )
-        out = detail::decode_one ( ptr, ptr + 2 * sizeof(OutputType), out );
+        out = detail::decode_one ( ptr, (const T *) NULL, out );
     return out;
     }
 
 
-/// \fn unhex ( const Range &r, OutputIterator out )
+/// \fn OutputIterator unhex ( const Range &r, OutputIterator out )
 /// \brief   Converts a sequence of hexadecimal characters into a sequence of integers.
 /// 
 /// \param r        The input range
@@ -247,7 +242,7 @@ OutputIterator unhex ( const Range &r, OutputIterator out ) {
     }
 
 
-/// \fn hex ( const String &input )
+/// \fn String hex ( const String &input )
 /// \brief   Converts a sequence of integral types into a hexadecimal sequence of characters.
 /// 
 /// \param input    A container to be converted
@@ -260,8 +255,8 @@ String hex ( const String &input ) {
     return output;
     }
 
-/// \fn unhex ( const String &input )
-/// \brief   Converts a sequence of hexadecimal characters into a sequence of integers.
+/// \fn String unhex ( const String &input )
+/// \brief   Converts a sequence of hexadecimal characters into a sequence of characters.
 /// 
 /// \param input    A container to be converted
 /// \return         A container with the decoded text

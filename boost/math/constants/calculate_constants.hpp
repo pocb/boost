@@ -85,6 +85,7 @@ template <class T>  // sqrt(2/pi)
 template <int N>
 inline T constant_root_two_div_pi<T>::compute(BOOST_MATH_EXPLICIT_TEMPLATE_TYPE_SPEC(mpl::int_<N>))
 {
+   BOOST_MATH_STD_USING
    return sqrt((2 / pi<T, policies::policy<policies::digits2<N> > >()));
 }
 
@@ -237,6 +238,14 @@ inline T constant_ln_two<T>::compute(BOOST_MATH_EXPLICIT_TEMPLATE_TYPE_SPEC(mpl:
    //
    BOOST_MATH_STD_USING
    return log(static_cast<T>(2));
+}
+
+template <class T>
+template<int N>
+inline T constant_ln_ten<T>::compute(BOOST_MATH_EXPLICIT_TEMPLATE_TYPE_SPEC(mpl::int_<N>))
+{
+   BOOST_MATH_STD_USING
+   return log(static_cast<T>(10));
 }
 
 template <class T>
@@ -945,8 +954,6 @@ inline T constant_rayleigh_kurtosis<T>::compute(BOOST_MATH_EXPLICIT_TEMPLATE_TYP
    * (pi<T, policies::policy<policies::digits2<N> > >() - static_cast<T>(4)))
    );
 }
-
-
 
 }}}} // namespaces
 

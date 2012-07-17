@@ -68,6 +68,12 @@ public:
     using namespace boost;
     BOOST_CHECK( get(m_color, target(e, g)) == Color::black() );
   }
+  template <class Edge, class Graph>
+  void finish_edge(Edge e, Graph& g) {
+    using namespace boost;
+    BOOST_CHECK( get(m_color, target(e, g)) == Color::gray() ||
+                 get(m_color, target(e, g)) == Color::black() );
+  }
   template <class Vertex, class Graph>
   void finish_vertex(Vertex u, Graph&) {
     using namespace boost;

@@ -17,25 +17,28 @@
 #include <boost/preprocessor/punctuation/comma_if.hpp>
 #include <boost/preprocessor/control/iif.hpp>
 #include <boost/preprocessor/cat.hpp>
-#include <cassert>
 
 // PRIVATE //
 
 #define CONST_BLOCK_BIND_(r, unused, i, var) \
     BOOST_PP_COMMA_IF(i) const bind& var
     
-#define CONST_BLOCK_(list) \
+//[const_block_macro
+#define CONST_BLOCK_(variables) \
     void BOOST_LOCAL_FUNCTION( \
-        BOOST_PP_IIF(BOOST_PP_LIST_IS_NIL(list), \
+        BOOST_PP_IIF(BOOST_PP_LIST_IS_NIL(variables), \
             void BOOST_PP_TUPLE_EAT(3) \
         , \
             BOOST_PP_LIST_FOR_EACH_I \
-        )(CONST_BLOCK_BIND_, ~, list) \
+        )(CONST_BLOCK_BIND_, ~, variables) \
     )
+//]
 
+//[const_block_end_macro
 #define CONST_BLOCK_END_(id) \
-    BOOST_LOCAL_FUNCTION_NAME(BOOST_PP_CAT(const_assert_, id)) \
-    BOOST_PP_CAT(const_assert_, id)(); /* call local function immediately */
+    BOOST_LOCAL_FUNCTION_NAME(BOOST_PP_CAT(const_block_, id)) \
+    BOOST_PP_CAT(const_block_, id)(); /* call local function immediately */
+//]
 
 // PUBLIC //
 

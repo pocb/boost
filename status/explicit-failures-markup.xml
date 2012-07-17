@@ -77,6 +77,21 @@
       </mark-expected-failures>
     </library>
 
+    <!-- algorithm -->
+    <library name="algorithm">
+      <mark-expected-failures>
+          <test name="empty_search_test"/>
+          <test name="search_test1"/>
+          <test name="search_test2"/>
+          <test name="search_test3"/>
+          <test name="is_permutation_test1"/>
+          <toolset name="vacpp-10.1"/>
+        <note author="Marshall Clow">
+          These failures are caused by a lack of support/configuration for Boost.Tr1
+        </note>
+      </mark-expected-failures>
+    </library>
+
     <!-- minmax -->
     <library name="algorithm/minmax">
       <mark-unusable>
@@ -466,34 +481,34 @@
 
     <!-- build -->
     <library name="build">
-        <test name="timedata">
-            <mark-failure>
-                <toolset name="msvc-7.1"/>
-                <toolset name="msvc-8.0"/>
-                <toolset name="msvc-9.0"/>
-                <note author="Vladimir Prus">
-                  See https://zigzag.lvk.cs.msu.su:7813/boost.build/ticket/218
-                </note>
-            </mark-failure>
-        </test>
+        <mark-expected-failures>
+            <test name="collect_debug_info"/>
+            <toolset name="*"/>
+            <note author="Jurko Gospodnetić">
+                Temporarily enabled and always failing test used for collecting
+                additional feedback from the testing site.
+            </note>
+        </mark-expected-failures>
     </library>
 
     <!-- chrono -->
     <library name="chrono">
         <mark-unusable>
             <toolset name="borland-*"/>
-            <toolset name="vacpp*"/>
+            <toolset name="vacpp-10*"/>
             <note author="Vicente J. Botet Escriba">
                 The compiler does not support features that are essential for the library.
             </note>
         </mark-unusable>
-        <test name="*_header" category="Header Only">
+        <test name="*_h" category="Header Only">
         </test>
-        <test name="*_static" category="Static Link">
+        <test name="*_l" category="Non Header Only">
         </test>
-        <test name="*_shared" category="Shared Link">
+        <test name="*_s" category="Static Link">
         </test>
-        <test name="*_fail" category="Compile Diagnostic Required">
+        <test name="*_d" category="Dynamic Link">
+        </test>
+        <test name="*_f" category="Compile Diagnostic Required">
         </test>
       
     </library>
@@ -637,6 +652,15 @@
                 <toolset name="borland-5.9*"/>
                 <note author="Alisdair Meredith">
                     This compiler does not support the is_abstract type trait
+                </note>
+            </mark-failure>
+        </test>
+        <test name="lexical_cast_containers_test">
+            <mark-failure>
+                <toolset name="vacpp*"/>
+                <toolset name="msvc-9.0~wm5~*"/>
+                <note author="Antony Polukhin">
+                    This compiler is unable to compile Boost.Container library
                 </note>
             </mark-failure>
         </test>
@@ -1754,16 +1778,6 @@
                 ADL which these compilers do not support.
             </note>
         </mark-expected-failures>
-
-        <mark-expected-failures>
-            <test name="noncopyable_rvalue_const"/>
-            <test name="noncopyable_rvalue_const_r"/>
-            <test name="noncopyable_rvalue_nonconst"/>
-            <test name="noncopyable_rvalue_nonconst_r"/>
-            <toolset name="*"/>
-            <note refid="50" author="Eric Niebler"/>
-        </mark-expected-failures>
-
     </library>
 
     <!-- format -->
@@ -1930,9 +1944,7 @@
             </note>
         </mark-expected-failures>
     </library>
-
-
-
+    
     <!-- fusion -->
     <library name="fusion">
         <mark-unusable>
@@ -1978,6 +1990,8 @@
             <toolset name="vacpp"/>
             <toolset name="vacpp-10.1"/>
             <toolset name="msvc-7.1"/>
+            <toolset name="*_fno_rtti"/>
+            <toolset name="cray-8.0"/>
             <note author="Barend Gehrels">
                 These compilers do not support features that are essential for the library.
             </note>
@@ -2432,6 +2446,69 @@
         </mark-expected-failures>
     </library>
 
+    <!-- local_function -->
+    <library name="local_function">
+        <mark-unusable>
+            <!-- most Preprocessor tests also fail on this compiler -->
+            <toolset name="cray-8.0"/>
+        </mark-unusable>
+        <!-- variadic macros required -->
+        <mark-expected-failures>
+            <test name="add"/>
+            <test name="add_classifiers"/>
+            <test name="add_default"/>
+            <test name="add_except"/>
+            <test name="add_inline"/>
+            <test name="add_params_only"/>
+            <test name="add_template"/>
+            <test name="add_this"/>
+            <test name="add_typed"/>
+            <test name="add_with_default"/>
+            <test name="all_decl"/>
+            <test name="factorial"/>
+            <test name="goto"/>
+            <test name="macro_commas"/>
+            <test name="nesting"/>
+            <test name="operator"/>
+            <test name="overload"/>
+            <test name="return_assign"/>
+            <test name="return_derivative"/>
+            <test name="return_inc"/>
+            <test name="return_setget"/>
+            <test name="return_this"/>
+            <test name="same_line"/>
+            <test name="transform"/>
+            <test name="typeof"/>
+            <test name="typeof_template"/>
+            <toolset name="intel-darwin-11.1"/>
+            <toolset name="intel-linux-10.1"/>
+            <toolset name="intel-linux-11.1"/>
+            <toolset name="pgi-11.9"/>
+            <toolset name="sun-5.10"/>
+            <note author="Lorenzo Caminiti" refid="51"/>
+        </mark-expected-failures>
+        <!-- auto-declarations not allowed -->
+        <mark-expected-failures>
+            <test name="add_classifiers"/>
+            <test name="add_classifiers_seq"/>
+            <test name="add_classifiers_seq_nova"/>
+            <toolset name="clang-darwin-trunkLX"/>
+            <toolset name="clang-darwin-trunkRX"/>
+            <toolset name="darwin-4.4_0x"/>
+            <toolset name="gcc-4.4.3_0x"/>
+            <toolset name="gcc-4.4.4_0x"/>
+            <toolset name="gcc-4.5.3_0x"/>
+            <toolset name="gcc-4.6.2_0x"/>
+            <toolset name="gcc-mingw-4.5.2_0x"/>
+            <toolset name="msvc-10.0"/>
+            <toolset name="msvc-11.0"/>
+            <note author="Lorenzo Caminiti">
+                This test does not allow C++11 auto-declaration support
+                (beccause it uses the `auto` keyword as storage classifier).
+            </note>
+        </mark-expected-failures>
+    </library>
+
     <!-- logic -->
     <library name="logic">
       <test name="tribool_io_test">
@@ -2826,6 +2903,7 @@ for more information.
         <toolset name="sun-5.10"/>
         <toolset name="borland-*"/>
         <toolset name="vacpp*"/>
+        <toolset name="cray-8.0"/>
         <note author="Thomas Heller" id="phoenix-incompatible-compilers">
             These compilers don't work with phoenix.
             This is due to the fact that phoenix uses proto
@@ -2867,6 +2945,7 @@ for more information.
         <toolset name="borland-*"/>
         <toolset name="vacpp"/>
         <toolset name="vacpp-*"/>
+        <toolset name="cray-8.0"/>
       </mark-unusable>
     </library>
 
@@ -2906,9 +2985,6 @@ for more information.
             <test name="*_warchive"/>
             <test name="test_codecvt_null"/>
             <test name="test_utf8_codecvt"/>
-            <toolset name="mingw*"/>
-            <toolset name="*mingw*"/>
-            <toolset name="*cygwin*"/>
             <toolset name="gcc-2.95.3-linux"/>
             <toolset name="*como-4_3_3*"/>
             <note author="Robert Ramey,Roland Schwarz" date="16 Feb 07" refid="19"/>
@@ -3114,12 +3190,13 @@ for more information.
     <!-- spirit (v2) -->
     <library name="spirit">
       <mark-unusable>
-	<toolset name="sun-5.7"/>
-	<toolset name="sun-5.8"/>
+        <toolset name="sun-5.7"/>
+        <toolset name="sun-5.8"/>
         <toolset name="sun-5.9"/>
         <toolset name="sun-5.10"/>
-	<toolset name="vacpp*"/>
-	<toolset name="borland-*"/>
+        <toolset name="vacpp*"/>
+        <toolset name="borland-*"/>
+        <toolset name="cray-8.0"/>
       </mark-unusable>
     </library>
 
@@ -4755,7 +4832,7 @@ for more information.
         </mark-expected-failures>
         <mark-expected-failures>
             <test name="si_physics"/>
-            <toolset name="vacpp*"/>
+            <toolset name="vacpp-10*"/>
             <note author="Vicente J. Botet Escriba">
                 The compiler does not support features that are essential for this test .
             </note>
@@ -4915,11 +4992,14 @@ for more information.
 
     <!-- scope_exit -->
     <library name="scope_exit">
+        <mark-unusable>
+            <!-- most Preprocessor tests also fail on this compiler -->
+            <toolset name="cray-8.0"/>
+        </mark-unusable>
         <mark-expected-failures>
             <test name="emulation_tpl"/>
             <toolset name="intel-*-9.1"/>
             <toolset name="intel-*-10.0"/>
-            <toolset name="intel-*-10.1"/>
             <toolset name="intel-*-11.0"/>
             <note author="Alexander Nasonov">
                 The test does not compile in typeof emulation mode,
@@ -4953,6 +5033,75 @@ for more information.
             <toolset name="msvc-7.1*"/>
             <toolset name="msvc-8.0*"/>
             <note author="Alexander Nasonov" refid="2"/>
+        </mark-expected-failures>
+        <!-- type-of emulation mode required -->
+        <mark-expected-failures>
+            <test name="native"/>
+            <test name="native_this"/>
+            <test name="native_this_tpl"/>
+            <test name="native_tpl"/>
+            <test name="native_tu_test"/>
+            <toolset name="sun-5.10"/>
+            <note author="Lorenzo Caminiti">
+                This compiler does not support native type-of (force type-of
+                emulation mode defining the BOOST_TYPEOF_EMULATION macro).
+            </note>
+        </mark-expected-failures>
+        <!-- variadic macros required -->
+        <mark-expected-failures>
+            <test name="same_line"/>
+            <test name="world"/>
+            <test name="world_checkpoint"/>
+            <test name="world_this"/>
+            <test name="world_tpl"/>
+            <toolset name="intel-darwin-11.1"/>
+            <toolset name="intel-linux-10.1"/>
+            <toolset name="intel-linux-11.1"/>
+            <toolset name="pgi-11.9"/>
+            <toolset name="sun-5.10"/>
+            <note author="Lorenzo Caminiti" refid="51"/>
+        </mark-expected-failures>
+        <!-- lambda functions required -->
+        <mark-expected-failures>
+            <test name="world_checkpoint_all"/>
+            <test name="world_checkpoint_all_seq"/>
+            <test name="world_checkpoint_all_seq_nova"/>
+            <toolset name="clang-darwin-trunk"/>
+            <toolset name="darwin-4.4"/>
+            <toolset name="darwin-4.4_0x"/>
+            <toolset name="gcc-4.2.1"/>
+            <toolset name="gcc-4.2.4"/>
+            <toolset name="gcc-4.3.4"/>
+            <toolset name="gcc-4.3.4_0x"/>
+            <toolset name="gcc-4.4.3"/>
+            <toolset name="gcc-4.4.3_0x"/>
+            <toolset name="gcc-4.4.4"/>
+            <toolset name="gcc-4.4.4_0x"/>
+            <toolset name="gcc-4.5.3"/>
+            <toolset name="gcc-4.6"/>
+            <toolset name="gcc-4.6.2"/>
+            <toolset name="gcc-mingw-4.4.0"/>
+            <toolset name="gcc-mingw-4.4.7"/>
+            <toolset name="gcc-mingw-4.5.2"/>
+            <toolset name="gcc-mingw-4.5.4"/>
+            <toolset name="gcc-mingw-4.6.3"/>
+            <toolset name="gcc-mingw-4.7.0"/>
+            <toolset name="intel-darwin-11.1"/>
+            <toolset name="intel-darwin-12.0"/>
+            <toolset name="intel-linux-10.1"/>
+            <toolset name="intel-linux-11.1"/>
+            <toolset name="intel-linux-12.0"/>
+            <toolset name="intel-linux-12.1"/>
+            <toolset name="msvc-8.0"/>
+            <toolset name="msvc-9.0"/>
+            <toolset name="msvc-9.0~stlport5.2"/>
+            <toolset name="msvc-9.0~wm5~stlport5.2"/>
+            <toolset name="pathscale-4.0.8"/>
+            <toolset name="pgi-11.9"/>
+            <toolset name="sun-5.10"/>
+            <toolset name="vacpp-10.1"/>
+            <toolset name="vacpp"/>
+            <note author="Lorenzo Caminiti" refid="52"/>
         </mark-expected-failures>
     </library>
 
@@ -5172,6 +5321,41 @@ for more information.
             <toolset name="*como-4_3_3*"/>
             <note author="B. Dawes" refid="10"/>
         </mark-unusable>
+        <mark-expected-failures>
+            <test name="test_thread*"/>
+            <test name="test_thread_id*"/>
+            <test name="test_hardware_concurrency*"/>
+            <test name="test_thread_move*"/>
+            <test name="test_thread_return_local*"/>
+            <test name="test_thread_move_return*"/>
+            <test name="test_thread_launching*"/>
+            <test name="test_thread_mf*"/>
+            <test name="test_thread_exit*"/>
+            <test name="test_move_function*"/>
+            <test name="test_mutex*"/>
+            <test name="test_condition_notify_one*"/>
+            <test name="test_condition_timed_wait_times_out*"/>
+            <test name="test_condition_notify_all*"/>
+            <test name="test_condition*"/>
+            <test name="test_tss*"/>
+            <test name="test_once*"/>
+            <test name="test_xtime*"/>
+            <test name="test_barrier*"/>
+            <test name="test_shared_mutex*"/>
+            <test name="test_shared_mutex_part_2*"/>
+            <test name="test_shared_mutex_timed_locks*"/>
+            <test name="test_shared_mutex_timed_locks_chrono*"/>
+            <test name="test_lock_concept*"/>
+            <test name="test_generic_locks*"/>
+            <test name="test_futures*"/>
+            <test name="test_2309*"/>
+            <test name="test_2741*"/>
+            <toolset name="sun-*"/>
+            <note author="Vicente J. Botet Escriba" date="2012-03-28">
+This test uses Boost.Test and Boost.Test doesn't works on this compiler.
+            </note>
+        </mark-expected-failures>
+
         <test name="test_mutex">
             <mark-failure>
                 <toolset name="msvc-7.0"/>
@@ -5218,6 +5402,7 @@ for more information.
             <toolset name="como-win-*"/>
             <toolset name="msvc*wm5*"/>
             <toolset name="cw-9.4"/>
+            <toolset name="gcc-mingw*"/>
             <note author="Roland Schwarz" date="2006-12-14">
                 When a thread ends, tss data needs to be cleaned up. This process
                 is mostly automatic. When threads are launched by the Boost.Thread API
@@ -5251,9 +5436,47 @@ With aC++, the tests compile cleanly in strict ansi mode and succeed.
             <test name="test_thread_move_return_lib"/>
             <test name="test_thread_return_local"/>
             <test name="test_thread_return_local_lib"/>
-            <toolset name="*"/>
+            <toolset name="sun-*"/>
             <note author="Anthony Williams" date="2009-10-28">
 These tests will fail in most compilers that don't support rvalue references.
+            </note>
+        </mark-expected-failures>
+        <mark-expected-failures>
+            <test name="*mutex__native_handle*"/>
+            <test name="*variable__native_handle*"/>
+            <toolset name="msvc-*"/>
+            <toolset name="gcc-mingw*"/>
+            <note author="Vicente J. Botet Escriba" date="2012-03-21">
+The implementation of native_handle() is not possible on this platform.
+            </note>
+        </mark-expected-failures>
+        <mark-expected-failures>
+            <test name="recursive_mutex__native_handle*"/>
+            <toolset name="pgi-*"/>
+            <toolset name="sun-*"/>
+            <note author="Vicente J. Botet Escriba" date="2012-03-21">
+The implementation of native_handle() is not possible on this platform.
+            </note>
+        </mark-expected-failures>
+        <mark-expected-failures>
+            <test name="*sleep_for*"/>
+            <test name="*sleep_until*"/>
+            <test name="*wait_for*"/>
+            <test name="*wait_until*"/>
+            <test name="*cons__duration*"/>
+            <test name="*cons__time_point*"/>
+            <test name="*try_lock_for*"/>
+            <test name="*try_lock_until*"/>
+            <test name="*upgrade_lock_for*"/>
+            <test name="*upgrade_lock_until*"/>
+            <test name="*try_join_for*"/>
+            <test name="*try_join_until*"/>
+            <test name="*chrono*"/>
+            <test name="*shared_lock_until*"/>
+            <test name="*shared_lock_for*"/>
+            <toolset name="vacpp*"/>
+            <note author="Vicente J. Botet Escriba" date="2012-03-21">
+This platform doesn't supports Boost.Chrono.
             </note>
         </mark-expected-failures>
     </library>
@@ -6448,6 +6671,12 @@ These tests will fail in most compilers that don't support rvalue references.
             <toolset name="sun-5.10"/>
             <note refid="17"/>
         </mark-unusable>
+        <mark-unusable>
+            <toolset name="cray-8.0"/>
+            <note author="Eric Niebler">
+                Boost.Proto doesn't work on the cray compiler.
+            </note>
+        </mark-unusable>
 
         <mark-expected-failures>
             <test name="test_actions"/>
@@ -6748,8 +6977,12 @@ These tests will fail in most compilers that don't support rvalue references.
         This test fails because MinGW apparently does not always catch exceptions properly.
     </note>
 
-    <note id="50">
-        This test requires C++0x support.
+    <note id="51">
+        This test requires variadic macro support.
+    </note>
+    
+    <note id="52">
+        This test requires lambda function support.
     </note>
 
 </explicit-failures-markup>

@@ -18,6 +18,8 @@
 
 // thread& operator=(thread&& t);
 
+#define BOOST_THREAD_PROVIDES_THREAD_MOVE_ASSIGN_CALLS_TERMINATE_IF_JOINABLE
+
 #include <boost/thread/thread.hpp>
 #include <new>
 #include <cstdlib>
@@ -57,7 +59,7 @@ public:
   void operator()(int i, double j)
   {
     BOOST_TEST(alive_ == 1);
-    BOOST_TEST(n_alive == 1);
+    //BOOST_TEST(n_alive == 1);
     BOOST_TEST(i == 5);
     BOOST_TEST(j == 5.5);
     op_run = true;
@@ -69,7 +71,7 @@ bool G::op_run = false;
 
 void f1()
 {
-  std::exit(0);
+  std::exit(boost::report_errors());
 }
 
 int main()
@@ -85,20 +87,16 @@ int main()
     BOOST_TEST(t1.get_id() == id);
     BOOST_TEST(t0.get_id() == boost::thread::id());
     t1.join();
-#if 0
-    BOOST_TEST(G::n_alive == 0);
-#endif
     BOOST_TEST(G::op_run);
   }
-  {
-    boost::thread t0(G(), 5, 5.5);
-    boost::thread::id id = t0.get_id();
-    boost::thread t1;
-    t0 = boost::move(t1);
-#if 0
-    BOOST_TEST(false);
-#endif
-  }
+//  BOOST_TEST(G::n_alive == 0);
+//  {
+//    boost::thread t0(G(), 5, 5.5);
+//    boost::thread::id id = t0.get_id();
+//    boost::thread t1;
+//    t0 = boost::move(t1);
+//    BOOST_TEST(false);
+//  }
   return boost::report_errors();
 }
 

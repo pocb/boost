@@ -14,6 +14,7 @@
 #include <boost/chrono/system_clocks.hpp>
 #include <boost/chrono/ceil.hpp>
 #endif
+#include <boost/thread/detail/delete.hpp>
 
 #include <boost/config/abi_prefix.hpp>
 
@@ -111,17 +112,8 @@ namespace boost
         pthread_mutex_t internal_mutex;
         pthread_cond_t cond;
 
-#ifndef BOOST_NO_DELETED_FUNCTIONS
     public:
-        condition_variable_any(condition_variable_any const&) = delete;
-        condition_variable_any& operator=(condition_variable_any const&) = delete;
-#else // BOOST_NO_DELETED_FUNCTIONS
-    private:
-        condition_variable_any(condition_variable_any&);
-        condition_variable_any& operator=(condition_variable_any&);
-#endif // BOOST_NO_DELETED_FUNCTIONS
-
-    public:
+        BOOST_THREAD_NO_COPYABLE(condition_variable_any)
         condition_variable_any()
         {
             int const res=pthread_mutex_init(&internal_mutex,NULL);

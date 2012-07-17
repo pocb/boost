@@ -44,6 +44,8 @@ struct line_line_intersection
 
         coordinate_type denominator = det(x1 - x2, y1 - y2, x3 - x4, y3 - y4);
 
+        // TODO: use something else then denominator (sides?) to determine this.
+
         // If denominator is zero, segments are parallel.
         // We have context information, so know that it should then
         // be the case that line1.p2 == line2.p1, and that is the
@@ -52,7 +54,7 @@ struct line_line_intersection
         {
             set<0>(p, x2);
             set<1>(p, y2);
-            return true;
+            return false;
         }
 
         coordinate_type d1 = det(x1, y1, x2, y2);

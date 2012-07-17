@@ -7,15 +7,16 @@
 // Home at http://www.boost.org/libs/scope_exit
 
 #include <boost/config.hpp>
-#ifndef BOOST_NO_LAMBDAS
+#ifdef BOOST_NO_LAMBDAS
+#   error "lambda functions required"
+#else
 
 #include <boost/scope_exit.hpp>
 #include <boost/foreach.hpp>
 #include <boost/typeof/typeof.hpp>
 #include <boost/typeof/std/vector.hpp>
 #include BOOST_TYPEOF_INCREMENT_REGISTRATION_GROUP()
-#define BOOST_TEST_MODULE TestWorldCheckpointAllSeq
-#include <boost/test/unit_test.hpp>
+#include <boost/detail/lightweight_test.hpp>
 #include <vector>
 #include <iostream>
 #include <sstream>
@@ -59,9 +60,9 @@ void world::add_person(person const& a_person) {
     // This block must be no-throw.
     person& p = persons_.back();
     person::evolution_t checkpoint = p.evolution;
-    BOOST_SCOPE_EXIT_ALL( (&) (checkpoint) (this_) ) {
-        if(checkpoint == p.evolution) this_->persons_.pop_back();
-    } BOOST_SCOPE_EXIT_END
+    BOOST_SCOPE_EXIT_ALL( (&) (checkpoint) (this) ) {
+        if(checkpoint == p.evolution) this->persons_.pop_back();
+    };
 
     // ...
 
@@ -70,29 +71,29 @@ void world::add_person(person const& a_person) {
     // Assign new identifier to the person.
     person::id_t const prev_id = p.id;
     p.id = next_id_++;
-    BOOST_SCOPE_EXIT_ALL( (=) (&p) (this) ) {
+    BOOST_SCOPE_EXIT_ALL( (=) (&p) ) {
         if(checkpoint == p.evolution) {
             this->next_id_ = p.id;
             p.id = prev_id;
         }
-    }; // Use `;` instead of `SCOPE_EXIT_END` (C++11).
+    };
 
     // ...
 
     checkpoint = ++p.evolution;
 }
 
-BOOST_AUTO_TEST_CASE(test_world_checkpoint_all_seq) {
+int main(void) {
     person adam, eva;
     std::ostringstream oss;
     oss << adam;
     std::cout << oss.str() << std::endl;
-    BOOST_CHECK(oss.str() == "person(0, 0)");
+    BOOST_TEST(oss.str() == "person(0, 0)");
 
     oss.str("");
     oss << eva;
     std::cout << oss.str() << std::endl;
-    BOOST_CHECK(oss.str() == "person(0, 0)");
+    BOOST_TEST(oss.str() == "person(0, 0)");
 
     world w;
     w.add_person(adam);
@@ -100,12 +101,10 @@ BOOST_AUTO_TEST_CASE(test_world_checkpoint_all_seq) {
     oss.str("");
     oss << w;
     std::cout << oss.str() << std::endl;
-    BOOST_CHECK(oss.str() == "world(3, { person(1, 2),  person(2, 2), })");
+    BOOST_TEST(oss.str() == "world(3, { person(1, 2),  person(2, 2), })");
+
+    return boost::report_errors();
 }
 
-#else
-
-int main(void) { return 0; } // Trivial test.
-
-#endif
+#endif // variadic macros
 

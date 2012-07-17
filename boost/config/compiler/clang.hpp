@@ -8,13 +8,16 @@
 
 // Clang compiler setup.
 
-#if __has_feature(cxx_exceptions) && !defined(BOOST_NO_EXCEPTIONS)
-#else
+#if !__has_feature(cxx_exceptions) && !defined(BOOST_NO_EXCEPTIONS)
 #  define BOOST_NO_EXCEPTIONS
 #endif
 
-#if !__has_feature(cxx_rtti)
+#if !__has_feature(cxx_rtti) && !defined(BOOST_NO_RTTI)
 #  define BOOST_NO_RTTI
+#endif
+
+#if !__has_feature(cxx_rtti) && !defined(BOOST_NO_TYPEID)
+#  define BOOST_NO_TYPEID
 #endif
 
 #if defined(__int64)
@@ -44,7 +47,7 @@
 #  define BOOST_NO_DECLTYPE
 #endif
 
-#if !__has_feature(__cxx_decltype__)
+#if !__has_feature(cxx_decltype_incomplete_return_types)
 #  define BOOST_NO_DECLTYPE_N3276
 #endif
 
@@ -70,6 +73,10 @@
 
 #if !__has_feature(cxx_lambdas)
 #  define BOOST_NO_LAMBDAS
+#endif
+
+#if !__has_feature(cxx_local_type_template_args)
+#  define BOOST_NO_LOCAL_CLASS_TEMPLATE_PARAMETERS
 #endif
 
 #if !__has_feature(cxx_noexcept)

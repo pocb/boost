@@ -25,31 +25,22 @@
 
 class MoveOnly
 {
-  MoveOnly(const MoveOnly&);
-public:
+  BOOST_THREAD_MOVABLE_ONLY(MoveOnly)
   MoveOnly()
   {
   }
-#ifndef BOOST_NO_RVALUE_REFERENCES
-  MoveOnly(MoveOnly&&)
+  MoveOnly(BOOST_THREAD_RV_REF(MoveOnly))
   {}
-  void operator()(MoveOnly&&)
-  {
-  }
-#else
-  MoveOnly(detail::thread_move_t<MoveOnly>)
-  {}
-  void operator()(detail::thread_move_t<MoveOnly>)
-  {
-  }
-#endif
 
+  void operator()(BOOST_THREAD_RV_REF(MoveOnly))
+  {
+  }
 };
 
 int main()
 {
   {
-    boost::thread t = boost::thread(MoveOnly(), MoveOnly());
+    boost::thread t = boost::thread( BOOST_THREAD_MAKE_RV_REF(MoveOnly()), BOOST_THREAD_MAKE_RV_REF(MoveOnly()) );
     t.join();
   }
   return boost::report_errors();

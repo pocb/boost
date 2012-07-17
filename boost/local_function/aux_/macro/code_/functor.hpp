@@ -8,8 +8,8 @@
 #ifndef BOOST_LOCAL_FUNCTION_AUX_CODE_FUNCTOR_HPP_
 #define BOOST_LOCAL_FUNCTION_AUX_CODE_FUNCTOR_HPP_
 
+#include <boost/local_function/config.hpp>
 #include <boost/local_function/aux_/symbol.hpp>
-#include <boost/local_function/aux_/config.hpp>
 #include <boost/local_function/aux_/function.hpp>
 #include <boost/local_function/aux_/add_pointed_const.hpp>
 #include <boost/local_function/aux_/member.hpp>
@@ -237,14 +237,16 @@ BOOST_LOCAL_FUNCTION_AUX_CODE_FUNCTOR_COMMA_MAYBECONST_BIND_PARAM_DECL_( \
       BOOST_LOCAL_FUNCTION_AUX_CODE_FUNCTOR_MAYBECONST_BIND_PARAM_( \
             BOOST_PP_TUPLE_ELEM(4, 2, id_typename_offset_const), i)
 
-#define BOOST_LOCAL_FUNCTION_AUX_CODE_FUNCTOR_COMMA_BIND_THIS_TYPE_(id) \
-    , BOOST_LOCAL_FUNCTION_AUX_CODE_BIND_THIS_TYPE(id)
+#define BOOST_LOCAL_FUNCTION_AUX_CODE_FUNCTOR_COMMA_BIND_THIS_TYPE_( \
+        id, typename01) \
+    , BOOST_LOCAL_FUNCTION_AUX_CODE_BIND_THIS_TYPE(id, typename01)
       
 #define BOOST_LOCAL_FUNCTION_AUX_CODE_FUNCTOR_BIND_THIS_PARAM_ \
     bind_this
 
-#define BOOST_LOCAL_FUNCTION_AUX_CODE_FUNCTOR_COMMA_BIND_THIS_PARAM_DECL_(id) \
-    , BOOST_LOCAL_FUNCTION_AUX_CODE_BIND_THIS_TYPE(id) & \
+#define BOOST_LOCAL_FUNCTION_AUX_CODE_FUNCTOR_COMMA_BIND_THIS_PARAM_DECL_( \
+        id, typename01) \
+    , BOOST_LOCAL_FUNCTION_AUX_CODE_BIND_THIS_TYPE(id, typename01) & \
       BOOST_LOCAL_FUNCTION_AUX_CODE_FUNCTOR_BIND_THIS_PARAM_
 
 #define BOOST_LOCAL_FUNCTION_AUX_CODE_FUNCTOR_COMMA_NOBIND_(z, n, unused) \
@@ -323,8 +325,8 @@ BOOST_LOCAL_FUNCTION_AUX_CODE_FUNCTOR_MAYBECONST_BIND_MEMBER_INIT_ENUM_( \
 
 // Expand to the function type `R (A1, ...)`.
 #define BOOST_LOCAL_FUNCTION_AUX_CODE_FUNCTOR_F_( \
-        id, decl_traits, has_type, function_type) \
-    BOOST_LOCAL_FUNCTION_AUX_CODE_RESULT_TYPE(id) \
+        id, typename01, decl_traits, has_type, function_type) \
+    BOOST_LOCAL_FUNCTION_AUX_CODE_RESULT_TYPE(id, typename01) \
     BOOST_PP_EXPR_IIF(has_type, (function_type) ) \
     ( \
         BOOST_PP_LIST_FOR_EACH_I( \
@@ -383,7 +385,8 @@ BOOST_LOCAL_FUNCTION_AUX_CODE_FUNCTOR_MAYBECONST_BIND_MEMBER_INIT_ENUM_( \
 #define BOOST_LOCAL_FUNCTION_AUX_CODE_FUNCTOR_CALL_(z, defaults_n, \
         id, typename01, decl_traits, params, \
         const_binds, has_const_bind_this, binds, has_bind_this) \
-    inline BOOST_LOCAL_FUNCTION_AUX_CODE_RESULT_TYPE(id) operator()( \
+    inline BOOST_LOCAL_FUNCTION_AUX_CODE_RESULT_TYPE(id, typename01) \
+    operator()( \
         BOOST_PP_LIST_FOR_EACH_I( \
                 BOOST_LOCAL_FUNCTION_AUX_CODE_FUNCTOR_PARAM_ARG_DECL_ENUM_, \
                 typename01, params) \
@@ -423,8 +426,8 @@ BOOST_LOCAL_FUNCTION_AUX_CODE_FUNCTOR_STATIC_CALL_COMMA_BIND_PARAM_DECLS_( \
             has_const_bind_this), \
         BOOST_LOCAL_FUNCTION_AUX_CODE_FUNCTOR_COMMA_BIND_THIS_PARAM_DECL_ \
     , \
-        BOOST_PP_TUPLE_EAT(1) \
-    )(id) \
+        BOOST_PP_TUPLE_EAT(2) \
+    )(id, typename01) \
     /* fill with nobind_t (if no local-types as tparams) */ \
     BOOST_PP_REPEAT(BOOST_PP_SUB(BOOST_LOCAL_FUNCTION_CONFIG_BIND_MAX, \
             BOOST_PP_IIF(BOOST_PP_BITOR(has_bind_this, \
@@ -459,10 +462,10 @@ BOOST_LOCAL_FUNCTION_AUX_CODE_FUNCTOR_STATIC_CALL_COMMA_BIND_PARAM_DECLS_( \
 #define BOOST_LOCAL_FUNCTION_AUX_CODE_FUNCTOR_STATIC_CALL_(z, defaults_n, \
         id, typename01, decl_traits, params, \
         const_binds, has_const_bind_this, binds, has_bind_this) \
-    inline static BOOST_LOCAL_FUNCTION_AUX_CODE_RESULT_TYPE(id) \
+    inline static BOOST_LOCAL_FUNCTION_AUX_CODE_RESULT_TYPE(id, typename01) \
     BOOST_LOCAL_FUNCTION_AUX_CODE_FUNCTOR_STATIC_CALL_FUNC_(z, defaults_n, ~)( \
         void* object \
-        BOOST_PP_IIF(BOOST_LOCAL_FUNCTION_AUX_CONFIG_LOCALS_AS_TPARAMS_01, \
+        BOOST_PP_IIF(BOOST_LOCAL_FUNCTION_CONFIG_LOCALS_AS_TPARAMS, \
             BOOST_PP_TUPLE_EAT(6) \
         , \
   BOOST_LOCAL_FUNCTION_AUX_CODE_FUNCTOR_STATIC_CALL_COMMA_BIND_PARAM_DECLS_ \
@@ -484,7 +487,7 @@ BOOST_LOCAL_FUNCTION_AUX_CODE_FUNCTOR_STATIC_CALL_COMMA_BIND_PARAM_DECLS_( \
             static_cast< \
                 BOOST_LOCAL_FUNCTION_AUX_CODE_FUNCTOR_CLASS_TYPE_(id)* \
             >(object)-> \
-            BOOST_PP_IIF(BOOST_LOCAL_FUNCTION_AUX_CONFIG_LOCALS_AS_TPARAMS_01,\
+            BOOST_PP_IIF(BOOST_LOCAL_FUNCTION_CONFIG_LOCALS_AS_TPARAMS,\
                 BOOST_LOCAL_FUNCTION_AUX_CODE_FUNCTOR_STATIC_CALL_OPERATOR_ \
             , \
                 BOOST_LOCAL_FUNCTION_AUX_CODE_FUNCTOR_STATIC_CALL_BODY_ \
@@ -541,8 +544,8 @@ BOOST_LOCAL_FUNCTION_AUX_CODE_FUNCTOR_STATIC_CALL_COMMA_BIND_PARAM_DECLS_( \
             has_const_bind_this), \
         BOOST_LOCAL_FUNCTION_AUX_CODE_FUNCTOR_COMMA_BIND_THIS_TYPE_ \
     , \
-        BOOST_PP_TUPLE_EAT(1) \
-    )(id) \
+        BOOST_PP_TUPLE_EAT(2) \
+    )(id, typename01) \
     /* fill with nobind_t (if no local-types as tparams) */ \
     BOOST_PP_REPEAT(BOOST_PP_SUB(BOOST_LOCAL_FUNCTION_CONFIG_BIND_MAX, \
             BOOST_PP_IIF(BOOST_PP_BITOR(has_bind_this, has_const_bind_this), \
@@ -575,7 +578,7 @@ BOOST_LOCAL_FUNCTION_AUX_CODE_FUNCTOR_STATIC_CALL_COMMA_BIND_PARAM_DECLS_( \
         typedef BOOST_LOCAL_FUNCTION_AUX_TYPEOF_TYPE( \
             BOOST_PP_EXPR_IIF(typename01, typename) \
             ::boost::local_function::aux::add_pointed_const< \
-                BOOST_LOCAL_FUNCTION_AUX_CODE_BIND_THIS_TYPE(id) \
+                BOOST_LOCAL_FUNCTION_AUX_CODE_BIND_THIS_TYPE(id, typename01) \
             >::type \
             this_ \
         ) ; /* close typedef */ \
@@ -583,7 +586,7 @@ BOOST_LOCAL_FUNCTION_AUX_CODE_FUNCTOR_STATIC_CALL_COMMA_BIND_PARAM_DECLS_( \
     /* ... or, non-const this */ \
     BOOST_PP_EXPR_IIF(has_bind_this, \
         typedef BOOST_LOCAL_FUNCTION_AUX_TYPEOF_TYPE( \
-            BOOST_LOCAL_FUNCTION_AUX_CODE_BIND_THIS_TYPE(id) \
+            BOOST_LOCAL_FUNCTION_AUX_CODE_BIND_THIS_TYPE(id, typename01) \
             this_ \
         ) ; /* close typedef */ \
     )
@@ -605,8 +608,9 @@ BOOST_LOCAL_FUNCTION_AUX_CODE_FUNCTOR_STATIC_CALL_COMMA_BIND_PARAM_DECLS_( \
     /* bind this const or not (pointed-const is not added here because */ \
     /* this is a reference, it is added to the this_ body param instead */ \
     BOOST_PP_EXPR_IIF(BOOST_PP_BITOR(has_bind_this, has_const_bind_this), \
-        BOOST_LOCAL_FUNCTION_AUX_CODE_BIND_THIS_TYPE(id)/* this is * so no & */\
-        BOOST_LOCAL_FUNCTION_AUX_CODE_FUNCTOR_BIND_MEMBER_THIS_ \
+        /* this is * so no & */ \
+        BOOST_LOCAL_FUNCTION_AUX_CODE_BIND_THIS_TYPE(id, typename01) \
+            BOOST_LOCAL_FUNCTION_AUX_CODE_FUNCTOR_BIND_MEMBER_THIS_ \
         ; /* end member variable declaration */ \
     )
 
@@ -683,25 +687,27 @@ BOOST_LOCAL_FUNCTION_AUX_CODE_FUNCTOR_STATIC_CALL_COMMA_BIND_PARAM_DECLS_( \
 #define BOOST_LOCAL_FUNCTION_AUX_CODE_FUNCTOR_( \
         id, typename01, decl_traits, params, \
         default_count, const_binds, has_const_bind_this, binds, has_bind_this) \
-    class BOOST_LOCAL_FUNCTION_AUX_CODE_FUNCTOR_CLASS_TYPE_(id) \
+    typedef class BOOST_LOCAL_FUNCTION_AUX_CODE_FUNCTOR_CLASS_TYPE_(id) \
     /* run-time: do not use base class to allow for compiler optimizations */ \
     { \
         /* function type */ \
+    private: \
         typedef \
-            BOOST_LOCAL_FUNCTION_AUX_CODE_FUNCTOR_F_(id, decl_traits, \
-                    1 /* has type */, \
+            BOOST_LOCAL_FUNCTION_AUX_CODE_FUNCTOR_F_(id, typename01, \
+                    decl_traits, 1 /* has type */, \
                     BOOST_LOCAL_FUNCTION_AUX_CODE_FUNCTOR_F_TYPE_) \
         ; \
         /* functor type -- this type cannot have ID postfix because it is */ \
         /* used the `NAME` macro (this symbol is within functor class so */ \
-        /* it does not have to have ID postfix) */ \
+        /* it does not have to have ID postfix), must be public so it */ \
+        /* can be accessed by `NAME` macro from outside this class */ \
+    public: \
         typedef BOOST_PP_EXPR_IIF(typename01, typename) \
             BOOST_IDENTITY_TYPE(( /* IDENTITY for template param comma */ \
                 ::boost::local_function::aux::function< \
                       BOOST_LOCAL_FUNCTION_AUX_CODE_FUNCTOR_F_TYPE_ \
                     , default_count \
-                    BOOST_PP_IIF( \
-  BOOST_LOCAL_FUNCTION_AUX_CONFIG_LOCALS_AS_TPARAMS_01, \
+                    BOOST_PP_IIF(BOOST_LOCAL_FUNCTION_CONFIG_LOCALS_AS_TPARAMS,\
                         BOOST_PP_TUPLE_EAT(6) \
                     , \
                         BOOST_LOCAL_FUNCTION_AUX_CODE_FUNCTOR_COMMA_BIND_TYPES_\
@@ -711,6 +717,7 @@ BOOST_LOCAL_FUNCTION_AUX_CODE_FUNCTOR_STATIC_CALL_COMMA_BIND_PARAM_DECLS_( \
             )) \
             BOOST_LOCAL_FUNCTION_AUX_CODE_FUNCTOR_TYPE \
         ; \
+    private: \
         BOOST_LOCAL_FUNCTION_AUX_CODE_FUNCTOR_BIND_TYPEOF_TYPEDEFS_( \
                 id, typename01, \
                 const_binds, has_const_bind_this, binds, has_bind_this) \
@@ -719,7 +726,8 @@ BOOST_LOCAL_FUNCTION_AUX_CODE_FUNCTOR_STATIC_CALL_COMMA_BIND_PARAM_DECLS_( \
         /* (traits must be defined in both this and the global functor) */ \
         enum { arity = ::boost::function_traits< /* can't use static data */ \
                 BOOST_LOCAL_FUNCTION_AUX_CODE_FUNCTOR_F_TYPE_ >::arity }; \
-        typedef BOOST_LOCAL_FUNCTION_AUX_CODE_RESULT_TYPE(id) result_type; \
+        typedef BOOST_LOCAL_FUNCTION_AUX_CODE_RESULT_TYPE(id, typename01) \
+                result_type; \
         BOOST_PP_LIST_FOR_EACH_I( \
                 BOOST_LOCAL_FUNCTION_AUX_CODE_FUNCTOR_ARG_TYPEDEF_, \
                 typename01, params) \
@@ -764,8 +772,7 @@ BOOST_LOCAL_FUNCTION_AUX_CODE_FUNCTOR_STATIC_CALL_COMMA_BIND_PARAM_DECLS_( \
         ) { \
             functor.BOOST_LOCAL_FUNCTION_AUX_FUNCTION_INIT_CALL_FUNC( \
                     object \
-                    BOOST_PP_IIF( \
-  BOOST_LOCAL_FUNCTION_AUX_CONFIG_LOCALS_AS_TPARAMS_01, \
+                    BOOST_PP_IIF(BOOST_LOCAL_FUNCTION_CONFIG_LOCALS_AS_TPARAMS,\
                         BOOST_PP_TUPLE_EAT(6) \
                     , \
   BOOST_LOCAL_FUNCTION_AUX_CODE_FUNCTOR_COMMA_STATIC_BINDS_ \
@@ -790,7 +797,7 @@ BOOST_LOCAL_FUNCTION_AUX_CODE_FUNCTOR_STATIC_CALL_COMMA_BIND_PARAM_DECLS_( \
         /* body function (unfortunately, cannot be static to allow access */ \
         /* to member var with local function name for recursion but doing */ \
         /* so also allows the body to misuse `this` instead of `this_`) */ \
-        inline BOOST_LOCAL_FUNCTION_AUX_CODE_RESULT_TYPE(id) \
+        inline BOOST_LOCAL_FUNCTION_AUX_CODE_RESULT_TYPE(id, typename01) \
         BOOST_LOCAL_FUNCTION_AUX_CODE_FUNCTOR_BODY_FUNC_( \
                 /* const binds */ \
                 BOOST_PP_LIST_FOR_EACH_I( \
@@ -823,14 +830,16 @@ BOOST_LOCAL_FUNCTION_AUX_CODE_FUNCTOR_STATIC_CALL_COMMA_BIND_PARAM_DECLS_( \
                 BOOST_PP_EXPR_IIF(has_const_bind_this, \
                     BOOST_PP_EXPR_IIF(typename01, typename) \
                     ::boost::local_function::aux::add_pointed_const< \
-                        BOOST_LOCAL_FUNCTION_AUX_CODE_BIND_THIS_TYPE(id) \
-                    >::type const \
-                    this_ /* special name to access object this */ \
+                        BOOST_LOCAL_FUNCTION_AUX_CODE_BIND_THIS_TYPE(id, \
+                                typename01) \
+                    >::type \
+                    const this_ /* special name to access object this */ \
                 ) \
                 /* const pointer to non-const object */ \
                 BOOST_PP_EXPR_IIF(has_bind_this, \
-                    BOOST_LOCAL_FUNCTION_AUX_CODE_BIND_THIS_TYPE(id) const \
-                    this_ /* special name to access object this */ \
+                    BOOST_LOCAL_FUNCTION_AUX_CODE_BIND_THIS_TYPE(id, \
+                            typename01) \
+                    const this_ /* special name to access object this */ \
                 ) \
                 /* params (last because they can have defaults) */ \
                 BOOST_PP_COMMA_IF( \

@@ -52,13 +52,6 @@ typedef struct _settings SETTINGS ;
 
 /* RULE - a generic jam rule, the product of RULE and ACTIONS. */
 
-/* A rule's argument list. */
-struct argument_list
-{
-    int reference_count;
-    LOL data[1];
-};
-
 /* Build actions corresponding to a rule. */
 struct rule_actions
 {
@@ -82,17 +75,12 @@ struct _rule
 {
     OBJECT        * name;
     FUNCTION      * procedure;
-    argument_list * arguments;  /* argument checking info, or NULL for unchecked
-                                 */
     rule_actions  * actions;    /* build actions, or NULL for no actions */
     module_t      * module;     /* module in which this rule is executed */
     int             exported;   /* nonzero if this rule is supposed to appear in
                                  * the global module and be automatically
                                  * imported into other modules
                                  */
-#ifdef HAVE_PYTHON
-    PyObject * python_function;
-#endif
 };
 
 /* ACTIONS - a chain of ACTIONs. */
@@ -123,7 +111,6 @@ struct _settings
     SETTINGS * next;
     OBJECT   * symbol;        /* symbol name for var_set() */
     LIST     * value;         /* symbol value for var_set() */
-    int multiple;
 };
 
 /* TARGETS - a chain of TARGETs. */
@@ -238,6 +225,9 @@ struct _target
 
     int        asynccnt;              /* child deps outstanding */
     TARGETS  * parents;               /* used by make1() for completion */
+    TARGET   * scc_root;              /* used by make to resolve cyclic includes */
+    TARGET   * rescanning;            /* used by make0 to mark visited targets when rescanning */
+    int        depth;                 /* The depth of the target in the make0 stack. */
     char     * cmds;                  /* type-punned command list */
 
     const char * failed;
@@ -256,15 +246,11 @@ void       freesettings ( SETTINGS * );
 void       actions_refer( rule_actions * );
 void       actions_free ( rule_actions * );
 
-/* Argument list related functions. */
-void            args_free ( argument_list * );
-argument_list * args_new  ();
-void            args_refer( argument_list * );
-
 /* Rule related functions. */
 RULE * bindrule        ( OBJECT * rulename, module_t * );
 RULE * import_rule     ( RULE * source, module_t *, OBJECT * name );
-RULE * new_rule_body   ( module_t *, OBJECT * rulename, argument_list *, FUNCTION * func, int exprt );
+void   rule_localize   ( RULE * rule, module_t * module );
+RULE * new_rule_body   ( module_t *, OBJECT * rulename, FUNCTION * func, int exprt );
 RULE * new_rule_actions( module_t *, OBJECT * rulename, FUNCTION * command, LIST * bindlist, int flags );
 void   rule_free       ( RULE * );
 
@@ -279,6 +265,7 @@ void      target_include                 ( TARGET * including, TARGET * included
 TARGETS * targetlist                     ( TARGETS * chain, LIST * target_names );
 void      touch_target                   ( OBJECT * t );
 void      clear_includes                 ( TARGET * );
+TARGET *  target_scc                     ( TARGET * t );
 
 /* Final module cleanup. */
 void rules_done();

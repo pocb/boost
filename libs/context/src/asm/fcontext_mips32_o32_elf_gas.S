@@ -22,35 +22,28 @@
  *  |  S8 |  RA |  PC |                                         |  *
  *  -------------------------------------------------------------  *
  *  -------------------------------------------------------------  *
- *  |  13 |  14 |  15 |  16 |  17 |  18 |                       |  *
+ *  |  13 |  14 |                                               |  *
  *  -------------------------------------------------------------  *
- *  | 104 | 112 | 120 | 128 | 136 | 144 |                       |  *
- *  -------------------------------------------------------------  *
- *  | F20 | F22 | F24 | F26 | F28 | F30 |                       |  *
- *  -------------------------------------------------------------  *
- *  -------------------------------------------------------------  *
- *  |  19 |  20 |                                               |  *
- *  -------------------------------------------------------------  *
- *  | 152 | 156 |                                               |  *
+ *  | 104 | 112 |                                               |  *
  *  -------------------------------------------------------------  *
  *  |sbase|slimt|                                               |  *
  *  -------------------------------------------------------------  *
  *  -------------------------------------------------------------  *
- *  |  21 |                                                     |  *
+ *  |  15 |  16 |  17 |  18 |  19 |  20 |                       |  *
  *  -------------------------------------------------------------  *
- *  | 160 |                                                     |  *
+ *  | 120 | 128 | 136 | 144 | 152 | 160 |                       |  *
  *  -------------------------------------------------------------  *
- *  |flink|                                                     |  *
+ *  | F20 | F22 | F24 | F26 | F28 | F30 |                       |  *
  *  -------------------------------------------------------------  *
  *                                                                 *
  * *****************************************************************/
 
 .text
-.globl boost_fcontext_jump
+.globl jump_fcontext
 .align 2
-.type boost_fcontext_jump,@function
-.ent boost_fcontext_jump
-boost_fcontext_jump:
+.type jump_fcontext,@function
+.ent jump_fcontext
+jump_fcontext:
     sw      $s0, ($a0)      # save S0
     sw      $s1, 8($a0)     # save S1
     sw      $s2, 16($a0)    # save S2
@@ -66,14 +59,22 @@ boost_fcontext_jump:
     sw      $ra, 96($a0)    # save RA as PC
 
 #if defined(__mips_hard_float)
-    s.d     $f20, 104($a0)  # save F20
-    s.d     $f22, 112($a0)  # save F22
-    s.d     $f24, 120($a0)  # save F24
-    s.d     $f26, 128($a0)  # save F26
-    s.d     $f28, 136($a0)  # save F28
-    s.d     $f30, 144($a0)  # save F30
-#endif
+    beqz    $a3,  1f        # test if fpu env should be preserved 
+    s.d     $f20, 120($a0)  # save F20
+    s.d     $f22, 128($a0)  # save F22
+    s.d     $f24, 136($a0)  # save F24
+    s.d     $f26, 144($a0)  # save F26
+    s.d     $f28, 152($a0)  # save F28
+    s.d     $f30, 160($a0)  # save F30
 
+    l.d     $f20, 120($a1)  # restore F20
+    l.d     $f22, 128($a1)  # restore F22
+    l.d     $f24, 136($a1)  # restore F24
+    l.d     $f26, 144($a1)  # restore F26
+    l.d     $f28, 152($a1)  # restore F28
+    l.d     $f30, 160($a1)  # restore F30
+1:
+#endif
 
     lw      $s0, ($a1)      # restore S0
     lw      $s1, 8($a1)     # restore S1
@@ -89,28 +90,20 @@ boost_fcontext_jump:
     lw      $ra, 88($a1)    # restore RA
     move    $a0, $s2        # restore void pointer as argument
 
-#if defined(__mips_hard_float)
-    l.d     $f20, 104($a1)  # restore F20
-    l.d     $f22, 112($a1)  # restore F22
-    l.d     $f24, 120($a1)  # restore F24
-    l.d     $f26, 128($a1)  # restore F26
-    l.d     $f28, 136($a1)  # restore F28
-    l.d     $f30, 144($a1)  # restore F30
-#endif
-
     move    $v0, $a2        # use third arg as return value after jump
+    move    $a0, $a2        # use third arg as first arg in context function
 
     lw      $t9, 96($a1)    # load PC
     jr      $t9             # jump to context
-.end boost_fcontext_jump
-.size boost_fcontext_jump, .-boost_fcontext_jump
+.end jump_fcontext
+.size jump_fcontext, .-jump_fcontext
 
 .text
-.globl boost_fcontext_make
+.globl make_fcontext
 .align 2
-.type boost_fcontext_make,@function
-.ent boost_fcontext_make
-boost_fcontext_make:
+.type make_fcontext,@function
+.ent make_fcontext
+make_fcontext:
 #ifdef __PIC__
 .set    noreorder
 .cpload $t9
@@ -118,20 +111,15 @@ boost_fcontext_make:
 #endif
     sw      $a0, ($a0)          # save the current context
     sw      $gp, 24($a0)        # save global pointer
-    sw      $a1, 96($a0)        # save the address of the function supposed to be run
-    sw      $a2, 16($a0)        # save void pointer
-    lw      $t0, 152($a0)       # load the stack base
+    sw      $a1, 96($a0)        # save the address of the context function
+    lw      $t0, 104($a0)       # load the stack base
 
     sub     $sp, $sp, 28
     sw      $ra, 24($sp)
     sw      $a0, 20($sp)
-    move    $a0, $t0            # stack pointer as arg for boost_fcontext_align
-#ifdef __PIC__
-    lw      $t9, %call16(boost_fcontext_align)($gp) # align stack
+    move    $a0, $t0            # stack pointer as arg for align_stack
+    lw      $t9, %call16(align_stack)($gp) # align stack
     jalr    $t9
-#else
-    jal     boost_fcontext_align                    # align stack
-#endif
     nop
     move    $t0, $v0            # begin of aligned stack 
     lw      $ra, 24($sp)
@@ -139,35 +127,18 @@ boost_fcontext_make:
     addi    $sp, $sp, 28
 
     sub     $t0, $t0, 16        # reserve 16 byte of argument space
-    sw      $t0, 72($a0)        # save the stack base
-    lw      $t0, 160($a0)       # load address of next user context
-    sw      $t0, 8($a0)         # save the next context
-    la      $t9, link_fcontext  # get address of link_fcontext
-    sw      $t9, 88($a0)        # save address of link_fcontext
+    sw      $t0, 72($a0)        # save the algned stack base
+
+    la      $t9, finish         # helper code executed after context function returns
+    sw      $t9, 88($a0)
 
     move    $v0, $zero
     jr      $ra
 
-link_fcontext:
+finish:
     move    $gp, $s3            # restore GP (global pointer)
-    move    $a1, $s1            # set A1 to address of next context
-    beqz    $a1, 2f             # test if a next context was given
-
-    move    $a0, $s0            # set A0 to address of current context
-#ifdef __PIC__
-    lw      $t9, %call16(boost_fcontext_start)($gp)  # install next context
-    jr      $t9
-#else
-    j       boost_fcontext_start       # install next context
-#endif
-
-2:
-    move    $a0, $zero
-#ifdef __PIC__
+    move    $a0, $zero          # exit code is zero
     lw      $t9, %call16(_exit)($gp)  # exit application
     jalr    $t9
-#else
-    j       _exit               # exit application
-#endif
-.end boost_fcontext_make
-.size boost_fcontext_make, .-boost_fcontext_make
+.end make_fcontext
+.size make_fcontext, .-make_fcontext

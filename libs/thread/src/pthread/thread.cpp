@@ -24,7 +24,7 @@
 #include <unistd.h>
 #endif
 
-#include "timeconv.inl"
+#include <libs/thread/src/pthread/timeconv.inl>
 
 namespace boost
 {
@@ -46,7 +46,11 @@ namespace boost
 
         namespace
         {
+#ifdef BOOST_THREAD_PROVIDES_ONCE_CXX11
+          boost::once_flag current_thread_tls_init_flag;
+#else
             boost::once_flag current_thread_tls_init_flag=BOOST_ONCE_INIT;
+#endif
             pthread_key_t current_thread_tls_key;
 
             extern "C"
@@ -244,10 +248,7 @@ namespace boost
         }
     }
 
-    thread::~thread()
-    {
-        detach();
-    }
+
 
     detail::thread_data_ptr thread::get_thread_info BOOST_PREVENT_MACRO_SUBSTITUTION () const
     {
@@ -358,7 +359,7 @@ namespace boost
     }
 
 
-    void thread::detach()
+    void thread::detach() BOOST_NOEXCEPT
     {
         detail::thread_data_ptr local_thread_info;
         thread_info.swap(local_thread_info);
@@ -389,7 +390,7 @@ namespace boost
             if(thread_info)
             {
                 unique_lock<mutex> lk(thread_info->sleep_mutex);
-                while(thread_info->sleep_condition.timed_wait(lk,st));
+                while(thread_info->sleep_condition.timed_wait(lk,st)) {}
             }
             else
             {
@@ -415,7 +416,7 @@ namespace boost
                     cond.timed_wait(lock, xt);
 #   endif
                     xtime cur;
-                    xtime_get(&cur, TIME_UTC);
+                    xtime_get(&cur, TIME_UTC_);
                     if (xtime_cmp(xt, cur) <= 0)
                         return;
                 }
@@ -457,7 +458,7 @@ namespace boost
             BOOST_VERIFY(!pthread_yield());
 #   else
             xtime xt;
-            xtime_get(&xt, TIME_UTC);
+            xtime_get(&xt, TIME_UTC_);
             sleep(xt);
 #   endif
         }
@@ -482,6 +483,10 @@ namespace boost
 
     thread::id thread::get_id() const BOOST_NOEXCEPT
     {
+    #if defined BOOST_THREAD_PROVIDES_BASIC_THREAD_ID
+        //return local_thread_info->thread_handle;
+        return const_cast<thread*>(this)->native_handle();
+    #else
         detail::thread_data_ptr const local_thread_info=(get_thread_info)();
         if(local_thread_info)
         {
@@ -489,8 +494,9 @@ namespace boost
         }
         else
         {
-            return id();
+                return id();
         }
+    #endif
     }
 
     void thread::interrupt()
@@ -508,7 +514,7 @@ namespace boost
         }
     }
 
-    bool thread::interruption_requested() const
+    bool thread::interruption_requested() const BOOST_NOEXCEPT
     {
         detail::thread_data_ptr const local_thread_info=(get_thread_info)();
         if(local_thread_info)
@@ -542,8 +548,12 @@ namespace boost
     {
         thread::id get_id() BOOST_NOEXCEPT
         {
+        #if defined BOOST_THREAD_PROVIDES_BASIC_THREAD_ID
+             return pthread_self();
+        #else
             boost::detail::thread_data_base* const thread_info=get_or_make_current_thread_data();
             return thread::id(thread_info?thread_info->shared_from_this():detail::thread_data_ptr());
+        #endif
         }
 
         void interruption_point()
@@ -560,13 +570,13 @@ namespace boost
             }
         }
 
-        bool interruption_enabled()
+        bool interruption_enabled() BOOST_NOEXCEPT
         {
             boost::detail::thread_data_base* const thread_info=detail::get_current_thread_data();
             return thread_info && thread_info->interrupt_enabled;
         }
 
-        bool interruption_requested()
+        bool interruption_requested() BOOST_NOEXCEPT
         {
             boost::detail::thread_data_base* const thread_info=detail::get_current_thread_data();
             if(!thread_info)
@@ -580,7 +590,7 @@ namespace boost
             }
         }
 
-        disable_interruption::disable_interruption():
+        disable_interruption::disable_interruption() BOOST_NOEXCEPT:
             interruption_was_enabled(interruption_enabled())
         {
             if(interruption_was_enabled)
@@ -589,7 +599,7 @@ namespace boost
             }
         }
 
-        disable_interruption::~disable_interruption()
+        disable_interruption::~disable_interruption() BOOST_NOEXCEPT
         {
             if(detail::get_current_thread_data())
             {
@@ -597,7 +607,7 @@ namespace boost
             }
         }
 
-        restore_interruption::restore_interruption(disable_interruption& d)
+        restore_interruption::restore_interruption(disable_interruption& d) BOOST_NOEXCEPT
         {
             if(d.interruption_was_enabled)
             {
@@ -605,7 +615,7 @@ namespace boost
             }
         }
 
-        restore_interruption::~restore_interruption()
+        restore_interruption::~restore_interruption() BOOST_NOEXCEPT
         {
             if(detail::get_current_thread_data())
             {

@@ -7,15 +7,16 @@
 // Home at http://www.boost.org/libs/scope_exit
 
 #include <boost/config.hpp>
-#ifndef BOOST_NO_VARIADIC_MACROS
+#ifdef BOOST_NO_VARIADIC_MACROS
+#   error "variadic macros required"
+#else
 
 #include <boost/scope_exit.hpp>
 #include <boost/foreach.hpp>
 #include <boost/typeof/typeof.hpp>
 #include <boost/typeof/std/vector.hpp>
 #include BOOST_TYPEOF_INCREMENT_REGISTRATION_GROUP()
-#define BOOST_TEST_MODULE TestWorldCheckpoint
-#include <boost/test/unit_test.hpp>
+#include <boost/detail/lightweight_test.hpp>
 #include <vector>
 #include <iostream>
 #include <sstream>
@@ -84,17 +85,17 @@ void world::add_person(person const& a_person) {
 }
 //]
 
-BOOST_AUTO_TEST_CASE(test_world_checkpoint) {
+int main(void) {
     person adam, eva;
     std::ostringstream oss;
     oss << adam;
     std::cout << oss.str() << std::endl;
-    BOOST_CHECK(oss.str() == "person(0, 0)");
+    BOOST_TEST(oss.str() == "person(0, 0)");
 
     oss.str("");
     oss << eva;
     std::cout << oss.str() << std::endl;
-    BOOST_CHECK(oss.str() == "person(0, 0)");
+    BOOST_TEST(oss.str() == "person(0, 0)");
 
     world w;
     w.add_person(adam);
@@ -102,12 +103,10 @@ BOOST_AUTO_TEST_CASE(test_world_checkpoint) {
     oss.str("");
     oss << w;
     std::cout << oss.str() << std::endl;
-    BOOST_CHECK(oss.str() == "world(3, { person(1, 2),  person(2, 2), })");
+    BOOST_TEST(oss.str() == "world(3, { person(1, 2),  person(2, 2), })");
+
+    return boost::report_errors();
 }
 
-#else
-
-int main(void) { return 0; } // Trivial test.
-
-#endif
+#endif // variadic macros
 

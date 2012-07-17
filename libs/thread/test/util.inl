@@ -19,6 +19,8 @@
 
 // boostinspect:nounnamed
 
+
+
 namespace
 {
 inline boost::xtime delay(int secs, int msecs=0, int nsecs=0)
@@ -28,8 +30,8 @@ inline boost::xtime delay(int secs, int msecs=0, int nsecs=0)
     const int NANOSECONDS_PER_MILLISECOND = 1000000;
 
     boost::xtime xt;
-    if (boost::TIME_UTC != boost::xtime_get (&xt, boost::TIME_UTC))
-        BOOST_ERROR ("boost::xtime_get != boost::TIME_UTC");
+    if (boost::TIME_UTC_ != boost::xtime_get (&xt, boost::TIME_UTC_))
+        BOOST_ERROR ("boost::xtime_get != boost::TIME_UTC_");
 
     nsecs += xt.nsec;
     msecs += nsecs / NANOSECONDS_PER_MILLISECOND;
@@ -41,6 +43,13 @@ inline boost::xtime delay(int secs, int msecs=0, int nsecs=0)
     return xt;
 }
 
+}
+namespace boost
+{
+namespace threads
+{
+namespace test
+{
 inline bool in_range(const boost::xtime& xt, int secs=1)
 {
     boost::xtime min = delay(-secs);
@@ -48,7 +57,13 @@ inline bool in_range(const boost::xtime& xt, int secs=1)
     return (boost::xtime_cmp(xt, min) >= 0) &&
         (boost::xtime_cmp(xt, max) <= 0);
 }
+}
+}
+}
 
+
+namespace
+{
 class execution_monitor
 {
 public:

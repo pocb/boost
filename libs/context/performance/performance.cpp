@@ -4,6 +4,8 @@
 //    (See accompanying file LICENSE_1_0.txt or copy at
 //          http://www.boost.org/LICENSE_1_0.txt)
 
+#define BOOST_PP_LIMIT_MAG  10
+
 #include <cstdio>
 #include <cstdlib>
 #include <iostream>
@@ -11,121 +13,241 @@
 
 #include <boost/assert.hpp>
 #include <boost/bind.hpp>
+#include <boost/function.hpp>
+#include <boost/config.hpp>
 #include <boost/context/all.hpp>
+#include <boost/preprocessor/repetition/repeat_from_to.hpp>
 #include <boost/program_options.hpp>
 
+#ifndef BOOST_WINDOWS
+#include <ucontext.h>
+#endif
+
 #include "bind_processor.hpp"
-#include "performance.hpp"
+#include "cycle.hpp"
 
-namespace po = boost::program_options;
+#if _POSIX_C_SOURCE >= 199309L
+#include "zeit.hpp"
+#endif
 
-boost::contexts::context c;
+namespace ctx = boost::ctx;
 
-void fn()
-{ c.suspend(); }
+bool preserve_fpu = false;
 
-void test_creation( unsigned int iterations)
+#define CALL_FUNCTION(z,n,unused) \
+    fn();
+
+#define CALL_UCONTEXT(z,n,unused) \
+    ::swapcontext( & ucm, & uc);
+
+#define CALL_FCONTEXT(z,n,unused) \
+    ctx::jump_fcontext( & fcm, & fc, 7, preserve_fpu);
+
+#ifndef BOOST_WINDOWS
+ucontext_t uc, ucm;
+#endif
+ctx::fcontext_t fc, fcm;
+
+static void f3()
+{ }
+
+#ifndef BOOST_WINDOWS
+static void f2()
 {
-    cycle_t total( 0);
-    cycle_t overhead( get_overhead() );
-    std::cout << "overhead for rdtsc == " << overhead << " cycles" << std::endl;
+    while ( true)
+        ::swapcontext( & uc, & ucm);
+}
+#endif
 
-    // cache warm-up
-    {
-        c = boost::contexts::context(
-				fn,
-				boost::contexts::default_stacksize(),
-				boost::contexts::no_stack_unwind, boost::contexts::return_to_caller);
-    }
-
-    for ( unsigned int i = 0; i < iterations; ++i)
-    {
-        cycle_t start( get_cycles() );
-        c = boost::contexts::context(
-				fn,
-				boost::contexts::default_stacksize(),
-				boost::contexts::no_stack_unwind, boost::contexts::return_to_caller);
-        cycle_t diff( get_cycles() - start);
-        diff -= overhead;
-        BOOST_ASSERT( diff >= 0);
-        total += diff;
-    }
-    std::cout << "average of " << total/iterations << " cycles per creation" << std::endl;
+static void f1( intptr_t)
+{
+    while ( true)
+        ctx::jump_fcontext( & fc, & fcm, 7, preserve_fpu);
 }
 
-void test_switching( unsigned int iterations)
+#ifdef BOOST_CONTEXT_CYCLE
+cycle_t test_function_cycle( cycle_t ov)
 {
-    cycle_t total( 0);
-    cycle_t overhead( get_overhead() );
-    std::cout << "overhead for rdtsc == " << overhead << " cycles" << std::endl;
+    boost::function< void() > fn( boost::bind( f3) );
+    // cache warum-up
+BOOST_PP_REPEAT_FROM_TO( 0, BOOST_PP_LIMIT_MAG, CALL_FUNCTION, ~)
+
+    cycle_t start( cycles() );
+BOOST_PP_REPEAT_FROM_TO( 0, BOOST_PP_LIMIT_MAG, CALL_FUNCTION, ~)
+    cycle_t total( cycles() - start);
+
+    // we have two jumps and two measuremt-overheads
+    total -= ov; // overhead of measurement
+    total /= BOOST_PP_LIMIT_MAG; // per call
+    total /= 2; // 2x jump_to c1->c2 && c2->c1
+
+    return total;
+}
+
+#ifndef BOOST_WINDOWS
+cycle_t test_ucontext_cycle( cycle_t ov)
+{
+    ctx::stack_allocator alloc;
+
+    ::getcontext( & uc);
+    uc.uc_stack.ss_sp = 
+        static_cast< char * >( alloc.allocate(ctx::default_stacksize() ) )
+        - ctx::default_stacksize();
+    uc.uc_stack.ss_size = ctx::default_stacksize();
+    ::makecontext( & uc, f2, 7);
 
     // cache warum-up
-    {
-        c = boost::contexts::context(
-				fn,
-				boost::contexts::default_stacksize(),
-				boost::contexts::no_stack_unwind, boost::contexts::return_to_caller);
-        c.start();
-        c.resume();
-    }
+BOOST_PP_REPEAT_FROM_TO( 0, BOOST_PP_LIMIT_MAG, CALL_UCONTEXT, ~)
 
-    for ( unsigned int i = 0; i < iterations; ++i)
-    {
-        c = boost::contexts::context(
-				fn,
-				boost::contexts::default_stacksize(),
-				boost::contexts::no_stack_unwind, boost::contexts::return_to_caller);
-        cycle_t start( get_cycles() );
-        c.start();
-        cycle_t diff( get_cycles() - start);
+    cycle_t start( cycles() );
+BOOST_PP_REPEAT_FROM_TO( 0, BOOST_PP_LIMIT_MAG, CALL_UCONTEXT, ~)
+    cycle_t total( cycles() - start);
 
-        // we have two jumps and two measuremt-overheads
-        diff -= overhead; // overhead of measurement
-        diff /= 2; // 2x jump_to c1->c2 && c2->c1
+    // we have two jumps and two measuremt-overheads
+    total -= ov; // overhead of measurement
+    total /= BOOST_PP_LIMIT_MAG; // per call
+    total /= 2; // 2x jump_to c1->c2 && c2->c1
 
-        BOOST_ASSERT( diff >= 0);
-        total += diff;
-    }
-    std::cout << "average of " << total/iterations << " cycles per switch" << std::endl;
+    return total;
 }
+#endif
+
+cycle_t test_fcontext_cycle( cycle_t ov)
+{
+    ctx::stack_allocator alloc;
+    fc.fc_stack.base = alloc.allocate(ctx::default_stacksize());
+    fc.fc_stack.limit =
+        static_cast< char * >( fc.fc_stack.base) - ctx::default_stacksize();
+    ctx::make_fcontext( & fc, f1);
+
+    ctx::jump_fcontext( & fcm, & fc, 7, preserve_fpu);
+
+    // cache warum-up
+BOOST_PP_REPEAT_FROM_TO( 0, BOOST_PP_LIMIT_MAG, CALL_FCONTEXT, ~)
+
+    cycle_t start( cycles() );
+BOOST_PP_REPEAT_FROM_TO( 0, BOOST_PP_LIMIT_MAG, CALL_FCONTEXT, ~)
+    cycle_t total( cycles() - start);
+
+    // we have two jumps and two measuremt-overheads
+    total -= ov; // overhead of measurement
+    total /= BOOST_PP_LIMIT_MAG; // per call
+    total /= 2; // 2x jump_to c1->c2 && c2->c1
+
+    return total;
+}
+#endif
+
+#if _POSIX_C_SOURCE >= 199309L
+zeit_t test_function_zeit( zeit_t ov)
+{
+    boost::function< void() > fn( boost::bind( f3) );
+    // cache warum-up
+BOOST_PP_REPEAT_FROM_TO( 0, BOOST_PP_LIMIT_MAG, CALL_FUNCTION, ~)
+
+    zeit_t start( zeit() );
+BOOST_PP_REPEAT_FROM_TO( 0, BOOST_PP_LIMIT_MAG, CALL_FUNCTION, ~)
+    zeit_t total( zeit() - start);
+
+    // we have two jumps and two measuremt-overheads
+    total -= ov; // overhead of measurement
+    total /= BOOST_PP_LIMIT_MAG; // per call
+    total /= 2; // 2x jump_to c1->c2 && c2->c1
+
+    return total;
+}
+
+#ifndef BOOST_WINDOWS
+zeit_t test_ucontext_zeit( zeit_t ov)
+{
+    ctx::stack_allocator alloc;
+
+    ::getcontext( & uc);
+    uc.uc_stack.ss_sp = 
+        static_cast< char * >( alloc.allocate(ctx::default_stacksize() ) )
+        - ctx::default_stacksize();
+    uc.uc_stack.ss_size = ctx::default_stacksize();
+    ::makecontext( & uc, f2, 7);
+
+    // cache warum-up
+BOOST_PP_REPEAT_FROM_TO( 0, BOOST_PP_LIMIT_MAG, CALL_UCONTEXT, ~)
+
+    zeit_t start( zeit() );
+BOOST_PP_REPEAT_FROM_TO( 0, BOOST_PP_LIMIT_MAG, CALL_UCONTEXT, ~)
+    zeit_t total( zeit() - start);
+
+    // we have two jumps and two measuremt-overheads
+    total -= ov; // overhead of measurement
+    total /= BOOST_PP_LIMIT_MAG; // per call
+    total /= 2; // 2x jump_to c1->c2 && c2->c1
+
+    return total;
+}
+#endif
+
+zeit_t test_fcontext_zeit( zeit_t ov)
+{
+    ctx::stack_allocator alloc;
+    fc.fc_stack.base = alloc.allocate(ctx::default_stacksize());
+    fc.fc_stack.limit =
+        static_cast< char * >( fc.fc_stack.base) - ctx::default_stacksize();
+    ctx::make_fcontext( & fc, f1);
+
+    ctx::jump_fcontext( & fcm, & fc, 7, preserve_fpu);
+
+    // cache warum-up
+BOOST_PP_REPEAT_FROM_TO( 0, BOOST_PP_LIMIT_MAG, CALL_FCONTEXT, ~)
+
+    zeit_t start( zeit() );
+BOOST_PP_REPEAT_FROM_TO( 0, BOOST_PP_LIMIT_MAG, CALL_FCONTEXT, ~)
+    zeit_t total( zeit() - start);
+
+    // we have two jumps and two measuremt-overheads
+    total -= ov; // overhead of measurement
+    total /= BOOST_PP_LIMIT_MAG; // per call
+    total /= 2; // 2x jump_to c1->c2 && c2->c1
+
+    return total;
+}
+#endif
 
 int main( int argc, char * argv[])
 {
     try
     {
-        unsigned int iterations( 0);
-
-        po::options_description desc("allowed options");
-        desc.add_options()
-            ("help,h", "help message")
-            ("creating,c", "test creation")
-            ("switching,s", "test switching")
-            ("iterations,i", po::value< unsigned int >( & iterations), "iterations");
-
-        po::variables_map vm;
-        po::store(
-            po::parse_command_line(
-                argc,
-                argv,
-                desc),
-            vm);
-        po::notify( vm);
-
-        if ( vm.count("help") )
-        {
-            std::cout << desc << std::endl;
-            return EXIT_SUCCESS;
-        }
-
-        if ( 0 >= iterations) throw std::invalid_argument("iterations must be greater than zero");
-
         bind_to_processor( 0);
 
-       if ( vm.count("creating") )
-           test_creation( iterations);
+#ifdef BOOST_CONTEXT_CYCLE
+        {
+            cycle_t ov( overhead_cycles() );
+            std::cout << "overhead for rdtsc == " << ov << " cycles" << std::endl;
 
-       if ( vm.count("switching") )
-            test_switching( iterations);
+            unsigned int res = test_fcontext_cycle( ov);
+            std::cout << "fcontext: average of " << res << " cycles per switch" << std::endl;
+#ifndef BOOST_WINDOWS
+            res = test_ucontext_cycle( ov);
+            std::cout << "ucontext: average of " << res << " cycles per switch" << std::endl;
+#endif
+            res = test_function_cycle( ov);
+            std::cout << "boost::function: average of " << res << " cycles per switch" << std::endl;
+        }
+#endif
+
+#if _POSIX_C_SOURCE >= 199309L
+        {
+            zeit_t ov( overhead_zeit() );
+            std::cout << "\noverhead for clock_gettime() == " << ov << " ns" << std::endl;
+
+            unsigned int res = test_fcontext_zeit( ov);
+            std::cout << "fcontext: average of " << res << " ns per switch" << std::endl;
+#ifndef BOOST_WINDOWS
+            res = test_ucontext_zeit( ov);
+            std::cout << "ucontext: average of " << res << " ns per switch" << std::endl;
+#endif
+            res = test_function_zeit( ov);
+            std::cout << "boost::function: average of " << res << " ns per switch" << std::endl;
+        }
+#endif
 
         return EXIT_SUCCESS;
     }
@@ -135,3 +257,6 @@ int main( int argc, char * argv[])
     { std::cerr << "unhandled exception" << std::endl; }
     return EXIT_FAILURE;
 }
+
+#undef CALL_FCONTEXT
+#undef CALL_UCONTEXT

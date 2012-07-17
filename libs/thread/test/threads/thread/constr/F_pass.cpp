@@ -17,23 +17,35 @@
 
 // template <class F, class ...Args> thread(F f, Args... args);
 
-#include <boost/thread/thread.hpp>
 #include <new>
 #include <cstdlib>
 #include <cassert>
+#include <boost/thread/thread.hpp>
 #include <boost/detail/lightweight_test.hpp>
 
 unsigned throw_one = 0xFFFF;
 
+#if defined _GLIBCXX_THROW
+void* operator new(std::size_t s) _GLIBCXX_THROW (std::bad_alloc)
+#elif defined BOOST_MSVC
+void* operator new(std::size_t s)
+#else
 void* operator new(std::size_t s) throw (std::bad_alloc)
+#endif
 {
+  std::cout << __FILE__ << ":" << __LINE__ << std::endl;
   if (throw_one == 0) throw std::bad_alloc();
   --throw_one;
   return std::malloc(s);
 }
 
+#if defined BOOST_MSVC
+void operator delete(void* p)
+#else
 void operator delete(void* p) throw ()
+#endif
 {
+  std::cout << __FILE__ << ":" << __LINE__ << std::endl;
   std::free(p);
 }
 
@@ -74,14 +86,6 @@ public:
     op_run = true;
   }
 
-  void operator()(int i, double j)
-  {
-    BOOST_TEST(alive_ == 1);
-    BOOST_TEST(n_alive >= 1);
-    BOOST_TEST(i == 5);
-    BOOST_TEST(j == 5.5);
-    op_run = true;
-  }
 };
 
 int G::n_alive = 0;
@@ -96,6 +100,7 @@ int main()
     BOOST_TEST(f_run == true);
   }
   f_run = false;
+#ifndef BOOST_MSVC
   {
     try
     {
@@ -109,6 +114,7 @@ int main()
       BOOST_TEST(!f_run);
     }
   }
+#endif
   {
     BOOST_TEST(G::n_alive == 0);
     BOOST_TEST(!G::op_run);
@@ -117,6 +123,7 @@ int main()
     BOOST_TEST(G::n_alive == 0);
     BOOST_TEST(G::op_run);
   }
+#ifndef BOOST_MSVC
   G::op_run = false;
   {
     try
@@ -131,17 +138,11 @@ int main()
     {
       throw_one = 0xFFFF;
       BOOST_TEST(G::n_alive == 0);
+      std::cout << __FILE__ << ":" << __LINE__ <<" " << G::n_alive << std::endl;
       BOOST_TEST(!G::op_run);
     }
   }
-  {
-    BOOST_TEST(G::n_alive == 0);
-    BOOST_TEST(!G::op_run);
-    boost::thread t(G(), 5, 5.5);
-    t.join();
-    BOOST_TEST(G::n_alive == 0);
-    BOOST_TEST(G::op_run);
-  }
+#endif
 
   return boost::report_errors();
 }

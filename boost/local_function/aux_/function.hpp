@@ -10,7 +10,6 @@
 #       define BOOST_LOCAL_FUNCTION_AUX_FUNCTION_HPP_
 
 #       include <boost/local_function/config.hpp>
-#       include <boost/local_function/aux_/config.hpp>
 #       include <boost/local_function/aux_/member.hpp>
 #       include <boost/call_traits.hpp>
 #       include <boost/typeof/typeof.hpp>
@@ -35,8 +34,11 @@
 #define BOOST_LOCAL_FUNCTION_AUX_FUNCTION_INIT_CALL_FUNC \
     BOOST_LOCAL_FUNCTION_AUX_SYMBOL( (init_call) )
 
+#define BOOST_LOCAL_FUNCTION_AUX_typename_seq(z, n, unused) \
+    (typename)
+
 #define BOOST_LOCAL_FUNCTION_AUX_arg_type(z, arg_n, unused) \
-    BOOST_PP_CAT(A, arg_n)
+    BOOST_PP_CAT(Arg, arg_n)
 
 #define BOOST_LOCAL_FUNCTION_AUX_arg_typedef(z, arg_n, unused) \
     typedef \
@@ -56,14 +58,14 @@
 
 #define BOOST_LOCAL_FUNCTION_AUX_arg_name(z, arg_n, comma01) \
     BOOST_PP_COMMA_IF(comma01) \
-    BOOST_PP_CAT(a, arg_n)
+    BOOST_PP_CAT(arg, arg_n)
 
 #define BOOST_LOCAL_FUNCTION_AUX_arg_param_decl(z, arg_n, unused) \
     BOOST_LOCAL_FUNCTION_AUX_arg_param_type(z, arg_n, 0 /* no leading comma */)\
     BOOST_LOCAL_FUNCTION_AUX_arg_name(z, arg_n, 0 /* no leading comma */)
 
 #define BOOST_LOCAL_FUNCTION_AUX_bind_type(z, bind_n, unused) \
-    BOOST_PP_CAT(B, bind_n)
+    BOOST_PP_CAT(Bind, bind_n)
 
 #define BOOST_LOCAL_FUNCTION_AUX_comma_bind_type(z, bind_n, unused) \
     , BOOST_LOCAL_FUNCTION_AUX_bind_type(z, bind_n, ~)
@@ -75,7 +77,7 @@
     , typename BOOST_LOCAL_FUNCTION_AUX_bind_type(z, bind_n, ~)
 
 #define BOOST_LOCAL_FUNCTION_AUX_bind_name(z, bind_n, unused) \
-    BOOST_PP_CAT(b, bind_n)
+    BOOST_PP_CAT(bing, bind_n)
 
 #define BOOST_LOCAL_FUNCTION_AUX_comma_bind_param_decl(z, bind_n, unused) \
     , \
@@ -111,7 +113,7 @@
 #define BOOST_LOCAL_FUNCTION_AUX_call_typedef(z, n, arity) \
     typedef R (*BOOST_LOCAL_FUNCTION_AUX_call_ptr(z, n, ~))( \
         object_ptr \
-        BOOST_PP_IIF(BOOST_LOCAL_FUNCTION_AUX_CONFIG_LOCALS_AS_TPARAMS_01, \
+        BOOST_PP_IIF(BOOST_LOCAL_FUNCTION_CONFIG_LOCALS_AS_TPARAMS, \
             BOOST_PP_TUPLE_EAT(3) \
         , \
             BOOST_PP_REPEAT_ ## z \
@@ -150,7 +152,7 @@
         return BOOST_LOCAL_FUNCTION_AUX_call_member(z, defaults_n, ~)( \
             object_ \
             BOOST_PP_IIF( \
-                    BOOST_LOCAL_FUNCTION_AUX_CONFIG_LOCALS_AS_TPARAMS_01,\
+                    BOOST_LOCAL_FUNCTION_CONFIG_LOCALS_AS_TPARAMS,\
                 BOOST_PP_TUPLE_EAT(3) \
             , \
                 BOOST_PP_REPEAT_ ## z \
@@ -166,7 +168,7 @@ namespace boost { namespace local_function { namespace aux {
 template<
       typename F
     , size_t defaults
-#if !BOOST_LOCAL_FUNCTION_AUX_CONFIG_LOCALS_AS_TPARAMS_01
+#if !BOOST_LOCAL_FUNCTION_CONFIG_LOCALS_AS_TPARAMS
     BOOST_PP_REPEAT(BOOST_LOCAL_FUNCTION_CONFIG_BIND_MAX,
             BOOST_LOCAL_FUNCTION_AUX_comma_bind_tparam, ~)
 #endif
@@ -184,15 +186,18 @@ class function {}; // Empty template, only use its specializations.
 // Register type for type-of emu (NAME use TYPEOF to deduce this fctor type).
 #include BOOST_TYPEOF_INCREMENT_REGISTRATION_GROUP()
 BOOST_TYPEOF_REGISTER_TEMPLATE(boost::local_function::aux::function,
-    BOOST_PP_ADD(2, // F and defaults tparams.
-        BOOST_PP_IIF(BOOST_LOCAL_FUNCTION_AUX_CONFIG_LOCALS_AS_TPARAMS_01,
-            0 // No additional tparam.
-        ,
-            BOOST_LOCAL_FUNCTION_CONFIG_BIND_MAX // Bind tparams.
-        )
-    )
+    (typename) // For `F` tparam.
+    (size_t) // For `defaults` tparam.
+    // MSVC error if using #if instead of PP_IIF here.
+    BOOST_PP_IIF(BOOST_LOCAL_FUNCTION_CONFIG_LOCALS_AS_TPARAMS,
+        BOOST_PP_TUPLE_EAT(3) // Nothing.
+    ,
+        BOOST_PP_REPEAT // For bind tparams.
+    )(BOOST_LOCAL_FUNCTION_CONFIG_BIND_MAX,
+            BOOST_LOCAL_FUNCTION_AUX_typename_seq, ~)
 )
 
+#undef BOOST_LOCAL_FUNCTION_AUX_typename_seq
 #undef BOOST_LOCAL_FUNCTION_AUX_arg_type
 #undef BOOST_LOCAL_FUNCTION_AUX_arg_typedef
 #undef BOOST_LOCAL_FUNCTION_AUX_comma_arg_tparam
@@ -235,7 +240,7 @@ template<
     typename R
     BOOST_PP_REPEAT(BOOST_LOCAL_FUNCTION_AUX_arity,
             BOOST_LOCAL_FUNCTION_AUX_comma_arg_tparam, ~)
-#if !BOOST_LOCAL_FUNCTION_AUX_CONFIG_LOCALS_AS_TPARAMS_01
+#if !BOOST_LOCAL_FUNCTION_CONFIG_LOCALS_AS_TPARAMS
     BOOST_PP_REPEAT(BOOST_LOCAL_FUNCTION_CONFIG_BIND_MAX,
             BOOST_LOCAL_FUNCTION_AUX_comma_bind_tparam, ~)
 #endif
@@ -246,7 +251,7 @@ class function<
                 BOOST_LOCAL_FUNCTION_AUX_arg_type, ~)
       )
     , BOOST_LOCAL_FUNCTION_AUX_defaults
-#if !BOOST_LOCAL_FUNCTION_AUX_CONFIG_LOCALS_AS_TPARAMS_01
+#if !BOOST_LOCAL_FUNCTION_CONFIG_LOCALS_AS_TPARAMS
     BOOST_PP_REPEAT(BOOST_LOCAL_FUNCTION_CONFIG_BIND_MAX,
             BOOST_LOCAL_FUNCTION_AUX_comma_bind_type, ~)
 #endif
@@ -282,7 +287,7 @@ public:
     // so used internal symbol.
     inline void BOOST_LOCAL_FUNCTION_AUX_FUNCTION_INIT_CALL_FUNC(
         object_ptr object
-#if !BOOST_LOCAL_FUNCTION_AUX_CONFIG_LOCALS_AS_TPARAMS_01
+#if !BOOST_LOCAL_FUNCTION_CONFIG_LOCALS_AS_TPARAMS
         BOOST_PP_REPEAT(BOOST_LOCAL_FUNCTION_CONFIG_BIND_MAX,
                 BOOST_LOCAL_FUNCTION_AUX_comma_bind_param_decl, ~)
 #endif
@@ -290,7 +295,7 @@ public:
                 BOOST_LOCAL_FUNCTION_AUX_comma_call_param_decl, ~)
     ) {
         object_ = object;
-#if !BOOST_LOCAL_FUNCTION_AUX_CONFIG_LOCALS_AS_TPARAMS_01
+#if !BOOST_LOCAL_FUNCTION_CONFIG_LOCALS_AS_TPARAMS
         BOOST_PP_REPEAT(BOOST_LOCAL_FUNCTION_CONFIG_BIND_MAX,
                 BOOST_LOCAL_FUNCTION_AUX_bind_member_init, ~)
 #endif
@@ -308,7 +313,7 @@ public:
 
 private:
     object_ptr object_;
-#if !BOOST_LOCAL_FUNCTION_AUX_CONFIG_LOCALS_AS_TPARAMS_01
+#if !BOOST_LOCAL_FUNCTION_CONFIG_LOCALS_AS_TPARAMS
     BOOST_PP_REPEAT(BOOST_LOCAL_FUNCTION_CONFIG_BIND_MAX,
             BOOST_LOCAL_FUNCTION_AUX_bind_member_decl, ~)
 #endif

@@ -107,9 +107,9 @@ namespace boost{ namespace math
       template <class T, T (*F)(BOOST_EXPLICIT_TEMPLATE_TYPE_SPEC(T))>
       struct constant_initializer
       {
-         static void do_nothing()
+         static void force_instantiate()
          {
-            init.do_nothing();
+            init.force_instantiate();
          }
       private:
          struct initializer
@@ -122,7 +122,7 @@ namespace boost{ namespace math
       #endif
                   );
             }
-            void do_nothing()const{}
+            void force_instantiate()const{}
          };
          static const initializer init;
       };
@@ -133,9 +133,9 @@ namespace boost{ namespace math
       template <class T, int N, T (*F)(BOOST_MATH_EXPLICIT_TEMPLATE_TYPE_SPEC(mpl::int_<N>) BOOST_MATH_APPEND_EXPLICIT_TEMPLATE_TYPE_SPEC(T))>
       struct constant_initializer2
       {
-         static void do_nothing()
+         static void force_instantiate()
          {
-            init.do_nothing();
+            init.force_instantiate();
          }
       private:
          struct initializer
@@ -148,7 +148,7 @@ namespace boost{ namespace math
       #endif
                   );
             }
-            void do_nothing()const{}
+            void force_instantiate()const{}
          };
          static const initializer init;
       };
@@ -174,7 +174,7 @@ namespace boost{ namespace math
    public:\
    static inline T get(const mpl::int_<construct_from_string>&)\
    {\
-      constant_initializer<T, & BOOST_JOIN(constant_, name)<T>::get_from_string >::do_nothing();\
+      constant_initializer<T, & BOOST_JOIN(constant_, name)<T>::get_from_string >::force_instantiate();\
       return get_from_string();\
    }\
    static inline BOOST_CONSTEXPR T get(const mpl::int_<construct_from_float>)\
@@ -185,7 +185,7 @@ namespace boost{ namespace math
    { return BOOST_JOIN(x, L); }\
    template <int N> static inline T get(const mpl::int_<N>& n)\
    {\
-      constant_initializer2<T, N, & BOOST_JOIN(constant_, name)<T>::template compute<N> >::do_nothing();\
+      constant_initializer2<T, N, & BOOST_JOIN(constant_, name)<T>::template compute<N> >::force_instantiate();\
       return compute<N>(); \
    }\
    /* This one is for true arbitary precision, which may well vary at runtime: */ \
@@ -250,6 +250,7 @@ namespace boost{ namespace math
   BOOST_DEFINE_MATH_CONSTANT(root_e, 1.648721270700128146848650787814163571e+00, "1.64872127070012814684865078781416357165377610071014801157507931164066102119421560863277652005636664300286663776e+00")
   BOOST_DEFINE_MATH_CONSTANT(log10_e, 4.342944819032518276511289189166050822e-01, "4.34294481903251827651128918916605082294397005803666566114453783165864649208870774729224949338431748318706106745e-01")
   BOOST_DEFINE_MATH_CONSTANT(one_div_log10_e, 2.302585092994045684017991454684364207e+00, "2.30258509299404568401799145468436420760110148862877297603332790096757260967735248023599720508959829834196778404e+00")
+  BOOST_DEFINE_MATH_CONSTANT(ln_ten, 2.302585092994045684017991454684364207e+00, "2.30258509299404568401799145468436420760110148862877297603332790096757260967735248023599720508959829834196778404e+00")
   BOOST_DEFINE_MATH_CONSTANT(degree, 1.745329251994329576923690768488612713e-02, "1.74532925199432957692369076848861271344287188854172545609719144017100911460344944368224156963450948221230449251e-02")
   BOOST_DEFINE_MATH_CONSTANT(radian, 5.729577951308232087679815481410517033e+01, "5.72957795130823208767981548141051703324054724665643215491602438612028471483215526324409689958511109441862233816e+01")
   BOOST_DEFINE_MATH_CONSTANT(sin_one, 8.414709848078965066525023216302989996e-01, "8.41470984807896506652502321630298999622563060798371065672751709991910404391239668948639743543052695854349037908e-01")

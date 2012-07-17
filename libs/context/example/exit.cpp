@@ -5,29 +5,53 @@
 //          http://www.boost.org/LICENSE_1_0.txt)
 
 #include <cstdlib>
+#include <cstring>
 #include <iostream>
-#include <string>
+#include <vector>
 
+#include <boost/assert.hpp>
 #include <boost/context/all.hpp>
-#include <boost/move/move.hpp>
 
-void fn()
+namespace ctx = boost::ctx;
+
+ctx::fcontext_t fc1, fc2;
+
+void f1( intptr_t)
 {
-    std::cout << "inside function fn(): when fn() returns ::exit() will be called; no return to main()" << std::endl;
+        std::cout << "f1: entered" << std::endl;
+        std::cout << "f1: call jump_fcontext( & fc1, & fc2, 0)" << std::endl;
+        ctx::jump_fcontext( & fc1, & fc2, 0);
+        std::cout << "f1: return" << std::endl;
+}
+
+void f2( intptr_t)
+{
+        std::cout << "f2: entered" << std::endl;
+        std::cout << "f2: call jump_fcontext( & fc2, & fc1, 0)" << std::endl;
+        ctx::jump_fcontext( & fc2, & fc1, 0);
+        BOOST_ASSERT( false && ! "f2: never returns");
 }
 
 int main( int argc, char * argv[])
 {
-    {
-        boost::contexts::context ctx(
-			fn,
-			boost::contexts::default_stacksize(),
-			boost::contexts::no_stack_unwind, boost::contexts::exit_application);
+        ctx::fcontext_t fcm;
+        ctx::stack_allocator alloc;
 
-        ctx.start();
-    }
+        fc1.fc_stack.base = alloc.allocate(ctx::minimum_stacksize());
+        fc1.fc_stack.limit =
+            static_cast< char * >( fc1.fc_stack.base) - ctx::minimum_stacksize();
+        ctx::make_fcontext( & fc1, f1);
 
-    std::cout << "Done" << std::endl;
+        fc2.fc_stack.base = alloc.allocate(ctx::minimum_stacksize());
+        fc2.fc_stack.limit =
+            static_cast< char * >( fc2.fc_stack.base) - ctx::minimum_stacksize();
+        ctx::make_fcontext( & fc2, f2);
 
-    return EXIT_SUCCESS;
+        std::cout << "main: call start_fcontext( & fcm, & fc1, 0)" << std::endl;
+        ctx::jump_fcontext( & fcm, & fc1, 0);
+
+        std::cout << "main: done" << std::endl;
+        BOOST_ASSERT( false && ! "main: never returns");
+
+        return EXIT_SUCCESS;
 }

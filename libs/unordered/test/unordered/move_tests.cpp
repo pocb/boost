@@ -4,9 +4,10 @@
 // file LICENSE_1_0.txt or move at http://www.boost.org/LICENSE_1_0.txt)
 
 #include "../helpers/prefix.hpp"
-
 #include <boost/unordered_set.hpp>
 #include <boost/unordered_map.hpp>
+#include "../helpers/postfix.hpp"
+
 #include "../helpers/test.hpp"
 #include "../objects/test.hpp"
 #include "../objects/cxx11_allocator.hpp"
@@ -21,7 +22,7 @@
 
 namespace move_tests
 {
-    test::seed_t seed(98624);
+    test::seed_t initialize_seed(98624);
 #if defined(BOOST_UNORDERED_USE_MOVE) || !defined(BOOST_NO_RVALUE_REFERENCES)
 #define BOOST_UNORDERED_TEST_MOVING 1
 #else

@@ -250,9 +250,15 @@ struct touch : public base_turn_handler
             int const side_pk_q2 = SideStrategy::apply(qj, qk, pk);
             int const side_pk_p  = SideStrategy::apply(pi, pj, pk);
             int const side_qk_q  = SideStrategy::apply(qi, qj, qk);
+
+            bool const both_continue = side_pk_p == 0 && side_qk_q == 0;
+            bool const robustness_issue_in_continue = both_continue && side_pk_q2 != 0;
+
             bool const q_turns_left = side_qk_q == 1;
             bool const block_q = side_qk_p1 == 0
-                        && ! same(side_qi_p1, side_qk_q);
+                        && ! same(side_qi_p1, side_qk_q)
+                        && ! robustness_issue_in_continue
+                        ;
 
             // If Pk at same side as Qi/Qk
             // (the "or" is for collinear case)
@@ -533,6 +539,13 @@ struct collinear : public base_turn_handler
          - if P arrives and P turns right: intersection for P
          - if Q arrives and Q turns left: union for Q (=intersection for P)
          - if Q arrives and Q turns right: intersection for Q (=union for P)
+
+         ROBUSTNESS: p and q are collinear, so you would expect
+         that side qk//p1 == pk//q1. But that is not always the case
+         in near-epsilon ranges. Then decision logic is different.
+         If p arrives, q is further, so the angle qk//p1 is (normally) 
+         more precise than pk//p1
+
     */
     template
     <
@@ -555,11 +568,17 @@ struct collinear : public base_turn_handler
         // Should not be 0, this is checked before
         BOOST_ASSERT(arrival != 0);
 
+        int const side_p = SideStrategy::apply(pi, pj, pk);
+        int const side_q = SideStrategy::apply(qi, qj, qk);
+
         // If p arrives, use p, else use q
         int const side_p_or_q = arrival == 1
-            ? SideStrategy::apply(pi, pj, pk)
-            : SideStrategy::apply(qi, qj, qk)
+            ? side_p
+            : side_q
             ;
+
+        int const side_pk = SideStrategy::apply(qi, qj, pk);
+        int const side_qk = SideStrategy::apply(pi, pj, qk);
 
         // See comments above,
         // resulting in a strange sort of mathematic rule here:
@@ -568,7 +587,15 @@ struct collinear : public base_turn_handler
 
         int const product = arrival * side_p_or_q;
 
-        if(product == 0)
+        // Robustness: side_p is supposed to be equal to side_pk (because p/q are collinear)
+        // and side_q to side_qk
+        bool const robustness_issue = side_pk != side_p || side_qk != side_q;
+
+        if (robustness_issue)
+        {
+            handle_robustness(ti, arrival, side_p, side_q, side_pk, side_qk);
+        }
+        else if(product == 0)
         {
             both(ti, operation_continue);
         }
@@ -577,6 +604,38 @@ struct collinear : public base_turn_handler
             ui_else_iu(product == 1, ti);
         }
     }
+
+    static inline void handle_robustness(TurnInfo& ti, int arrival, 
+                    int side_p, int side_q, int side_pk, int side_qk)
+    {
+        // We take the longer one, i.e. if q arrives in p (arrival == -1),
+        // then p exceeds q and we should take p for a union...
+
+        bool use_p_for_union = arrival == -1;
+
+        // ... unless one of the sides consistently directs to the other side
+        int const consistent_side_p = side_p == side_pk ? side_p : 0;
+        int const consistent_side_q = side_q == side_qk ? side_q : 0;
+        if (arrival == -1 && (consistent_side_p == -1 || consistent_side_q == 1))
+        {
+            use_p_for_union = false;
+        }
+        if (arrival == 1 && (consistent_side_p == 1 || consistent_side_q == -1))
+        {
+            use_p_for_union = true;
+        }
+
+        //std::cout << "ROBUSTNESS -> Collinear " 
+        //    << " arr: " << arrival
+        //    << " dir: " << side_p << " " << side_q
+        //    << " rev: " << side_pk << " " << side_qk
+        //    << " cst: " << cside_p << " " << cside_q
+        //    << std::boolalpha << " " << use_p_for_union
+        //    << std::endl;
+
+        ui_else_iu(use_p_for_union, ti);
+    }
+
 };
 
 template

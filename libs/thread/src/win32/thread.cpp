@@ -4,8 +4,13 @@
 // (C) Copyright 2007 Anthony Williams
 // (C) Copyright 2007 David Deakins
 
+#ifndef _WIN32_WINNT
 #define _WIN32_WINNT 0x400
+#endif
+
+#ifndef WINVER
 #define WINVER 0x400
+#endif
 
 #include <boost/thread/thread.hpp>
 #include <algorithm>
@@ -26,7 +31,11 @@ namespace boost
 {
     namespace
     {
+#ifdef BOOST_THREAD_PROVIDES_ONCE_CXX11
+        boost::once_flag current_thread_tls_init_flag;
+#else
         boost::once_flag current_thread_tls_init_flag=BOOST_ONCE_INIT;
+#endif
         #if defined(UNDER_CE)
         // Windows CE does not define the TLS_OUT_OF_INDEXES constant.
         DWORD tls_out_of_index=0xFFFFFFFF;
@@ -89,7 +98,7 @@ namespace boost
 
         typedef void* uintptr_t;
 
-        inline uintptr_t const _beginthreadex(void* security, unsigned stack_size, unsigned (__stdcall* start_address)(void*),
+        inline uintptr_t _beginthreadex(void* security, unsigned stack_size, unsigned (__stdcall* start_address)(void*),
                                               void* arglist, unsigned initflag, unsigned* thrdaddr)
         {
             DWORD threadID;
@@ -271,14 +280,15 @@ namespace boost
 
     }
 
-    thread::~thread()
-    {
-        detach();
-    }
-
     thread::id thread::get_id() const BOOST_NOEXCEPT
     {
+    #if defined BOOST_THREAD_PROVIDES_BASIC_THREAD_ID
+      detail::thread_data_ptr local_thread_info=(get_thread_info)();
+      return local_thread_info?local_thread_info->id:0;
+      //return const_cast<thread*>(this)->native_handle();
+    #else
         return thread::id((get_thread_info)());
+    #endif
     }
 
     bool thread::joinable() const BOOST_NOEXCEPT
@@ -319,7 +329,9 @@ namespace boost
     }
 
 #ifdef BOOST_THREAD_USES_CHRONO
-    bool thread::do_try_join_for(chrono::milliseconds const &rel_time_in_milliseconds) {
+
+    bool thread::try_join_until(const chrono::time_point<chrono::system_clock, chrono::nanoseconds>& tp)
+    {
       if (this_thread::get_id() == get_id())
       {
         boost::throw_exception(thread_resource_error(system::errc::resource_deadlock_would_occur, "boost thread: trying joining itself"));
@@ -327,18 +339,19 @@ namespace boost
       detail::thread_data_ptr local_thread_info=(get_thread_info)();
       if(local_thread_info)
       {
-          if(!this_thread::interruptible_wait(local_thread_info->thread_handle,rel_time_in_milliseconds.count()))
-          {
-              return false;
-          }
-          release_handle();
+        chrono::milliseconds rel_time= chrono::ceil<chrono::milliseconds>(tp-chrono::system_clock::now());
+        if(!this_thread::interruptible_wait(local_thread_info->thread_handle,rel_time.count()))
+        {
+            return false;
+        }
+        release_handle();
       }
       return true;
-
     }
+
 #endif
 
-    void thread::detach()
+    void thread::detach() BOOST_NOEXCEPT
     {
         release_handle();
     }
@@ -357,7 +370,7 @@ namespace boost
         }
     }
 
-    bool thread::interruption_requested() const
+    bool thread::interruption_requested() const BOOST_NOEXCEPT
     {
         detail::thread_data_ptr local_thread_info=(get_thread_info)();
         return local_thread_info.get() && (detail::win32::WaitForSingleObject(local_thread_info->interruption_handle,0)==0);
@@ -535,7 +548,12 @@ namespace boost
 
         thread::id get_id() BOOST_NOEXCEPT
         {
+        #if defined BOOST_THREAD_PROVIDES_BASIC_THREAD_ID
+          //return detail::win32::GetCurrentThread();
+          return detail::win32::GetCurrentThreadId();
+        #else
             return thread::id(get_or_make_current_thread_data());
+        #endif
         }
 
         void interruption_point()
@@ -547,12 +565,12 @@ namespace boost
             }
         }
 
-        bool interruption_enabled()
+        bool interruption_enabled() BOOST_NOEXCEPT
         {
             return get_current_thread_data() && get_current_thread_data()->interruption_enabled;
         }
 
-        bool interruption_requested()
+        bool interruption_requested() BOOST_NOEXCEPT
         {
             return get_current_thread_data() && (detail::win32::WaitForSingleObject(get_current_thread_data()->interruption_handle,0)==0);
         }
@@ -562,7 +580,7 @@ namespace boost
             detail::win32::Sleep(0);
         }
 
-        disable_interruption::disable_interruption():
+        disable_interruption::disable_interruption() BOOST_NOEXCEPT:
             interruption_was_enabled(interruption_enabled())
         {
             if(interruption_was_enabled)
@@ -571,7 +589,7 @@ namespace boost
             }
         }
 
-        disable_interruption::~disable_interruption()
+        disable_interruption::~disable_interruption() BOOST_NOEXCEPT
         {
             if(get_current_thread_data())
             {
@@ -579,7 +597,7 @@ namespace boost
             }
         }
 
-        restore_interruption::restore_interruption(disable_interruption& d)
+        restore_interruption::restore_interruption(disable_interruption& d) BOOST_NOEXCEPT
         {
             if(d.interruption_was_enabled)
             {
@@ -587,7 +605,7 @@ namespace boost
             }
         }
 
-        restore_interruption::~restore_interruption()
+        restore_interruption::~restore_interruption() BOOST_NOEXCEPT
         {
             if(get_current_thread_data())
             {

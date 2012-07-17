@@ -6,8 +6,8 @@
 <meta name="generator" content="DocBook XSL Stylesheets V1.76.1">
 <link rel="home" href="../index.html" title="Chapter&#160;1.&#160;Boost.ScopeExit 1.1.0">
 <link rel="up" href="../index.html" title="Chapter&#160;1.&#160;Boost.ScopeExit 1.1.0">
-<link rel="prev" href="../BOOST_SCOPE_EXIT_CONFIG_NO_CPP11.html" title="Macro BOOST_SCOPE_EXIT_CONFIG_NO_CPP11">
-<link rel="next" href="No_Variadic_Macros.html" title="Annex: No Variadic Macros">
+<link rel="prev" href="tutorial.html" title="Tutorial">
+<link rel="next" href="no_variadic_macros.html" title="Annex: No Variadic Macros">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
 <table cellpadding="2" width="100%"><tr>
@@ -20,19 +20,19 @@
 </tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="../BOOST_SCOPE_EXIT_CONFIG_NO_CPP11.html"><img src="../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="No_Variadic_Macros.html"><img src="../../../../../doc/src/images/next.png" alt="Next"></a>
+<a accesskey="p" href="tutorial.html"><img src="../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="no_variadic_macros.html"><img src="../../../../../doc/src/images/next.png" alt="Next"></a>
 </div>
-<div class="section scope_exit_Alternatives">
+<div class="section scope_exit_alternatives">
 <div class="titlepage"><div><div><h2 class="title" style="clear: both">
-<a name="scope_exit.Alternatives"></a><a class="link" href="Alternatives.html" title="Annex: Alternatives">Annex: Alternatives</a>
+<a name="scope_exit.alternatives"></a><a class="link" href="alternatives.html" title="Annex: Alternatives">Annex: Alternatives</a>
 </h2></div></div></div>
 <p>
-      This section presents some alternatives and work related to <a class="link" href="../index.html" title="Chapter&#160;1.&#160;Boost.ScopeExit 1.1.0">Boost.ScopeExit</a>.
+      This section presents some alternative and related work to <a class="link" href="../index.html" title="Chapter&#160;1.&#160;Boost.ScopeExit 1.1.0">Boost.ScopeExit</a>.
     </p>
-<h6>
-<a name="scope_exit.Alternatives.h0"></a>
-      <span><a name="scope_exit.Alternatives.try_catch"></a></span><a class="link" href="Alternatives.html#scope_exit.Alternatives.try_catch">Try-Catch</a>
-    </h6>
+<h4>
+<a name="scope_exit.alternatives.h0"></a>
+      <span><a name="scope_exit.alternatives.try_catch"></a></span><a class="link" href="alternatives.html#scope_exit.alternatives.try_catch">Try-Catch</a>
+    </h4>
 <p>
       This is an example of using a badly designed <code class="computeroutput"><span class="identifier">file</span></code>
       class. An instance of <code class="computeroutput"><span class="identifier">file</span></code>
@@ -58,7 +58,7 @@
 <p>
       Note the following issues with this approach:
     </p>
-<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<div class="orderedlist"><ol class="orderedlist" type="1">
 <li class="listitem">
           The <code class="computeroutput"><span class="identifier">passwd</span></code> object is defined
           outside of the <code class="computeroutput"><span class="keyword">try</span></code> block because
@@ -74,7 +74,7 @@
           If opening throws, the <code class="computeroutput"><span class="identifier">passwd</span><span class="special">.</span><span class="identifier">close</span><span class="special">()</span></code> should not be called, hence the call
           to <code class="computeroutput"><span class="identifier">passwd</span><span class="special">.</span><span class="identifier">is_open</span><span class="special">()</span></code>.
         </li>
-</ul></div>
+</ol></div>
 <p>
       The <a class="link" href="../index.html" title="Chapter&#160;1.&#160;Boost.ScopeExit 1.1.0">Boost.ScopeExit</a> approach does not have
       any of these issues. For example (see also <a href="../../../example/try_catch.cpp" target="_top"><code class="literal">try_catch.cpp</code></a>):
@@ -93,10 +93,10 @@
 </pre>
 <p>
     </p>
-<h6>
-<a name="scope_exit.Alternatives.h1"></a>
-      <span><a name="scope_exit.Alternatives.raii"></a></span><a class="link" href="Alternatives.html#scope_exit.Alternatives.raii">RAII</a>
-    </h6>
+<h4>
+<a name="scope_exit.alternatives.h1"></a>
+      <span><a name="scope_exit.alternatives.raii"></a></span><a class="link" href="alternatives.html#scope_exit.alternatives.raii">RAII</a>
+    </h4>
 <p>
       <a href="http://www.research.att.com/~bs/glossary.html#Gresource-acquisition-is-initialization" target="_top">RAII</a>
       is absolutely perfect for the <code class="computeroutput"><span class="identifier">file</span></code>
@@ -145,13 +145,14 @@
       Or with specialized containers such as <a href="http://www.boost.org/libs/ptr_container" target="_top">Boost.PointerContainer</a>
       or <a href="http://www.boost.org/libs/multi_index" target="_top">Boost.Multi-Index</a>.
     </p>
-<h6>
-<a name="scope_exit.Alternatives.h2"></a>
-      <span><a name="scope_exit.Alternatives.scope_guards"></a></span><a class="link" href="Alternatives.html#scope_exit.Alternatives.scope_guards">Scope
+<h4>
+<a name="scope_exit.alternatives.h2"></a>
+      <span><a name="scope_exit.alternatives.scope_guards"></a></span><a class="link" href="alternatives.html#scope_exit.alternatives.scope_guards">Scope
       Guards</a>
-    </h6>
+    </h4>
 <p>
-      Imagine that a new currency rate is introduced before performing a transaction:
+      Imagine that a new currency rate is introduced before performing a transaction
+      (see also []):
     </p>
 <p>
 </p>
@@ -193,7 +194,7 @@
 <p>
       Note the following issues with this approach:
     </p>
-<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<div class="orderedlist"><ol class="orderedlist" type="1">
 <li class="listitem">
           <a href="http://www.boost.org/libs/lambda" target="_top">Boost.Lambda</a> expressions
           are hard to write correctly (e.g., overloaded functions must be explicitly
@@ -209,7 +210,7 @@
           Setting a breakpoint inside <code class="computeroutput"><span class="identifier">if_</span><span class="special">[...]</span></code> requires in-depth knowledge of <a href="http://www.boost.org/libs/lambda" target="_top">Boost.Lambda</a> and debugging
           techniques.
         </li>
-</ul></div>
+</ol></div>
 <p>
       This code will look much better with C++11 lambdas:
     </p>
@@ -239,11 +240,11 @@
 </pre>
 <p>
     </p>
-<h6>
-<a name="scope_exit.Alternatives.h3"></a>
-      <span><a name="scope_exit.Alternatives.the_d_programming_language"></a></span><a class="link" href="Alternatives.html#scope_exit.Alternatives.the_d_programming_language">The
+<h4>
+<a name="scope_exit.alternatives.h3"></a>
+      <span><a name="scope_exit.alternatives.the_d_programming_language"></a></span><a class="link" href="alternatives.html#scope_exit.alternatives.the_d_programming_language">The
       D Programming Language</a>
-    </h6>
+    </h4>
 <p>
       <a class="link" href="../index.html" title="Chapter&#160;1.&#160;Boost.ScopeExit 1.1.0">Boost.ScopeExit</a> is similar to <a href="http://www.digitalmars.com/d/2.0/statement.html#ScopeGuardStatement" target="_top">scope(exit)</a>
       feature built into the <a href="http://www.digitalmars.com/d/index.html" target="_top">D</a>
@@ -254,22 +255,21 @@
       language. Unfortunately, these are not possible in C++ because failure or success
       conditions cannot be determined by calling <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">uncaught_exception</span></code>
       (see <a href="http://www.gotw.ca/gotw/047.htm" target="_top">Guru of the Week #47</a>
-      for more details about <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">uncaught_exception</span></code>
-      and if it has any good use at all). However, this is not a big problem because
-      these two <a href="http://www.digitalmars.com/d/index.html" target="_top">D</a>'s
+      for details about <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">uncaught_exception</span></code> and if it has any good
+      use at all). However, this is not a big problem because these two <a href="http://www.digitalmars.com/d/index.html" target="_top">D</a>'s
       constructs can be expressed in terms of <a href="http://www.digitalmars.com/d/2.0/statement.html#ScopeGuardStatement" target="_top">scope(exit)</a>
       and a <code class="computeroutput"><span class="keyword">bool</span> <span class="identifier">commit</span></code>
-      variable as explained in the <a class="link" href="Tutorial.html" title="Tutorial">Tutorial</a>
-      section.
+      variable (similarly to some examples presented in the <a class="link" href="tutorial.html" title="Tutorial">Tutorial</a>
+      section).
     </p>
-<h6>
-<a name="scope_exit.Alternatives.h4"></a>
-      <span><a name="scope_exit.Alternatives.c__11_lambdas"></a></span><a class="link" href="Alternatives.html#scope_exit.Alternatives.c__11_lambdas">C++11
+<h4>
+<a name="scope_exit.alternatives.h4"></a>
+      <span><a name="scope_exit.alternatives.c__11_lambdas"></a></span><a class="link" href="alternatives.html#scope_exit.alternatives.c__11_lambdas">C++11
       Lambdas</a>
-    </h6>
+    </h4>
 <p>
       Using C++11 lambdas, it is relatively easy to implement the <a class="link" href="../index.html" title="Chapter&#160;1.&#160;Boost.ScopeExit 1.1.0">Boost.ScopeExit</a>
-      construct. For example (see also <a href="../../../test/world_lambda.cpp" target="_top"><code class="literal">world_lambda.cpp</code></a>):
+      construct. For example (see also <a href="../../../example/world_cxx11_lambda.cpp" target="_top"><code class="literal">world_cxx11_lambda.cpp</code></a>):
     </p>
 <p>
 </p>
@@ -286,8 +286,8 @@
     <span class="keyword">bool</span> <span class="identifier">commit</span> <span class="special">=</span> <span class="keyword">false</span><span class="special">;</span>
 
     <span class="identifier">persons_</span><span class="special">.</span><span class="identifier">push_back</span><span class="special">(</span><span class="identifier">a_person</span><span class="special">);</span>
-    <span class="identifier">scope_exit</span> <span class="identifier">on_exit1</span><span class="special">([&amp;</span><span class="identifier">commit</span><span class="special">,</span> <span class="special">&amp;</span><span class="identifier">persons_</span><span class="special">](</span><span class="keyword">void</span><span class="special">)</span> <span class="special">{</span> <span class="comment">// Use C++11 lambda.</span>
-        <span class="keyword">if</span><span class="special">(!</span><span class="identifier">commit</span><span class="special">)</span> <span class="identifier">persons_</span><span class="special">.</span><span class="identifier">pop_back</span><span class="special">();</span>
+    <span class="identifier">scope_exit</span> <span class="identifier">on_exit1</span><span class="special">([&amp;</span><span class="identifier">commit</span><span class="special">,</span> <span class="keyword">this</span><span class="special">](</span><span class="keyword">void</span><span class="special">)</span> <span class="special">{</span> <span class="comment">// Use C++11 lambda.</span>
+        <span class="keyword">if</span><span class="special">(!</span><span class="identifier">commit</span><span class="special">)</span> <span class="identifier">persons_</span><span class="special">.</span><span class="identifier">pop_back</span><span class="special">();</span> <span class="comment">// `persons_` via captured `this`.</span>
     <span class="special">});</span>
 
     <span class="comment">// ...</span>
@@ -312,7 +312,7 @@
 </tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="../BOOST_SCOPE_EXIT_CONFIG_NO_CPP11.html"><img src="../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="No_Variadic_Macros.html"><img src="../../../../../doc/src/images/next.png" alt="Next"></a>
+<a accesskey="p" href="tutorial.html"><img src="../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="no_variadic_macros.html"><img src="../../../../../doc/src/images/next.png" alt="Next"></a>
 </div>
 </body>
 </html>

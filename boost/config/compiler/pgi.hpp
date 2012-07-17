@@ -1,6 +1,6 @@
 //  (C) Copyright Noel Belcourt 2007.
-//  Use, modification and distribution are subject to the 
-//  Boost Software License, Version 1.0. (See accompanying file 
+//  Use, modification and distribution are subject to the
+//  Boost Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 //  See http://www.boost.org for most recent version.
@@ -20,7 +20,8 @@
 
 // options requested by configure --enable-test
 #define BOOST_HAS_PTHREADS
-#undef BOOST_HAS_PTHREAD_YIELD
+#define BOOST_HAS_THREADS
+#define BOOST_HAS_PTHREAD_YIELD
 #define BOOST_HAS_NRVO
 #define BOOST_HAS_LONG_LONG
 
@@ -29,7 +30,7 @@
 #undef BOOST_NO_EXCEPTION_STD_NAMESPACE
 #undef BOOST_DEDUCED_TYPENAME
 
-#define BOOST_FUNCTION_SCOPE_USING_DECLARATION_BREAKS_ADL 
+#define BOOST_FUNCTION_SCOPE_USING_DECLARATION_BREAKS_ADL
 #define BOOST_NO_TWO_PHASE_NAME_LOOKUP
 #define BOOST_NO_AUTO_MULTIDECLARATIONS
 #define BOOST_NO_AUTO_DECLARATIONS
@@ -49,7 +50,7 @@
 
 #elif __PGIC__ >= 7
 
-#define BOOST_FUNCTION_SCOPE_USING_DECLARATION_BREAKS_ADL 
+#define BOOST_FUNCTION_SCOPE_USING_DECLARATION_BREAKS_ADL
 #define BOOST_NO_TWO_PHASE_NAME_LOOKUP
 #define BOOST_NO_SWPRINTF
 #define BOOST_NO_AUTO_MULTIDECLARATIONS
@@ -76,6 +77,7 @@
 #define BOOST_NO_EXTERN_TEMPLATE
 #define BOOST_NO_FUNCTION_TEMPLATE_DEFAULT_ARGS
 #define BOOST_NO_LAMBDAS
+#define BOOST_NO_LOCAL_CLASS_TEMPLATE_PARAMETERS
 #define BOOST_NO_NOEXCEPT
 #define BOOST_NO_NULLPTR
 #define BOOST_NO_NUMERIC_LIMITS_LOWEST

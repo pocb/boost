@@ -16,7 +16,7 @@
 
 // template <class Mutex> class unique_lock;
 
-// unique_lock& operator=(unique_lock&& u);
+// unique_lock(unique_lock&& u);
 
 
 #include <boost/thread/locks.hpp>
@@ -36,9 +36,26 @@ int main()
   BOOST_TEST(lk0.owns_lock() == false);
   }
   {
-  boost::unique_lock<boost::mutex> lk( (boost::unique_lock<boost::mutex>(m)));
+  boost::unique_lock<boost::mutex> lk( (BOOST_THREAD_MAKE_RV_REF(boost::unique_lock<boost::mutex>(m))));
   BOOST_TEST(lk.mutex() == &m);
   BOOST_TEST(lk.owns_lock() == true);
+  }
+  {
+  boost::unique_lock<boost::mutex> lk0(m, boost::defer_lock);
+  boost::unique_lock<boost::mutex> lk( (boost::move(lk0)));
+  BOOST_TEST(lk.mutex() == &m);
+  BOOST_TEST(lk.owns_lock() == false);
+  BOOST_TEST(lk0.mutex() == 0);
+  BOOST_TEST(lk0.owns_lock() == false);
+  }
+  {
+  boost::unique_lock<boost::mutex> lk0(m, boost::defer_lock);
+  lk0.release();
+  boost::unique_lock<boost::mutex> lk( (boost::move(lk0)));
+  BOOST_TEST(lk.mutex() == 0);
+  BOOST_TEST(lk.owns_lock() == false);
+  BOOST_TEST(lk0.mutex() == 0);
+  BOOST_TEST(lk0.owns_lock() == false);
   }
 
   return boost::report_errors();

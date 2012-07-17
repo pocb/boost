@@ -17,6 +17,8 @@
 
 // template <class F, class ...Args> thread(F&& f, Args&&... args);
 
+#define BOOST_THREAD_USES_MOVE
+
 #include <boost/thread/thread.hpp>
 #include <new>
 #include <cstdlib>
@@ -25,41 +27,13 @@
 
 class MoveOnly
 {
-#ifndef BOOST_NO_RVALUE_REFERENCES
-  MoveOnly(const MoveOnly&);
-#else
-  MoveOnly(MoveOnly&);
-  MoveOnly& operator=(MoveOnly&);
-#endif
 public:
-  typedef int boost_move_emulation_t;
+  BOOST_THREAD_MOVABLE_ONLY(MoveOnly)
   MoveOnly()
   {
   }
-#ifndef BOOST_NO_RVALUE_REFERENCES
-  MoveOnly(MoveOnly&&)
+  MoveOnly(BOOST_THREAD_RV_REF(MoveOnly))
   {}
-#else
-#if defined BOOST_THREAD_USES_MOVE
-  MoveOnly(boost::rv<MoveOnly>&)
-  {}
-  MoveOnly& operator=(boost::rv<MoveOnly>&)
-  {
-    return *this;
-  }
-  operator ::boost::rv<MoveOnly>&()
-  {
-    return *static_cast< ::boost::rv<MoveOnly>* >(this);
-  }
-  operator const ::boost::rv<MoveOnly>&() const
-  {
-    return *static_cast<const ::boost::rv<MoveOnly>* >(this);
-  }
-#else
-  MoveOnly(detail::thread_move_t<MoveOnly>)
-  {}
-#endif
-#endif
 
   void operator()()
   {
@@ -67,16 +41,13 @@ public:
 };
 
 MoveOnly MakeMoveOnly() {
-  MoveOnly x;
-  return boost::move(x);
+  return BOOST_THREAD_MAKE_RV_REF(MoveOnly());
 }
+
 int main()
 {
   {
-    // FIXME The following fails
-    boost::thread t = boost::thread( MoveOnly() );
-    //boost::thread t = boost::thread( MakeMoveOnly() );
-    //boost::thread t (( boost::move( MoveOnly() ) ));
+    boost::thread t(( BOOST_THREAD_MAKE_RV_REF(MakeMoveOnly()) ));
     t.join();
   }
   return boost::report_errors();

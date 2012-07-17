@@ -1,4 +1,5 @@
 //  (C) Copyright 2008-10 Anthony Williams
+//  (C) Copyright 2011-2012 Vicente J. Botet Escriba
 //
 //  Distributed under the Boost Software License, Version 1.0. (See
 //  accompanying file LICENSE_1_0.txt or copy at
@@ -8,7 +9,7 @@
 #define BOOST_THREAD_FUTURE_HPP
 
 #include <boost/thread/detail/config.hpp>
-#include <boost/thread/detail/scoped_enum.hpp>
+#include <boost/detail/scoped_enum_emulation.hpp>
 #include <stdexcept>
 #include <boost/thread/detail/move.hpp>
 #include <boost/thread/thread_time.hpp>
@@ -19,6 +20,8 @@
 #include <boost/scoped_ptr.hpp>
 #include <boost/type_traits/is_fundamental.hpp>
 #include <boost/type_traits/is_convertible.hpp>
+#include <boost/type_traits/remove_reference.hpp>
+#include <boost/type_traits/remove_cv.hpp>
 #include <boost/mpl/if.hpp>
 #include <boost/config.hpp>
 #include <boost/throw_exception.hpp>
@@ -36,10 +39,17 @@
 #include <boost/chrono/system_clocks.hpp>
 #endif
 
-#if BOOST_THREAD_VERSION==1
-#define BOOST_THREAD_FUTURE unique_future
-#else
+#if defined BOOST_THREAD_PROVIDES_FUTURE_CTOR_ALLOCATORS
+#include <boost/thread/detail/memory.hpp>
+#endif
+
+#include <boost/utility/result_of.hpp>
+//#include <boost/thread.hpp>
+
+#if defined BOOST_THREAD_PROVIDES_FUTURE
 #define BOOST_THREAD_FUTURE future
+#else
+#define BOOST_THREAD_FUTURE unique_future
 #endif
 
 namespace boost
@@ -104,14 +114,17 @@ namespace boost
     }
   }
 
-  class BOOST_THREAD_DECL future_error
+  class BOOST_SYMBOL_VISIBLE future_error
       : public std::logic_error
   {
       system::error_code ec_;
   public:
-      future_error(system::error_code ec);
+      future_error(system::error_code ec)
+      : logic_error(ec.message()),
+        ec_(ec)
+      {
+      }
 
-      BOOST_SYMBOL_VISIBLE
       const system::error_code& code() const BOOST_NOEXCEPT
       {
         return ec_;
@@ -357,19 +370,18 @@ namespace boost
 #ifndef BOOST_NO_RVALUE_REFERENCES
             typedef T const& source_reference_type;
             struct dummy;
-            typedef typename boost::mpl::if_<boost::is_fundamental<T>,dummy&,T&&>::type rvalue_source_type;
-            typedef typename boost::mpl::if_<boost::is_fundamental<T>,T,T&&>::type move_dest_type;
-#else
-#if defined BOOST_THREAD_USES_MOVE
+            typedef typename boost::mpl::if_<boost::is_fundamental<T>,dummy&,BOOST_THREAD_RV_REF(T)>::type rvalue_source_type;
+            typedef typename boost::mpl::if_<boost::is_fundamental<T>,T,BOOST_THREAD_RV_REF(T)>::type move_dest_type;
+#elif defined BOOST_THREAD_USES_MOVE
             typedef T& source_reference_type;
-            typedef typename boost::mpl::if_<boost::has_move_emulation_enabled<T>,::boost::rv<T>&,T const&>::type rvalue_source_type;
-            typedef typename boost::mpl::if_<boost::has_move_emulation_enabled<T>,::boost::rv<T>&,T>::type move_dest_type;
+            typedef typename boost::mpl::if_<boost::has_move_emulation_enabled<T>,BOOST_THREAD_RV_REF(T),T const&>::type rvalue_source_type;
+            typedef typename boost::mpl::if_<boost::has_move_emulation_enabled<T>,BOOST_THREAD_RV_REF(T),T>::type move_dest_type;
 #else
             typedef T& source_reference_type;
-            typedef typename boost::mpl::if_<boost::is_convertible<T&,boost::detail::thread_move_t<T> >,boost::detail::thread_move_t<T>,T const&>::type rvalue_source_type;
-            typedef typename boost::mpl::if_<boost::is_convertible<T&,boost::detail::thread_move_t<T> >,boost::detail::thread_move_t<T>,T>::type move_dest_type;
+            typedef typename boost::mpl::if_<boost::is_convertible<T&,BOOST_THREAD_RV_REF(T) >,BOOST_THREAD_RV_REF(T),T const&>::type rvalue_source_type;
+            typedef typename boost::mpl::if_<boost::is_convertible<T&,BOOST_THREAD_RV_REF(T) >,BOOST_THREAD_RV_REF(T),T>::type move_dest_type;
 #endif
-#endif
+
             typedef const T& shared_future_get_result_type;
 
             static void init(storage_type& storage,source_reference_type t)
@@ -449,6 +461,7 @@ namespace boost
                 future_traits<T>::init(result,result_);
                 mark_finished_internal();
             }
+
             void mark_finished_with_result_internal(rvalue_source_type result_)
             {
                 future_traits<T>::init(result,static_cast<rvalue_source_type>(result_));
@@ -460,28 +473,18 @@ namespace boost
                 boost::lock_guard<boost::mutex> lock(mutex);
                 mark_finished_with_result_internal(result_);
             }
+
             void mark_finished_with_result(rvalue_source_type result_)
             {
                 boost::lock_guard<boost::mutex> lock(mutex);
-#if defined BOOST_THREAD_USES_MOVEXX
-                mark_finished_with_result_internal(static_cast<rvalue_source_type>(result_));
-#else
                 mark_finished_with_result_internal(result_);
-#endif
             }
 
-#if defined BOOST_THREAD_USES_MOVEXX
-            T& get()
-            {
-                wait();
-                return *result;             }
-#else
             move_dest_type get()
             {
                 wait();
                 return static_cast<move_dest_type>(*result);
             }
-#endif
 
             shared_future_get_result_type get_sh()
             {
@@ -547,12 +550,22 @@ namespace boost
                     return future_state::ready;
                 }
             }
-
         private:
             future_object(future_object const&);
             future_object& operator=(future_object const&);
         };
 
+//        template<typename T, typename Allocator>
+//        struct future_object_alloc: public future_object<T>
+//        {
+//          typedef future_object<T> base;
+//          Allocator alloc_;
+//
+//        public:
+//          explicit future_object_alloc(const Allocator& a)
+//              : alloc_(a) {}
+//
+//        };
         class future_waiter
         {
             struct registered_waiter;
@@ -783,17 +796,6 @@ namespace boost
     template <typename R>
     class BOOST_THREAD_FUTURE
     {
-
-#ifndef BOOST_NO_DELETED_FUNCTIONS
-    public:
-      BOOST_THREAD_FUTURE(BOOST_THREAD_FUTURE & rhs) = delete;
-      BOOST_THREAD_FUTURE& operator=(BOOST_THREAD_FUTURE& rhs) = delete;
-#else // BOOST_NO_DELETED_FUNCTIONS
-    private:
-      BOOST_THREAD_FUTURE(BOOST_THREAD_FUTURE & rhs);// = delete;
-      BOOST_THREAD_FUTURE& operator=(BOOST_THREAD_FUTURE& rhs);// = delete;
-#endif // BOOST_NO_DELETED_FUNCTIONS
-
     private:
 
         typedef boost::shared_ptr<detail::future_object<R> > future_ptr;
@@ -812,6 +814,7 @@ namespace boost
         {}
 
     public:
+        BOOST_THREAD_MOVABLE_ONLY(BOOST_THREAD_FUTURE)
         typedef future_state::state state;
 
         BOOST_THREAD_FUTURE()
@@ -820,59 +823,23 @@ namespace boost
         ~BOOST_THREAD_FUTURE()
         {}
 
-#ifndef BOOST_NO_RVALUE_REFERENCES
-        BOOST_THREAD_FUTURE(BOOST_THREAD_FUTURE && other)
+        BOOST_THREAD_FUTURE(BOOST_THREAD_RV_REF(BOOST_THREAD_FUTURE) other) BOOST_NOEXCEPT:
+            future_(BOOST_THREAD_RV(other).future_)
         {
-            future_.swap(other.future_);
-        }
-        BOOST_THREAD_FUTURE& operator=(BOOST_THREAD_FUTURE && other)
-        {
-            future_=other.future_;
-            other.future_.reset();
-            return *this;
-        }
-#else
-#if defined BOOST_THREAD_USES_MOVE
-        BOOST_THREAD_FUTURE(boost::rv<BOOST_THREAD_FUTURE>& other):
-            future_(other.future_)
-        {
-            other.future_.reset();
+            BOOST_THREAD_RV(other).future_.reset();
         }
 
-        BOOST_THREAD_FUTURE& operator=(boost::rv<BOOST_THREAD_FUTURE>& other)
+        BOOST_THREAD_FUTURE& operator=(BOOST_THREAD_RV_REF(BOOST_THREAD_FUTURE) other) BOOST_NOEXCEPT
         {
-            future_=other.future_;
-            other.future_.reset();
-            return *this;
-        }
-        operator ::boost::rv<BOOST_THREAD_FUTURE>&()
-        {
-          return *static_cast< ::boost::rv<BOOST_THREAD_FUTURE>* >(this);
-        }
-        operator const ::boost::rv<BOOST_THREAD_FUTURE>&() const
-        {
-          return *static_cast<const ::boost::rv<BOOST_THREAD_FUTURE>* >(this);
-        }
-#else
-        BOOST_THREAD_FUTURE(boost::detail::thread_move_t<BOOST_THREAD_FUTURE> other):
-            future_(other->future_)
-        {
-            other->future_.reset();
-        }
-
-        BOOST_THREAD_FUTURE& operator=(boost::detail::thread_move_t<BOOST_THREAD_FUTURE> other)
-        {
-            future_=other->future_;
-            other->future_.reset();
+            future_=BOOST_THREAD_RV(other).future_;
+            BOOST_THREAD_RV(other).future_.reset();
             return *this;
         }
 
-        operator boost::detail::thread_move_t<BOOST_THREAD_FUTURE>()
+        shared_future<R> share()
         {
-            return boost::detail::thread_move_t<BOOST_THREAD_FUTURE>(*this);
+          return shared_future<R>(::boost::move(*this));
         }
-#endif
-#endif
 
         void swap(BOOST_THREAD_FUTURE& other)
         {
@@ -891,7 +858,7 @@ namespace boost
         }
 
         // functions to check state, and wait for ready
-        state get_state() const
+        state get_state() const BOOST_NOEXCEPT
         {
             if(!future_)
             {
@@ -900,23 +867,22 @@ namespace boost
             return future_->get_state();
         }
 
-
-        bool is_ready() const
+        bool is_ready() const BOOST_NOEXCEPT
         {
             return get_state()==future_state::ready;
         }
 
-        bool has_exception() const
+        bool has_exception() const BOOST_NOEXCEPT
         {
             return future_ && future_->has_exception();
         }
 
-        bool has_value() const
+        bool has_value() const BOOST_NOEXCEPT
         {
             return future_ && future_->has_value();
         }
 
-        bool valid() const
+        bool valid() const BOOST_NOEXCEPT
         {
             return future_ != 0;
         }
@@ -966,12 +932,7 @@ namespace boost
 #endif
     };
 
-#ifdef BOOST_NO_RVALUE_REFERENCES
-    template <typename T>
-    struct has_move_emulation_enabled_aux<BOOST_THREAD_FUTURE<T> >
-      : BOOST_MOVE_BOOST_NS::integral_constant<bool, true>
-    {};
-#endif
+    BOOST_THREAD_DCL_MOVABLE_BEG(T) BOOST_THREAD_FUTURE<T> BOOST_THREAD_DCL_MOVABLE_END
 
     template <typename R>
     class shared_future
@@ -979,9 +940,6 @@ namespace boost
         typedef boost::shared_ptr<detail::future_object<R> > future_ptr;
 
         future_ptr future_;
-
-//         shared_future(const BOOST_THREAD_FUTURE<R>& other);
-//         shared_future& operator=(const BOOST_THREAD_FUTURE<R>& other);
 
         friend class detail::future_waiter;
         friend class promise<R>;
@@ -992,6 +950,8 @@ namespace boost
         {}
 
     public:
+        BOOST_THREAD_MOVABLE(shared_future)
+
         shared_future(shared_future const& other):
             future_(other.future_)
         {}
@@ -1009,95 +969,30 @@ namespace boost
             future_=other.future_;
             return *this;
         }
-#ifndef BOOST_NO_RVALUE_REFERENCES
-        shared_future(shared_future && other)
+        shared_future(BOOST_THREAD_RV_REF(shared_future) other) BOOST_NOEXCEPT :
+            future_(BOOST_THREAD_RV(other).future_)
         {
-            future_.swap(other.future_);
+            BOOST_THREAD_RV(other).future_.reset();
         }
-        shared_future(BOOST_THREAD_FUTURE<R> && other)
+        shared_future(BOOST_THREAD_RV_REF_BEG BOOST_THREAD_FUTURE<R> BOOST_THREAD_RV_REF_END other) BOOST_NOEXCEPT :
+            future_(BOOST_THREAD_RV(other).future_)
         {
-            future_.swap(other.future_);
+            BOOST_THREAD_RV(other).future_.reset();
         }
-        shared_future& operator=(shared_future && other)
+        shared_future& operator=(BOOST_THREAD_RV_REF(shared_future) other) BOOST_NOEXCEPT
         {
-            future_.swap(other.future_);
-            other.future_.reset();
+            future_.swap(BOOST_THREAD_RV(other).future_);
+            BOOST_THREAD_RV(other).future_.reset();
             return *this;
         }
-        shared_future& operator=(BOOST_THREAD_FUTURE<R> && other)
+        shared_future& operator=(BOOST_THREAD_RV_REF_BEG BOOST_THREAD_FUTURE<R> BOOST_THREAD_RV_REF_END other) BOOST_NOEXCEPT
         {
-            future_.swap(other.future_);
-            other.future_.reset();
-            return *this;
-        }
-#else
-#if defined BOOST_THREAD_USES_MOVE
-        shared_future(boost::rv<shared_future>& other):
-            future_(other.future_)
-        {
-            other.future_.reset();
-        }
-//         shared_future(const BOOST_THREAD_FUTURE<R> &) = delete;
-        shared_future(boost::rv<BOOST_THREAD_FUTURE<R> >& other):
-            future_(other.future_)
-        {
-            other.future_.reset();
-        }
-        shared_future& operator=(boost::rv<shared_future>& other)
-        {
-            future_.swap(other.future_);
-            other.future_.reset();
-            return *this;
-        }
-        shared_future& operator=(boost::rv<BOOST_THREAD_FUTURE<R> >& other)
-        {
-            future_.swap(other.future_);
-            other.future_.reset();
-            return *this;
-        }
-        operator ::boost::rv<shared_future>&()
-        {
-          return *static_cast< ::boost::rv<shared_future>* >(this);
-        }
-        operator const ::boost::rv<shared_future>&() const
-        {
-          return *static_cast<const ::boost::rv<shared_future>* >(this);
-        }
-
-#else
-
-        shared_future(boost::detail::thread_move_t<shared_future> other):
-            future_(other->future_)
-        {
-            other->future_.reset();
-        }
-//         shared_future(const BOOST_THREAD_FUTURE<R> &) = delete;
-        shared_future(boost::detail::thread_move_t<BOOST_THREAD_FUTURE<R> > other):
-            future_(other->future_)
-        {
-            other->future_.reset();
-        }
-        shared_future& operator=(boost::detail::thread_move_t<shared_future> other)
-        {
-            future_.swap(other->future_);
-            other->future_.reset();
-            return *this;
-        }
-        shared_future& operator=(boost::detail::thread_move_t<BOOST_THREAD_FUTURE<R> > other)
-        {
-            future_.swap(other->future_);
-            other->future_.reset();
+            future_.swap(BOOST_THREAD_RV(other).future_);
+            BOOST_THREAD_RV(other).future_.reset();
             return *this;
         }
 
-        operator boost::detail::thread_move_t<shared_future>()
-        {
-            return boost::detail::thread_move_t<shared_future>(*this);
-        }
-#endif
-#endif
-
-        void swap(shared_future& other)
+        void swap(shared_future& other) BOOST_NOEXCEPT
         {
             future_.swap(other.future_);
         }
@@ -1114,7 +1009,7 @@ namespace boost
         }
 
         // functions to check state, and wait for ready
-        state get_state() const
+        state get_state() const  BOOST_NOEXCEPT
         {
             if(!future_)
             {
@@ -1123,18 +1018,22 @@ namespace boost
             return future_->get_state();
         }
 
+        bool valid() const  BOOST_NOEXCEPT
+        {
+            return future_ != 0;
+        }
 
-        bool is_ready() const
+        bool is_ready() const  BOOST_NOEXCEPT
         {
             return get_state()==future_state::ready;
         }
 
-        bool has_exception() const
+        bool has_exception() const BOOST_NOEXCEPT
         {
             return future_ && future_->has_exception();
         }
 
-        bool has_value() const
+        bool has_value() const BOOST_NOEXCEPT
         {
             return future_ && future_->has_value();
         }
@@ -1184,12 +1083,7 @@ namespace boost
 #endif
     };
 
-#ifdef BOOST_NO_RVALUE_REFERENCES
-    template <typename T>
-    struct has_move_emulation_enabled_aux<shared_future<T> >
-      : BOOST_MOVE_BOOST_NS::integral_constant<bool, true>
-    {};
-#endif
+    BOOST_THREAD_DCL_MOVABLE_BEG(T) shared_future<T> BOOST_THREAD_DCL_MOVABLE_END
 
     template <typename R>
     class promise
@@ -1199,20 +1093,9 @@ namespace boost
         future_ptr future_;
         bool future_obtained;
 
-#ifndef BOOST_NO_DELETED_FUNCTIONS
-    public:
-        promise(promise const&  rhs);// = delete;
-        promise & operator=(promise const & rhs);// = delete;
-#else // BOOST_NO_DELETED_FUNCTIONS
-    private:
-        promise(promise & rhs);// = delete;
-        promise & operator=(promise & rhs);// = delete;
-#endif // BOOST_NO_DELETED_FUNCTIONS
-    private:
-
         void lazy_init()
         {
-#if BOOST_THREAD_VERSION==1
+#if defined BOOST_THREAD_PROMISE_LAZY
             if(!atomic_load(&future_))
             {
                 future_ptr blank;
@@ -1222,13 +1105,24 @@ namespace boost
         }
 
     public:
-//         template <class Allocator> explicit promise(Allocator a);
+        BOOST_THREAD_MOVABLE_ONLY(promise)
+#if defined BOOST_THREAD_PROVIDES_FUTURE_CTOR_ALLOCATORS
+        template <class Allocator>
+        promise(boost::allocator_arg_t, Allocator a)
+        {
+          typedef typename Allocator::template rebind<detail::future_object<R> >::other A2;
+          A2 a2(a);
+          typedef thread_detail::allocator_destructor<A2> D;
 
+          future_ = future_ptr(::new(a2.allocate(1)) detail::future_object<R>(), D(a2, 1) );
+          future_obtained = false;
+        }
+#endif
         promise():
-#if BOOST_THREAD_VERSION==1
+#if defined BOOST_THREAD_PROMISE_LAZY
             future_(),
 #else
-            future_(new detail::future_object<R>),
+            future_(new detail::future_object<R>()),
 #endif
             future_obtained(false)
         {}
@@ -1247,80 +1141,20 @@ namespace boost
         }
 
         // Assignment
-#ifndef BOOST_NO_RVALUE_REFERENCES
-        promise(promise && rhs):
-#if ! BOOST_THREAD_VERSION==1
-            future_(rhs.future_),
-#endif
-            future_obtained(rhs.future_obtained)
+        promise(BOOST_THREAD_RV_REF(promise) rhs) BOOST_NOEXCEPT :
+            future_(BOOST_THREAD_RV(rhs).future_),future_obtained(BOOST_THREAD_RV(rhs).future_obtained)
         {
-#if BOOST_THREAD_VERSION==1
-          future_.swap(rhs.future_);
-#else
-          // we need to release the future as shared_ptr doesn't implements move semantics
-            rhs.future_.reset();
-#endif
-            rhs.future_obtained=false;
+            BOOST_THREAD_RV(rhs).future_.reset();
+            BOOST_THREAD_RV(rhs).future_obtained=false;
         }
-        promise & operator=(promise&& rhs)
+        promise & operator=(BOOST_THREAD_RV_REF(promise) rhs) BOOST_NOEXCEPT
         {
-#if BOOST_THREAD_VERSION==1
-            future_.swap(rhs.future_);
-            future_obtained=rhs.future_obtained;
-            rhs.future_.reset();
-            rhs.future_obtained=false;
-#else
-            promise(boost::move(rhs)).swap(*this);
-#endif
-
+            future_=BOOST_THREAD_RV(rhs).future_;
+            future_obtained=BOOST_THREAD_RV(rhs).future_obtained;
+            BOOST_THREAD_RV(rhs).future_.reset();
+            BOOST_THREAD_RV(rhs).future_obtained=false;
             return *this;
         }
-#else
-#if defined BOOST_THREAD_USES_MOVE
-        promise(boost::rv<promise>& rhs):
-            future_(rhs.future_),future_obtained(rhs.future_obtained)
-        {
-            rhs.future_.reset();
-            rhs.future_obtained=false;
-        }
-        promise & operator=(boost::rv<promise>& rhs)
-        {
-            future_=rhs.future_;
-            future_obtained=rhs.future_obtained;
-            rhs.future_.reset();
-            rhs.future_obtained=false;
-            return *this;
-        }
-        operator ::boost::rv<promise>&()
-        {
-          return *static_cast< ::boost::rv<promise>* >(this);
-        }
-        operator const ::boost::rv<promise>&() const
-        {
-          return *static_cast<const ::boost::rv<promise>* >(this);
-        }
-#else
-        promise(boost::detail::thread_move_t<promise> rhs):
-            future_(rhs->future_),future_obtained(rhs->future_obtained)
-        {
-            rhs->future_.reset();
-            rhs->future_obtained=false;
-        }
-        promise & operator=(boost::detail::thread_move_t<promise> rhs)
-        {
-            future_=rhs->future_;
-            future_obtained=rhs->future_obtained;
-            rhs->future_.reset();
-            rhs->future_obtained=false;
-            return *this;
-        }
-
-        operator boost::detail::thread_move_t<promise>()
-        {
-            return boost::detail::thread_move_t<promise>(*this);
-        }
-#endif
-#endif
 
         void swap(promise& other)
         {
@@ -1395,30 +1229,38 @@ namespace boost
         future_ptr future_;
         bool future_obtained;
 
-#ifndef BOOST_NO_DELETED_FUNCTIONS
-    public:
-        promise(promise const&  rhs);// = delete;
-        promise & operator=(promise const & rhs);// = delete;
-#else // BOOST_NO_DELETED_FUNCTIONS
-    private:
-        promise(promise & rhs);// = delete;
-        promise & operator=(promise & rhs);// = delete;
-#endif // BOOST_NO_DELETED_FUNCTIONS
-    private:
-
         void lazy_init()
         {
+#if defined BOOST_THREAD_PROMISE_LAZY
             if(!atomic_load(&future_))
             {
                 future_ptr blank;
                 atomic_compare_exchange(&future_,&blank,future_ptr(new detail::future_object<void>));
             }
+#endif
         }
     public:
-//         template <class Allocator> explicit promise(Allocator a);
+        BOOST_THREAD_MOVABLE_ONLY(promise)
 
+#if defined BOOST_THREAD_PROVIDES_FUTURE_CTOR_ALLOCATORS
+        template <class Allocator>
+        promise(boost::allocator_arg_t, Allocator a)
+        {
+          typedef typename Allocator::template rebind<detail::future_object<void> >::other A2;
+          A2 a2(a);
+          typedef thread_detail::allocator_destructor<A2> D;
+
+          future_ = future_ptr(::new(a2.allocate(1)) detail::future_object<void>(), D(a2, 1) );
+          future_obtained = false;
+        }
+#endif
         promise():
-            future_(),future_obtained(false)
+#if defined BOOST_THREAD_PROMISE_LAZY
+            future_(),
+#else
+            future_(new detail::future_object<void>),
+#endif
+            future_obtained(false)
         {}
 
         ~promise()
@@ -1435,67 +1277,22 @@ namespace boost
         }
 
         // Assignment
-#ifndef BOOST_NO_RVALUE_REFERENCES
-        promise(promise && rhs):
-            future_obtained(rhs.future_obtained)
+        promise(BOOST_THREAD_RV_REF(promise) rhs) BOOST_NOEXCEPT :
+            future_(BOOST_THREAD_RV(rhs).future_),future_obtained(BOOST_THREAD_RV(rhs).future_obtained)
         {
-            future_.swap(rhs.future_);
-            rhs.future_obtained=false;
-        }
-        promise & operator=(promise&& rhs)
-        {
-            future_.swap(rhs.future_);
-            future_obtained=rhs.future_obtained;
-            rhs.future_.reset();
-            rhs.future_obtained=false;
-            return *this;
-        }
-#else
-#if defined BOOST_THREAD_USES_MOVE
-        promise(boost::rv<promise>& rhs):
-            future_(rhs.future_),future_obtained(rhs.future_obtained)
-        {
-            rhs.future_.reset();
-            rhs.future_obtained=false;
-        }
-        promise & operator=(boost::rv<promise>& rhs)
-        {
-            future_=rhs.future_;
-            future_obtained=rhs.future_obtained;
-            rhs.future_.reset();
-            rhs.future_obtained=false;
-            return *this;
-        }
-        operator ::boost::rv<promise>&()
-        {
-          return *static_cast< ::boost::rv<promise>* >(this);
-        }
-        operator const ::boost::rv<promise>&() const
-        {
-          return *static_cast<const ::boost::rv<promise>* >(this);
-        }
-#else
-        promise(boost::detail::thread_move_t<promise> rhs):
-            future_(rhs->future_),future_obtained(rhs->future_obtained)
-        {
-            rhs->future_.reset();
-            rhs->future_obtained=false;
-        }
-        promise & operator=(boost::detail::thread_move_t<promise> rhs)
-        {
-            future_=rhs->future_;
-            future_obtained=rhs->future_obtained;
-            rhs->future_.reset();
-            rhs->future_obtained=false;
-            return *this;
+          // we need to release the future as shared_ptr doesn't implements move semantics
+            BOOST_THREAD_RV(rhs).future_.reset();
+            BOOST_THREAD_RV(rhs).future_obtained=false;
         }
 
-        operator boost::detail::thread_move_t<promise>()
+        promise & operator=(BOOST_THREAD_RV_REF(promise) rhs) BOOST_NOEXCEPT
         {
-            return boost::detail::thread_move_t<promise>(*this);
+            future_=BOOST_THREAD_RV(rhs).future_;
+            future_obtained=BOOST_THREAD_RV(rhs).future_obtained;
+            BOOST_THREAD_RV(rhs).future_.reset();
+            BOOST_THREAD_RV(rhs).future_obtained=false;
+            return *this;
         }
-#endif
-#endif
 
         void swap(promise& other)
         {
@@ -1508,6 +1305,10 @@ namespace boost
         {
             lazy_init();
 
+            if (future_.get()==0)
+            {
+                boost::throw_exception(promise_moved());
+            }
             if(future_obtained)
             {
                 boost::throw_exception(future_already_retrieved());
@@ -1547,12 +1348,17 @@ namespace boost
 
     };
 
-#ifdef BOOST_NO_RVALUE_REFERENCES
-    template <typename T>
-    struct has_move_emulation_enabled_aux<promise<T> >
-      : BOOST_MOVE_BOOST_NS::integral_constant<bool, true>
-    {};
+#if defined BOOST_THREAD_PROVIDES_FUTURE_CTOR_ALLOCATORS
+    namespace container
+    {
+      template <class R, class Alloc>
+      struct uses_allocator<promise<R> , Alloc> : true_type
+      {
+      };
+    }
 #endif
+
+    BOOST_THREAD_DCL_MOVABLE_BEG(T) promise<T> BOOST_THREAD_DCL_MOVABLE_END
 
     namespace detail
     {
@@ -1566,6 +1372,10 @@ namespace boost
                 started(false)
             {}
 
+            void reset()
+            {
+              started=false;
+            }
             void run()
             {
                 {
@@ -1598,33 +1408,29 @@ namespace boost
         struct task_object:
             task_base<R>
         {
+        private:
+          task_object(task_object&);
+        public:
             F f;
             task_object(F const& f_):
                 f(f_)
             {}
 #ifndef BOOST_NO_RVALUE_REFERENCES
-            task_object(F&& f_):
-                f(f_)
+            task_object(BOOST_THREAD_RV_REF(F) f_):
+              f(boost::forward<F>(f_))
             {}
 #else
-#if defined BOOST_THREAD_USES_MOVE
-            task_object(boost::rv<F>& f_):
+            task_object(BOOST_THREAD_RV_REF(F) f_):
                 f(boost::move(f_))
             {}
-#else
-            task_object(boost::detail::thread_move_t<F> f_):
-                f(f_)
-            {}
 #endif
-#endif
-
             void do_run()
             {
                 try
                 {
                     this->mark_finished_with_result(f());
                 }
-                catch(thread_interrupted& it)
+                catch(thread_interrupted& )
                 {
                     this->mark_interrupted_finish();
                 }
@@ -1639,24 +1445,21 @@ namespace boost
         struct task_object<void,F>:
             task_base<void>
         {
+        private:
+          task_object(task_object&);
+        public:
             F f;
             task_object(F const& f_):
                 f(f_)
             {}
 #ifndef BOOST_NO_RVALUE_REFERENCES
-            task_object(F&& f_):
-                f(f_)
+            task_object(BOOST_THREAD_RV_REF(F) f_):
+              f(boost::forward<F>(f_))
             {}
 #else
-#if defined BOOST_THREAD_USES_MOVE
-            task_object(boost::rv<F>& f_):
+            task_object(BOOST_THREAD_RV_REF(F) f_):
                 f(boost::move(f_))
             {}
-#else
-            task_object(boost::detail::thread_move_t<F> f_):
-                f(f_)
-            {}
-#endif
 #endif
 
             void do_run()
@@ -1666,7 +1469,7 @@ namespace boost
                     f();
                     this->mark_finished_with_result();
                 }
-                catch(thread_interrupted& it)
+                catch(thread_interrupted& )
                 {
                     this->mark_interrupted_finish();
                 }
@@ -1679,60 +1482,91 @@ namespace boost
 
     }
 
-
     template<typename R>
     class packaged_task
     {
+        typedef boost::shared_ptr<detail::task_base<R> > task_ptr;
         boost::shared_ptr<detail::task_base<R> > task;
         bool future_obtained;
 
-#ifndef BOOST_NO_DELETED_FUNCTIONS
     public:
-        packaged_task(packaged_task const&);// = delete;
-        packaged_task& operator=(packaged_task const&);// = delete;
-#else // BOOST_NO_DELETED_FUNCTIONS
-    private:
-        packaged_task(packaged_task&);// = delete;
-        packaged_task& operator=(packaged_task&);// = delete;
-#endif // BOOST_NO_DELETED_FUNCTIONS
-    public:
+        typedef R result_type;
+        BOOST_THREAD_MOVABLE_ONLY(packaged_task)
+
         packaged_task():
             future_obtained(false)
         {}
 
         // construction and destruction
+
+        explicit packaged_task(R(*f)()):
+            task(new detail::task_object<R,R(*)()>(f)),future_obtained(false)
+        {}
+#ifndef BOOST_NO_RVALUE_REFERENCES
+        template <class F>
+        explicit packaged_task(BOOST_THREAD_RV_REF(F) f):
+            task(new detail::task_object<R,
+                typename remove_cv<typename remove_reference<F>::type>::type
+                >(boost::forward<F>(f))),future_obtained(false)
+        {}
+#else
         template <class F>
         explicit packaged_task(F const& f):
             task(new detail::task_object<R,F>(f)),future_obtained(false)
         {}
-        explicit packaged_task(R(*f)()):
-            task(new detail::task_object<R,R(*)()>(f)),future_obtained(false)
-        {}
-
-#ifndef BOOST_NO_RVALUE_REFERENCES
         template <class F>
-        explicit packaged_task(F&& f):
-            task(new detail::task_object<R,F>(f)),future_obtained(false)
-        {}
-#else
-#if defined BOOST_THREAD_USES_MOVE
-        template <class F>
-        explicit packaged_task(boost::rv<F>& f):
+        explicit packaged_task(BOOST_THREAD_RV_REF(F) f):
             task(new detail::task_object<R,F>(boost::move(f))),future_obtained(false)
         {}
+#endif
+
+#if defined BOOST_THREAD_PROVIDES_FUTURE_CTOR_ALLOCATORS
+        template <class Allocator>
+        packaged_task(boost::allocator_arg_t, Allocator a, R(*f)())
+        {
+          typedef R(*FR)();
+          typedef typename Allocator::template rebind<detail::task_object<R,FR> >::other A2;
+          A2 a2(a);
+          typedef thread_detail::allocator_destructor<A2> D;
+
+          task = task_ptr(::new(a2.allocate(1)) detail::task_object<R,FR>(f), D(a2, 1) );
+          future_obtained = false;
+        }
+#ifndef BOOST_NO_RVALUE_REFERENCES
+        template <class F, class Allocator>
+        packaged_task(boost::allocator_arg_t, Allocator a, BOOST_THREAD_RV_REF(F) f)
+        {
+          typedef typename remove_cv<typename remove_reference<F>::type>::type FR;
+          typedef typename Allocator::template rebind<detail::task_object<R,FR> >::other A2;
+          A2 a2(a);
+          typedef thread_detail::allocator_destructor<A2> D;
+
+          task = task_ptr(::new(a2.allocate(1)) detail::task_object<R,FR>(boost::forward<F>(f)), D(a2, 1) );
+          future_obtained = false;
+        }
 #else
-        template <class F>
-        explicit packaged_task(boost::detail::thread_move_t<F> f):
-            task(new detail::task_object<R,F>(f)),future_obtained(false)
-        {}
-#endif
-#endif
+        template <class F, class Allocator>
+        packaged_task(boost::allocator_arg_t, Allocator a, const F& f)
+        {
+          typedef typename Allocator::template rebind<detail::task_object<R,F> >::other A2;
+          A2 a2(a);
+          typedef thread_detail::allocator_destructor<A2> D;
 
-//         template <class F, class Allocator>
-//         explicit packaged_task(F const& f, Allocator a);
-//         template <class F, class Allocator>
-//         explicit packaged_task(F&& f, Allocator a);
+          task = task_ptr(::new(a2.allocate(1)) detail::task_object<R,F>(f), D(a2, 1) );
+          future_obtained = false;
+        }
+        template <class F, class Allocator>
+        packaged_task(boost::allocator_arg_t, Allocator a, BOOST_THREAD_RV_REF(F) f)
+        {
+          typedef typename Allocator::template rebind<detail::task_object<R,F> >::other A2;
+          A2 a2(a);
+          typedef thread_detail::allocator_destructor<A2> D;
 
+          task = task_ptr(::new(a2.allocate(1)) detail::task_object<R,F>(boost::move(f)), D(a2, 1) );
+          future_obtained = false;
+        }
+#endif //BOOST_NO_RVALUE_REFERENCES
+#endif // BOOST_THREAD_PROVIDES_FUTURE_CTOR_ALLOCATORS
 
         ~packaged_task()
         {
@@ -1743,65 +1577,35 @@ namespace boost
         }
 
         // assignment
-#ifndef BOOST_NO_RVALUE_REFERENCES
-        packaged_task(packaged_task&& other):
-            future_obtained(other.future_obtained)
+        packaged_task(BOOST_THREAD_RV_REF(packaged_task) other) BOOST_NOEXCEPT :
+            future_obtained(BOOST_THREAD_RV(other).future_obtained)
         {
-            task.swap(other.task);
-            other.future_obtained=false;
+            task.swap(BOOST_THREAD_RV(other).task);
+            BOOST_THREAD_RV(other).future_obtained=false;
         }
-        packaged_task& operator=(packaged_task&& other)
+        packaged_task& operator=(BOOST_THREAD_RV_REF(packaged_task) other) BOOST_NOEXCEPT
         {
-            packaged_task temp(static_cast<packaged_task&&>(other));
+            packaged_task temp(static_cast<BOOST_THREAD_RV_REF(packaged_task)>(other));
             swap(temp);
             return *this;
         }
-#else
-#if defined BOOST_THREAD_USES_MOVE
-        packaged_task(boost::rv<packaged_task>& other):
-            future_obtained(other.future_obtained)
-        {
-            task.swap(other.task);
-            other.future_obtained=false;
-        }
-        packaged_task& operator=(boost::rv<packaged_task>& other)
-        {
-            packaged_task temp(other);
-            swap(temp);
-            return *this;
-        }
-        operator ::boost::rv<packaged_task>&()
-        {
-          return *static_cast< ::boost::rv<packaged_task>* >(this);
-        }
-        operator const ::boost::rv<packaged_task>&() const
-        {
-          return *static_cast<const ::boost::rv<packaged_task>* >(this);
-        }
-#else
-        packaged_task(boost::detail::thread_move_t<packaged_task> other):
-            future_obtained(other->future_obtained)
-        {
-            task.swap(other->task);
-            other->future_obtained=false;
-        }
-        packaged_task& operator=(boost::detail::thread_move_t<packaged_task> other)
-        {
-            packaged_task temp(other);
-            swap(temp);
-            return *this;
-        }
-        operator boost::detail::thread_move_t<packaged_task>()
-        {
-            return boost::detail::thread_move_t<packaged_task>(*this);
-        }
-#endif
-#endif
 
-        void swap(packaged_task& other)
+        void reset()
+        {
+            if (!valid())
+                throw future_error(system::make_error_code(future_errc::no_state));
+            task->reset();
+            future_obtained=false;
+        }
+
+        void swap(packaged_task& other) BOOST_NOEXCEPT
         {
             task.swap(other.task);
             std::swap(future_obtained,other.future_obtained);
+        }
+        bool valid() const BOOST_NOEXCEPT
+        {
+          return task.get()!=0;
         }
 
         // result retrieval
@@ -1820,6 +1624,8 @@ namespace boost
             {
                 boost::throw_exception(future_already_retrieved());
             }
+            return BOOST_THREAD_FUTURE<R>();
+
         }
 
 
@@ -1841,14 +1647,48 @@ namespace boost
 
     };
 
-#ifdef BOOST_NO_RVALUE_REFERENCES
-#if ! defined BOOST_THREAD_USES_MOVE
-    template <typename T>
-    struct has_move_emulation_enabled_aux<packaged_task<T> >
-      : BOOST_MOVE_BOOST_NS::integral_constant<bool, true>
-    {};
+#if defined BOOST_THREAD_PROVIDES_FUTURE_CTOR_ALLOCATORS
+    namespace container
+    {
+      template <class R, class Alloc>
+      struct uses_allocator<packaged_task<R>, Alloc>
+        : public true_type {};
+    }
 #endif
-#endif
+
+    BOOST_THREAD_DCL_MOVABLE_BEG(T) packaged_task<T> BOOST_THREAD_DCL_MOVABLE_END
+
+//    template <class F>
+//    BOOST_THREAD_FUTURE<typename boost::result_of<F()>::type>
+//    async(launch policy, F f)
+//    {
+//        typedef typename boost::result_of<F()>::type R;
+//        typedef BOOST_THREAD_FUTURE<R> future;
+//        if (int(policy) & int(launch::async))
+//        {
+//          packaged_task<R> pt( f );
+//
+//          BOOST_THREAD_FUTURE ret = pt.get_future();
+//          boost::thread( boost::move(pt) ).detach();
+//          return ::boost::move(ret);
+//        }
+//        else if (int(policy) & int(launch::deferred))
+//        {
+//          packaged_task<R> pt( f );
+//
+//          BOOST_THREAD_FUTURE ret = pt.get_future();
+//          return ::boost::move(ret);
+//        }
+//    }
+//
+//    template <class F>
+//    BOOST_THREAD_FUTURE<typename boost::result_of<F()>::type>
+//    async(F f)
+//    {
+//        return async(launch::any, f);
+//    }
+
+
 
 }
 

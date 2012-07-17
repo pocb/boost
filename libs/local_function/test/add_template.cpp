@@ -6,11 +6,12 @@
 // Home at http://www.boost.org/libs/local_function
 
 #include <boost/config.hpp>
-#ifndef BOOST_NO_VARIADIC_MACROS
+#ifdef BOOST_NO_VARIADIC_MACROS
+#   error "variadic macros required"
+#else
 
 #include <boost/local_function.hpp>
-#define BOOST_TEST_MODULE TestAddTemplate
-#include <boost/test/unit_test.hpp>
+#include <boost/detail/lightweight_test.hpp>
 #include <algorithm>
 
 //[add_template
@@ -18,10 +19,10 @@ template<typename T>
 T total(const T& x, const T& y, const T& z) {
     T sum = T(), factor = 10;
 
-    // Using the `..._TPL` macro.
+    // Must use the `..._TPL` macros within templates.
     T BOOST_LOCAL_FUNCTION_TPL(const bind factor, bind& sum, T num) {
         return sum += factor * num;
-    } BOOST_LOCAL_FUNCTION_NAME(add)
+    } BOOST_LOCAL_FUNCTION_NAME_TPL(add)
 
     add(x);
     T nums[2]; nums[0] = y; nums[1] = z;
@@ -31,13 +32,10 @@ T total(const T& x, const T& y, const T& z) {
 }
 //]
 
-BOOST_AUTO_TEST_CASE(test_add_template) {
-    BOOST_CHECK(total(1, 2, 3) == 60);
+int main(void) {
+    BOOST_TEST(total(1, 2, 3) == 60);
+    return boost::report_errors();
 }
 
-#else
-
-int main(void) { return 0; }
-
-#endif
+#endif // VARIADIC_MACROS
 

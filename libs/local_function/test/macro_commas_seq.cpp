@@ -7,9 +7,9 @@
 
 #include <boost/local_function.hpp>
 #include <boost/utility/identity_type.hpp>
+#include <boost/typeof/std/string.hpp>  // Type-of registrations
+#include <boost/typeof/std/map.hpp>     // needed for `NAME` macro.
 #include <boost/config.hpp>
-#define BOOST_TEST_MODULE TestMacroCommasSeq
-#include <boost/test/unit_test.hpp>
 #include <map>
 #include <string>
 
@@ -17,12 +17,15 @@ std::string cat(const std::string& x, const std::string& y) { return x + y; }
 
 template<typename V, typename K>
 struct key_sizeof {
-    BOOST_STATIC_CONSTANT(int, value = sizeof(K));
+    static int const value;
 };
+
+template<typename V, typename K>
+int const key_sizeof<V, K>::value = sizeof(K);
 
 typedef int sign_t;
 
-BOOST_AUTO_TEST_CASE(test_macro_commas_seq) {
+int main(void) {
     void BOOST_LOCAL_FUNCTION(
         (BOOST_IDENTITY_TYPE((const std::map<std::string, size_t>&)) m)
         (BOOST_IDENTITY_TYPE((::sign_t)) sign)
@@ -36,5 +39,6 @@ BOOST_AUTO_TEST_CASE(test_macro_commas_seq) {
     std::map<std::string, size_t> m;
     ::sign_t sign = -1;
     f(m, sign);
+    return 0;
 }
 

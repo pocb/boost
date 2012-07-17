@@ -7,14 +7,15 @@
 // Home at http://www.boost.org/libs/scope_exit
 
 #include <boost/config.hpp>
-#ifndef BOOST_NO_VARIADIC_MACROS
+#ifdef BOOST_NO_VARIADIC_MACROS
+#   error "variadic macros required"
+#else
 
 #include <boost/scope_exit.hpp>
 #include <boost/typeof/typeof.hpp>
 #include <boost/typeof/std/vector.hpp>
 #include BOOST_TYPEOF_INCREMENT_REGISTRATION_GROUP()
-#define BOOST_TEST_MODULE TestWorldThis
-#include <boost/test/unit_test.hpp>
+#include <boost/detail/lightweight_test.hpp>
 #include <boost/config.hpp>
 #include <vector>
 
@@ -34,35 +35,24 @@ void world::add_person(person const& a_person) {
     bool commit = false;
 
     persons_.push_back(a_person);
-#ifdef BOOST_NO_LAMBDAS
-    //[world_this_
+    //[world_this
     BOOST_SCOPE_EXIT(&commit, this_) { // Capture object `this_`.
         if(!commit) this_->persons_.pop_back();
     } BOOST_SCOPE_EXIT_END
     //]
-#else
-    //[world_this
-    BOOST_SCOPE_EXIT(&commit, this) { // Use `this` (C++11).
-        if(!commit) this->persons_.pop_back();
-    }; // Use `;` instead of `BOOST_SCOPE_EXIT_END` (C++11).
-    //]
-#endif
 
     // ...
 
     commit = true;
 }
 
-BOOST_AUTO_TEST_CASE(test_world_this) {
+int main(void) {
     world w;
     person p;
     w.add_person(p);
-    BOOST_CHECK(w.population() == 1);
+    BOOST_TEST(w.population() == 1);
+    return boost::report_errors();
 }
 
-#else
-
-int main(void) { return 0; } // Trivial test.
-
-#endif
+#endif // variadic macros
 

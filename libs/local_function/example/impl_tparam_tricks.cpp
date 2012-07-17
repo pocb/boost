@@ -6,15 +6,14 @@
 // Home at http://www.boost.org/libs/local_function
 
 //[impl_tparam_tricks
-#define BOOST_TEST_MODULE TestImplTparamTricks
-#include <boost/test/unit_test.hpp>
+#include <boost/detail/lightweight_test.hpp>
 #include <vector>
 #include <algorithm>
 
 // Casting functor trick.
 struct casting_func {
-    explicit casting_func(void* obj, void (*call)(void*, const int&)):
-            obj_(obj), call_(call) {}
+    explicit casting_func(void* obj, void (*call)(void*, const int&))
+            : obj_(obj), call_(call) {}
     // Unfortunately, function pointer call is not inlined.
     inline void operator()(const int& num) { call_(obj_, num); }
 private:
@@ -34,18 +33,17 @@ private:
     interface* func_;
 };
 
-BOOST_AUTO_TEST_CASE(test_impl_tparam_tricks) {
+int main(void) {
     int sum = 0, factor = 10;
 
     // Local class for local function.
-    struct local_add: virtual_func::interface {
-        explicit local_add(int& _sum, const int& _factor):
-                sum_(_sum), factor_(_factor) {}
+    struct local_add : virtual_func::interface {
+        explicit local_add(int& _sum, const int& _factor)
+                : sum_(_sum), factor_(_factor) {}
         inline void operator()(const int& num) {
             body(sum_, factor_, num);
         }
-        inline static void call(
-                void* obj, const int& num) {
+        inline static void call(void* obj, const int& num) {
             local_add* self = static_cast<local_add*>(obj);
             self->body(self->sum_, self->factor_, num);
         }
@@ -66,7 +64,8 @@ BOOST_AUTO_TEST_CASE(test_impl_tparam_tricks) {
     std::for_each(v.begin(), v.end(), add_casting); // OK.
     std::for_each(v.begin(), v.end(), add_virtual); // OK.
 
-    BOOST_CHECK(sum == 200);
+    BOOST_TEST(sum == 200);
+    return boost::report_errors();
 }
 //]
 

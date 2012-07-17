@@ -10,14 +10,15 @@
 #include <boost/typeof/typeof.hpp>
 #include <boost/typeof/std/vector.hpp>
 #include BOOST_TYPEOF_INCREMENT_REGISTRATION_GROUP()
-#define BOOST_TEST_MODULE TestWorldVoid
-#include <boost/test/unit_test.hpp>
+#include <boost/detail/lightweight_test.hpp>
 #include <vector>
 
 struct person {};
 BOOST_TYPEOF_REGISTER_TYPE(person)
 
-struct world_t; BOOST_TYPEOF_REGISTER_TYPE(world_t)
+struct world_t;
+BOOST_TYPEOF_REGISTER_TYPE(world_t)
+
 //[world_void
 struct world_t {
     std::vector<person> persons;
@@ -38,9 +39,10 @@ void add_person(person const& a_person) {
 }
 //]
 
-BOOST_AUTO_TEST_CASE( test_world_void ) {
+int main(void) {
     person p;
     add_person(p);
-    BOOST_CHECK( world.persons.size() == 1 );
+    BOOST_TEST(world.persons.size() == 1);
+    return boost::report_errors();
 }
 

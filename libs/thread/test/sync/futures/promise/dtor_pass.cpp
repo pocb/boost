@@ -18,7 +18,7 @@
 
 // ~promise();
 
-#define BOOST_THREAD_VERSION 2
+#define BOOST_THREAD_VERSION 3
 
 #include <boost/thread/future.hpp>
 #include <boost/detail/lightweight_test.hpp>
@@ -30,7 +30,7 @@ int main()
       boost::future<T> f;
       {
           boost::promise<T> p;
-          f = p.get_future();
+          f = BOOST_THREAD_MAKE_RV_REF(p.get_future());
           p.set_value(3);
       }
       BOOST_TEST(f.get() == 3);
@@ -40,11 +40,12 @@ int main()
       boost::future<T> f;
       {
           boost::promise<T> p;
-          f = p.get_future();
+          f = BOOST_THREAD_MAKE_RV_REF(p.get_future());
       }
       try
       {
-          T i = f.get();
+          //T i =
+              (void)f.get();
           BOOST_TEST(false);
       }
       catch (const boost::future_error& e)
@@ -52,14 +53,13 @@ int main()
           BOOST_TEST(e.code() == boost::system::make_error_code(boost::future_errc::broken_promise));
       }
   }
-
   {
       typedef int& T;
       int i = 4;
       boost::future<T> f;
       {
           boost::promise<T> p;
-          f = p.get_future();
+          f = BOOST_THREAD_MAKE_RV_REF(p.get_future());
           p.set_value(i);
       }
       BOOST_TEST(&f.get() == &i);
@@ -69,11 +69,12 @@ int main()
       boost::future<T> f;
       {
           boost::promise<T> p;
-          f = p.get_future();
+          f = BOOST_THREAD_MAKE_RV_REF(p.get_future());
       }
       try
       {
-          T i = f.get();
+          //T i =
+              (void)f.get();
           BOOST_TEST(false);
       }
       catch (const boost::future_error& e)
@@ -81,13 +82,12 @@ int main()
           BOOST_TEST(e.code() == boost::system::make_error_code(boost::future_errc::broken_promise));
       }
   }
-
   {
       typedef void T;
       boost::future<T> f;
       {
           boost::promise<T> p;
-          f = p.get_future();
+          f = BOOST_THREAD_MAKE_RV_REF(p.get_future());
           p.set_value();
       }
       f.get();
@@ -98,7 +98,7 @@ int main()
       boost::future<T> f;
       {
           boost::promise<T> p;
-          f = p.get_future();
+          f = BOOST_THREAD_MAKE_RV_REF(p.get_future());
       }
       try
       {

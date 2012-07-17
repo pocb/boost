@@ -6,10 +6,14 @@
 // Home at http://www.boost.org/libs/local_function
 
 #include <boost/local_function.hpp>
-#define BOOST_TEST_MODULE TestAddThisSeq
-#include <boost/test/unit_test.hpp>
+#include <boost/typeof/typeof.hpp>
+#include BOOST_TYPEOF_INCREMENT_REGISTRATION_GROUP()
+#include <boost/detail/lightweight_test.hpp>
 #include <vector>
 #include <algorithm>
+
+struct adder;
+BOOST_TYPEOF_REGISTER_TYPE(adder) // Register before `bind this_` below.
 
 struct adder {
     adder() : sum_(0) {}
@@ -29,10 +33,11 @@ private:
     int sum_;
 };
 
-BOOST_AUTO_TEST_CASE(test_add_this_seq) {
+int main(void) {
     std::vector<int> v(3);
     v[0] = 1; v[1] = 2; v[2] = 3;
 
-    BOOST_CHECK(adder().sum(v) == 60);
+    BOOST_TEST(adder().sum(v) == 60);
+    return boost::report_errors();
 }
 

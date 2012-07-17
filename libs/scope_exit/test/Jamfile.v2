@@ -8,55 +8,46 @@
 
 import testing ;
 
-project
-    :   requirements
-        <library>/boost/test//boost_test_exec_monitor
-        <library>/boost//unit_test_framework
-        <link>static
-    ;
-
-# Run variadic and sequence syntax (also forcing no variadic macros).
-rule run-vaseq ( file_name )
+rule run-vaseq ( command target )
 {
-    run $(file_name).cpp ;
-    run $(file_name)_seq.cpp ;
-    run $(file_name)_seq.cpp : : : <define>BOOST_NO_VARIADIC_MACROS :
-            $(file_name)_seq_nova : ;
+    # Sun does not automatically detect type-of emulation mode (force it).
+    run $(target).cpp : : : <toolset>sun:<define>BOOST_TYPEOF_EMULATION ;
+    run $(target)_seq.cpp : : : <toolset>sun:<define>BOOST_TYPEOF_EMULATION ;
+    run $(target)_seq_nova.cpp : : :
+            <toolset>sun:<define>BOOST_TYPEOF_EMULATION ;
 }
 
-test-suite world_tests
-    :   [ run-vaseq world ]
-        [ run-vaseq world_checkpoint ]
-        [ run-vaseq world_checkpoint_all ]
-        [ run world_lambda.cpp ]
-        [ run-vaseq world_this ]
-        [ run-vaseq world_tpl ]
-        [ run world_void.cpp ]
-    ;
+rule run-typeof ( native_target emulation_target )
+{
+    run $(native_target).cpp : : : <define>BOOST_TYPEOF_NATIVE ;
+    run $(native_target).cpp : : : <define>BOOST_TYPEOF_EMULATION :
+            $(emulation_target) : ;
+}
 
-test-suite native_tests
-    :   [ run native.cpp : : : <define>BOOST_TYPEOF_NATIVE ]
-        [ run native_tpl.cpp : : : <define>BOOST_TYPEOF_NATIVE ]
-        [ run native_this.cpp : : : <define>BOOST_TYPEOF_NATIVE ]
-        [ compile-fail native_const_error.cpp : <define>BOOST_TYPEOF_NATIVE ]
-        [ compile-fail native_cv_error.cpp : <define>BOOST_TYPEOF_NATIVE ]
-        # Following test is known to fail on MSVC 7.1 and 8.0.
-        [ run native_tu_test.cpp native_tu1.cpp native_tu2.cpp : : :
-                <define>BOOST_TYPEOF_NATIVE ]
-    ;
+rule compile-fail-typeof ( native_target emulation_target )
+{
+    compile-fail $(native_target).cpp : <define>BOOST_TYPEOF_NATIVE ;
+    compile-fail $(native_target).cpp : <define>BOOST_TYPEOF_EMULATION :
+            $(emulation_target) : ;
+}
 
-test-suite emulation_tests
-    :   [ run native.cpp : : : <define>BOOST_TYPEOF_EMULATION : emulation : ]
-        [ run native_tpl.cpp : : : <define>BOOST_TYPEOF_EMULATION :
-                emulation_tpl : ]
-        [ run native_this.cpp : : : <define>BOOST_TYPEOF_EMULATION :
-                emulation_this : ]
-        [ compile-fail native_const_error.cpp : <define>BOOST_TYPEOF_EMULATION :
-                emulation_const_error : ]
-        [ compile-fail native_cv_error.cpp : <define>BOOST_TYPEOF_EMULATION :
-                emulation_cv_error : ]
-        # Following test is known to fail on MSVC 7.1 and 8.0.
-        [ run native_tu_test.cpp native_tu1.cpp native_tu2.cpp : : :
-                <define>BOOST_TYPEOF_EMULATION : emulation_tu_test : ]
-    ;
+run-vaseq run same_line ;
+run-vaseq run world ;
+run-vaseq run world_checkpoint ;
+run-vaseq run world_checkpoint_all ;
+run-vaseq run world_this ;
+run-vaseq run world_tpl ;
+run world_void.cpp ;
+run world_void_nova.cpp ;
+
+run-typeof native emulation ;
+run-typeof native_tpl emulation_tpl ;
+run-typeof native_this emulation_this ;
+run-typeof native_this_tpl emulation_this_tpl ;
+compile-fail-typeof native_const_error emulation_const_error ;
+compile-fail-typeof native_cv_error emulation_cv_error ;
+run native_tu_test.cpp native_tu1.cpp native_tu2.cpp : : :
+        <define>BOOST_TYPEOF_NATIVE ;
+run native_tu_test.cpp native_tu1.cpp native_tu2.cpp : : :
+        <define>BOOST_TYPEOF_EMULATION : emulation_tu_test : ;
 

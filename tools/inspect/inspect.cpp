@@ -1,4 +1,4 @@
-//  inspect program  ---------------------------------------------------------//
+//  inspect program  -------------------------------------------------------------------//
 
 //  Copyright Beman Dawes 2002.
 //  Copyright Rene Rivera 2004-2006.
@@ -15,6 +15,11 @@
 
 //  See http://www.boost.org/tools/inspect/ for more information.
 
+const char* boost_no_inspect = "boost-" "no-inspect";
+
+//  Directories with a file name of the boost_no_inspect value are not inspected.
+//  Files that contain the boost_no_inspect value are not inspected.
+
 
 #include <vector>
 #include <list>
@@ -25,6 +30,15 @@
 #include "boost/lexical_cast.hpp"
 #include "boost/filesystem/operations.hpp"
 #include "boost/filesystem/fstream.hpp"
+
+#include <stdio.h>  // for popen, pclose
+#if defined(_MSC_VER)
+# define POPEN _popen
+# define PCLOSE _pclose
+#else
+# define POPEN popen
+# define PCLOSE pclose
+#endif
 
 #include "time_string.hpp"
 
@@ -111,29 +125,26 @@ namespace
 
 //  get info (as a string) if inspect_root is svn working copy  --------------//
 
-  void extract_info( fs::ifstream & entries_file, string & rev, string & repos )
-    {
-      std::getline( entries_file, rev );
-      std::getline( entries_file, rev );
-      std::getline( entries_file, rev );
-      std::getline( entries_file, rev );    // revision number as a string
-      std::getline( entries_file, repos );  // repository as a string
-    }
-
   string info( const fs::path & inspect_root )
   {
-    string rev( "?" );
-    string repos( "unknown" );
-    fs::path entries( inspect_root / ".svn" / "entries" );
-    fs::ifstream entries_file( entries );
-    if ( entries_file )
-      extract_info( entries_file, rev, repos );
-    else
+    string rev("unknown");
+    string repos("unknown");
+    string command("cd ");
+    command += inspect_root.string() + " & svn info";
+    FILE* fp = POPEN(command.c_str(), "r");
+    if (fp)
     {
-      entries = inspect_root / ".." / "svn_info" / ".svn" / "entries";
-      fs::ifstream entries_file( entries );
-      if ( entries_file )
-        extract_info( entries_file, rev, repos );
+      static const int line_max = 128;
+      char line[line_max];
+      while (fgets(line, line_max, fp) != NULL)
+      {
+        string ln(line);
+        string::size_type pos;
+        if ((pos = ln.find("Revision: ")) != string::npos)
+          rev = ln.substr(pos + 10);
+        else if ((pos = ln.find("URL: ")) != string::npos)
+          repos = ln.substr(pos + 5);
+      }
     }
     return repos + " at revision " + rev;
   }
@@ -165,7 +176,7 @@ namespace
       // ignore OS X directory info files:
       && leaf != ".DS_Store"
       // ignore if tag file present
-      && !boost::filesystem::exists(pth / "boost-no-inspect")
+      && !boost::filesystem::exists(pth / boost_no_inspect)
       ;
   }
 
@@ -268,9 +279,9 @@ namespace
         ++file_count;
         string content;
         load_content( *itr, content );
-        check( lib.empty()
-                ? library_from_content( content ) : lib
-               , *itr, content, insps );
+        if (content.find(boost_no_inspect) == string::npos)
+          check( lib.empty() ? library_from_content( content ) : lib,
+                 *itr, content, insps );
       }
     }
   }
@@ -376,8 +387,6 @@ namespace
 
   void display_details()
   {
-    // gps - review this
-
     if (display_text == display_format)
     {
       // display error messages with group indication
@@ -977,10 +986,14 @@ int cpp_main( int argc_param, char * argv_param[] )
     if (display_text == display_format)
     {
       std::cout << "Details:\n" << inspector_keys;
-    }
+      std::cout << "\nDirectories with a file named \"" << boost_no_inspect << "\" will not be inspected.\n"
+                   "Files containing \"" << boost_no_inspect << "\" will not be inspected.\n";
+   }
     else
     {
       std::cout << "<h2>Details</h2>\n" << inspector_keys;
+      std::cout << "\n<p>Directories with a file named \"" << boost_no_inspect << "\" will not be inspected.<br>\n"
+                   "Files containing \"" << boost_no_inspect << "\" will not be inspected.</p>\n";
     }
     display_details();
   }

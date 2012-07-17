@@ -10,13 +10,18 @@ extern "C" {
 
 #include <stddef.h>
 #include <stdio.h>
-#include <stdlib.h>
 
 #include <excpt.h>
 #include <windows.h>
 #include <winnt.h>
 
-static char * exception_description(
+#if defined(_MSC_VER)
+# define SNPRINTF _snprintf
+#else
+# define SNPRINTF snprintf
+#endif
+
+static const char * exception_description(
     _EXCEPTION_RECORD const* record, char * description, size_t len)
 {
     const DWORD code = record->ExceptionCode;
@@ -28,11 +33,7 @@ static char * exception_description(
     {
         const char * accessType = ( info[0]) ? "writing" : "reading";
         const ULONG_PTR address = info[1];
-#if defined (__MINGW32__) || defined (__MINGW64__)
-        snprintf( description, len, "Access violation %s 0x%08X", accessType, address);
-#else
-        _snprintf_s( description, len, _TRUNCATE, "Access violation %s 0x%08X", accessType, address);
-#endif
+        SNPRINTF( description, len, "Access violation %s %p", accessType, reinterpret_cast< void * >( address) );
         return description;
     }
     case EXCEPTION_DATATYPE_MISALIGNMENT:    return "Datatype misalignment";
@@ -58,24 +59,19 @@ static char * exception_description(
     case EXCEPTION_INVALID_HANDLE:           return "Invalid handle";
     }
 
-#if defined (__MINGW32__) || defined (__MINGW64__)
-    snprintf( description, len, "Unknown (0x%08X)", code);
-#else
-    _snprintf_s( description, len, _TRUNCATE, "Unknown (0x%08X)", code);
-#endif
-
+    SNPRINTF( description, len, "Unknown (0x%08lX)", code);
     return description;
 }
 
-EXCEPTION_DISPOSITION boost_fcontext_seh(
+EXCEPTION_DISPOSITION seh_fcontext(
      struct _EXCEPTION_RECORD * record,
-     void * frame,
-     struct _CONTEXT * ctx,
-     void * dispatcher)
+     void *,
+     struct _CONTEXT *,
+     void *)
 {
     char description[255];
 
-    fprintf( stderr, "exception: %s (%08X)\n",
+    fprintf( stderr, "exception: %s (%08lX)\n",
         exception_description( record, description, sizeof( description) ),
         record->ExceptionCode);
 

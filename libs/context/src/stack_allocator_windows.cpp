@@ -16,6 +16,7 @@ extern "C" {
 
 #include <boost/config.hpp>
 #include <boost/assert.hpp>
+#include <boost/cstdint.hpp>
 #include <boost/format.hpp>
 
 #include <boost/context/stack_utils.hpp>
@@ -30,7 +31,7 @@ extern "C" {
 # endif
 
 namespace boost {
-namespace contexts {
+namespace ctx {
 
 void *
 stack_allocator::allocate( std::size_t size) const

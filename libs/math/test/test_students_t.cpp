@@ -21,6 +21,7 @@
 #include <boost/math/distributions/students_t.hpp>
     using boost::math::students_t_distribution;
 #include <boost/math/tools/test.hpp> // for real_concept
+#include "test_out_of_range.hpp"
 
 #include <iostream>
    using std::cout;
@@ -465,6 +466,11 @@ void test_spots(RealType)
          static_cast<RealType>(1.0))),
          9);
 
+    BOOST_CHECK_THROW(quantile(dist, -1), std::domain_error);
+    BOOST_CHECK_THROW(quantile(dist, 2), std::domain_error);
+    BOOST_CHECK_THROW(pdf(students_t_distribution<RealType>(0), 0), std::domain_error);
+    BOOST_CHECK_THROW(pdf(students_t_distribution<RealType>(-1), 0), std::domain_error);
+    check_out_of_range<students_t_distribution<RealType> >(1);
 } // template <class RealType>void test_spots(RealType)
 
 int test_main(int, char* [])

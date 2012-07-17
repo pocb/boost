@@ -61,7 +61,7 @@ struct _variable
     LIST   * value;
 };
 
-static VARIABLE * var_enter( struct module_t * module, OBJECT * symbol );
+static LIST * * var_enter( struct module_t * module, OBJECT * symbol );
 static void var_dump( OBJECT * symbol, LIST * value, char * what );
 
 
@@ -118,7 +118,7 @@ void var_defines( struct module_t * module, char * const * e, int preprocess )
             if ( quoted && preprocess )
             {
                 string_append_range( buf, val + 2, val + len );
-                l = list_new( l, object_new( buf->value ) );
+                l = list_push_back( l, object_new( buf->value ) );
                 string_truncate( buf, 0 );
             }
             else
@@ -141,11 +141,11 @@ void var_defines( struct module_t * module, char * const * e, int preprocess )
                 )
                 {
                     string_append_range( buf, pp, p );
-                    l = list_new( l, object_new( buf->value ) );
+                    l = list_push_back( l, object_new( buf->value ) );
                     string_truncate( buf, 0 );
                 }
 
-                l = list_new( l, object_new( pp ) );
+                l = list_push_back( l, object_new( pp ) );
             }
 
             /* Get name. */
@@ -160,7 +160,7 @@ void var_defines( struct module_t * module, char * const * e, int preprocess )
 }
 
 
-static LIST * saved_var = 0;
+static LIST * saved_var = L0;
 
 /*
  * var_get() - get value of a user defined symbol.
@@ -170,40 +170,47 @@ static LIST * saved_var = 0;
 
 LIST * var_get( struct module_t * module, OBJECT * symbol )
 {
-    LIST * result = 0;
+    LIST * result = L0;
 #ifdef OPT_AT_FILES
     /* Some "fixed" variables... */
     if ( object_equal( symbol, constant_TMPDIR ) )
     {
         list_free( saved_var );
-        result = saved_var = list_new( L0, object_new( path_tmpdir() ) );
+        result = saved_var = list_new( object_new( path_tmpdir()->value ) );
     }
     else if ( object_equal( symbol, constant_TMPNAME ) )
     {
         list_free( saved_var );
-        result = saved_var = list_new( L0, path_tmpnam() );
+        result = saved_var = list_new( path_tmpnam() );
     }
     else if ( object_equal( symbol, constant_TMPFILE ) )
     {
         list_free( saved_var );
-        result = saved_var = list_new( L0, path_tmpfile() );
+        result = saved_var = list_new( path_tmpfile() );
     }
     else if ( object_equal( symbol, constant_STDOUT ) )
     {
         list_free( saved_var );
-        result = saved_var = list_new( L0, object_copy( constant_STDOUT ) );
+        result = saved_var = list_new( object_copy( constant_STDOUT ) );
     }
     else if ( object_equal( symbol, constant_STDERR ) )
     {
         list_free( saved_var );
-        result = saved_var = list_new( L0, object_copy( constant_STDERR ) );
+        result = saved_var = list_new( object_copy( constant_STDERR ) );
     }
     else
 #endif
     {
         VARIABLE * v;
+        int n;
 
-        if ( module->variables && ( v = (VARIABLE *)hash_find( module->variables, symbol ) ) )
+        if ( ( n = module_get_fixed_var( module, symbol ) ) != -1 )
+        {
+            if ( DEBUG_VARGET )
+                var_dump( symbol, module->fixed_variables[ n ], "get" );
+            result = module->fixed_variables[ n ];
+        }
+        else if ( module->variables && ( v = (VARIABLE *)hash_find( module->variables, symbol ) ) )
         {
             if ( DEBUG_VARGET )
                 var_dump( v->symbol, v->value, "get" );
@@ -213,6 +220,20 @@ LIST * var_get( struct module_t * module, OBJECT * symbol )
     return result;
 }
 
+
+LIST * var_get_and_clear_raw( module_t * module, OBJECT * symbol )
+{
+    LIST * result = L0;
+    VARIABLE * v;
+
+    if ( module->variables && ( v = (VARIABLE *)hash_find( module->variables, symbol ) ) )
+    {
+        result = v->value;
+        v->value = L0;
+    }
+
+    return result;
+}
 
 /*
  * var_set() - set a variable in Jam's user defined symbol table.
@@ -226,7 +247,7 @@ LIST * var_get( struct module_t * module, OBJECT * symbol )
 
 void var_set( struct module_t * module, OBJECT * symbol, LIST * value, int flag )
 {
-    VARIABLE * v = var_enter( module, symbol );
+    LIST * * v = var_enter( module, symbol );
 
     if ( DEBUG_VARSET )
         var_dump( symbol, value, "set" );
@@ -235,19 +256,19 @@ void var_set( struct module_t * module, OBJECT * symbol, LIST * value, int flag 
     {
     case VAR_SET:
         /* Replace value */
-        list_free( v->value );
-        v->value = value;
+        list_free( *v );
+        *v = value;
         break;
 
     case VAR_APPEND:
         /* Append value */
-        v->value = list_append( v->value, value );
+        *v = list_append( *v, value );
         break;
 
     case VAR_DEFAULT:
         /* Set only if unset */
-        if ( !v->value )
-            v->value = value;
+        if ( list_empty( *v ) )
+            *v = value;
         else
             list_free( value );
         break;
@@ -261,11 +282,11 @@ void var_set( struct module_t * module, OBJECT * symbol, LIST * value, int flag 
 
 LIST * var_swap( struct module_t * module, OBJECT * symbol, LIST * value )
 {
-    VARIABLE * v = var_enter( module, symbol );
-    LIST     * oldvalue = v->value;
+    LIST * * v = var_enter( module, symbol );
+    LIST     * oldvalue = *v;
     if ( DEBUG_VARSET )
         var_dump( symbol, value, "set" );
-    v->value = value;
+    *v = value;
     return oldvalue;
 }
 
@@ -274,10 +295,16 @@ LIST * var_swap( struct module_t * module, OBJECT * symbol, LIST * value )
  * var_enter() - make new var symbol table entry, returning var ptr.
  */
 
-static VARIABLE * var_enter( struct module_t * module, OBJECT * symbol )
+static LIST * * var_enter( struct module_t * module, OBJECT * symbol )
 {
     int found;
     VARIABLE * v;
+    int n;
+
+    if ( ( n = module_get_fixed_var( module, symbol ) ) != -1 )
+    {
+        return &module->fixed_variables[ n ];
+    }
 
     if ( !module->variables )
         module->variables = hashinit( sizeof( VARIABLE ), "variables" );
@@ -286,10 +313,10 @@ static VARIABLE * var_enter( struct module_t * module, OBJECT * symbol )
     if ( !found )
     {
         v->symbol = object_copy( symbol );
-        v->value = 0;
+        v->value = L0;
     }
 
-    return v;
+    return &v->value;
 }
 
 
@@ -320,7 +347,7 @@ static void delete_var_( void * xvar, void * data )
 void var_done( struct module_t * module )
 {
     list_free( saved_var );
-    saved_var = 0;
+    saved_var = L0;
     hashenumerate( module->variables, delete_var_, (void *)0 );
-    hashdone( module->variables );
+    hash_free( module->variables );
 }

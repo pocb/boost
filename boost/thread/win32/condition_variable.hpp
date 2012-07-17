@@ -4,6 +4,7 @@
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 // (C) Copyright 2007-8 Anthony Williams
+// (C) Copyright 2011-2012 Vicente J. Botet Escriba
 
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/win32/thread_primitives.hpp>
@@ -11,7 +12,6 @@
 #include <boost/assert.hpp>
 #include <algorithm>
 #include <boost/thread/cv_status.hpp>
-//#include <boost/thread/thread.hpp>
 #include <boost/thread/win32/thread_data.hpp>
 #include <boost/thread/thread_time.hpp>
 #include <boost/thread/win32/interlocked_read.hpp>
@@ -42,10 +42,8 @@ namespace boost
             bool notified;
             long references;
 
-            basic_cv_list_entry(basic_cv_list_entry&);
-            void operator=(basic_cv_list_entry&);
-
         public:
+            BOOST_THREAD_NO_COPYABLE(basic_cv_list_entry)
             explicit basic_cv_list_entry(detail::win32::handle_manager const& wake_sem_):
                 semaphore(detail::win32::create_anonymous_semaphore(0,LONG_MAX)),
                 wake_sem(wake_sem_.duplicate()),
@@ -135,6 +133,7 @@ namespace boost
             template<typename lock_type>
             struct relocker
             {
+                BOOST_THREAD_NO_COPYABLE(relocker)
                 lock_type& lock;
                 bool unlocked;
 
@@ -154,9 +153,6 @@ namespace boost
                     }
 
                 }
-            private:
-                relocker(relocker&);
-                void operator=(relocker&);
             };
 
 
@@ -188,6 +184,7 @@ namespace boost
             {
                 entry_ptr const entry;
 
+                BOOST_THREAD_NO_COPYABLE(entry_manager)
                 entry_manager(entry_ptr const& entry_):
                     entry(entry_)
                 {}
@@ -201,10 +198,6 @@ namespace boost
                 {
                     return entry.get();
                 }
-
-            private:
-                void operator=(entry_manager&);
-                entry_manager(entry_manager&);
             };
 
 
@@ -301,10 +294,8 @@ namespace boost
     class condition_variable:
         private detail::basic_condition_variable
     {
-    private:
-        condition_variable(condition_variable&);
-        void operator=(condition_variable&);
     public:
+        BOOST_THREAD_NO_COPYABLE(condition_variable)
         condition_variable()
         {}
 
@@ -410,10 +401,8 @@ namespace boost
     class condition_variable_any:
         private detail::basic_condition_variable
     {
-    private:
-        condition_variable_any(condition_variable_any&);
-        void operator=(condition_variable_any&);
     public:
+        BOOST_THREAD_NO_COPYABLE(condition_variable_any)
         condition_variable_any()
         {}
 

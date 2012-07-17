@@ -14,6 +14,7 @@
 #       include <boost/functional/overloaded_function/detail/base.hpp>
 #       include <boost/functional/overloaded_function/detail/function_type.hpp>
 #       include <boost/functional/overloaded_function/config.hpp>
+#       include <boost/typeof/typeof.hpp>
 #       include <boost/preprocessor/iteration/iterate.hpp>
 #       include <boost/preprocessor/repetition/enum.hpp>
 #       include <boost/preprocessor/repetition/repeat.hpp>
@@ -23,6 +24,7 @@
 #       include <boost/preprocessor/comparison/less.hpp>
 #       include <boost/preprocessor/cat.hpp>
 #       include <boost/preprocessor/arithmetic/add.hpp>
+#       include <boost/preprocessor/arithmetic/sub.hpp>
 #       include <boost/preprocessor/tuple/eat.hpp>
 #       include <boost/preprocessor/logical/and.hpp>
 #       include <boost/preprocessor/logical/not.hpp>
@@ -81,16 +83,12 @@
         BOOST_FUNCTIONAL_f_type(z, n, ~) \
     >::type
 
-namespace boost {
-
-// Iterate within namespace.
 #       define BOOST_PP_ITERATION_PARAMS_1 \
-                (3, (0, BOOST_PP_SUB( /*at least 2 func to overload 2, 3, ...*/\
-                 BOOST_FUNCTIONAL_OVERLOADED_FUNCTION_CONFIG_OVERLOAD_MAX, 2), \
-                "boost/functional/overloaded_function.hpp"))
+            /* at least 2 func to overload so start from 2 to MAX */ \
+            /* (cannot iterate [0, MAX-2) because error on Sun) */ \
+            (3, (2, BOOST_FUNCTIONAL_OVERLOADED_FUNCTION_CONFIG_OVERLOAD_MAX, \
+            "boost/functional/overloaded_function.hpp"))
 #       include BOOST_PP_ITERATE() // Iterate over function arity.
-
-} // namespace
 
 #undef BOOST_FUNCTIONAL_f_type
 #undef BOOST_FUNCTIONAL_f_arg
@@ -112,12 +110,19 @@ namespace boost {
 #elif BOOST_PP_ITERATION_DEPTH() == 1
 #   define BOOST_FUNCTIONAL_overloads \
         /* iterate as OVERLOADS, OVERLOADS-1, OVERLOADS-2, ... */ \
-        BOOST_PP_SUB(BOOST_FUNCTIONAL_OVERLOADED_FUNCTION_CONFIG_OVERLOAD_MAX, \
-                BOOST_PP_FRAME_ITERATION(1))
+        /* (add 2 because iteration started from 2 to MAX) */ \
+        BOOST_PP_ADD(2, BOOST_PP_SUB( \
+                BOOST_FUNCTIONAL_OVERLOADED_FUNCTION_CONFIG_OVERLOAD_MAX, \
+                BOOST_PP_FRAME_ITERATION(1)))
 #   define BOOST_FUNCTIONAL_is_tspec \
         /* if template specialization */ \
         BOOST_PP_LESS(BOOST_FUNCTIONAL_overloads, \
                 BOOST_FUNCTIONAL_OVERLOADED_FUNCTION_CONFIG_OVERLOAD_MAX)
+
+// For type-of emulation: This must be included at this pp iteration level.
+#   include BOOST_TYPEOF_INCREMENT_REGISTRATION_GROUP()
+
+namespace boost {
 
 template<
     BOOST_PP_ENUM(BOOST_FUNCTIONAL_overloads, BOOST_FUNCTIONAL_f_tparam_dflt,
@@ -165,6 +170,12 @@ overloaded_function<
     >(BOOST_PP_ENUM(BOOST_FUNCTIONAL_overloads, BOOST_FUNCTIONAL_f_arg, ~));
 }
 
+} // namespace
+
+// For type-of emulation: Register overloaded function type (for _AUTO, etc).
+BOOST_TYPEOF_REGISTER_TEMPLATE(boost::overloaded_function,
+    BOOST_FUNCTIONAL_overloads)
+
 #   undef BOOST_FUNCTIONAL_overloads
 #   undef BOOST_FUNCTIONAL_is_tspec
 #endif // iteration
@@ -174,8 +185,8 @@ overloaded_function<
 #else // DOXYGEN
 
 /** @file
-@brief Overload distinct function pointers, function references, and function
-objects into a single function object.
+@brief Overload distinct function pointers, function references, and
+monomorphic function objects into a single function object.
 */
 
 namespace boost {
@@ -184,18 +195,25 @@ namespace boost {
 @brief Function object to overload functions with distinct signatures.
 
 This function object aggregates together calls to functions of all the
-specified function types <c>F1</c>, <c>F2</c>, etc.
-The specified function types must have distinct parameters from one another and
-they must be in the following format (which is the Boost.Function preferred
-syntax):
+specified function types <c>F1</c>, <c>F2</c>, etc which must have distinct
+function signatures from one another.
+
+@Params
+@Param{F<em>i</em>,
+Each function type must be specified using the following syntax (which is
+Boost.Function's preferred syntax):
 @code
-    result_type (argument1_type, argumgnet2_type, ...)
+    result_type (argument1_type\, argumgnet2_type\, ...)
 @endcode
+}
+@EndParams
 
 In some cases, the @RefFunc{make_overloaded_function} function template can be
-useful to construct the overloaded function object without explicitly
+useful to construct an overloaded function object without explicitly
 specifying the function types.
 
+At least two distinct function types must be specified (because there is
+nothing to overload between one or zero functions).
 The maximum number of functions to overload is given by the
 @RefMacro{BOOST_FUNCTIONAL_OVERLOADED_FUNCTION_CONFIG_OVERLOAD_MAX}
 configuration macro.
@@ -204,12 +222,10 @@ types is given by the
 @RefMacro{BOOST_FUNCTIONAL_OVERLOADED_FUNCTION_CONFIG_ARITY_MAX}
 configuration macro.
 
-@See
-    @RefSect{Tutorial} section,
-    @RefFunc{make_overloaded_function},
-    @RefMacro{BOOST_FUNCTIONAL_OVERLOADED_FUNCTION_CONFIG_OVERLOAD_MAX},
-    @RefMacro{BOOST_FUNCTIONAL_OVERLOADED_FUNCTION_CONFIG_ARITY_MAX},
-    Boost.Function.
+@See @RefSect{tutorial, Tutorial} section, @RefFunc{make_overloaded_function},
+@RefMacro{BOOST_FUNCTIONAL_OVERLOADED_FUNCTION_CONFIG_OVERLOAD_MAX},
+@RefMacro{BOOST_FUNCTIONAL_OVERLOADED_FUNCTION_CONFIG_ARITY_MAX},
+Boost.Function.
 */
 template<typename F1, typename F2, ...>
 class overloaded_function {
@@ -220,6 +236,10 @@ public:
     Any function pointer, function reference, and monomorphic function object
     that can be converted to a <c>boost::function</c> function object can be
     specified as parameter.
+
+    @Note Unfortunately, it is not possible to support polymorphic function
+    objects (as explained <a
+    href="http://lists.boost.org/Archives/boost/2012/03/191744.php">here</a>).
     */
     overloaded_function(const boost::function<F1>&,
             const boost::function<F2>&, ...);
@@ -258,29 +278,27 @@ public:
 function types.
 
 This function template creates and returns an @RefClass{overloaded_function}
-function object that overloads all the specified functions <c>f1</c>,
-<c>f2</c>, etc.
+object that overloads all the specified functions <c>f1</c>, <c>f2</c>, etc.
 
 The function types are internally determined from the template parameter types
 so they do not need to be explicitly specified.
 Therefore, this function template usually has a more concise syntax when
 compared with @RefClass{overloaded_function}.
 This is especially useful when the explicit type of the returned
-@RefClass{overloaded_function} does not need to be known (e.g., when used with Boost.Typeof's <c>BOOST_AUTO</c> (or C++11 <c>auto</c>) or when the overloaded
-function object is handled using a function template parameter, see the
-@RefSect{Tutorial} section).
+@RefClass{overloaded_function} object does not need to be known (e.g., when
+used with Boost.Typeof's <c>BOOST_AUTO</c>, C++11 <c>auto</c>, or when the
+overloaded function object is handled using a function template parameter, see
+the @RefSect{tutorial, Tutorial} section).
 
 The maximum number of functions to overload is given by the
 @RefMacro{BOOST_FUNCTIONAL_OVERLOADED_FUNCTION_CONFIG_OVERLOAD_MAX}
 configuration macro.
 
 @Note In this documentation, <c>__function_type__</c> is a placeholder for a
-symbol that is specific to implementation of this library.
+symbol that is specific to the implementation of this library.
 
-@See
-    @RefSect{Tutorial} section,
-    @RefClass{overloaded_function},
-    @RefMacro{BOOST_FUNCTIONAL_OVERLOADED_FUNCTION_CONFIG_OVERLOAD_MAX}.
+@See @RefSect{tutorial, Tutorial} section, @RefClass{overloaded_function},
+@RefMacro{BOOST_FUNCTIONAL_OVERLOADED_FUNCTION_CONFIG_OVERLOAD_MAX}.
 */
 template<typename F1, typename F2, ...>
 overloaded_function<

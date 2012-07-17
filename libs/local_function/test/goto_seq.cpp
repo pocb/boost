@@ -6,12 +6,10 @@
 // Home at http://www.boost.org/libs/local_function
 
 #include <boost/local_function.hpp>
-#define BOOST_TEST_MODULE TestGotoSeq
-#include <boost/test/unit_test.hpp>
 
 int error(int x, int y) {
-    int BOOST_LOCAL_FUNCTION( (int x) ) {
-        if(x > 0) goto success;
+    int BOOST_LOCAL_FUNCTION( (int z) ) {
+        if(z > 0) goto success;
         return -1;
     success:
         return 0;
@@ -20,7 +18,8 @@ int error(int x, int y) {
     return validate(x + y);
 }
 
-BOOST_AUTO_TEST_CASE(test_goto_seq) {
+int main(void) {
     error(1, 2);
+    return 0;
 }
 

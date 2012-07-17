@@ -18,7 +18,7 @@
 
 // promise();
 
-#define BOOST_THREAD_VERSION 2
+#define BOOST_THREAD_VERSION 3
 
 #include <boost/thread/future.hpp>
 #include <boost/detail/lightweight_test.hpp>
@@ -28,17 +28,19 @@ int main()
 
   {
       boost::promise<int> p;
-      boost::future<int> f = p.get_future();
+      boost::future<int> f = BOOST_THREAD_MAKE_RV_REF(p.get_future());
       BOOST_TEST(f.valid());
   }
   {
       boost::promise<int&> p;
-      boost::future<int&> f = p.get_future();
+      boost::future<int&> f = BOOST_THREAD_MAKE_RV_REF(p.get_future());
       BOOST_TEST(f.valid());
   }
   {
       boost::promise<void> p;
-      boost::future<void> f = p.get_future();
+      std::cout << __LINE__ << std::endl;
+      boost::future<void> f = BOOST_THREAD_MAKE_RV_REF(p.get_future());
+      std::cout << __LINE__ << std::endl;
       BOOST_TEST(f.valid());
   }
 
