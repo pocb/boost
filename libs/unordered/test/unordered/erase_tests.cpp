@@ -4,9 +4,10 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include "../helpers/prefix.hpp"
-
 #include <boost/unordered_set.hpp>
 #include <boost/unordered_map.hpp>
+#include "../helpers/postfix.hpp"
+
 #include "../helpers/test.hpp"
 #include <boost/next_prior.hpp>
 #include "../objects/test.hpp"
@@ -20,7 +21,7 @@
 namespace erase_tests
 {
 
-test::seed_t seed(85638);
+test::seed_t initialize_seed(85638);
 
 template <class Container>
 void erase_tests1(Container*,

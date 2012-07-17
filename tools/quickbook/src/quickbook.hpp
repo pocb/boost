@@ -15,7 +15,7 @@
 #include <time.h>
 #include <vector>
 #include <string>
-#include <boost/filesystem/v3/path.hpp>
+#include <boost/filesystem/path.hpp>
 #include "fwd.hpp"
 #include "values.hpp"
 
@@ -31,7 +31,7 @@ namespace quickbook
     extern std::vector<std::string> preset_defines;
     extern fs::path image_location;
 
-    void parse_file(actions& actor,
+    void parse_file(quickbook::state& state,
             value include_doc_id = value(),
             bool nested_file = false);
     // Some initialisation methods

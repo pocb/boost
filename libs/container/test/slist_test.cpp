@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////
 //
-// (C) Copyright Ion Gaztanaga 2004-2011. Distributed under the Boost
+// (C) Copyright Ion Gaztanaga 2004-2012. Distributed under the Boost
 // Software License, Version 1.0. (See accompanying file
 // LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
@@ -22,13 +22,13 @@ namespace boost {
 namespace container {
 
 //Explicit instantiation to detect compilation errors
-template class boost::container::slist<test::movable_and_copyable_int, 
+template class boost::container::slist<test::movable_and_copyable_int,
    test::simple_allocator<test::movable_and_copyable_int> >;
 
-template class boost::container::slist<test::movable_and_copyable_int, 
+template class boost::container::slist<test::movable_and_copyable_int,
    test::dummy_test_allocator<test::movable_and_copyable_int> >;
 
-template class boost::container::slist<test::movable_and_copyable_int, 
+template class boost::container::slist<test::movable_and_copyable_int,
    std::allocator<test::movable_and_copyable_int> >;
 }}
 

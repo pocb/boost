@@ -4,12 +4,13 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include "../helpers/prefix.hpp"
+#include <boost/unordered_set.hpp>
+#include <boost/unordered_map.hpp>
+#include "../helpers/postfix.hpp"
 
 #include <boost/config.hpp>
 #include <algorithm>
 #include <iterator>
-#include <boost/unordered_set.hpp>
-#include <boost/unordered_map.hpp>
 #include "../helpers/test.hpp"
 #include "../objects/test.hpp"
 #include "../objects/cxx11_allocator.hpp"
@@ -24,7 +25,7 @@
 namespace swap_tests
 {
 
-test::seed_t seed(783472);
+test::seed_t initialize_seed(783472);
 
 template <class X>
 void swap_test_impl(X& x1, X& x2)

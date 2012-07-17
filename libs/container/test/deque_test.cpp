@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////
 //
-// (C) Copyright Ion Gaztanaga 2004-2011. Distributed under the Boost
+// (C) Copyright Ion Gaztanaga 2004-2012. Distributed under the Boost
 // Software License, Version 1.0. (See accompanying file
 // LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
@@ -259,11 +259,11 @@ bool do_test()
 
       cntdeque->resize(100);
       stddeque->resize(100);
-      if(!test::CheckEqualContainers(cntdeque, stddeque)) return 1;         
+      if(!test::CheckEqualContainers(cntdeque, stddeque)) return 1;        
 
       cntdeque->resize(200);
       stddeque->resize(200);
-      if(!test::CheckEqualContainers(cntdeque, stddeque)) return 1;         
+      if(!test::CheckEqualContainers(cntdeque, stddeque)) return 1;        
 
       delete cntdeque;
       delete stddeque;
@@ -272,7 +272,7 @@ bool do_test()
       std::cout << ex.what() << std::endl;
       return false;
    }
-   
+  
    std::cout << std::endl << "Test OK!" << std::endl;
    return true;
 }
