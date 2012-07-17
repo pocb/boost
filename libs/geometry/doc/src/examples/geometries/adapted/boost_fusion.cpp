@@ -1,7 +1,7 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
 // QuickBook Example
 
-// Copyright (c) 2011 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2011-2012 Barend Gehrels, Amsterdam, the Netherlands.
 
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
@@ -24,7 +24,7 @@ struct sample_point
 };
 
 BOOST_FUSION_ADAPT_STRUCT(sample_point, (double, x) (double, y) (double, z))
-BOOST_GEOMETRY_REGISTER_BOOST_FUSION_CS(sample_point)
+BOOST_GEOMETRY_REGISTER_BOOST_FUSION_CS(cs::cartesian)
 
 int main()
 {

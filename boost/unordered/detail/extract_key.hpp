@@ -33,7 +33,8 @@ namespace detail {
         static choice1::type test(T2 const&);
         static choice2::type test(Key const&);
         
-        enum { value = sizeof(test(make<T>())) == sizeof(choice2::type) };
+        enum { value = sizeof(test(boost::unordered::detail::make<T>())) ==
+            sizeof(choice2::type) };
         
         typedef typename boost::detail::if_true<value>::
             BOOST_NESTED_TEMPLATE then<Key const&, no_key>::type type;
@@ -50,25 +51,17 @@ namespace detail {
             return v;
         }
 
-#if BOOST_UNORDERED_USE_RV_REF
-        static key_type const& extract(BOOST_RV_REF(key_type) v)
-        {
-            return v;
-        }
-#endif
-
         static no_key extract()
         {
             return no_key();
         }
         
-#if defined(BOOST_UNORDERED_STD_FORWARD_MOVE)
+#if defined(BOOST_UNORDERED_VARIADIC_MOVE)
         template <class... Args>
         static no_key extract(Args const&...)
         {
             return no_key();
         }
-
 #else
         template <class Arg>
         static no_key extract(Arg const&)
@@ -93,7 +86,7 @@ namespace detail {
     struct map_extractor
     {
         typedef ValueType value_type;
-        typedef typename ::boost::remove_const<Key>::type key_type;
+        typedef typename boost::remove_const<Key>::type key_type;
 
         static key_type const& extract(value_type const& v)
         {
@@ -104,13 +97,6 @@ namespace detail {
         {
             return v;
         }
-
-        // TODO: Why does this cause errors?
-        //
-        //static key_type const& extract(BOOST_RV_REF(key_type) v)
-        //{
-        //    return v;
-        //}
 
         template <class Second>
         static key_type const& extract(std::pair<key_type, Second> const& v)
@@ -125,7 +111,7 @@ namespace detail {
             return v.first;
         }
 
-#if defined(BOOST_UNORDERED_STD_FORWARD_MOVE)
+#if defined(BOOST_UNORDERED_VARIADIC_MOVE)
         template <class Arg1, class... Args>
         static key_type const& extract(key_type const& k,
             Arg1 const&, Args const&...)
@@ -164,7 +150,7 @@ namespace detail {
         }
 #endif
 
-#if defined(BOOST_UNORDERED_STD_FORWARD_MOVE)
+#if defined(BOOST_UNORDERED_VARIADIC_MOVE)
 
 #define BOOST_UNORDERED_KEY_FROM_TUPLE(namespace_)                          \
         template <typename T2>                                              \
@@ -207,8 +193,6 @@ BOOST_UNORDERED_KEY_FROM_TUPLE(boost)
 
 #if !defined(BOOST_NO_0X_HDR_TUPLE)
 BOOST_UNORDERED_KEY_FROM_TUPLE(std)
-#elif defined(BOOST_HAS_TR1_TUPLE)
-BOOST_UNORDERED_KEY_FROM_TUPLE(std::tr1)
 #endif
 
 

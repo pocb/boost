@@ -7,7 +7,6 @@
 #ifndef BOOST_GRAPH_DIRECTED_GRAPH_HPP
 #define BOOST_GRAPH_DIRECTED_GRAPH_HPP
 
-#include <boost/utility.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/properties.hpp>
 
@@ -410,7 +409,7 @@ template <DIRECTED_GRAPH_PARAMS>
 typename DIRECTED_GRAPH::vertex_descriptor
 vertex(typename DIRECTED_GRAPH::vertices_size_type n,
        DIRECTED_GRAPH const& g)
-{ return vertex(g.impl()); }
+{ return vertex(n, g.impl()); }
 
 template <DIRECTED_GRAPH_PARAMS>
 std::pair<typename DIRECTED_GRAPH::edge_descriptor, bool>

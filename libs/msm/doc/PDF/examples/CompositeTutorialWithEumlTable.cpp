@@ -112,10 +112,7 @@ namespace
 
     };
     // Playing Submachine back-end
-    struct Playing_impl : public boost::msm::back::state_machine<Playing_>,
-                          public msm::front::euml::euml_state<Playing_>
-    {
-    };
+    typedef boost::msm::back::state_machine<Playing_> Playing_impl;
 
     // state not defining any entry or exit
     struct Paused_impl : public msm::front::state<> , public msm::front::euml::euml_state<Paused_impl>

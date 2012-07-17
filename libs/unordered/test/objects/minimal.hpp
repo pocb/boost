@@ -202,17 +202,67 @@ namespace minimal
     template <class T> class ptr;
     template <class T> class const_ptr;
 
+    struct void_ptr
+    {
+#if !defined(BOOST_NO_MEMBER_TEMPLATE_FRIENDS)
+        template <typename T>
+        friend class ptr;
+    private:
+#endif
+
+        void* ptr_;
+
+    public:
+        void_ptr() : ptr_(0) {}
+
+        template <typename T>
+        explicit void_ptr(ptr<T> const& x) : ptr_(x.ptr_) {}
+
+        // I'm not using the safe bool idiom because the containers should be
+        // able to cope with bool conversions.
+        operator bool() const { return !!ptr_; }
+
+        bool operator==(void_ptr const& x) const { return ptr_ == x.ptr_; }
+        bool operator!=(void_ptr const& x) const { return ptr_ != x.ptr_; }
+    };
+
+    class void_const_ptr
+    {
+#if !defined(BOOST_NO_MEMBER_TEMPLATE_FRIENDS)
+        template <typename T>
+        friend class const_ptr;
+    private:
+#endif
+
+        void* ptr_;
+
+    public:
+        void_const_ptr() : ptr_(0) {}
+
+        template <typename T>
+        explicit void_const_ptr(const_ptr<T> const& x) : ptr_(x.ptr_) {}
+
+        // I'm not using the safe bool idiom because the containers should be
+        // able to cope with bool conversions.
+        operator bool() const { return !!ptr_; }
+
+        bool operator==(void_const_ptr const& x) const { return ptr_ == x.ptr_; }
+        bool operator!=(void_const_ptr const& x) const { return ptr_ != x.ptr_; }
+    };
+
     template <class T>
     class ptr
     {
         friend class allocator<T>;
         friend class const_ptr<T>;
+        friend struct void_ptr;
 
         T* ptr_;
 
         ptr(T* x) : ptr_(x) {}
     public:
         ptr() : ptr_(0) {}
+        explicit ptr(void_ptr const& x) : ptr_((T*) x.ptr_) {}
 
         T& operator*() const { return *ptr_; }
         T* operator->() const { return ptr_; }
@@ -234,13 +284,6 @@ namespace minimal
         bool operator>(ptr const& x) const { return ptr_ > x.ptr_; }
         bool operator<=(ptr const& x) const { return ptr_ <= x.ptr_; }
         bool operator>=(ptr const& x) const { return ptr_ >= x.ptr_; }
-
-        bool operator==(const_ptr<T> const& x) const { return ptr_ == x.ptr_; }
-        bool operator!=(const_ptr<T> const& x) const { return ptr_ != x.ptr_; }
-        bool operator<(const_ptr<T> const& x) const { return ptr_ < x.ptr_; }
-        bool operator>(const_ptr<T> const& x) const { return ptr_ > x.ptr_; }
-        bool operator<=(const_ptr<T> const& x) const { return ptr_ <= x.ptr_; }
-        bool operator>=(const_ptr<T> const& x) const { return ptr_ >= x.ptr_; }
     private:
         // TODO:
         //ampersand_operator_used operator&() const { return ampersand_operator_used(); }
@@ -250,6 +293,7 @@ namespace minimal
     class const_ptr
     {
         friend class allocator<T>;
+        friend struct const_void_ptr;
 
         T const* ptr_;
 
@@ -257,6 +301,7 @@ namespace minimal
     public:
         const_ptr() : ptr_(0) {}
         const_ptr(ptr<T> const& x) : ptr_(x.ptr_) {}
+        explicit const_ptr(void_const_ptr const& x) : ptr_((T const*) x.ptr_) {}
 
         T const& operator*() const { return *ptr_; }
         T const* operator->() const { return ptr_; }
@@ -269,13 +314,6 @@ namespace minimal
         T const& operator[](int s) const { return ptr_[s]; }
         bool operator!() const { return !ptr_; }
         operator bool() const { return !!ptr_; }
-
-        bool operator==(ptr<T> const& x) const { return ptr_ == x.ptr_; }
-        bool operator!=(ptr<T> const& x) const { return ptr_ != x.ptr_; }
-        bool operator<(ptr<T> const& x) const { return ptr_ < x.ptr_; }
-        bool operator>(ptr<T> const& x) const { return ptr_ > x.ptr_; }
-        bool operator<=(ptr<T> const& x) const { return ptr_ <= x.ptr_; }
-        bool operator>=(ptr<T> const& x) const { return ptr_ >= x.ptr_; }
 
         bool operator==(const_ptr const& x) const { return ptr_ == x.ptr_; }
         bool operator!=(const_ptr const& x) const { return ptr_ != x.ptr_; }
@@ -294,6 +332,8 @@ namespace minimal
     public:
         typedef std::size_t size_type;
         typedef std::ptrdiff_t difference_type;
+        typedef void_ptr void_pointer;
+        typedef void_const_ptr const_void_pointer;
         typedef ptr<T> pointer;
         typedef const_ptr<T> const_pointer;
         typedef T& reference;
@@ -327,9 +367,9 @@ namespace minimal
 
         void construct(T* p, T const& t) { new((void*)p) T(t); }
 
-#if defined(BOOST_UNORDERED_STD_FORWARD_MOVE)
+#if defined(BOOST_UNORDERED_VARIADIC_MOVE)
         template<class... Args> void construct(T* p, Args&&... args) {
-            new((void*)p) T(std::forward<Args>(args)...);
+            new((void*)p) T(boost::forward<Args>(args)...);
         }
 #endif
 
@@ -399,9 +439,9 @@ namespace minimal
 
         void construct(T* p, T const& t) { new((void*)p) T(t); }
 
-#if defined(BOOST_UNORDERED_STD_FORWARD_MOVE)
+#if defined(BOOST_UNORDERED_VARIADIC_MOVE)
         template<class... Args> void construct(T* p, Args&&... args) {
-            new((void*)p) T(std::forward<Args>(args)...);
+            new((void*)p) T(boost::forward<Args>(args)...);
         }
 #endif
 

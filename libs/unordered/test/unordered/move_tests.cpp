@@ -4,9 +4,10 @@
 // file LICENSE_1_0.txt or move at http://www.boost.org/LICENSE_1_0.txt)
 
 #include "../helpers/prefix.hpp"
-
 #include <boost/unordered_set.hpp>
 #include <boost/unordered_map.hpp>
+#include "../helpers/postfix.hpp"
+
 #include "../helpers/test.hpp"
 #include "../objects/test.hpp"
 #include "../objects/cxx11_allocator.hpp"
@@ -21,7 +22,12 @@
 
 namespace move_tests
 {
-    test::seed_t seed(98624);
+    test::seed_t initialize_seed(98624);
+#if defined(BOOST_UNORDERED_USE_MOVE) || !defined(BOOST_NO_RVALUE_REFERENCES)
+#define BOOST_UNORDERED_TEST_MOVING 1
+#else
+#define BOOST_UNORDERED_TEST_MOVING 0
+#endif
 
     template<class T>
     T empty(T*) {
@@ -95,7 +101,7 @@ namespace move_tests
             test::object_count count;
             T y;
             y = create(v, count);
-#if defined(BOOST_HAS_NRVO)
+#if BOOST_UNORDERED_TEST_MOVING && defined(BOOST_HAS_NRVO)
             BOOST_TEST(count == test::global_object_count);
 #endif
             test::check_container(y, v);
@@ -193,12 +199,18 @@ namespace move_tests
             test::check_container(y, v2);
             test::check_equivalent_keys(y);
             BOOST_TEST(y.max_load_factor() == 2.0);
-            if (allocator_type::is_propagate_on_move) {
+
+#if defined(BOOST_HAS_NRVO)
+            if (BOOST_UNORDERED_TEST_MOVING ?
+                    (bool) allocator_type::is_propagate_on_move :
+                    (bool) allocator_type::is_propagate_on_assign)
+            {
                 BOOST_TEST(test::equivalent(y.get_allocator(), al2));
             }
             else {
                 BOOST_TEST(test::equivalent(y.get_allocator(), al1));
             }
+#endif
         }
 
         {
@@ -207,14 +219,95 @@ namespace move_tests
             T y(0, hf, eq, al1);
             y = create(v, count, hf, eq, al2, 0.5);
 #if defined(BOOST_HAS_NRVO)
-            if (allocator_type::is_propagate_on_move) {
+            if (BOOST_UNORDERED_TEST_MOVING &&
+                    allocator_type::is_propagate_on_move)
+            {
                 BOOST_TEST(count == test::global_object_count);
             }
 #endif
             test::check_container(y, v);
             test::check_equivalent_keys(y);
             BOOST_TEST(y.max_load_factor() == 0.5);
-            if (allocator_type::is_propagate_on_move) {
+
+#if defined(BOOST_HAS_NRVO)
+            if (BOOST_UNORDERED_TEST_MOVING ?
+                    (bool) allocator_type::is_propagate_on_move :
+                    (bool) allocator_type::is_propagate_on_assign)
+            {
+                BOOST_TEST(test::equivalent(y.get_allocator(), al2));
+            }
+            else {
+                BOOST_TEST(test::equivalent(y.get_allocator(), al1));
+            }
+#endif
+        }
+
+        {
+            test::check_instances check_;
+
+            test::random_values<T> v(500, generator);
+            T y(0, hf, eq, al1);
+
+            T x(0, hf, eq, al2);
+            x.max_load_factor(0.25);
+            x.insert(v.begin(), v.end());
+
+            test::object_count count = test::global_object_count;
+            y = boost::move(x);
+            if (BOOST_UNORDERED_TEST_MOVING &&
+                    allocator_type::is_propagate_on_move)
+            {
+                BOOST_TEST(count == test::global_object_count);
+            }
+            test::check_container(y, v);
+            test::check_equivalent_keys(y);
+            BOOST_TEST(y.max_load_factor() == 0.25);
+
+            if (BOOST_UNORDERED_TEST_MOVING ?
+                    (bool) allocator_type::is_propagate_on_move :
+                    (bool) allocator_type::is_propagate_on_assign)
+            {
+                BOOST_TEST(test::equivalent(y.get_allocator(), al2));
+            }
+            else {
+                BOOST_TEST(test::equivalent(y.get_allocator(), al1));
+            }
+        }
+
+        {
+            test::check_instances check_;
+
+            test::random_values<T> v1(1000, generator);
+            test::random_values<T> v2(200, generator);
+
+            T x(0, hf, eq, al2);
+            x.max_load_factor(0.5);
+            x.insert(v2.begin(), v2.end());
+
+            test::object_count count1 = test::global_object_count;
+
+            T y(v1.begin(), v1.end(), 0, hf, eq, al1);
+            y = boost::move(x);
+
+            test::object_count count2 = test::global_object_count;
+
+            if (BOOST_UNORDERED_TEST_MOVING &&
+                    allocator_type::is_propagate_on_move)
+            {
+                BOOST_TEST(count1.instances ==
+                    test::global_object_count.instances);
+                BOOST_TEST(count2.constructions ==
+                    test::global_object_count.constructions);
+            }
+
+            test::check_container(y, v2);
+            test::check_equivalent_keys(y);
+            BOOST_TEST(y.max_load_factor() == 0.5);
+
+            if (BOOST_UNORDERED_TEST_MOVING ?
+                    (bool) allocator_type::is_propagate_on_move :
+                    (bool) allocator_type::is_propagate_on_assign)
+            {
                 BOOST_TEST(test::equivalent(y.get_allocator(), al2));
             }
             else {

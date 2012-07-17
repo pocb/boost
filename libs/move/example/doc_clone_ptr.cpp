@@ -18,7 +18,7 @@ class Base
    public:
    Base(){}
 
-   // Compiler-generated copy constructor...
+   Base(const Base &x) {/**/}             // Copy ctor
 
    Base(BOOST_RV_REF(Base) x) {/**/}      // Move ctor
 
@@ -30,6 +30,8 @@ class Base
    
    virtual Base *clone() const
    {  return new Base(*this);  }
+
+   virtual ~Base(){}
 };
 
 class Member

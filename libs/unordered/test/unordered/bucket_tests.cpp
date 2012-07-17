@@ -4,9 +4,10 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include "../helpers/prefix.hpp"
-
 #include <boost/unordered_set.hpp>
 #include <boost/unordered_map.hpp>
+#include "../helpers/postfix.hpp"
+
 #include "../helpers/test.hpp"
 #include <algorithm>
 #include "../objects/test.hpp"
@@ -20,7 +21,7 @@
 
 namespace bucket_tests {
 
-test::seed_t seed(54635);
+test::seed_t initialize_seed(54635);
 
 template <class X>
 void tests(X* = 0, test::random_generator generator = test::default_generator)

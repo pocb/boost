@@ -3,7 +3,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
 <title>Additional Implementation Notes</title>
 <link rel="stylesheet" href="../../../../../../../doc/src/boostbook.css" type="text/css">
-<meta name="generator" content="DocBook XSL Stylesheets V1.74.0">
+<meta name="generator" content="DocBook XSL Stylesheets V1.76.1">
 <link rel="home" href="../../index.html" title="Math Toolkit">
 <link rel="up" href="../backgrounders.html" title="Backgrounders">
 <link rel="prev" href="../backgrounders.html" title="Backgrounders">
@@ -22,7 +22,7 @@
 <div class="spirit-nav">
 <a accesskey="p" href="../backgrounders.html"><img src="../../../../../../../doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../backgrounders.html"><img src="../../../../../../../doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="../../../../../../../doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="relative_error.html"><img src="../../../../../../../doc/src/images/next.png" alt="Next"></a>
 </div>
-<div class="section" lang="en">
+<div class="section math_toolkit_backgrounders_implementation">
 <div class="titlepage"><div><div><h3 class="title">
 <a name="math_toolkit.backgrounders.implementation"></a><a class="link" href="implementation.html" title="Additional Implementation Notes">Additional
       Implementation Notes</a>
@@ -32,9 +32,9 @@
         of each function or distribution. The notes here are of a more general nature,
         and reflect more the general implementation philosophy used.
       </p>
-<a name="math_toolkit.backgrounders.implementation.implemention_philosophy"></a><h5>
-<a name="id1311030"></a>
-        <a class="link" href="implementation.html#math_toolkit.backgrounders.implementation.implemention_philosophy">Implemention
+<h5>
+<a name="math_toolkit.backgrounders.implementation.h0"></a>
+        <span><a name="math_toolkit.backgrounders.implementation.implemention_philosophy"></a></span><a class="link" href="implementation.html#math_toolkit.backgrounders.implementation.implemention_philosophy">Implemention
         philosophy</a>
       </h5>
 <p>
@@ -84,9 +84,9 @@
 <p>
         These could still provide sufficient accuracy for some speed-critical applications.
       </p>
-<a name="math_toolkit.backgrounders.implementation.accuracy_and_representation_of_test_values"></a><h5>
-<a name="id1311093"></a>
-        <a class="link" href="implementation.html#math_toolkit.backgrounders.implementation.accuracy_and_representation_of_test_values">Accuracy
+<h5>
+<a name="math_toolkit.backgrounders.implementation.h1"></a>
+        <span><a name="math_toolkit.backgrounders.implementation.accuracy_and_representation_of_test_values"></a></span><a class="link" href="implementation.html#math_toolkit.backgrounders.implementation.accuracy_and_representation_of_test_values">Accuracy
         and Representation of Test Values</a>
       </h5>
 <p>
@@ -129,19 +129,19 @@
         a power of two (in order to ensure that the result is an exactly representable
         binary value).
       </p>
-<a name="math_toolkit.backgrounders.implementation.tolerance_of_tests"></a><h5>
-<a name="id1311237"></a>
-        <a class="link" href="implementation.html#math_toolkit.backgrounders.implementation.tolerance_of_tests">Tolerance
+<h5>
+<a name="math_toolkit.backgrounders.implementation.h2"></a>
+        <span><a name="math_toolkit.backgrounders.implementation.tolerance_of_tests"></a></span><a class="link" href="implementation.html#math_toolkit.backgrounders.implementation.tolerance_of_tests">Tolerance
         of Tests</a>
       </h5>
 <p>
         The tolerances need to be set to the maximum of:
       </p>
-<div class="itemizedlist"><ul type="disc">
-<li>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
             Some epsilon value.
           </li>
-<li>
+<li class="listitem">
             The accuracy of the data (often only near 64-bit double).
           </li>
 </ul></div>
@@ -155,9 +155,9 @@
         fail on other systems where long double is more accurate than double. Check
         first that the suffix L is present, and then that the tolerance is big enough.
       </p>
-<a name="math_toolkit.backgrounders.implementation.handling_unsuitable_arguments"></a><h5>
-<a name="id1311282"></a>
-        <a class="link" href="implementation.html#math_toolkit.backgrounders.implementation.handling_unsuitable_arguments">Handling
+<h5>
+<a name="math_toolkit.backgrounders.implementation.h3"></a>
+        <span><a name="math_toolkit.backgrounders.implementation.handling_unsuitable_arguments"></a></span><a class="link" href="implementation.html#math_toolkit.backgrounders.implementation.handling_unsuitable_arguments">Handling
         Unsuitable Arguments</a>
       </h5>
 <p>
@@ -166,7 +166,7 @@
         it is proposed that signalling a domain error is mandatory when the argument
         would give an mathematically undefined result.
       </p>
-<div class="itemizedlist"><ul type="disc"><li>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem">
             Guideline 1
           </li></ul></div>
 <div class="blockquote"><blockquote class="blockquote"><p>
@@ -183,7 +183,7 @@
           a domain error whenever evaluated with argument values for which the mathematical
           function is undefined.
         </p></blockquote></div>
-<div class="itemizedlist"><ul type="disc"><li>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem">
             Guideline 2
           </li></ul></div>
 <div class="blockquote"><blockquote class="blockquote"><p>
@@ -223,9 +223,9 @@
           done for most examples.
         </p></td></tr>
 </table></div>
-<a name="math_toolkit.backgrounders.implementation.handling_of_functions_that_are_not_mathematically_defined"></a><h5>
-<a name="id1311604"></a>
-        <a class="link" href="implementation.html#math_toolkit.backgrounders.implementation.handling_of_functions_that_are_not_mathematically_defined">Handling
+<h5>
+<a name="math_toolkit.backgrounders.implementation.h4"></a>
+        <span><a name="math_toolkit.backgrounders.implementation.handling_of_functions_that_are_not_mathematically_defined"></a></span><a class="link" href="implementation.html#math_toolkit.backgrounders.implementation.handling_of_functions_that_are_not_mathematically_defined">Handling
         of Functions that are Not Mathematically defined</a>
       </h5>
 <p>
@@ -257,9 +257,9 @@
           domain error occurs. Catching exceptions is therefore strongly recommended.
         </p></td></tr>
 </table></div>
-<a name="math_toolkit.backgrounders.implementation.median_of_distributions"></a><h5>
-<a name="id1311689"></a>
-        <a class="link" href="implementation.html#math_toolkit.backgrounders.implementation.median_of_distributions">Median
+<h5>
+<a name="math_toolkit.backgrounders.implementation.h5"></a>
+        <span><a name="math_toolkit.backgrounders.implementation.median_of_distributions"></a></span><a class="link" href="implementation.html#math_toolkit.backgrounders.implementation.median_of_distributions">Median
         of distributions</a>
       </h5>
 <p>
@@ -292,9 +292,9 @@
         <a href="http://documents.wolfram.com/v5/TheMathematicaBook/AdvancedMathematicsInMathematica/NumericalOperationsOnData/3.8.1.html" target="_top">Mathematica
         Basic Statistics.</a> give more detail, in particular for discrete distributions.
       </p>
-<a name="math_toolkit.backgrounders.implementation.handling_of_floating_point_infinity"></a><h5>
-<a name="id1311811"></a>
-        <a class="link" href="implementation.html#math_toolkit.backgrounders.implementation.handling_of_floating_point_infinity">Handling
+<h5>
+<a name="math_toolkit.backgrounders.implementation.h6"></a>
+        <span><a name="math_toolkit.backgrounders.implementation.handling_of_floating_point_infinity"></a></span><a class="link" href="implementation.html#math_toolkit.backgrounders.implementation.handling_of_floating_point_infinity">Handling
         of Floating-Point Infinity</a>
       </h5>
 <p>
@@ -336,9 +336,9 @@
         What happens at (and near), poles can be controlled through <a class="link" href="../policy/pol_ref/error_handling_policies.html" title="Error Handling Policies">error
         handling policies</a>.
       </p>
-<a name="math_toolkit.backgrounders.implementation.scale__shape_and_location"></a><h5>
-<a name="id1311900"></a>
-        <a class="link" href="implementation.html#math_toolkit.backgrounders.implementation.scale__shape_and_location">Scale,
+<h5>
+<a name="math_toolkit.backgrounders.implementation.h7"></a>
+        <span><a name="math_toolkit.backgrounders.implementation.scale__shape_and_location"></a></span><a class="link" href="implementation.html#math_toolkit.backgrounders.implementation.scale__shape_and_location">Scale,
         Shape and Location</a>
       </h5>
 <p>
@@ -350,8 +350,8 @@
   <span class="identifier">RealType</span> <span class="identifier">lower</span> <span class="special">=</span> <span class="identifier">dist</span><span class="special">.</span><span class="identifier">lower</span><span class="special">();</span>
   <span class="identifier">RealType</span> <span class="identifier">mode</span> <span class="special">=</span> <span class="identifier">dist</span><span class="special">.</span><span class="identifier">mode</span><span class="special">();</span>
   <span class="identifier">RealType</span> <span class="identifier">upper</span> <span class="special">=</span> <span class="identifier">dist</span><span class="special">.</span><span class="identifier">upper</span><span class="special">();</span>
-  <span class="identifier">RealType</span> <span class="identifier">result</span><span class="special">;</span>  <span class="comment">// of checks.
-</span>  <span class="keyword">if</span><span class="special">(</span><span class="keyword">false</span> <span class="special">==</span> <span class="identifier">detail</span><span class="special">::</span><span class="identifier">check_triangular</span><span class="special">(</span><span class="identifier">BOOST_CURRENT_FUNCTION</span><span class="special">,</span> <span class="identifier">lower</span><span class="special">,</span> <span class="identifier">mode</span><span class="special">,</span> <span class="identifier">upper</span><span class="special">,</span> <span class="special">&amp;</span><span class="identifier">result</span><span class="special">))</span>
+  <span class="identifier">RealType</span> <span class="identifier">result</span><span class="special">;</span>  <span class="comment">// of checks.</span>
+  <span class="keyword">if</span><span class="special">(</span><span class="keyword">false</span> <span class="special">==</span> <span class="identifier">detail</span><span class="special">::</span><span class="identifier">check_triangular</span><span class="special">(</span><span class="identifier">BOOST_CURRENT_FUNCTION</span><span class="special">,</span> <span class="identifier">lower</span><span class="special">,</span> <span class="identifier">mode</span><span class="special">,</span> <span class="identifier">upper</span><span class="special">,</span> <span class="special">&amp;</span><span class="identifier">result</span><span class="special">))</span>
   <span class="special">{</span>
     <span class="keyword">return</span> <span class="identifier">result</span><span class="special">;</span>
   <span class="special">}</span>
@@ -363,21 +363,21 @@
         for too many distributions to be generally applicable. Because they are non-member
         functions, they can be added if required.
       </p>
-<a name="math_toolkit.backgrounders.implementation.notes_on_implementation_of_specific_functions__amp__distributions"></a><h5>
-<a name="id1312235"></a>
-        <a class="link" href="implementation.html#math_toolkit.backgrounders.implementation.notes_on_implementation_of_specific_functions__amp__distributions">Notes
+<h5>
+<a name="math_toolkit.backgrounders.implementation.h8"></a>
+        <span><a name="math_toolkit.backgrounders.implementation.notes_on_implementation_of_specific_functions__amp__distributions"></a></span><a class="link" href="implementation.html#math_toolkit.backgrounders.implementation.notes_on_implementation_of_specific_functions__amp__distributions">Notes
         on Implementation of Specific Functions &amp; Distributions</a>
       </h5>
-<div class="itemizedlist"><ul type="disc"><li>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem">
             Default parameters for the Triangular Distribution. We are uncertain
             about the best default parameters. Some sources suggest that the Standard
             Triangular Distribution has lower = 0, mode = half and upper = 1. However
             as a approximation for the normal distribution, the most common usage,
             lower = -1, mode = 0 and upper = 1 would be more suitable.
           </li></ul></div>
-<a name="math_toolkit.backgrounders.implementation.rational_approximations_used"></a><h5>
-<a name="id1312259"></a>
-        <a class="link" href="implementation.html#math_toolkit.backgrounders.implementation.rational_approximations_used">Rational
+<h5>
+<a name="math_toolkit.backgrounders.implementation.h9"></a>
+        <span><a name="math_toolkit.backgrounders.implementation.rational_approximations_used"></a></span><a class="link" href="implementation.html#math_toolkit.backgrounders.implementation.rational_approximations_used">Rational
         Approximations Used</a>
       </h5>
 <p>
@@ -418,9 +418,9 @@
         still need to be accurately calculated, even if they can be in error compared
         to the "true" minimax solution.
       </p>
-<a name="math_toolkit.backgrounders.implementation.representation_of_mathematical_constants"></a><h5>
-<a name="id1312303"></a>
-        <a class="link" href="implementation.html#math_toolkit.backgrounders.implementation.representation_of_mathematical_constants">Representation
+<h5>
+<a name="math_toolkit.backgrounders.implementation.h10"></a>
+        <span><a name="math_toolkit.backgrounders.implementation.representation_of_mathematical_constants"></a></span><a class="link" href="implementation.html#math_toolkit.backgrounders.implementation.representation_of_mathematical_constants">Representation
         of Mathematical Constants</a>
       </h5>
 <p>
@@ -471,17 +471,17 @@
 <p>
         So you cannot write
       </p>
-<pre class="programlisting"><span class="keyword">double</span> <span class="identifier">p</span> <span class="special">=</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">math</span><span class="special">::</span><span class="identifier">constants</span><span class="special">::</span><span class="identifier">pi</span><span class="special">&lt;&gt;();</span>  <span class="comment">// could not deduce template argument for 'T'
-</span></pre>
+<pre class="programlisting"><span class="keyword">double</span> <span class="identifier">p</span> <span class="special">=</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">math</span><span class="special">::</span><span class="identifier">constants</span><span class="special">::</span><span class="identifier">pi</span><span class="special">&lt;&gt;();</span>  <span class="comment">// could not deduce template argument for 'T'</span>
+</pre>
 <p>
         Neither can you write:
       </p>
-<pre class="programlisting"><span class="keyword">double</span> <span class="identifier">p</span> <span class="special">=</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">math</span><span class="special">::</span><span class="identifier">constants</span><span class="special">::</span><span class="identifier">pi</span><span class="special">;</span> <span class="comment">// Context does not allow for disambiguation of overloaded function
-</span><span class="keyword">double</span> <span class="identifier">p</span> <span class="special">=</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">math</span><span class="special">::</span><span class="identifier">constants</span><span class="special">::</span><span class="identifier">pi</span><span class="special">();</span> <span class="comment">// Context does not allow for disambiguation of overloaded function
-</span></pre>
-<a name="math_toolkit.backgrounders.implementation.thread_safety"></a><h5>
-<a name="id1312691"></a>
-        <a class="link" href="implementation.html#math_toolkit.backgrounders.implementation.thread_safety">Thread
+<pre class="programlisting"><span class="keyword">double</span> <span class="identifier">p</span> <span class="special">=</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">math</span><span class="special">::</span><span class="identifier">constants</span><span class="special">::</span><span class="identifier">pi</span><span class="special">;</span> <span class="comment">// Context does not allow for disambiguation of overloaded function</span>
+<span class="keyword">double</span> <span class="identifier">p</span> <span class="special">=</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">math</span><span class="special">::</span><span class="identifier">constants</span><span class="special">::</span><span class="identifier">pi</span><span class="special">();</span> <span class="comment">// Context does not allow for disambiguation of overloaded function</span>
+</pre>
+<h5>
+<a name="math_toolkit.backgrounders.implementation.h11"></a>
+        <span><a name="math_toolkit.backgrounders.implementation.thread_safety"></a></span><a class="link" href="implementation.html#math_toolkit.backgrounders.implementation.thread_safety">Thread
         safety</a>
       </h5>
 <p>
@@ -504,9 +504,9 @@
         next C++ std revision, so hopefully all compilers will be required to do
         the right thing here at some point.
       </p>
-<a name="math_toolkit.backgrounders.implementation.sources_of_test_data"></a><h5>
-<a name="id1312727"></a>
-        <a class="link" href="implementation.html#math_toolkit.backgrounders.implementation.sources_of_test_data">Sources
+<h5>
+<a name="math_toolkit.backgrounders.implementation.h12"></a>
+        <span><a name="math_toolkit.backgrounders.implementation.sources_of_test_data"></a></span><a class="link" href="implementation.html#math_toolkit.backgrounders.implementation.sources_of_test_data">Sources
         of Test Data</a>
       </h5>
 <p>
@@ -545,9 +545,9 @@
         unfortunately it appears to suffer from very poor accuracy in areas where
         the underlying special function is known to be difficult to implement.
       </p>
-<a name="math_toolkit.backgrounders.implementation.creating_and_managing_the_equations"></a><h5>
-<a name="id1312796"></a>
-        <a class="link" href="implementation.html#math_toolkit.backgrounders.implementation.creating_and_managing_the_equations">Creating
+<h5>
+<a name="math_toolkit.backgrounders.implementation.h13"></a>
+        <span><a name="math_toolkit.backgrounders.implementation.creating_and_managing_the_equations"></a></span><a class="link" href="implementation.html#math_toolkit.backgrounders.implementation.creating_and_managing_the_equations">Creating
         and Managing the Equations</a>
       </h5>
 <p>
@@ -608,20 +608,25 @@
 </pre>
 <p>
         Note that unlike the sample config file supplied with SVGMath, this does
-        not make use of the Mathematica 7 font as this lacks sufficient Unicode information
-        for it to be used with either SVGMath or XEP "as is".
+        not make use of the <a href="http://support.wolfram.com/technotes/fonts/windows/latestfonts.html" target="_top">Mathematica
+        7 font</a> as this lacks sufficient Unicode information for it to be
+        used with either SVGMath or XEP "as is".
       </p>
 <p>
         Also note that the SVG files in the repository are almost certainly Windows-specific
         since they reference various Windows Fonts.
       </p>
 <p>
-        PNG files can be created from the SVG's using <a href="http://xmlgraphics.apache.org/batik/tools/rasterizer.html" target="_top">Batik</a>
+        PNG files can be created from the SVGs using <a href="http://xmlgraphics.apache.org/batik/tools/rasterizer.html" target="_top">Batik</a>
         and a command such as:
       </p>
 <pre class="programlisting">java -jar 'C:\download\open\batik-1.7\batik-rasterizer.jar' -dpi 120 *.svg</pre>
 <p>
-        Or using Inkscape and a command such as:
+        Or using Inkscape (File, Export bitmap, Drawing tab, bitmap size (default
+        size, 100 dpi), Filename (default). png)
+      </p>
+<p>
+        or Using Cygwin, a command such as:
       </p>
 <pre class="programlisting">for file in *.svg; do
   /cygdrive/c/progra~1/Inkscape/inkscape -d 120 -e $(cygpath -a -w $(basename $file .svg).png) $(cygpath -a -w $file);
@@ -696,8 +701,8 @@ done</pre>
         &lt;font weight="bold" style="italic"&gt;&lt;font-data ttf="palabi.ttf"/&gt;&lt;/font&gt;
       &lt;/font-family&gt;
 
-    &lt;font-family name<code class="literal">"Lucida Sans Unicode"&gt;
-         &lt;!-- &lt;font&gt;&lt;font-data ttf</code>"lsansuni.ttf"&gt;&lt;<span class="emphasis"><em>font&gt; --&gt;
+    &lt;font-family name="Lucida Sans Unicode"&gt;
+         &lt;!-- &lt;font&gt;&lt;font-data ttf="lsansuni.ttf"&gt;&lt;<span class="emphasis"><em>font&gt; --&gt;
          &lt;!-- actually called l_10646.ttf on Windows 2000 and Vista Sp1 --&gt;
          &lt;font&gt;&lt;font-data ttf="l_10646.ttf"</em></span>&gt;&lt;/font&gt;
     &lt;/font-family&gt;
@@ -718,11 +723,11 @@ done</pre>
         template defined in math.qbk. This outputs Docbook XML that looks like:
       </p>
 <pre class="programlisting">&lt;inlinemediaobject&gt;
-&lt;imageobject role<code class="literal">"html"&gt;
-&lt;imagedata fileref</code>"../equations/myfile.png"&gt;&lt;/imagedata&gt;
+&lt;imageobject role="html"&gt;
+&lt;imagedata fileref="../equations/myfile.png"&gt;&lt;/imagedata&gt;
 &lt;/imageobject&gt;
-&lt;imageobject role<code class="literal">"print"&gt;
-&lt;imagedata fileref</code>"../equations/myfile.svg"&gt;&lt;/imagedata&gt;
+&lt;imageobject role="print"&gt;
+&lt;imagedata fileref="../equations/myfile.svg"&gt;&lt;/imagedata&gt;
 &lt;/imageobject&gt;
 &lt;/inlinemediaobject&gt;
 </pre>
@@ -730,9 +735,9 @@ done</pre>
         MathML is not currently present in the Docbook output, or in the generated
         HTML: this needs further investigation.
       </p>
-<a name="math_toolkit.backgrounders.implementation.producing_graphs"></a><h5>
-<a name="id1313052"></a>
-        <a class="link" href="implementation.html#math_toolkit.backgrounders.implementation.producing_graphs">Producing
+<h5>
+<a name="math_toolkit.backgrounders.implementation.h14"></a>
+        <span><a name="math_toolkit.backgrounders.implementation.producing_graphs"></a></span><a class="link" href="implementation.html#math_toolkit.backgrounders.implementation.producing_graphs">Producing
         Graphs</a>
       </h5>
 <p>
@@ -750,9 +755,8 @@ done</pre>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
 <td align="left"></td>
-<td align="right"><div class="copyright-footer">Copyright &#169; 2006 , 2007, 2008, 2009, 2010 John Maddock, Paul A. Bristow,
-      Hubert Holin, Xiaogang Zhang, Bruno Lalande, Johan R&#229;de, Gautam Sewani and
-      Thijs van den Berg<p>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2006-2010 John Maddock, Paul A. Bristow, Hubert Holin, Xiaogang Zhang, Bruno
+      Lalande, Johan R&#229;de, Gautam Sewani, Thijs van den Berg and Benjamin Sobotta<p>
         Distributed under the Boost Software License, Version 1.0. (See accompanying
         file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
       </p>

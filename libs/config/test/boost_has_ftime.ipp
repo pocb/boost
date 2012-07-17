@@ -6,19 +6,17 @@
 //  See http://www.boost.org/libs/config for most recent version.
 
 //  MACRO:         BOOST_HAS_FTIME
-//  TITLE:         GetSystemTimeAsFileTime
-//  DESCRIPTION:   The platform supports Win32 API GetSystemTimeAsFileTime.
+//  TITLE:         The platform has FTIME.
+//  DESCRIPTION:   The platform supports the Win32 API type FTIME.
 
 #include <windows.h>
 
 
 namespace boost_has_ftime{
 
-void f()
+void f(FILETIME)
 {
     // this is never called, it just has to compile:
-   FILETIME ft;
-   GetSystemTimeAsFileTime(&ft);
 }
 
 int test()

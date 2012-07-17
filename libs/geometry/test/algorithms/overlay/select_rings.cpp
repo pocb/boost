@@ -1,6 +1,6 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
 //
-// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2007-2012 Barend Gehrels, Amsterdam, the Netherlands.
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -18,7 +18,7 @@
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/geometry/geometries/polygon.hpp>
 
-#include <boost/geometry/domains/gis/io/wkt/read_wkt.hpp>
+#include <boost/geometry/io/wkt/read.hpp>
 
 #include <boost/assign/list_of.hpp>
 #include <boost/foreach.hpp>
@@ -50,7 +50,7 @@ void test_geometry(std::string const& wkt1, std::string const& wkt2,
     map_type selected;
     std::map<bg::ring_identifier, int> empty;
 
-    bg::detail::overlay::select_rings<OverlayType>(geometry1, geometry2, empty, selected);
+    bg::detail::overlay::select_rings<OverlayType>(geometry1, geometry2, empty, selected, true);
 
     BOOST_CHECK_EQUAL(selected.size(), expected_ids.size());
     BOOST_CHECK_EQUAL(selected.size(), expected_withins.size());

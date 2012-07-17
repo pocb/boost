@@ -1,9 +1,9 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
 // Unit Test
 
-// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
-// Copyright (c) 2008-2011 Bruno Lalande, Paris, France.
-// Copyright (c) 2009-2011 Mateusz Loskot, London, UK.
+// Copyright (c) 2007-2012 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2012 Bruno Lalande, Paris, France.
+// Copyright (c) 2009-2012 Mateusz Loskot, London, UK.
 
 // Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
 // (geolib/GGL), copyright (c) 1995-2010 Geodan, Amsterdam, the Netherlands.
@@ -161,6 +161,14 @@ void test_assign_conversion()
 	
     ring_type ring;
     bg::assign(ring, b);
+
+    {
+        typedef bg::model::ring<P, false, false> ring_type_ccw;
+        ring_type_ccw ring_ccw;
+        // Should NOT compile (currently): bg::assign(ring_ccw, ring);
+
+    }
+
 
     //std::cout << bg::wkt(b) << std::endl;
     //std::cout << bg::wkt(ring) << std::endl;

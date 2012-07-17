@@ -1,7 +1,7 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
 // Unit Test
 
-// Copyright (c) 2010 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2010-2012 Barend Gehrels, Amsterdam, the Netherlands.
 
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
@@ -17,7 +17,8 @@
 
 #include <boost/geometry/geometry.hpp>
 #include <boost/geometry/geometries/point_xy.hpp>
-#include <boost/geometry/domains/gis/io/wkt/wkt.hpp>
+#include <boost/geometry/geometries/polygon.hpp>
+#include <boost/geometry/io/wkt/wkt.hpp>
 
 #if defined(TEST_WITH_SVG)
 #  include <boost/geometry/extensions/io/svg/svg_mapper.hpp>
@@ -62,7 +63,11 @@ inline typename bg::coordinate_type<Geometry1>::type intersect(Geometry1 const& 
     typedef std::deque<ring_type> out_vector;
     out_vector v;
 
-    bg::traverse<rev<Geometry1>::value, rev<Geometry2>::value>(g1, g2, op, turns, v);
+    bg::detail::overlay::traverse
+        <
+            rev<Geometry1>::value, rev<Geometry2>::value,
+            Geometry1, Geometry2
+        >::apply(g1, g2, op, turns, v);
 
     typename bg::coordinate_type<Geometry1>::type result = 0.0;
     BOOST_FOREACH(ring_type& ring, v)

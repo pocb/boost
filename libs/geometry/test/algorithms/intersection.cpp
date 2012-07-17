@@ -1,9 +1,9 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
 // Unit Test
 
-// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
-// Copyright (c) 2008-2011 Bruno Lalande, Paris, France.
-// Copyright (c) 2009-2011 Mateusz Loskot, London, UK.
+// Copyright (c) 2007-2012 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2012 Bruno Lalande, Paris, France.
+// Copyright (c) 2009-2012 Mateusz Loskot, London, UK.
 
 // Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
 // (geolib/GGL), copyright (c) 1995-2010 Geodan, Amsterdam, the Netherlands.
@@ -15,16 +15,26 @@
 #include <iostream>
 #include <string>
 
+#define BOOST_GEOMETRY_TEST_ONLY_ONE_TYPE
+#define TEST_ISOVIST
+
+//#define BOOST_GEOMETRY_DEBUG_SEGMENT_IDENTIFIER
+//#define BOOST_GEOMETRY_DEBUG_INTERSECTION
 //#define BOOST_GEOMETRY_DEBUG_TRAVERSE
+//#define BOOST_GEOMETRY_DEBUG_FOLLOW
 //#define BOOST_GEOMETRY_DEBUG_ASSEMBLE
 //#define BOOST_GEOMETRY_DEBUG_IDENTIFIER
 
 
+#include <boost/geometry/geometries/point_xy.hpp>
+#include <boost/geometry/geometries/register/linestring.hpp>
+
+#include <boost/geometry/util/rational.hpp>
+
 #include <algorithms/test_intersection.hpp>
 #include <algorithms/test_overlay.hpp>
 
-#include <boost/geometry/geometries/point_xy.hpp>
-#include <boost/geometry/geometries/register/linestring.hpp>
+#include <algorithms/overlay/overlay_cases.hpp>
 
 #include <test_common/test_point.hpp>
 #include <test_common/with_pointer.hpp>
@@ -155,18 +165,53 @@ void test_areal()
         crossed[0], crossed[1],
         3, 0, 1.5);
 
+    typedef typename bg::coordinate_type<Polygon>::type ct;
+
+#ifdef TEST_ISOVIST
 #ifdef _MSC_VER
+    test_one<Polygon, Polygon, Polygon>("isovist",
+        isovist1[0], isovist1[1],
+        1, 20, 88.19203,
+        if_typed_tt<ct>(0.01, 0.1));
+
+    // SQL Server gives: 88.1920416352664
+    // PostGIS gives:    88.19203677911
+
+#endif
+#endif
+
+    //std::cout << typeid(ct).name() << std::endl;
+
+    test_one<Polygon, Polygon, Polygon>("ggl_list_20110306_javier",
+        ggl_list_20110306_javier[0], ggl_list_20110306_javier[1],
+        1, if_typed_tt<ct>(5, 4), 
+        0.6649875, 
+        if_typed<ct, float>(1.0, 0.01)); 
+        
+    test_one<Polygon, Polygon, Polygon>("ggl_list_20110307_javier",
+        ggl_list_20110307_javier[0], ggl_list_20110307_javier[1],
+        1, 4, 0.4, 0.01);
+
+    test_one<Polygon, Polygon, Polygon>("ggl_list_20110627_phillip",
+        ggl_list_20110627_phillip[0], ggl_list_20110627_phillip[1],
+        1, if_typed_tt<ct>(6, 5), 11151.6618);
+
+#ifdef _MSC_VER // gcc/linux behaves differently
+    if (! boost::is_same<ct, float>::value)
     {
-        // Isovist (submitted by Brandon during Formal Review)
-        std::string tn = string_from_type<typename bg::coordinate_type<Polygon>::type>::name();
-        test_one<Polygon, Polygon, Polygon>("isovist",
-            isovist1[0], isovist1[1],
-            1,
-            tn == std::string("f") ? 19 : tn == std::string("d") ? 22 : 20,
-            88.19203,
-            tn == std::string("f") ? 0.5 : tn == std::string("d") ? 0.1 : 0.01);
+        test_one<Polygon, Polygon, Polygon>("ggl_list_20110716_enrico",
+            ggl_list_20110716_enrico[0], ggl_list_20110716_enrico[1],
+            3, 
+            if_typed<ct, float>(19, if_typed<ct, double>(22, 21)),
+            35723.8506317139);
     }
 #endif
+
+    test_one<Polygon, Polygon, Polygon>("buffer_rt_f", buffer_rt_f[0], buffer_rt_f[1],
+                1, 4,  0.00029437899183903937, 0.01);
+
+    test_one<Polygon, Polygon, Polygon>("buffer_rt_g", buffer_rt_g[0], buffer_rt_g[1],
+                1, 0, 2.914213562373);
 
     return;
 
@@ -218,6 +263,7 @@ void test_areal_clip()
         1, 4, 0.75);
 }
 
+
 template <typename Box>
 void test_boxes(std::string const& wkt1, std::string const& wkt2, double expected_area, bool expected_result)
 {
@@ -238,6 +284,70 @@ void test_boxes(std::string const& wkt1, std::string const& wkt2, double expecte
 
 
 template <typename P>
+void test_point_output()
+{
+    typedef bg::model::linestring<P> linestring;
+    typedef bg::model::polygon<P> polygon;
+    typedef bg::model::box<P> box;
+    typedef bg::model::segment<P> segment;
+
+    test_point_output<polygon, polygon>(simplex_normal[0], simplex_normal[1], 6);
+    test_point_output<box, polygon>("box(1 1,6 4)", simplex_normal[0], 4);
+    test_point_output<linestring, polygon>("linestring(0 2,6 2)", simplex_normal[0], 2);
+    // NYI because of sectionize:
+    // test_point_output<segment, polygon>("linestring(0 2,6 2)", simplex_normal[0], 2);
+    // NYI because needs special treatment:
+    // test_point_output<box, box>("box(0 0,4 4)", "box(2 2,6 6)", 2);
+}
+
+
+template <typename Polygon, typename LineString>
+void test_areal_linear()
+{
+    std::string const poly_simplex = "POLYGON((1 1,1 3,3 3,3 1,1 1))";
+
+    test_one_lp<LineString, Polygon, LineString>("simplex", poly_simplex, "LINESTRING(0 2,4 2)", 1, 2, 2.0);
+    test_one_lp<LineString, Polygon, LineString>("case2",   poly_simplex, "LINESTRING(0 1,4 3)", 1, 2, sqrt(5.0));
+    test_one_lp<LineString, Polygon, LineString>("case3", "POLYGON((2 0,2 5,5 5,5 0,2 0))", "LINESTRING(0 1,1 2,3 2,4 3,6 3,7 4)", 1, 4, 2 + sqrt(2.0));
+    test_one_lp<LineString, Polygon, LineString>("case4", "POLYGON((0 0,0 4,2 4,2 0,0 0))", "LINESTRING(1 1,3 2,1 3)", 2, 4, sqrt(5.0));
+
+    test_one_lp<LineString, Polygon, LineString>("case5", poly_simplex, "LINESTRING(0 1,3 4)", 1, 2, sqrt(2.0));
+    test_one_lp<LineString, Polygon, LineString>("case6", "POLYGON((2 0,2 4,3 4,3 1,4 1,4 3,5 3,5 1,6 1,6 3,7 3,7 1,8 1,8 3,9 3,9 0,2 0))", "LINESTRING(1 1,10 3)", 4, 8, 
+            // Pieces are 1 x 2/9:
+            4.0 * sqrt(1.0 + 4.0/81.0));
+    test_one_lp<LineString, Polygon, LineString>("case7", poly_simplex, "LINESTRING(1.5 1.5,2.5 2.5)", 1, 2, sqrt(2.0));
+    test_one_lp<LineString, Polygon, LineString>("case8", poly_simplex, "LINESTRING(1 0,2 0)", 0, 0, 0.0);
+
+    std::string const poly_9 = "POLYGON((1 1,1 4,4 4,4 1,1 1))";
+    test_one_lp<LineString, Polygon, LineString>("case9", poly_9, "LINESTRING(0 1,1 2,2 2)", 1, 2, 1.0);
+    test_one_lp<LineString, Polygon, LineString>("case10", poly_9, "LINESTRING(0 1,1 2,0 2)", 0, 0, 0.0);
+    test_one_lp<LineString, Polygon, LineString>("case11", poly_9, "LINESTRING(2 2,4 2,3 3)", 1, 3, 2.0 + sqrt(2.0));
+    test_one_lp<LineString, Polygon, LineString>("case12", poly_9, "LINESTRING(2 3,4 4,5 6)", 1, 2, sqrt(5.0));
+
+    test_one_lp<LineString, Polygon, LineString>("case13", poly_9, "LINESTRING(3 2,4 4,2 3)", 1, 3, 2.0 * sqrt(5.0));
+    test_one_lp<LineString, Polygon, LineString>("case14", poly_9, "LINESTRING(5 6,4 4,6 5)", 0, 0, 0.0);
+    test_one_lp<LineString, Polygon, LineString>("case15", poly_9, "LINESTRING(0 2,1 2,1 3,0 3)", 1, 2, 1.0);
+    test_one_lp<LineString, Polygon, LineString>("case16", poly_9, "LINESTRING(2 2,1 2,1 3,2 3)", 1, 4, 3.0);
+
+    std::string const angly = "LINESTRING(2 2,2 1,4 1,4 2,5 2,5 3,4 3,4 4,5 4,3 6,3 5,2 5,2 6,0 4)";
+    test_one_lp<LineString, Polygon, LineString>("case17", "POLYGON((1 1,1 5,4 5,4 1,1 1))", angly, 3, 8, 6.0);
+    test_one_lp<LineString, Polygon, LineString>("case18", "POLYGON((1 1,1 5,5 5,5 1,1 1))", angly, 2, 12, 10.0 + sqrt(2.0));
+    test_one_lp<LineString, Polygon, LineString>("case19", poly_9, "LINESTRING(1 2,1 3,0 3)", 1, 2, 1.0);
+    test_one_lp<LineString, Polygon, LineString>("case20", poly_9, "LINESTRING(1 2,1 3,2 3)", 1, 3, 2.0);
+
+    test_one_lp<LineString, Polygon, LineString>("case21", poly_9, "LINESTRING(1 2,1 4,4 4,4 1,2 1,2 2)", 1, 6, 11.0);
+
+    // Compile test - arguments in any order:
+    test_one<LineString, Polygon, LineString>("simplex", poly_simplex, "LINESTRING(0 2,4 2)", 1, 2, 2.0);
+    test_one<LineString, LineString, Polygon>("simplex", "LINESTRING(0 2,4 2)", poly_simplex, 1, 2, 2.0);
+
+    typedef typename bg::point_type<Polygon>::type Point;
+    test_one<LineString, bg::model::ring<Point>, LineString>("simplex", poly_simplex, "LINESTRING(0 2,4 2)", 1, 2, 2.0);
+
+}
+
+
+template <typename P>
 void test_all()
 {
     typedef bg::model::linestring<P> linestring;
@@ -251,12 +361,18 @@ void test_all()
 
     std::string clip = "box(2 2,8 8)";
 
+    test_areal_linear<polygon, linestring>();
+    test_areal_linear<polygon_open, linestring>();
+    test_areal_linear<polygon_ccw, linestring>();
+    test_areal_linear<polygon_ccw_open, linestring>();
+
     // Test polygons clockwise and counter clockwise
     test_areal<polygon>();
 
     test_areal<polygon_ccw>();
     test_areal<polygon_open>();
     test_areal<polygon_ccw_open>();
+
 
     test_areal_clip<polygon, box>();
     test_areal_clip<polygon_ccw, box>();
@@ -310,6 +426,8 @@ void test_all()
     test_boxes<box>("box(2 2,8 7)", "box(4 4,10 10)", 12, true);
     test_boxes<box>("box(2 2,8 7)", "box(14 4,20 10)", 0, false);
     test_boxes<box>("box(2 2,4 4)", "box(4 4,8 8)", 0, true);
+
+    test_point_output<P>();
 
 
     /*
@@ -375,21 +493,33 @@ void test_exception()
     BOOST_CHECK_MESSAGE(false, "No exception thrown");
 }
 
+template <typename Point>
+void test_rational()
+{
+    typedef bg::model::polygon<Point> polygon;
+    test_one<polygon, polygon, polygon>("simplex_normal",
+        simplex_normal[0], simplex_normal[1],
+        1, 7, 5.47363293);
+}
+
+
 int test_main(int, char* [])
 {
-    test_exception<bg::model::d2::point_xy<double> >();
-
     test_all<bg::model::d2::point_xy<double> >();
 
 #if ! defined(BOOST_GEOMETRY_TEST_ONLY_ONE_TYPE)
     test_all<bg::model::d2::point_xy<float> >();
 
 #if defined(HAVE_TTMATH)
+    std::cout << "Testing TTMATH" << std::endl;
     test_all<bg::model::d2::point_xy<ttmath_big> >();
 #endif
 
-    //test_pointer_version();
 #endif
+
+    test_exception<bg::model::d2::point_xy<double> >();
+    test_pointer_version();
+    test_rational<bg::model::d2::point_xy<boost::rational<int> > >();
 
     return 0;
 }

@@ -1,13 +1,32 @@
-#include <iostream>
+
 // Copyright 2006-2009 Daniel James.
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include "../helpers/prefix.hpp"
-
 #include <boost/unordered_set.hpp>
 #include <boost/unordered_map.hpp>
+#include "../helpers/postfix.hpp"
+
+#include <iostream>
 #include "../helpers/test.hpp"
+
+#if defined(BOOST_UNORDERED_VARIADIC_MOVE)
+#   if defined(__SGI_STL_PORT) || defined(_STLPORT_VERSION)
+#   elif defined(__STD_RWCOMPILER_H__) || defined(_RWSTD_VER)
+#   elif defined(_LIBCPP_VERSION)
+#       define BOOST_UNORDERED_VARIADIC_MOVE
+#   elif defined(__GLIBCPP__) || defined(__GLIBCXX__)
+#       if defined(__GLIBCXX__) && __GLIBCXX__ >= 20090804
+#           define BOOST_UNORDERED_VARIADIC_MOVE
+#       endif
+#    elif defined(__STL_CONFIG_H)
+#    elif defined(__MSL_CPP__)
+#    elif defined(__IBMCPP__)
+#    elif defined(MSIPL_COMPILE_H)
+#    elif (defined(_YVALS) && !defined(__IBMCPP__)) || defined(_CPPLIB_VER)
+#   endif
+#endif
 
 namespace unnecessary_copy_tests
 {
@@ -243,11 +262,11 @@ namespace unnecessary_copy_tests
         // the existing element.
         reset();
         x.emplace();
-#if defined(BOOST_UNORDERED_STD_FORWARD_MOVE)
-        COPY_COUNT(1); MOVE_COUNT(0);
-#else
+#if !defined(BOOST_NO_RVALUE_REFERENCES)
         // source_cost doesn't make much sense here, but it seems to fit.
         COPY_COUNT(1); MOVE_COUNT(source_cost);
+#else
+        COPY_COUNT(1); MOVE_COUNT(1 + source_cost);
 #endif
 #endif
 
@@ -355,9 +374,7 @@ namespace unnecessary_copy_tests
 
 #if (defined(__GNUC__) && __GNUC__ > 4) || \
     (defined(__GNUC__) && __GNUC__ == 4 && __GNUC_MINOR__ > 2) || \
-    (defined(BOOST_MSVC) && BOOST_MSVC >= 1600 ) || \
-    (!defined(__GNUC__) && !defined(BOOST_MSVC))
-
+    (defined(BOOST_MSVC) && BOOST_MSVC >= 1600 )
         count_copies part;
         reset();
         std::pair<count_copies const&, count_copies const&> a_ref(part, part);

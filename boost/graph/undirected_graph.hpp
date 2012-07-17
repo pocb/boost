@@ -7,7 +7,6 @@
 #ifndef BOOST_GRAPH_UNDIRECTED_GRAPH_HPP
 #define BOOST_GRAPH_UNDIRECTED_GRAPH_HPP
 
-#include <boost/utility.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/properties.hpp>
 
@@ -413,7 +412,7 @@ template <UNDIRECTED_GRAPH_PARAMS>
 typename UNDIRECTED_GRAPH::vertex_descriptor
 vertex(typename UNDIRECTED_GRAPH::vertices_size_type n,
        UNDIRECTED_GRAPH const& g)
-{ return vertex(g.impl()); }
+{ return vertex(n, g.impl()); }
 
 template <UNDIRECTED_GRAPH_PARAMS>
 std::pair<typename UNDIRECTED_GRAPH::edge_descriptor, bool>

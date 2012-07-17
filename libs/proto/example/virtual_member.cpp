@@ -72,10 +72,10 @@ namespace mini_lambda
         typedef typename N::next next;
         typedef typename N::prior prior;
         typedef typename N::value_type value_type;
-        BOOST_STATIC_CONSTANT(value_type, value = N::value);
+        static const value_type value = N::value;
     };
 
-    // Some keyword types for our lambda DSEL
+    // Some keyword types for our lambda EDSL
     namespace keyword
     {
         struct if_ {};

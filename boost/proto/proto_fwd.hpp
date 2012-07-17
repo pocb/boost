@@ -92,6 +92,22 @@
 # endif
 #endif
 
+#ifndef BOOST_NO_DECLTYPE_N3276
+# // Proto can only use the decltype-based result_of if N3276 has been
+# // implemented by the compiler.
+# // See http://www.open-std.org/JTC1/SC22/WG21/docs/papers/2011/n3276.pdf
+# ifndef BOOST_PROTO_USE_NORMAL_RESULT_OF
+#  define BOOST_PROTO_USE_NORMAL_RESULT_OF
+# endif
+# // If we're using the decltype-based result_of, we need to be a bit
+# // stricter about the return types of some functions.
+# ifndef BOOST_PROTO_STRICT_RESULT_OF
+#  define BOOST_PROTO_STRICT_RESULT_OF
+# endif
+#endif
+
+// Unless compiler support is there, use tr1_result_of instead of
+// result_of to avoid the problems addressed by N3276.
 #ifdef BOOST_PROTO_USE_NORMAL_RESULT_OF
 # define BOOST_PROTO_RESULT_OF boost::result_of
 #else
@@ -100,6 +116,14 @@
 
 #ifdef BOOST_MPL_CFG_EXTENDED_TEMPLATE_PARAMETERS_MATCHING
 # define BOOST_PROTO_EXTENDED_TEMPLATE_PARAMETERS_MATCHING 
+#endif
+
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+# define BOOST_PROTO_DISABLE_MSVC_C4522 __pragma(warning(disable : 4522))  // 'class' : multiple assignment operators specified
+# define BOOST_PROTO_DISABLE_MSVC_C4714 __pragma(warning(disable : 4714))  // function 'xxx' marked as __forceinline not inlined
+#else
+# define BOOST_PROTO_DISABLE_MSVC_C4522 
+# define BOOST_PROTO_DISABLE_MSVC_C4714
 #endif
 
 namespace boost { namespace proto
@@ -187,6 +211,12 @@ namespace boost { namespace proto
         struct not_a_domain;
         struct not_a_grammar;
         struct not_a_generator;
+
+        template<typename T, typename Void = void>
+        struct is_transform_;
+
+        template<typename T, typename Void = void>
+        struct is_aggregate_;
     }
 
     typedef detail::ignore const ignore;
@@ -268,6 +298,9 @@ namespace boost { namespace proto
     }
 
     using namespace tagns_;
+
+    template<typename Expr>
+    struct tag_of;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     struct _;
@@ -359,7 +392,7 @@ namespace boost { namespace proto
     template<typename Condition, typename Then = _, typename Else = not_<_> >
     struct if_;
 
-    template<typename Cases>
+    template<typename Cases, typename Transform = tag_of<_>()>
     struct switch_;
 
     template<typename T>
@@ -460,9 +493,6 @@ namespace boost { namespace proto
 
     template<typename SubDomain, typename SuperDomain>
     struct is_sub_domain_of;
-
-    template<typename Expr>
-    struct tag_of;
 
     template<typename Expr>
     struct arity_of;
@@ -682,10 +712,10 @@ namespace boost { namespace proto
     template<typename T>
     struct is_callable;
 
-    template<typename T, typename Void = void>
+    template<typename T>
     struct is_transform;
 
-    template<typename T, typename Void = void>
+    template<typename T>
     struct is_aggregate;
 
     #define BOOST_PROTO_UNEXPR() typedef int proto_is_expr_;

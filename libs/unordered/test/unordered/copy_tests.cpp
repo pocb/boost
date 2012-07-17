@@ -4,9 +4,10 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include "../helpers/prefix.hpp"
-
 #include <boost/unordered_set.hpp>
 #include <boost/unordered_map.hpp>
+#include "../helpers/postfix.hpp"
+
 #include "../helpers/test.hpp"
 #include "../objects/test.hpp"
 #include "../objects/cxx11_allocator.hpp"
@@ -15,7 +16,7 @@
 #include "../helpers/equivalent.hpp"
 #include "../helpers/invariants.hpp"
 
-test::seed_t seed(9063);
+test::seed_t initialize_seed(9063);
 
 namespace copy_tests
 {

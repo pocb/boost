@@ -1,7 +1,7 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library) 
 // Unit Test
 
-// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2007-2012 Barend Gehrels, Amsterdam, the Netherlands.
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -13,27 +13,25 @@
 #include <iomanip>
 
 #include <boost/foreach.hpp>
-#include <geometry_test_common.hpp>
 
 #include <boost/geometry/algorithms/intersection.hpp>
 #include <boost/geometry/algorithms/area.hpp>
 #include <boost/geometry/algorithms/correct.hpp>
 #include <boost/geometry/algorithms/length.hpp>
 #include <boost/geometry/algorithms/num_points.hpp>
-#include <boost/geometry/algorithms/unique.hpp>
 
 #include <boost/geometry/geometries/geometries.hpp>
 
 #include <boost/geometry/strategies/strategies.hpp>
 
-#include <boost/geometry/domains/gis/io/wkt/wkt.hpp>
+#include <boost/geometry/io/wkt/wkt.hpp>
 
 
 #if defined(TEST_WITH_SVG)
 #  include <boost/geometry/extensions/io/svg/svg_mapper.hpp>
 #endif
 
-
+#include <geometry_test_common.hpp>
 
 
 template <typename OutputType, typename CalculationType, typename G1, typename G2>
@@ -42,11 +40,14 @@ typename bg::default_area_result<G1>::type test_intersection(std::string const& 
         std::size_t expected_count = 0, std::size_t expected_point_count = 0,
         double expected_length_or_area = 0,
         double percentage = 0.0001,
-        bool make_unique = true)
+        bool debug = false)
 {
     static const bool is_line = bg::geometry_id<OutputType>::type::value == 2;
 
-    //std::cout << caseid << std::endl;
+    if (debug)
+    {
+        std::cout << std::endl << "case " << caseid << std::endl;
+    }
 
 
     typedef typename bg::coordinate_type<G1>::type coordinate_type;
@@ -62,6 +63,7 @@ typename bg::default_area_result<G1>::type test_intersection(std::string const& 
         > strategy;
 
     // Check both normal behaviour, and _inserter behaviour
+    if (! debug)
     {
         std::vector<OutputType> out;
         bg::intersection(g1, g2, out);
@@ -78,30 +80,18 @@ typename bg::default_area_result<G1>::type test_intersection(std::string const& 
     {
         if (expected_point_count > 0)
         {
-            if (make_unique)
-            {
-                // Get a correct point-count without duplicate points
-                // (note that overlay might be adapted to avoid duplicates)
-                bg::unique(*it);
-                n += bg::num_points(*it, true);
-            }
-            else
-            {
-                n += bg::num_points(*it, true);
-            }
+            n += bg::num_points(*it, true);
         }
 
         // instead of specialization we check it run-time here
-        length_or_area += is_line
+        length_or_area += is_line 
             ? bg::length(*it)
             : bg::area(*it);
 
-        /*
-        std::cout << std::endl << "case " << caseid << " ";
-        std::cout
-            << std::setprecision(20)
-            << bg::dsv(*it) << std::endl;
-        */
+        if (debug)
+        {
+            std::cout << std::setprecision(20) << bg::wkt(*it) << std::endl;
+        }
     }
 
 
@@ -126,7 +116,8 @@ typename bg::default_area_result<G1>::type test_intersection(std::string const& 
                 );
     }
 
-    BOOST_CHECK_CLOSE(length_or_area, expected_length_or_area, percentage);
+    double const detected_length_or_area = boost::numeric_cast<double>(length_or_area);
+    BOOST_CHECK_CLOSE(detected_length_or_area, expected_length_or_area, percentage);
 #endif
 
 
@@ -171,6 +162,11 @@ typename bg::default_area_result<G1>::type test_intersection(std::string const& 
     }
 #endif
 
+    if (debug)
+    {
+        std::cout << "end case " << caseid << std::endl;
+    }
+
     return length_or_area;
 }
 
@@ -180,7 +176,7 @@ typename bg::default_area_result<G1>::type test_one(std::string const& caseid,
         std::size_t expected_count = 0, std::size_t expected_point_count = 0,
         double expected_length_or_area = 0,
         double percentage = 0.0001,
-        bool make_unique = true)
+        bool debug = false)
 {
     G1 g1;
     bg::read_wkt(wkt1, g1);
@@ -194,9 +190,52 @@ typename bg::default_area_result<G1>::type test_one(std::string const& caseid,
 
     return test_intersection<OutputType, void>(caseid, g1, g2,
         expected_count, expected_point_count,
-        expected_length_or_area, percentage, make_unique);
+        expected_length_or_area, percentage,
+        debug);
 }
 
+template <typename OutputType, typename Areal, typename Linear>
+void test_one_lp(std::string const& caseid,
+        std::string const& wkt_areal, std::string const& wkt_linear,
+        std::size_t expected_count = 0, std::size_t expected_point_count = 0,
+        double expected_length = 0,
+        double percentage = 0.0001,
+        bool debug1 = false, bool debug2 = false)
+{
+    Areal areal;
+    bg::read_wkt(wkt_areal, areal);
+    bg::correct(areal);
+
+    Linear linear;
+    bg::read_wkt(wkt_linear, linear);
+
+    test_intersection<OutputType, void>(caseid, areal, linear,
+        expected_count, expected_point_count,
+        expected_length, percentage, debug1);
+
+    // A linestring reversed should deliver exactly the same.
+    bg::reverse(linear);
+
+    test_intersection<OutputType, void>(caseid + "_rev", areal, linear,
+        expected_count, expected_point_count,
+        expected_length, percentage, debug2);
+}
+
+template <typename Geometry1, typename Geometry2>
+void test_point_output(std::string const& wkt1, std::string const& wkt2, unsigned int expected_count)
+{
+    Geometry1 g1;
+    bg::read_wkt(wkt1, g1);
+    bg::correct(g1);
+        
+    Geometry2 g2;
+    bg::read_wkt(wkt2, g2);
+    bg::correct(g2);
+
+    std::vector<typename bg::point_type<Geometry1>::type> points;
+    bg::intersection(g1, g2, points);
+    BOOST_CHECK_EQUAL(points.size(), expected_count);
+}
 
 
 #endif
