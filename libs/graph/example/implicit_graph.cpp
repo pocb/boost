@@ -4,7 +4,7 @@
 //    (See accompanying file LICENSE_1_0.txt or copy at
 //          http://www.boost.org/LICENSE_1_0.txt)
 
-
+#include <boost/concept/assert.hpp>
 #include <boost/graph/adjacency_iterator.hpp>
 #include <boost/graph/dijkstra_shortest_paths.hpp>
 #include <boost/graph/graph_concepts.hpp>
@@ -444,15 +444,15 @@ int main (int argc, char const *argv[]) {
   // Check the concepts that graph models.  This is included to demonstrate
   // how concept checking works, but is not required for a working program
   // since Boost algorithms do their own concept checking.
-  function_requires< BidirectionalGraphConcept<ring_graph> >();
-  function_requires< AdjacencyGraphConcept<ring_graph> >();
-  function_requires< VertexListGraphConcept<ring_graph> >();
-  function_requires< EdgeListGraphConcept<ring_graph> >();
-  function_requires< AdjacencyMatrixConcept<ring_graph> >();
-  function_requires<
-    ReadablePropertyMapConcept<const_edge_weight_map, edge_descriptor> >();
-  function_requires<
-    ReadablePropertyGraphConcept<ring_graph, edge_descriptor, edge_weight_t> >();
+  BOOST_CONCEPT_ASSERT(( BidirectionalGraphConcept<ring_graph> ));
+  BOOST_CONCEPT_ASSERT(( AdjacencyGraphConcept<ring_graph> ));
+  BOOST_CONCEPT_ASSERT(( VertexListGraphConcept<ring_graph> ));
+  BOOST_CONCEPT_ASSERT(( EdgeListGraphConcept<ring_graph> ));
+  BOOST_CONCEPT_ASSERT(( AdjacencyMatrixConcept<ring_graph> ));
+  BOOST_CONCEPT_ASSERT((
+    ReadablePropertyMapConcept<const_edge_weight_map, edge_descriptor> ));
+  BOOST_CONCEPT_ASSERT((
+    ReadablePropertyGraphConcept<ring_graph, edge_descriptor, edge_weight_t> ));
 
   // Specify the size of the graph on the command line, or use a default size
   // of 5.
@@ -460,7 +460,6 @@ int main (int argc, char const *argv[]) {
 
   // Create a small ring graph.
   ring_graph g(n);
-  const_edge_weight_map m = get(edge_weight, g);
 
   // Print the outgoing edges of all the vertices.  For n=5 this will print:
   //
@@ -473,18 +472,18 @@ int main (int argc, char const *argv[]) {
   // 5 vertices
   std::cout << "Vertices, outgoing edges, and adjacent vertices" << std::endl;
   vertex_iterator vi, vi_end;
-  for (tie(vi, vi_end) = vertices(g); vi != vi_end; vi++) {
+  for (boost::tie(vi, vi_end) = vertices(g); vi != vi_end; vi++) {
     vertex_descriptor u = *vi;
     std::cout << "Vertex " << u << ": ";
     // Adjacenct edges
     out_edge_iterator ei, ei_end;
-    for (tie(ei, ei_end) = out_edges(u, g); ei != ei_end; ei++)
+    for (boost::tie(ei, ei_end) = out_edges(u, g); ei != ei_end; ei++)
       std::cout << *ei << "  ";
     std::cout << " Adjacent vertices ";
     // Adjacent vertices
     // Here we want our adjacency_iterator and not boost::adjacency_iterator.
     ::adjacency_iterator ai, ai_end;
-    for (tie(ai, ai_end) = adjacent_vertices(u, g); ai != ai_end; ai++) {
+    for (boost::tie(ai, ai_end) = adjacent_vertices(u, g); ai != ai_end; ai++) {
       std::cout << *ai << " ";
     }
     std::cout << std::endl;
@@ -503,7 +502,7 @@ int main (int argc, char const *argv[]) {
   // 5 edges
   std::cout << "Edges and weights" << std::endl;
   edge_iterator ei, ei_end;
-  for (tie(ei, ei_end) = edges(g); ei != ei_end; ei++) {
+  for (boost::tie(ei, ei_end) = edges(g); ei != ei_end; ei++) {
     edge_descriptor e = *ei;
     std::cout << e << " weight " << get(edge_weight, g, e) << std::endl;
   }
@@ -528,7 +527,7 @@ int main (int argc, char const *argv[]) {
                             distance_map(&dist[0]) );
 
     std::cout << "Dijkstra search from vertex " << source << std::endl;
-    for (tie(vi, vi_end) = vertices(g); vi != vi_end; ++vi) {
+    for (boost::tie(vi, vi_end) = vertices(g); vi != vi_end; ++vi) {
       vertex_descriptor u = *vi;
       std::cout << "Vertex " << u << ": "
                 << "parent "<< pred[*vi] << ", "

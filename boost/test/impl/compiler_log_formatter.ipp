@@ -16,13 +16,14 @@
 #define BOOST_TEST_COMPILER_LOG_FORMATTER_IPP_020105GER
 
 // Boost.Test
-#include <boost/test/output/compiler_log_formatter.hpp>
-#include <boost/test/unit_test_suite_impl.hpp>
 #include <boost/test/framework.hpp>
+#include <boost/test/execution_monitor.hpp>
+#include <boost/test/tree/test_unit.hpp>
 #include <boost/test/utils/basic_cstring/io.hpp>
 #include <boost/test/utils/lazy_ostream.hpp>
 #include <boost/test/utils/setcolor.hpp>
-#include <boost/test/detail/unit_test_parameters.hpp>
+#include <boost/test/output/compiler_log_formatter.hpp>
+#include <boost/test/unit_test_parameters.hpp>
 
 // Boost
 #include <boost/version.hpp>
@@ -35,9 +36,7 @@
 //____________________________________________________________________________//
 
 namespace boost {
-
 namespace unit_test {
-
 namespace output {
 
 // ************************************************************************** //
@@ -183,19 +182,19 @@ compiler_log_formatter::log_entry_start( std::ostream& output, log_entry_data co
             print_prefix( output, entry_data.m_file_name, entry_data.m_line_num );
             if( runtime_config::color_output() )
                 output << setcolor( term_attr::BRIGHT, term_color::YELLOW );
-            output << "warning in \"" << test_phase_identifier() << "\": ";
+            output << "warning: in \"" << test_phase_identifier() << "\": ";
             break;
         case BOOST_UTL_ET_ERROR:
             print_prefix( output, entry_data.m_file_name, entry_data.m_line_num );
             if( runtime_config::color_output() )
                 output << setcolor( term_attr::BRIGHT, term_color::RED );
-            output << "error in \"" << test_phase_identifier() << "\": ";
+            output << "error: in \"" << test_phase_identifier() << "\": ";
             break;
         case BOOST_UTL_ET_FATAL_ERROR:
             print_prefix( output, entry_data.m_file_name, entry_data.m_line_num );
             if( runtime_config::color_output() )
                 output << setcolor( term_attr::BLINK, term_color::RED );
-            output << "fatal error in \"" << test_phase_identifier() << "\": ";
+            output << "fatal error: in \"" << test_phase_identifier() << "\": ";
             break;
     }
 }
@@ -269,12 +268,8 @@ compiler_log_formatter::log_entry_context( std::ostream& output, const_string co
 //____________________________________________________________________________//
 
 } // namespace output
-
 } // namespace unit_test
-
 } // namespace boost
-
-//____________________________________________________________________________//
 
 #include <boost/test/detail/enable_warnings.hpp>
 

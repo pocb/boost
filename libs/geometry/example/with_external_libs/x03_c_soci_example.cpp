@@ -1,6 +1,6 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
 //
-// Copyright (c) 2009-2011 Mateusz Loskot, London, UK.
+// Copyright (c) 2009-2012 Mateusz Loskot, London, UK.
 //
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
@@ -32,7 +32,7 @@
 #include <boost/geometry/geometries/geometries.hpp>
 #include <boost/geometry/extensions/gis/io/wkb/read_wkb.hpp>
 #include <boost/geometry/extensions/gis/io/wkb/utility.hpp>
-#include <boost/geometry/domains/gis/io/wkt/wkt.hpp>
+#include <boost/geometry/io/wkt/wkt.hpp>
 
 // user-defined type with GGL geometry
 struct tree

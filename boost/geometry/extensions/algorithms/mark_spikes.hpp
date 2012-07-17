@@ -1,6 +1,6 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
 
-// Copyright (c) 2010-2011 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2010-2012 Barend Gehrels, Amsterdam, the Netherlands.
 
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
@@ -122,7 +122,7 @@ inline void part_area_and_perimeter(Range const& range,
     // Do the same for distance to get correct ratio (though this might be discussed)
     perimeter += distance_strategy.apply(*it2, *it1);
 
-    area = abs(area_strategy.result(area_state));
+    area = geometry::math::abs(area_strategy.result(area_state));
 }
 
 

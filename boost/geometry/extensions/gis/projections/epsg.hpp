@@ -1,6 +1,6 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
 
-// Copyright (c) 2008-2011 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2012 Barend Gehrels, Amsterdam, the Netherlands.
 
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
@@ -17,7 +17,7 @@
 // Only to be included if EPSG codes are necessary.
 // It is not included automatically
 
-namespace boost { namespace geometry { namespace projection
+namespace boost { namespace geometry { namespace projections
 {
 
 
@@ -3563,6 +3563,6 @@ inline parameters init(int epsg_code)
     return detail::pj_init_plus(args, false);
 }
 
-}}} // namespace boost::geometry::projection
+}}} // namespace boost::geometry::projections
 
 #endif

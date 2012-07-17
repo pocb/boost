@@ -1,7 +1,7 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
 // This file is manually converted from PROJ4
 
-// Copyright (c) 2008-2011 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2012 Barend Gehrels, Amsterdam, the Netherlands.
 
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
@@ -55,7 +55,7 @@
 #include <boost/geometry/extensions/gis/geographic/strategies/dms_parser.hpp>
 
 
-namespace boost { namespace geometry { namespace projection
+namespace boost { namespace geometry { namespace projections
 {
 
 
@@ -257,7 +257,7 @@ parameters pj_init(R const& arguments, bool use_defaults = true)
 
 inline parameters pj_init_plus(std::string const& definition, bool use_defaults = true)
 {
-    static const char* sep = " +";
+    const char* sep = " +";
 
     /* split into arguments based on '+' and trim white space */
 
@@ -296,6 +296,6 @@ inline parameters pj_init_plus(std::string const& definition, bool use_defaults 
 }
 
 } // namespace detail
-}}} // namespace boost::geometry::projection
+}}} // namespace boost::geometry::projections
 
 #endif // BOOST_GEOMETRY_PROJECTIONS_IMPL_PJ_INIT_HPP

@@ -1,7 +1,7 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
 // This file is manually converted from PROJ4
 
-// Copyright (c) 2008-2011 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2012 Barend Gehrels, Amsterdam, the Netherlands.
 
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
@@ -35,39 +35,36 @@
 #ifndef BOOST_GEOMETRY_PROJECTIONS_IMPL_ADJLON_HPP
 #define BOOST_GEOMETRY_PROJECTIONS_IMPL_ADJLON_HPP
 
-#include <cmath>
-
 #include <boost/math/constants/constants.hpp>
 #include <boost/geometry/util/math.hpp>
 
-#include <boost/geometry/extensions/gis/projections/impl/projects.hpp>
-
-namespace boost { namespace geometry { namespace projection
+namespace boost { namespace geometry { namespace projections
 {
 
 namespace detail
 {
 
 /* reduce argument to range +/- PI */
-inline double adjlon (double lon)
+template <typename T>
+inline T adjlon (T lon)
 {
-    static const double SPI = 3.14159265359;
-    static const double TWOPI = 6.2831853071795864769;
-    static const double ONEPI = 3.14159265358979323846;
-
-    if (geometry::math::abs(lon) <= SPI)
+    if (geometry::math::abs(lon) <= boost::math::constants::pi<T>())
     {
         return lon;
     }
 
-    lon += ONEPI;  /* adjust to 0..2pi rad */
-    lon -= TWOPI * std::floor(lon / TWOPI); /* remove integral # of 'revolutions'*/
-    lon -= ONEPI;  /* adjust back to -pi..pi rad */
+    /* adjust to 0..2pi rad */
+    lon += boost::math::constants::pi<T>();
+    /* remove integral # of 'revolutions'*/
+    lon -= boost::math::constants::two_pi<T>() *
+                std::floor(lon / boost::math::constants::two_pi<T>());
+    /* adjust back to -pi..pi rad */
+    lon -= boost::math::constants::pi<T>();
 
     return lon;
 }
 
 } // namespace detail
-}}} // namespace boost::geometry::projection
+}}} // namespace boost::geometry::projections
 
 #endif // BOOST_GEOMETRY_PROJECTIONS_IMPL_ADJLON_HPP

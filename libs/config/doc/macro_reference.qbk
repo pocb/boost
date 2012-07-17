@@ -16,11 +16,11 @@
 
 [#config_defects]
 
-[section Macros that describe defects]
+[section Macros that describe C++03 defects]
 
-The following macros all describe features that are required by the C++ standard,
+The following macros all describe features that are required by the C++03 standard,
 if one of the following macros is defined, then it represents a defect in the
-compiler's conformance with the standard.
+compiler's conformance with the 2003 standard.
 
 
 [table
@@ -514,11 +514,10 @@ standard).
 
 [endsect]
 
-[section Macros that describe possible C++0x features]
+[section Macros that describe possible C++ future features]
 
-The following macros describe features that are likely to be included in the
-upcoming ISO C++ standard, C++0x, but have not yet been approved for inclusion
-in the language.
+The following macros describe features that may be included in some future
+ISO C++ standard, but have not yet been approved for inclusion in the language.
 
 
 [table
@@ -531,32 +530,36 @@ The compiler supports  concepts.
 
 [endsect]
 
-[section Macros that describe C++0x features not supported]
+[section Macros that describe C++11 features not supported]
 
-The following macros describe features in the upcoming ISO C++ standard, C++0x,
+The following macros describe features in the 2011 ISO C++ standard, formerly known as C++0x,
 that are not yet supported by a particular compiler or library.
 
 [table
 [[Macro     ][Description     ]]
 
-[[`BOOST_NO_0X_HDR_ARRAY`][The standard library does not provide header <array>.]]
-[[`BOOST_NO_0X_HDR_CHRONO`][The standard library does not provide header <chrono>.]]
-[[`BOOST_NO_0X_HDR_CODECVT`][The standard library does not provide header <codecvt>.]]
-[[`BOOST_NO_0X_HDR_CONDITION_VARIABLE`][The standard library does not provide header <condition_variable>.]]
-[[`BOOST_NO_0X_HDR_FORWARD_LIST`][The standard library does not provide header <forward_list>.]]
-[[`BOOST_NO_0X_HDR_FUTURE`][The standard library does not provide header <future>.]]
-[[`BOOST_NO_0X_HDR_INITIALIZER_LIST`][The standard library does not provide header <initializer_list>.]]
-[[`BOOST_NO_0X_HDR_MUTEX`][The standard library does not provide header <mutex>.]]
-[[`BOOST_NO_0X_HDR_RANDOM`][The standard library does not provide header <random>.]]
-[[`BOOST_NO_0X_HDR_RATIO`][The standard library does not provide header <ratio>.]]
-[[`BOOST_NO_0X_HDR_REGEX`][The standard library does not provide header <regex>.]]
-[[`BOOST_NO_0X_HDR_SYSTEM_ERROR`][The standard library does not provide header <system_error>.]]
-[[`BOOST_NO_0X_HDR_THREAD`][The standard library does not provide header <thread>.]]
-[[`BOOST_NO_0X_HDR_TUPLE`][The standard library does not provide header <tuple>.]]
-[[`BOOST_NO_0X_HDR_TYPEINDEX`][The standard library does not provide header <typeindex>.]]
-[[`BOOST_NO_0X_HDR_TYPE_TRAITS`][The standard library does not provide header <type_traits>.]]
-[[`BOOST_NO_0X_HDR_UNORDERED_MAP`][The standard library does not provide header <unordered_map>.]]
-[[`BOOST_NO_0X_HDR_UNORDERED_SET`][The standard library does not provide header <unordered_set>.]]
+[[`BOOST_NO_CXX11_ALLOCATOR`][The standard library does not provide a C++11 version of `std::allocator` in <memory>.]]
+[[`BOOST_NO_CXX11_ATOMIC_SP`][The standard library <memory> does not support atomic smart pointer operations.]]
+[[`BOOST_NO_CXX11_HDR_ARRAY`][The standard library does not provide header <array>.]]
+[[`BOOST_NO_CXX11_HDR_CHRONO`][The standard library does not provide header <chrono>.]]
+[[`BOOST_NO_CXX11_HDR_CODECVT`][The standard library does not provide header <codecvt>.]]
+[[`BOOST_NO_CXX11_HDR_CONDITION_VARIABLE`][The standard library does not provide header <condition_variable>.]]
+[[`BOOST_NO_CXX11_HDR_FORWARD_LIST`][The standard library does not provide header <forward_list>.]]
+[[`BOOST_NO_CXX11_HDR_FUNCTIONAL`][The standard library does not provide a C++11 compatible version of <functional>.]]
+[[`BOOST_NO_CXX11_HDR_FUTURE`][The standard library does not provide header <future>.]]
+[[`BOOST_NO_CXX11_HDR_INITIALIZER_LIST`][The standard library does not provide header <initializer_list>.]]
+[[`BOOST_NO_CXX11_HDR_MUTEX`][The standard library does not provide header <mutex>.]]
+[[`BOOST_NO_CXX11_HDR_RANDOM`][The standard library does not provide header <random>.]]
+[[`BOOST_NO_CXX11_HDR_RATIO`][The standard library does not provide header <ratio>.]]
+[[`BOOST_NO_CXX11_HDR_REGEX`][The standard library does not provide header <regex>.]]
+[[`BOOST_NO_CXX11_HDR_SYSTEM_ERROR`][The standard library does not provide header <system_error>.]]
+[[`BOOST_NO_CXX11_HDR_THREAD`][The standard library does not provide header <thread>.]]
+[[`BOOST_NO_CXX11_HDR_TUPLE`][The standard library does not provide header <tuple>.]]
+[[`BOOST_NO_CXX11_HDR_TYPEINDEX`][The standard library does not provide header <typeindex>.]]
+[[`BOOST_NO_CXX11_HDR_TYPE_TRAITS`][The standard library does not provide header <type_traits>.]]
+[[`BOOST_NO_CXX11_HDR_UNORDERED_MAP`][The standard library does not provide header <unordered_map>.]]
+[[`BOOST_NO_CXX11_HDR_UNORDERED_SET`][The standard library does not provide header <unordered_set>.]]
+[[`BOOST_NO_CXX11_SMART_PTR`][The standard library header <memory> has no shared_ptr and unique_ptr.]]
 
 [[`BOOST_NO_AUTO_DECLARATIONS`][The compiler does not support
 type deduction for variables declared with the `auto` keyword (`auto var = ...;`).
@@ -597,11 +600,13 @@ explicit instantiation forward declarations for templates (`extern template ...`
 [[`BOOST_NO_FUNCTION_TEMPLATE_DEFAULT_ARGS`][The compiler does not support
 default template arguments for function templates.
 ]]
-[[`BOOST_NO_INITIALIZER_LISTS`][
-The C++ compiler does not support C++0x initializer lists.
-]]
 [[`BOOST_NO_LAMBDAS`][The compiler does not support Lambdas. 
 ]]                      
+[[`BOOST_NO_LOCAL_CLASS_TEMPLATE_PARAMETERS`][The compiler does not allow to
+pass local classes as template parameters (this macro intentionally does not
+control passing of unnamed types as template parameters, see also
+[@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2008/n2657.htm N2657]).
+]]
 [[`BOOST_NO_LONG_LONG`][The compiler does not support `long long`.
 ]]                
 [[`BOOST_NO_NOEXCEPT`][The compiler does not support `noexcept`. 
@@ -636,6 +641,76 @@ variadic templates.
 ]]
 [[`BOOST_NO_VARIADIC_MACROS`][The compiler does not support
 variadic macros. 
+]]
+]
+
+[endsect]
+
+[#config_11_for_03]
+
+[section Macros that allow use of C++11 features with C++03 compilers]
+
+The following macros allow use of C++11 features even with compilers that do not yet
+provide compliant C++11 support.
+
+[table
+[[Macro        ][ Description          ]]
+
+[[`BOOST_CONSTEXPR`][
+Some compilers don't support the use of `constexpr`. This macro expands to nothing on those compilers, and `constexpr`
+elsewhere. For example, when defining a constexpr function or constructor replace:
+``
+  constexpr tuple();
+``
+with:
+``
+  BOOST_CONSTEXPR tuple();
+``
+]]
+[[`BOOST_CONSTEXPR_OR_CONST`][
+Some compilers don't support the use of `constexpr`. This macro expands to `const` on those compilers, and `constexpr`
+elsewhere. For example, when defining const expr variables replace:
+``
+  static constexpr UIntType xor_mask = a;
+``
+with:
+``
+  static BOOST_CONSTEXPR_OR_CONST UIntType xor_mask = a;
+``
+]]
+[[`BOOST_STATIC_CONSTEXPR`][
+This is a shortcut for `static BOOST_CONSTEXPR_OR_CONST`. For example, when defining const expr variables replace:
+``
+  static constexpr UIntType xor_mask = a;
+``
+with:
+``
+  BOOST_STATIC_CONSTEXPR UIntType xor_mask = a;
+``
+]]
+[[
+``
+  BOOST_NOEXCEPT
+  BOOST_NOEXCEPT_IF(Predicate)
+  BOOST_NOEXCEPT_EXPR(Expression)
+``
+][
+If `BOOST_NO_NOEXCEPT` is defined (i.e. C++03 compliant compilers) these macros are defined as:
+[:
+``
+  #define BOOST_NOEXCEPT
+  #define BOOST_NOEXCEPT_IF(Predicate)
+  #define BOOST_NOEXCEPT_EXPR(Expression) false
+``
+]
+If `BOOST_NO_NOEXCEPT` is not defined (i.e. C++11 compliant compilers) they are defined as:
+[:
+``
+  #define BOOST_NOEXCEPT noexcept
+  #define BOOST_NOEXCEPT_IF(Predicate) noexcept((Predicate))
+  #define BOOST_NOEXCEPT_EXPR(Expression) noexcept((Expression))
+``
+]
 ]]
 ]
 
@@ -784,7 +859,7 @@ must be used when the macro invocation appears after a normal parameter
 declaration or after the invocation of another macro of this same group.
 ]]
 [[`BOOST_USE_FACET(Type, loc)`][
-When the standard library does not have a comforming `std::use_facet` there
+When the standard library does not have a conforming `std::use_facet` there
 are various workarounds available, but they differ from library to library.
 This macro provides a consistent way to access a locale's facets. For example,
 replace:
@@ -820,37 +895,25 @@ the arguments is itself a macro (see 16.3.1 in C++ standard). This is normally
 used to create a mangled name in combination with a predefined macro such a
 \_\_LINE__.
 ]]
-[[`BOOST_CONSTEXPR`][
-Some compilers don't support the use of `constexpr`. This macro expands to nothing on those compilers, and `constexpr`
-elsewhere. For example, when defining a constexpr function or constructor replace:
+[[`BOOST_FORCEINLINE`][
+This macro can be used in place of the `inline` keyword to instruct the compiler
+that a function should always be inlined.
+Overuse of this macro can lead to significant bloat, while good use can increase
+performance in certain cases, such as computation-intensive code built through
+generative programming techniques.
+
+Usage example:
 ``
-  constexpr tuple();
+  template<class T>
+  BOOST_FORCEINLINE T& f(T& t)
+  {
+      return t;
+  }
 ``
-with:
-``
-  BOOST_CONSTEXPR tuple();
-``
-]]
-[[`BOOST_CONSTEXPR_OR_CONST`][
-Some compilers don't support the use of `constexpr`. This macro expands to `const` on those compilers, and `constexpr`
-elsewhere. For example, when defining const expr variables replace:
-``
-  static constexpr UIntType xor_mask = a;
-``
-with:
-``
-  static BOOST_CONSTEXPR_OR_CONST UIntType xor_mask = a;
-``
-]]
-[[`BOOST_STATIC_CONSTEXPR`][
-This is a shortcut for `static BOOST_CONSTEXPR_OR_CONST`For example, when defining const expr variables replace:
-``
-  static constexpr UIntType xor_mask = a;
-``
-with:
-``
-  BOOST_STATIC_CONSTEXPR UIntType xor_mask = a;
-``
+
+Note that use of this macro can lead to cryptic error messages with some compilers.
+Consider defining it to `inline` before including the Boost.Config header in order to be
+able to debug errors more easily.
 ]]
 ]
 
@@ -919,6 +982,41 @@ library in use. Mainly for debugging the configuration.
 Defined as a string describing the name of the platform. Mainly for debugging
 the configuration.
 ]]
+]
+
+[endsect]
+
+[#deprecated_macros]
+
+[section Boost Deprecated Macros]
+
+The following have been deprecated; please use the replacements instead.
+They will be removed in a future version of boost.
+
+[table
+
+[[Deprecated Macro][Replacement][When deprecated][When removed]]
+
+[[`BOOST_NO_0X_HDR_ARRAY`][`BOOST_NO_CXX11_HDR_ARRAY`][Boost 1.50][]]
+[[`BOOST_NO_0X_HDR_CHRONO`][`BOOST_NO_CXX11_HDR_CHRONO`][Boost 1.50][]]
+[[`BOOST_NO_0X_HDR_CODECVT`][`BOOST_NO_CXX11_HDR_CODECVT`][Boost 1.50][]]
+[[`BOOST_NO_0X_HDR_CONDITION_VARIABLE`][`BOOST_NO_CXX11_HDR_CONDITION_VARIABLE`][Boost 1.50][]]
+[[`BOOST_NO_0X_HDR_FORWARD_LIST`][`BOOST_NO_CXX11_HDR_FORWARD_LIST`][Boost 1.50][]]
+[[`BOOST_NO_0X_HDR_FUTURE`][`BOOST_NO_CXX11_HDR_FUTURE`][Boost 1.50][]]
+[[`BOOST_NO_0X_HDR_INITIALIZER_LIST`][`BOOST_NO_CXX11_HDR_INITIALIZER_LIST`][Boost 1.50][]]
+[[`BOOST_NO_INITIALIZER_LISTS`][`BOOST_NO_CXX11_HDR_INITIALIZER_LIST`][Boost 1.50][]]
+[[`BOOST_NO_0X_HDR_MUTEX`][`BOOST_NO_CXX11_HDR_MUTEX`][Boost 1.50][]]
+[[`BOOST_NO_0X_HDR_RANDOM`][`BOOST_NO_CXX11_HDR_RANDOM`][Boost 1.50][]]
+[[`BOOST_NO_0X_HDR_RATIO`][`BOOST_NO_CXX11_HDR_RATIO`][Boost 1.50][]]
+[[`BOOST_NO_0X_HDR_REGEX`][`BOOST_NO_CXX11_HDR_REGEX`][Boost 1.50][]]
+[[`BOOST_NO_0X_HDR_SYSTEM_ERROR`][`BOOST_NO_CXX11_HDR_SYSTEM_ERROR`][Boost 1.50][]]
+[[`BOOST_NO_0X_HDR_THREAD`][`BOOST_NO_CXX11_HDR_THREAD`][Boost 1.50][]]
+[[`BOOST_NO_0X_HDR_TUPLE`][`BOOST_NO_CXX11_HDR_TUPLE`][Boost 1.50][]]
+[[`BOOST_NO_0X_HDR_TYPE_TRAITS`][`BOOST_NO_CXX11_HDR_TYPE_TRAITS`][Boost 1.50][]]
+[[`BOOST_NO_0X_HDR_TYPEINDEX`][`BOOST_NO_CXX11_HDR_TYPEINDEX`][Boost 1.50][]]
+[[`BOOST_NO_0X_HDR_UNORDERED_SET`][`BOOST_NO_CXX11_HDR_UNORDERED_SET`][Boost 1.50][]]
+[[`BOOST_NO_0X_HDR_UNORDERED_MAP`][`BOOST_NO_CXX11_HDR_UNORDERED_MAP`][Boost 1.50][]]
+[[`BOOST_NO_STD_UNORDERED`][`BOOST_NO_CXX11_HDR_UNORDERED_SET`][Boost 1.50][]]
 ]
 
 [endsect]

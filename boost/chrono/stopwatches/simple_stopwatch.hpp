@@ -7,12 +7,13 @@
 #ifndef BOOST_CHRONO_STOPWATCHES_SIMPLE_STOPWATCH__HPP
 #define BOOST_CHRONO_STOPWATCHES_SIMPLE_STOPWATCH__HPP
 
-#include <utility>
+#include <boost/chrono/config.hpp>
 
 #include <boost/chrono/chrono.hpp>
 #include <boost/system/error_code.hpp>
 #include <boost/chrono/thread_clock.hpp>
 #include <boost/chrono/process_cpu_clocks.hpp>
+#include <utility>
 
 namespace boost
 {
@@ -31,13 +32,14 @@ namespace boost
       typedef typename Clock::time_point time_point;
       typedef typename Clock::rep rep;
       typedef typename Clock::period period;
-      BOOST_CHRONO_STATIC_CONSTEXPR bool is_steady =             Clock::is_steady;
+      BOOST_STATIC_CONSTEXPR bool is_steady =             Clock::is_steady;
 
 
-      simple_stopwatch() BOOST_CHRONO_NOEXCEPT :
+      simple_stopwatch() BOOST_NOEXCEPT :
         start_(clock::now())
       {
       }
+#if !defined BOOST_CHRONO_DONT_PROVIDE_HYBRID_ERROR_HANDLING
       explicit simple_stopwatch(system::error_code & ec) :
         start_(duration::zero())
       {
@@ -51,15 +53,18 @@ namespace boost
         }
         start_ = tmp;
       }
+#endif
 
-      ~simple_stopwatch() BOOST_CHRONO_NOEXCEPT
+      ~simple_stopwatch() BOOST_NOEXCEPT
       {
       }
 
-      duration elapsed() BOOST_CHRONO_NOEXCEPT
+      duration elapsed() BOOST_NOEXCEPT
       {
         return clock::now() - start_;
       }
+
+#if !defined BOOST_CHRONO_DONT_PROVIDE_HYBRID_ERROR_HANDLING
       duration elapsed(system::error_code & ec)
       {
         time_point tmp = clock::now(ec);
@@ -70,6 +75,7 @@ namespace boost
         }
         return tmp - start_;
       }
+#endif
 
     private:
       time_point start_;

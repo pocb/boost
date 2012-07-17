@@ -90,7 +90,12 @@ void test_empty_allocator()
 {
     typedef empty_allocator<int> allocator;
     typedef boost::unordered::detail::allocator_traits<allocator> traits;
+#if BOOST_UNORDERED_USE_ALLOCATOR_TRAITS == 1
+    BOOST_MPL_ASSERT((boost::is_same<traits::size_type,
+        std::make_unsigned<std::ptrdiff_t>::type>));
+#else
     BOOST_MPL_ASSERT((boost::is_same<traits::size_type, std::size_t>));
+#endif
     BOOST_MPL_ASSERT((boost::is_same<traits::difference_type, std::ptrdiff_t>));
     BOOST_MPL_ASSERT((boost::is_same<traits::pointer, int*>));
     BOOST_MPL_ASSERT((boost::is_same<traits::const_pointer, int const*>));
@@ -123,7 +128,12 @@ void test_allocator1()
 {
     typedef allocator1<int> allocator;
     typedef boost::unordered::detail::allocator_traits<allocator> traits;
+#if BOOST_UNORDERED_USE_ALLOCATOR_TRAITS == 1
+    BOOST_MPL_ASSERT((boost::is_same<traits::size_type,
+        std::make_unsigned<std::ptrdiff_t>::type>));
+#else
     BOOST_MPL_ASSERT((boost::is_same<traits::size_type, std::size_t>));
+#endif
     BOOST_MPL_ASSERT((boost::is_same<traits::difference_type, std::ptrdiff_t>));
     BOOST_MPL_ASSERT((boost::is_same<traits::pointer, int*>));
     BOOST_MPL_ASSERT((boost::is_same<traits::const_pointer, int const*>));
@@ -136,8 +146,17 @@ void test_allocator1()
 
 // allocator 2
 
+template <typename Alloc>
+struct allocator2_base
+{
+    Alloc select_on_container_copy_construction() const {
+        ++selected;
+        return Alloc();
+    }
+};
+
 template <typename T>
-struct allocator2
+struct allocator2 : allocator2_base<allocator2<T> >
 {
     typedef T value_type;
     typedef T* pointer;
@@ -149,12 +168,6 @@ struct allocator2
     typedef no_type propagate_on_container_copy_assignment;
     typedef no_type propagate_on_container_move_assignment;
     typedef no_type propagate_on_container_swap;
-
-    // Note: Not const - so it shouldn't be called.
-    allocator2<T> select_on_container_copy_construction() {
-        ++selected;
-        return allocator2<T>();
-    }
 };
 
 void test_allocator2()
@@ -169,7 +182,7 @@ void test_allocator2()
     BOOST_TEST(!traits::propagate_on_container_copy_assignment::value);
     BOOST_TEST(!traits::propagate_on_container_move_assignment::value);
     BOOST_TEST(!traits::propagate_on_container_swap::value);
-    BOOST_TEST(call_select<allocator>() == 0);
+    BOOST_TEST(call_select<allocator>() == 1);
 }
 
 // allocator 3
@@ -181,6 +194,20 @@ struct ptr
     
     ptr(void* v) : value_((T*) v) {}
     T& operator*() const { return *value_; }
+};
+
+template <>
+struct ptr<void>
+{
+    void* value_;
+    ptr(void* v) : value_(v) {}
+};
+
+template <>
+struct ptr<const void>
+{
+    void const* value_;
+    ptr(void const* v) : value_(v) {}
 };
 
 template <typename T>

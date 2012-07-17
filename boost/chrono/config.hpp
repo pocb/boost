@@ -1,7 +1,7 @@
 //  boost/chrono/config.hpp  -------------------------------------------------//
 
 //  Copyright Beman Dawes 2003, 2006, 2008
-//  Copyright 2009 Vicente J. Botet Escriba
+//  Copyright 2009-2011 Vicente J. Botet Escriba
 
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -12,6 +12,14 @@
 #define BOOST_CHRONO_CONFIG_HPP
 
 #include <boost/config.hpp>
+
+#if !defined BOOST_CHRONO_VERSION
+#define BOOST_CHRONO_VERSION 1
+#else
+#if BOOST_CHRONO_VERSION!=1  && BOOST_CHRONO_VERSION!=2
+#error "BOOST_CHRONO_VERSION must be 1 or 2"
+#endif
+#endif
 
 #if defined(BOOST_CHRONO_SOURCE) && !defined(BOOST_USE_WINDOWS_H)
 #define BOOST_USE_WINDOWS_H
@@ -37,19 +45,30 @@
 # elif !defined( BOOST_CHRONO_WINDOWS_API ) && !defined( BOOST_CHRONO_MAC_API ) && !defined( BOOST_CHRONO_POSIX_API )
 #   if (defined(_WIN32) || defined(__WIN32__) || defined(WIN32))
 #     define BOOST_CHRONO_WINDOWS_API
-#     define BOOST_CHRONO_HAS_CLOCK_STEADY
-#     define BOOST_CHRONO_HAS_THREAD_CLOCK
-#     define BOOST_CHRONO_THREAD_CLOCK_IS_STEADY true
 #   elif defined(macintosh) || defined(__APPLE__) || defined(__APPLE_CC__)
 #     define BOOST_CHRONO_MAC_API
-#     define BOOST_CHRONO_HAS_CLOCK_STEADY
-#     define BOOST_CHRONO_THREAD_CLOCK_IS_STEADY true
 #   else
 #     define BOOST_CHRONO_POSIX_API
 #   endif
 # endif
 
+# if defined( BOOST_CHRONO_WINDOWS_API )
+#   ifndef UNDER_CE
+#     define BOOST_CHRONO_HAS_PROCESS_CLOCKS
+#   endif
+#   define BOOST_CHRONO_HAS_CLOCK_STEADY
+#   define BOOST_CHRONO_HAS_THREAD_CLOCK
+#   define BOOST_CHRONO_THREAD_CLOCK_IS_STEADY true
+# endif
+
+# if defined( BOOST_CHRONO_MAC_API )
+#   define BOOST_CHRONO_HAS_PROCESS_CLOCKS
+#   define BOOST_CHRONO_HAS_CLOCK_STEADY
+#   define BOOST_CHRONO_THREAD_CLOCK_IS_STEADY true
+# endif
+
 # if defined( BOOST_CHRONO_POSIX_API )
+#   define BOOST_CHRONO_HAS_PROCESS_CLOCKS
 #   include <time.h>  //to check for CLOCK_REALTIME and CLOCK_MONOTONIC and _POSIX_THREAD_CPUTIME
 #   if defined(CLOCK_REALTIME)
 #     if defined(CLOCK_MONOTONIC)
@@ -66,6 +85,10 @@
 #     define BOOST_CHRONO_HAS_THREAD_CLOCK
 #     define BOOST_CHRONO_THREAD_CLOCK_IS_STEADY true
 #   endif
+#   if defined(sun) || defined(__sun)
+#     undef BOOST_CHRONO_HAS_THREAD_CLOCK
+#     undef BOOST_CHRONO_THREAD_CLOCK_IS_STEADY
+#   endif
 # endif
 
 #if defined(BOOST_CHRONO_THREAD_DISABLED) && defined(BOOST_CHRONO_HAS_THREAD_CLOCK)
@@ -73,10 +96,7 @@
 #undef BOOST_CHRONO_THREAD_CLOCK_IS_STEADY
 #endif
 
-#ifdef UNDER_CE
-#else
-#define BOOST_CHRONO_HAS_PROCESS_CLOCKS
-#endif
+//#undef BOOST_CHRONO_HAS_PROCESS_CLOCKS
 
 // unicode support  ------------------------------//
 
@@ -86,30 +106,17 @@
 #define BOOST_CHRONO_HAS_UNICODE_SUPPORT 1
 #endif
 
-//  define constexpr related macros  ------------------------------//
-
-#if defined(BOOST_NO_CONSTEXPR)
-#define BOOST_CHRONO_CONSTEXPR
-#define BOOST_CHRONO_CONSTEXPR_OR_CONST const
-#define BOOST_CHRONO_CONST_REF const&
-#else
-#define BOOST_CHRONO_CONSTEXPR constexpr
-#define BOOST_CHRONO_CONSTEXPR_OR_CONST constexpr
-#define BOOST_CHRONO_CONST_REF
-#endif
-
+#if ! defined BOOST_NOEXCEPT
 #if defined(BOOST_NO_NOEXCEPT)
-#define BOOST_CHRONO_NOEXCEPT
+#define BOOST_NOEXCEPT
 #else
-#define BOOST_CHRONO_NOEXCEPT noexcept
+#define BOOST_NOEXCEPT noexcept
 #endif
-
-#define BOOST_CHRONO_STATIC_CONSTEXPR  static BOOST_CHRONO_CONSTEXPR_OR_CONST
-
+#endif
 
 #ifdef BOOST_CHRONO_HEADER_ONLY
 #define BOOST_CHRONO_INLINE inline
-#define BOOST_CHRONO_STATIC
+#define BOOST_CHRONO_STATIC inline
 #define BOOST_CHRONO_DECL
 
 #else
@@ -136,6 +143,7 @@
 #define BOOST_CHRONO_DECL
 #endif
 
+//#define  BOOST_CHRONO_DONT_PROVIDE_HYBRID_ERROR_HANDLING
 
 //  enable automatic library variant selection  ------------------------------//
 
@@ -158,4 +166,3 @@
 #endif  // auto-linking disabled
 #endif // BOOST_CHRONO_HEADER_ONLY
 #endif // BOOST_CHRONO_CONFIG_HPP
-

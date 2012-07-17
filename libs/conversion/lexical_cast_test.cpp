@@ -100,17 +100,17 @@ void test_wallocator();
 #endif
 void test_char_types_conversions();
 void operators_overload_test();
-#ifndef BOOST_NO_CHAR16_T
+#if !defined(BOOST_NO_CHAR16_T) && !defined(BOOST_NO_UNICODE_LITERALS)
 void test_char16_conversions();
 #endif
-#ifndef BOOST_NO_CHAR32_T
+#if !defined(BOOST_NO_CHAR32_T) && !defined(BOOST_NO_UNICODE_LITERALS)
 void test_char32_conversions();
 #endif
 
 
 unit_test::test_suite *init_unit_test_suite(int, char *[])
 {
-    unit_test_framework::test_suite *suite =
+    unit_test::test_suite *suite =
         BOOST_TEST_SUITE("lexical_cast unit test");
     suite->add(BOOST_TEST_CASE(test_conversion_to_char));
     suite->add(BOOST_TEST_CASE(test_conversion_to_int));
@@ -149,10 +149,10 @@ unit_test::test_suite *init_unit_test_suite(int, char *[])
 
     suite->add(BOOST_TEST_CASE(&test_char_types_conversions));
     suite->add(BOOST_TEST_CASE(&operators_overload_test));
-#ifndef BOOST_NO_CHAR16_T
+#if !defined(BOOST_NO_CHAR16_T) && !defined(BOOST_NO_UNICODE_LITERALS)
     suite->add(BOOST_TEST_CASE(&test_char16_conversions));
 #endif
-#ifndef BOOST_NO_CHAR32_T
+#if !defined(BOOST_NO_CHAR32_T) && !defined(BOOST_NO_UNICODE_LITERALS)
     suite->add(BOOST_TEST_CASE(&test_char32_conversions));
 #endif
 
@@ -427,7 +427,6 @@ void test_conversion_to_wstring()
     BOOST_CHECK(str == lexical_cast<std::wstring>(str));
     BOOST_CHECK(L"123" == lexical_cast<std::wstring>(123));
     BOOST_CHECK(L"1.23" == lexical_cast<std::wstring>(1.23));
-    BOOST_CHECK(L"1.111111111" == lexical_cast<std::wstring>(1.111111111));
     BOOST_CHECK(L"1" == lexical_cast<std::wstring>(true));
     BOOST_CHECK(L"0" == lexical_cast<std::wstring>(false));
 #if !defined(BOOST_NO_INTRINSIC_WCHAR_T)
@@ -756,12 +755,12 @@ void test_conversion_from_to_integral()
     test_conversion_from_integral_to_char<T>(wzero);
     test_conversion_from_char_to_integral<T>(wzero);
 #endif
-#ifndef BOOST_NO_CHAR16_T
+#if !defined(BOOST_NO_CHAR16_T) && !defined(BOOST_NO_UNICODE_LITERALS)
     char16_t const u16zero = u'0';
     test_conversion_from_integral_to_char<T>(u16zero);
     test_conversion_from_char_to_integral<T>(u16zero);
 #endif
-#ifndef BOOST_NO_CHAR32_T
+#if !defined(BOOST_NO_CHAR32_T) && !defined(BOOST_NO_UNICODE_LITERALS)
     char32_t const u32zero = u'0';
     test_conversion_from_integral_to_char<T>(u32zero);
     test_conversion_from_char_to_integral<T>(u32zero);
@@ -795,6 +794,17 @@ void test_conversion_from_to_integral()
     BOOST_CHECK_THROW(lexical_cast<T>("--1"), bad_lexical_cast);
     BOOST_CHECK_THROW(lexical_cast<T>("+-9"), bad_lexical_cast);
     // test_conversion_from_to_integral_for_locale
+
+    // Overflow test case from David W. Birdsall
+    std::string must_owerflow_str = "160000000000000000000";
+    std::string must_owerflow_negative_str = "-160000000000000000000";
+    for (int i = 0; i < 15; ++i) {
+        BOOST_CHECK_THROW(lexical_cast<T>(must_owerflow_str), bad_lexical_cast);
+        BOOST_CHECK_THROW(lexical_cast<T>(must_owerflow_negative_str), bad_lexical_cast);
+
+        must_owerflow_str += '0';
+        must_owerflow_negative_str += '0';
+    }
 
     typedef std::numpunct<char> numpunct;
 
@@ -1014,7 +1024,7 @@ void operators_overload_test()
 }
 
 
-#ifndef BOOST_NO_CHAR16_T
+#if !defined(BOOST_NO_CHAR16_T) && !defined(BOOST_NO_UNICODE_LITERALS)
 void test_char16_conversions()
 {
     BOOST_CHECK(u"100" == lexical_cast<std::u16string>(u"100"));
@@ -1022,7 +1032,7 @@ void test_char16_conversions()
 }
 #endif
 
-#ifndef BOOST_NO_CHAR32_T
+#if !defined(BOOST_NO_CHAR16_T) && !defined(BOOST_NO_UNICODE_LITERALS)
 void test_char32_conversions()
 {
     BOOST_CHECK(U"100" == lexical_cast<std::u32string>(U"100"));

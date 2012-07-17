@@ -23,6 +23,61 @@ namespace boost { namespace math {
 
 namespace detail {
 
+template <class T, class Policy>
+struct cyl_bessel_i_small_z
+{
+   typedef T result_type;
+
+   cyl_bessel_i_small_z(T v_, T z_) : k(0), v(v_), mult(z_*z_/4) 
+   {
+      BOOST_MATH_STD_USING
+      term = 1;
+   }
+
+   T operator()()
+   {
+      T result = term;
+      ++k;
+      term *= mult / k;
+      term /= k + v;
+      return result;
+   }
+private:
+   unsigned k;
+   T v;
+   T term;
+   T mult;
+};
+
+template <class T, class Policy>
+inline T bessel_i_small_z_series(T v, T x, const Policy& pol)
+{
+   BOOST_MATH_STD_USING
+   T prefix;
+   if(v < max_factorial<T>::value)
+   {
+      prefix = pow(x / 2, v) / boost::math::tgamma(v + 1, pol);
+   }
+   else
+   {
+      prefix = v * log(x / 2) - boost::math::lgamma(v + 1, pol);
+      prefix = exp(prefix);
+   }
+   if(prefix == 0)
+      return prefix;
+
+   cyl_bessel_i_small_z<T, Policy> s(v, x);
+   boost::uintmax_t max_iter = policies::get_max_series_iterations<Policy>();
+#if BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x582))
+   T zero = 0;
+   T result = boost::math::tools::sum_series(s, boost::math::policies::get_epsilon<T, Policy>(), max_iter, zero);
+#else
+   T result = boost::math::tools::sum_series(s, boost::math::policies::get_epsilon<T, Policy>(), max_iter);
+#endif
+   policies::check_series_iterations<T>("boost::math::bessel_j_small_z_series<%1%>(%1%,%1%)", max_iter, pol);
+   return prefix * result;
+}
+
 // Calculate K(v, x) and K(v+1, x) by method analogous to
 // Temme, Journal of Computational Physics, vol 21, 343 (1976)
 template <typename T, typename Policy>
@@ -64,6 +119,17 @@ int temme_ik(T v, T x, T* K, T* K1, const Policy& pol)
     coef = 1;
     sum = coef * f;
     sum1 = coef * h;
+
+    BOOST_MATH_INSTRUMENT_VARIABLE(p);
+    BOOST_MATH_INSTRUMENT_VARIABLE(q);
+    BOOST_MATH_INSTRUMENT_VARIABLE(f);
+    BOOST_MATH_INSTRUMENT_VARIABLE(sigma);
+    BOOST_MATH_INSTRUMENT_CODE(sinh(sigma));
+    BOOST_MATH_INSTRUMENT_VARIABLE(gamma1);
+    BOOST_MATH_INSTRUMENT_VARIABLE(gamma2);
+    BOOST_MATH_INSTRUMENT_VARIABLE(c);
+    BOOST_MATH_INSTRUMENT_VARIABLE(d);
+    BOOST_MATH_INSTRUMENT_VARIABLE(a);
 
     // series summation
     tolerance = tools::epsilon<T>();
@@ -282,6 +348,8 @@ int bessel_ik(T v, T x, T* I, T* K, int kind, const Policy& pol)
     {
         CF2_ik(u, x, &Ku, &Ku1, pol);               // continued fraction CF2_ik
     }
+    BOOST_MATH_INSTRUMENT_VARIABLE(Ku);
+    BOOST_MATH_INSTRUMENT_VARIABLE(Ku1);
     prev = Ku;
     current = Ku1;
     T scale = 1;
@@ -300,6 +368,8 @@ int bessel_ik(T v, T x, T* I, T* K, int kind, const Policy& pol)
     }
     Kv = prev;
     Kv1 = current;
+    BOOST_MATH_INSTRUMENT_VARIABLE(Kv);
+    BOOST_MATH_INSTRUMENT_VARIABLE(Kv1);
     if(kind & need_i)
     {
        T lim = (4 * v * v + 10) / (8 * x);
@@ -315,7 +385,7 @@ int bessel_ik(T v, T x, T* I, T* K, int kind, const Policy& pol)
           // to get here - probably we're going to overflow:
           Iv = asymptotic_bessel_i_large_x(v, x, pol);
        }
-       else if((x / v < 0.25) && (v > 0))
+       else if((v > 0) && (x / v < 0.25))
        {
           Iv = bessel_i_small_z_series(v, x, pol);
        }

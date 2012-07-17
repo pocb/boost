@@ -1,7 +1,7 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
 // Unit Test
 
-// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2007-2012 Barend Gehrels, Amsterdam, the Netherlands.
 
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
@@ -58,7 +58,7 @@ BOOST_GEOMETRY_REGISTER_BOOST_TUPLE_CS(cs::cartesian)
 // ----------------------------------------------------------------------------
 
 template <typename G>
-void test_geometry(G const& geometry, int expected_size = 0)
+void test_geometry(G const& geometry, std::size_t expected_size = 0)
 {
 #if defined(BOOST_GEOMETRY_TEST_RING)
     BOOST_CONCEPT_ASSERT( (bg::concept::ConstRing<G>) );

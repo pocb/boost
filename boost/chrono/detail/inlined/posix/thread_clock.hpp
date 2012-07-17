@@ -15,11 +15,12 @@
 #include <cassert>
 
 # include <sys/times.h>
+# include <pthread.h>
 # include <unistd.h>
 
 namespace boost { namespace chrono {
 
-    thread_clock::time_point thread_clock::now( ) BOOST_CHRONO_NOEXCEPT
+    thread_clock::time_point thread_clock::now( ) BOOST_NOEXCEPT
     {
       struct timespec ts;
 #if defined CLOCK_THREAD_CPUTIME_ID
@@ -43,7 +44,9 @@ namespace boost { namespace chrono {
             static_cast<thread_clock::rep>( ts.tv_sec ) * 1000000000 + ts.tv_nsec));
 
     }
-    thread_clock::time_point thread_clock::now( system::error_code & ec ) 
+
+#if !defined BOOST_CHRONO_DONT_PROVIDE_HYBRID_ERROR_HANDLING
+    thread_clock::time_point thread_clock::now( system::error_code & ec )
     {
       struct timespec ts;
 #if defined CLOCK_THREAD_CPUTIME_ID
@@ -62,9 +65,9 @@ namespace boost { namespace chrono {
             if (BOOST_CHRONO_IS_THROWS(ec))
             {
                 boost::throw_exception(
-                        system::system_error( 
-                                errno, 
-                                BOOST_CHRONO_SYSTEM_CATEGORY, 
+                        system::system_error(
+                                errno,
+                                BOOST_CHRONO_SYSTEM_CATEGORY,
                                 "chrono::thread_clock" ));
             }
             else
@@ -73,7 +76,7 @@ namespace boost { namespace chrono {
                 return time_point();
             }
         }
-        if (!BOOST_CHRONO_IS_THROWS(ec)) 
+        if (!BOOST_CHRONO_IS_THROWS(ec))
         {
             ec.clear();
         }
@@ -82,4 +85,5 @@ namespace boost { namespace chrono {
             static_cast<thread_clock::rep>( ts.tv_sec ) * 1000000000 + ts.tv_nsec));
 
     }
+#endif
 } }

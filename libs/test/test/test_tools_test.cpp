@@ -16,9 +16,9 @@
 #define BOOST_TEST_MAIN
 #include <boost/test/unit_test.hpp>
 #include <boost/test/unit_test_log.hpp>
-#include <boost/test/output_test_stream.hpp>
+#include <boost/test/tools/output_test_stream.hpp>
 #include <boost/test/execution_monitor.hpp>
-#include <boost/test/detail/unit_test_parameters.hpp>
+#include <boost/test/unit_test_parameters.hpp>
 #include <boost/test/output/compiler_log_formatter.hpp>
 #include <boost/test/framework.hpp>
 
@@ -269,7 +269,10 @@ TEST_CASE( test_BOOST_CHECK_THROW )
     CHECK_CRITICAL_TOOL_USAGE( BOOST_REQUIRE_THROW( i++, my_exception ) );
 
     unit_test_log.set_threshold_level( log_successful_tests );
-    BOOST_CHECK_THROW( throw my_exception(), my_exception ); // unreachable code warning is expected
+    if( i/10 > 10 )
+    {}
+    else 
+        BOOST_CHECK_THROW( throw my_exception(), my_exception ); // unreachable code warning is expected
 }
 
 //____________________________________________________________________________//
@@ -287,7 +290,9 @@ TEST_CASE( test_BOOST_CHECK_EXCEPTION )
 TEST_CASE( test_BOOST_CHECK_NO_THROW )
 {
     int i=0;
-    BOOST_CHECK_NO_THROW( i++ );
+    if( i*10 == 0 )
+        BOOST_CHECK_NO_THROW( i++ );
+    else {}
 
     BOOST_CHECK_NO_THROW( throw my_exception() ); // unreachable code warning is expected
 }
@@ -597,6 +602,49 @@ BOOST_AUTO_TEST_CASE( test_argument_handling )
 
 //____________________________________________________________________________//
 
+TEST_CASE( test_context_logging )
+{
+    BOOST_TEST_INFO( "some context" );
+    BOOST_CHECK( false );
+
+    int i = 12;
+    BOOST_TEST_INFO( "some more context: " << i );
+    BOOST_CHECK( false );
+
+    BOOST_TEST_INFO( "info 1" );
+    BOOST_TEST_INFO( "info 2" );
+    BOOST_TEST_INFO( "info 3" );
+    BOOST_CHECK( false );
+
+    BOOST_TEST_CONTEXT( "some sticky context" ) {
+        BOOST_CHECK( false );
+
+        BOOST_TEST_INFO( "more context" );
+        BOOST_CHECK( false );
+
+        BOOST_TEST_INFO( "different subcontext" );
+        BOOST_CHECK( false );
+    }
+
+    BOOST_TEST_CONTEXT( "outer context" ) {
+        BOOST_CHECK( false );
+
+        BOOST_TEST_CONTEXT( "inner context" ) {
+            BOOST_CHECK( false );
+        }
+
+        BOOST_CHECK( false );
+    }
+}
+
+//____________________________________________________________________________//
+
+TEST_CASE( test_BOOST_CHECKA )
+{
+    BOOST_CHECKA( true );
+}
+
+//____________________________________________________________________________//
 
 // !! CHECK_SMALL
 

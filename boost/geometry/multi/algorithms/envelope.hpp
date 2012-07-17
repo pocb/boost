@@ -1,8 +1,8 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
 
-// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
-// Copyright (c) 2008-2011 Bruno Lalande, Paris, France.
-// Copyright (c) 2009-2011 Mateusz Loskot, London, UK.
+// Copyright (c) 2007-2012 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2012 Bruno Lalande, Paris, France.
+// Copyright (c) 2009-2012 Mateusz Loskot, London, UK.
 
 // Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
 // (geolib/GGL), copyright (c) 1995-2010 Geodan, Amsterdam, the Netherlands.
@@ -34,9 +34,9 @@ namespace detail { namespace envelope
 {
 
 
-template<typename MultiLinestring, typename Box>
 struct envelope_multi_linestring
 {
+    template<typename MultiLinestring, typename Box>
     static inline void apply(MultiLinestring const& mp, Box& mbr)
     {
         assign_inverse(mbr);
@@ -52,9 +52,9 @@ struct envelope_multi_linestring
 
 
 // version for multi_polygon: outer ring's of all polygons
-template<typename MultiPolygon, typename Box>
 struct envelope_multi_polygon
 {
+    template<typename MultiPolygon, typename Box>
     static inline void apply(MultiPolygon const& mp, Box& mbr)
     {
         assign_inverse(mbr);
@@ -78,32 +78,20 @@ struct envelope_multi_polygon
 namespace dispatch
 {
 
-template
-<
-    typename Multi, typename Box,
-    typename StrategyLess, typename StrategyGreater
->
-struct envelope<multi_point_tag, box_tag, Multi, Box, StrategyLess, StrategyGreater>
-    : detail::envelope::envelope_range<Multi, Box>
+template <typename Multi>
+struct envelope<Multi, multi_point_tag>
+    : detail::envelope::envelope_range
 {};
 
-template
-<
-    typename Multi, typename Box,
-    typename StrategyLess, typename StrategyGreater
->
-struct envelope<multi_linestring_tag, box_tag, Multi, Box, StrategyLess, StrategyGreater>
-    : detail::envelope::envelope_multi_linestring<Multi, Box>
+template <typename Multi>
+struct envelope<Multi, multi_linestring_tag>
+    : detail::envelope::envelope_multi_linestring
 {};
 
 
-template
-<
-    typename Multi, typename Box,
-    typename StrategyLess, typename StrategyGreater
->
-struct envelope<multi_polygon_tag, box_tag, Multi, Box, StrategyLess, StrategyGreater>
-    : detail::envelope::envelope_multi_polygon<Multi, Box>
+template <typename Multi>
+struct envelope<Multi, multi_polygon_tag>
+    : detail::envelope::envelope_multi_polygon
 {};
 
 

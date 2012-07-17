@@ -1,6 +1,6 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
 
-// Copyright (c) 2008-2011 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2012 Barend Gehrels, Amsterdam, the Netherlands.
 
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
@@ -13,7 +13,7 @@
 #include <string>
 #include <boost/geometry/extensions/gis/projections/impl/projects.hpp>
 
-namespace boost { namespace geometry { namespace projection
+namespace boost { namespace geometry { namespace projections
 {
 
 /*!
@@ -35,6 +35,10 @@ class projection
         typedef double XY_T;
 
     public :
+
+        typedef LL geographic_point_type; ///< latlong point type
+        typedef XY cartesian_point_type;  ///< xy point type
+
         /// Forward projection, from Latitude-Longitude to Cartesian
         virtual bool forward(LL const& lp, XY& xy) const = 0;
 
@@ -57,7 +61,7 @@ class projection
 
 };
 
-}}} // namespace boost::geometry::projection
+}}} // namespace boost::geometry::projections
 
 
 

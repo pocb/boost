@@ -1,6 +1,6 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
 
-// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2007-2012 Barend Gehrels, Amsterdam, the Netherlands.
 
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
@@ -11,7 +11,7 @@
 
 #include <cmath>
 
-namespace boost { namespace geometry { namespace projection
+namespace boost { namespace geometry { namespace projections
 {
 
 // Functions to resolve ambiguity when compiling with coordinates of different types
@@ -30,6 +30,6 @@ inline int int_floor(double f)
     return int(std::floor(f));
 }
 
-}}} // namespace boost::geometry::projection
+}}} // namespace boost::geometry::projections
 
 #endif // BOOST_GEOMETRY_PROJECTIONS_IMPL_FUNCTION_OVERLOADS_HPP

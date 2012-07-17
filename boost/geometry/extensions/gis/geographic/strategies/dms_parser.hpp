@@ -1,6 +1,6 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
 
-// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2007-2012 Barend Gehrels, Amsterdam, the Netherlands.
 
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
@@ -38,7 +38,11 @@
 #include <string>
 
 #include <boost/static_assert.hpp>
+
+#if !defined(BOOST_GEOMETRY_NO_LEXICAL_CAST)
 #include <boost/lexical_cast.hpp>
+#endif // !defined(BOOST_GEOMETRY_NO_LEXICAL_CAST)
+
 #include <boost/algorithm/string.hpp>
 
 #include <boost/geometry/core/cs.hpp>
@@ -129,7 +133,11 @@ namespace strategy
         template <size_t I>
         static inline void assign_dms(dms_value& dms, std::string& value, bool& has_value)
         {
+#if !defined(BOOST_GEOMETRY_NO_LEXICAL_CAST)
             dms.dms[I] = boost::lexical_cast<double>(value.c_str());
+#else // !defined(BOOST_GEOMETRY_NO_LEXICAL_CAST)
+            dms.dms[I] = std::atof(value.c_str());
+#endif // !defined(BOOST_GEOMETRY_NO_LEXICAL_CAST)
             dms.has_dms[I] = true;
             has_value = false;
             value.clear();

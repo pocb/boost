@@ -1,5 +1,5 @@
 [library Boost.Functional/Hash
-    [quickbook 1.4]
+    [quickbook 1.5]
     [authors [James, Daniel]]
     [copyright 2005 2006 2007 2008 Daniel James]
     [purpose A TR1 hash function object that can be extended to hash user
@@ -14,11 +14,16 @@
     ]
 ]
 
+[def __issues__
+    [@http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2005/n1837.pdf
+    Library Extension Technical Report Issues List]]
+
 [include:hash intro.qbk]
 [include:hash tutorial.qbk]
 [include:hash portability.qbk]
 [include:hash disable.qbk]
 [include:hash changes.qbk]
+[include:hash rationale.qbk]
 [xinclude ref.xml]
 [include:hash links.qbk]
 [include:hash thanks.qbk]

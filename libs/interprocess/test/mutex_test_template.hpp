@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////
 //
-// (C) Copyright Ion Gaztanaga 2004-2009. Distributed under the Boost
+// (C) Copyright Ion Gaztanaga 2004-2011. Distributed under the Boost
 // Software License, Version 1.0. (See accompanying file
 // LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
@@ -26,9 +26,9 @@
 #include "boost_interprocess_check.hpp"
 #include "util.hpp"
 #include <boost/thread/thread.hpp>
-#include <iostream>
 #include <boost/interprocess/sync/scoped_lock.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
+#include <iostream>
 
 namespace boost { namespace interprocess { namespace test {
 
@@ -219,7 +219,7 @@ void timed_lock_and_sleep(void *arg, M &sm)
 {
    data<M> *pdata = static_cast<data<M>*>(arg);
    boost::posix_time::ptime pt(delay(pdata->m_secs));
-   boost::interprocess::scoped_lock<M> 
+   boost::interprocess::scoped_lock<M>
       l (sm, boost::interprocess::defer_lock);
    if (l.timed_lock(pt)){
       boost::thread::sleep(xsecs(2*BaseSeconds));
@@ -232,7 +232,7 @@ template<bool SameObject, typename M>
 void test_mutex_lock()
 {
    shared_val = 0;
-   
+  
    M m1, m2;
    M *pm1, *pm2;
 
@@ -261,15 +261,15 @@ void test_mutex_lock()
    boost::thread::sleep(xsecs(1*BaseSeconds));
    tm2.join();
 
-   assert(d1.m_value == 1);
-   assert(d2.m_value == 2);
+   BOOST_INTERPROCES_CHECK(d1.m_value == 1);
+   BOOST_INTERPROCES_CHECK(d2.m_value == 2);
 }
 
 template<bool SameObject, typename M>
 void test_mutex_lock_timeout()
 {
    shared_val = 0;
-   
+  
    M m1, m2;
    M *pm1, *pm2;
 
@@ -302,10 +302,10 @@ void test_mutex_lock_timeout()
    boost::thread::sleep(xsecs(1*BaseSeconds));
    tm2.join();
 
-   assert(d1.m_value == 1);
-   assert(d2.m_value == -1);
-   assert(d1.m_error == no_error);
-   assert(d2.m_error == boost::interprocess::timeout_when_locking_error);
+   BOOST_INTERPROCES_CHECK(d1.m_value == 1);
+   BOOST_INTERPROCES_CHECK(d2.m_value == -1);
+   BOOST_INTERPROCES_CHECK(d1.m_error == no_error);
+   BOOST_INTERPROCES_CHECK(d2.m_error == boost::interprocess::timeout_when_locking_error);
 }
 
 template<bool SameObject, typename M>
@@ -340,8 +340,8 @@ void test_mutex_try_lock()
    tm1.join();
    tm2.join();
    //Only the first should succeed locking
-   assert(d1.m_value == 1);
-   assert(d2.m_value == -1);
+   BOOST_INTERPROCES_CHECK(d1.m_value == 1);
+   BOOST_INTERPROCES_CHECK(d2.m_value == -1);
 }
 
 template<bool SameObject, typename M>
@@ -378,8 +378,8 @@ void test_mutex_timed_lock()
    tm2.join();
 
    //Both should succeed locking
-   assert(d1.m_value == 1);
-   assert(d2.m_value == 2);
+   BOOST_INTERPROCES_CHECK(d1.m_value == 1);
+   BOOST_INTERPROCES_CHECK(d2.m_value == 2);
 }
 
 template <typename M>
@@ -392,7 +392,7 @@ inline void test_all_lock()
    test_trylock<M>()();
    std::cout << "test_timedlock<" << typeid(M).name() << ">" << std::endl;
    test_timedlock<M>()();
-} 
+}
 
 template <typename M>
 inline void test_all_recursive_lock()

@@ -29,6 +29,7 @@ PRG_EXEC_MON_SOURCES =
 TEST_EXEC_MON_SOURCES =
   compiler_log_formatter
   debug
+  decorator
   execution_monitor
   framework
   plain_report_formatter
@@ -37,11 +38,11 @@ TEST_EXEC_MON_SOURCES =
   results_reporter
   test_main
   test_tools
+  test_tree
   unit_test_log
   unit_test_main
   unit_test_monitor
   unit_test_parameters
-  unit_test_suite
   xml_log_formatter
   xml_report_formatter
   ;
@@ -49,6 +50,7 @@ TEST_EXEC_MON_SOURCES =
 UTF_SOURCES =
   compiler_log_formatter
   debug
+  decorator
   exception_safety
   execution_monitor
   framework
@@ -59,11 +61,11 @@ UTF_SOURCES =
   results_collector
   results_reporter
   test_tools
+  test_tree
   unit_test_log
   unit_test_main
   unit_test_monitor
   unit_test_parameters
-  unit_test_suite
   xml_log_formatter
   xml_report_formatter
   ;
@@ -107,4 +109,4 @@ alias included : : : :
 boost-install boost_prg_exec_monitor 
               boost_test_exec_monitor
               boost_unit_test_framework ;
-          
+

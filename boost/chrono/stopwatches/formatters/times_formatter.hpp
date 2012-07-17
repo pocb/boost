@@ -1,4 +1,4 @@
-//  boost/chrono/stopwatches/stopwatch_formatter.hpp  ------------------------------------------------------------//
+//  boost/chrono/stopwatches/formatters/times_formatter.hpp  ------------------------------------------------------------//
 //  Copyright 2011 Vicente J. Botet Escriba
 //  Distributed under the Boost Software License, Version 1.0.
 //  See http://www.boost.org/LICENSE_1_0.txt
@@ -27,10 +27,10 @@ namespace boost
   namespace chrono
   {
 
-    template<typename Ratio = micro, typename CharT = char,
+    template<typename Ratio = milli, typename CharT = char,
         typename Traits = std::char_traits<CharT>,
         class Alloc = std::allocator<CharT> >
-    class basic_times_formatter: public base_formatter<CharT, Traits>
+    class basic_times_formatter: public base_formatter<CharT, Traits>, public basic_format<CharT, Traits>
     {
 
     public:
@@ -42,27 +42,21 @@ namespace boost
 
       basic_times_formatter() :
         base_type(),
-            internal_fmt_(BOOST_CHRONO_STOPWATCHES_TIMES_FORMAT_DEFAULT),
-            fmt_(internal_fmt_)
+        format_type(BOOST_CHRONO_STOPWATCHES_TIMES_FORMAT_DEFAULT)
       {
       }
       basic_times_formatter(ostream_type& os) :
         base_type(os),
-            internal_fmt_(BOOST_CHRONO_STOPWATCHES_TIMES_FORMAT_DEFAULT),
-            fmt_(internal_fmt_)
+        format_type(BOOST_CHRONO_STOPWATCHES_TIMES_FORMAT_DEFAULT)
       {
       }
       basic_times_formatter(const char* fmt, ostream_type& os = std::cout) :
-        base_type(os), internal_fmt_(fmt), fmt_(internal_fmt_)
+        base_type(os), format_type(fmt)
       {
       }
       basic_times_formatter(string_type const& fmt, ostream_type& os =
           std::cout) :
-        base_type(os), internal_fmt_(fmt), fmt_(internal_fmt_)
-      {
-      }
-      basic_times_formatter(format_type & fmt, ostream_type& os = std::cout) :
-        base_type(os), fmt_(fmt)
+        base_type(os), format_type(fmt)
       {
       }
 
@@ -75,10 +69,13 @@ namespace boost
 //      }
 
       template<class Stopwatch>
-      void operator()(Stopwatch & stopwatch_, system::error_code & ec)
+      void operator()(Stopwatch & stopwatch_
+          //, system::error_code & ec= BOOST_CHRONO_THROWS
+          )
       {
         typedef typename Stopwatch::duration::rep times_type;
-        times_type times = stopwatch_.elapsed(ec).count();
+        //times_type times = stopwatch_.elapsed(ec).count();
+        times_type times = stopwatch_.elapsed().count();
 
         if (times.real < 0)
           return;
@@ -88,17 +85,15 @@ namespace boost
         else
           p=0;
 
-        this->os_ << fmt_
-            % io::group(std::fixed, std::setprecision(this->precision_), duration_fmt(this->style_), boost::chrono::duration<double, Ratio>(nanoseconds(times.real)))
-            % io::group(std::fixed, std::setprecision(this->precision_), duration_fmt(this->style_), boost::chrono::duration<double, Ratio>(nanoseconds(times.user)))
-            % io::group(std::fixed, std::setprecision(this->precision_), duration_fmt(this->style_), boost::chrono::duration<double, Ratio>(nanoseconds(times.system)))
-            % io::group(std::fixed, std::setprecision(this->precision_), duration_fmt(this->style_), boost::chrono::duration<double, Ratio>(nanoseconds(times.user+times.system)))
+        duration_style_io_saver dsios(this->os_);
+        this->os_ << static_cast<format_type&>(*this)
+            % io::group(std::fixed, std::setprecision(this->precision_), duration_fmt(this->duration_style_), boost::chrono::duration<double, Ratio>(nanoseconds(times.real)))
+            % io::group(std::fixed, std::setprecision(this->precision_), duration_fmt(this->duration_style_), boost::chrono::duration<double, Ratio>(nanoseconds(times.user)))
+            % io::group(std::fixed, std::setprecision(this->precision_), duration_fmt(this->duration_style_), boost::chrono::duration<double, Ratio>(nanoseconds(times.system)))
+            % io::group(std::fixed, std::setprecision(this->precision_), duration_fmt(this->duration_style_), boost::chrono::duration<double, Ratio>(nanoseconds(times.user+times.system)))
             % io::group(std::fixed, std::setprecision(2), p)
-        << std::endl;
+        ;
       }
-    private:
-      boost::format internal_fmt_;
-      boost::format& fmt_;
     };
 
     typedef basic_times_formatter<milli, char> times_formatter;

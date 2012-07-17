@@ -1,7 +1,7 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
 //
-// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
-// Copyright (c) 2008-2011 Bruno Lalande, Paris, France.
+// Copyright (c) 2007-2012 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2012 Bruno Lalande, Paris, France.
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
@@ -12,10 +12,7 @@
 #include <iomanip>
 
 #include <boost/geometry/geometry.hpp>
-
-
-#include <boost/geometry/algorithms/parse.hpp>
-
+#include <boost/geometry/extensions/algorithms/parse.hpp>
 #include <boost/geometry/extensions/gis/latlong/latlong.hpp>
 
 // Formula to get the course (direction) between two points.

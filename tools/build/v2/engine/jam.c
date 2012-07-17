@@ -5,9 +5,9 @@
  *
  * This file is part of jam.
  *
- * License is hereby granted to use this software and distribute it
- * freely, as long as this copyright notice is retained and modifications
- * are clearly marked.
+ * License is hereby granted to use this software and distribute it freely, as
+ * long as this copyright notice is retained and modifications are clearly
+ * marked.
  *
  * ALL WARRANTIES ARE HEREBY DISCLAIMED.
  */
@@ -50,32 +50,30 @@
  *                             filesys
  *
  *
- * The support routines are called by all of the above, but themselves
- * are layered thus:
+ * The support routines are called by all of the above, but themselves are
+ * layered thus:
  *
  *                     variable|expand
- *                      /  |   |   |
- *                     /   |   |   |
- *                    /    |   |   |
- *                 lists   |   |   pathsys
- *                    \    |   |
- *                     \   |   |
- *                      \  |   |
- *                     newstr  |
+ *                      /      |   |
+ *                     /       |   |
+ *                    /        |   |
+ *                 lists       |   pathsys
+ *                    \        |
+ *                     \      hash
+ *                      \      |
+ *                       \     |
  *                        \    |
  *                         \   |
  *                          \  |
- *                          hash
+ *                         object
  *
  * Roughly, the modules are:
  *
  *  builtins.c - jam's built-in rules
  *  command.c - maintain lists of commands
  *  compile.c - compile parsed jam statements
- *  execunix.c - execute a shell script on UNIX
- *  execvms.c - execute a shell script, ala VMS
- *  expand.c - expand a buffer, given variable values
- *  file*.c - scan directories and archives on *
+ *  exec*.c - execute a shell script on a specific OS
+ *  file*.c - scan directories and archives on a specific OS
  *  hash.c - simple in-memory hashing routines
  *  hdrmacro.c - handle header file parsing for filename macro definitions
  *  headers.c - handle #includes in source files
@@ -84,10 +82,10 @@
  *  lists.c - maintain lists of strings
  *  make.c - bring a target up to date, once rules are in place
  *  make1.c - execute command to bring targets up to date
- *  newstr.c - string manipulation routines
+ *  object.c - string manipulation routines
  *  option.c - command line option processing
  *  parse.c - make and destroy parse trees as driven by the parser
- *  path*.c - manipulate file names on *
+ *  path*.c - manipulate file names on a specific OS
  *  hash.c - simple in-memory hashing routines
  *  regexp.c - Henry Spencer's regexp
  *  rules.c - access to RULEs, TARGETs, and ACTIONs
@@ -95,12 +93,6 @@
  *  search.c - find a target along $(SEARCH) or $(LOCATE)
  *  timestamp.c - get the timestamp of a file or archive member
  *  variable.c - handle jam multi-element variables
- *
- * 05/04/94 (seiwald) - async multiprocess (-j) support
- * 02/08/95 (seiwald) - -n implies -d2.
- * 02/22/95 (seiwald) - -v for version info.
- * 09/11/00 (seiwald) - PATCHLEVEL folded into VERSION.
- * 01/10/01 (seiwald) - pathsys.h split from filesys.h
  */
 
 
@@ -115,14 +107,19 @@
 #include "compile.h"
 #include "builtins.h"
 #include "rules.h"
-#include "newstr.h"
+#include "object.h"
 #include "scan.h"
 #include "timestamp.h"
 #include "make.h"
 #include "strings.h"
-#include "expand.h"
 #include "filesys.h"
 #include "output.h"
+#include "search.h"
+#include "class.h"
+#include "constants.h"
+#include "function.h"
+#include "pwd.h"
+#include "hcache.h"
 
 /* Macintosh is "special" */
 #ifdef OS_MAC
@@ -148,7 +145,8 @@ struct globs globs =
     { 0, 1 },   /* debug ... */
 #endif
     0,          /* output commands, not run them */
-    0           /* action timeout */
+    0,          /* action timeout */
+    0           /* maximum buffer size zero is all output */
 };
 
 /* Symbols to be defined as true for use in Jambase. */
@@ -196,7 +194,6 @@ static void run_unit_tests()
     execnt_unit_test();
 #endif
     string_unit_test();
-    var_expand_unit_test();
 }
 #endif
 
@@ -211,31 +208,34 @@ int anyhow = 0;
     extern PyObject * bjam_caller       ( PyObject * self, PyObject * args );
 #endif
 
-char *saved_argv0;
+void regex_done();
+
+char const * saved_argv0;
 
 int main( int argc, char * * argv, char * * arg_environ )
 {
     int                     n;
     char                  * s;
-    struct bjam_option      optv[N_OPTS];
+    struct bjam_option      optv[ N_OPTS ];
     char            const * all = "all";
     int                     status;
     int                     arg_c = argc;
     char          *       * arg_v = argv;
-    char            const * progname = argv[0];
+    char            const * progname = argv[ 0 ];
+    module_t              * environ_module;
 
-    saved_argv0 = argv[0];
+    saved_argv0 = argv[ 0 ];
 
     BJAM_MEM_INIT();
 
 # ifdef OS_MAC
-    InitGraf(&qd.thePort);
+    InitGraf( &qd.thePort );
 # endif
 
     --argc;
     ++argv;
 
-    if ( getoptions( argc, argv, "-:l:d:j:p:f:gs:t:ano:qv", optv ) < 0 )
+    if ( getoptions( argc, argv, "-:l:m:d:j:p:f:gs:t:ano:qv", optv ) < 0 )
     {
         printf( "\nusage: %s [ options ] targets...\n\n", progname );
 
@@ -245,6 +245,7 @@ int main( int argc, char * * argv, char * * arg_environ )
         /* printf( "-g      Build from newest sources first.\n" ); */
         printf( "-jx     Run up to x shell commands concurrently.\n" );
         printf( "-lx     Limit actions to x number of seconds after which they are stopped.\n" );
+        printf( "-mx     Maximum target output saved (kb), default is to save all output.\n" );
         printf( "-n      Don't actually execute the updating actions.\n" );
         printf( "-ox     Write the updating actions to file x.\n" );
         printf( "-px     x=0, pipes action stdout and stderr merged into action output.\n" );
@@ -262,7 +263,7 @@ int main( int argc, char * * argv, char * * arg_environ )
     {
         printf( "Boost.Jam  " );
         printf( "Version %s. %s.\n", VERSION, OSMINOR );
-        printf( "   Copyright 1993-2002 Christopher Seiwald and Perforce Software, Inc.  \n" );
+        printf( "   Copyright 1993-2002 Christopher Seiwald and Perforce Software, Inc.\n" );
         printf( "   Copyright 2001 David Turner.\n" );
         printf( "   Copyright 2001-2004 David Abrahams.\n" );
         printf( "   Copyright 2002-2008 Rene Rivera.\n" );
@@ -273,7 +274,10 @@ int main( int argc, char * * argv, char * * arg_environ )
 
     /* Pick up interesting options. */
     if ( ( s = getoptval( optv, 'n', 0 ) ) )
-        globs.noexec++, globs.debug[2] = 1;
+    {
+        ++globs.noexec;
+        globs.debug[ 2 ] = 1;
+    }
 
     if ( ( s = getoptval( optv, 'p', 0 ) ) )
     {
@@ -281,11 +285,10 @@ int main( int argc, char * * argv, char * * arg_environ )
          * stdout and stderr.
          */
         globs.pipe_action = atoi( s );
-        if ( ( 3 < globs.pipe_action ) || ( globs.pipe_action < 0 ) )
+        if ( globs.pipe_action < 0 || 3 < globs.pipe_action )
         {
-            printf(
-                "Invalid pipe descriptor '%d', valid values are -p[0..3].\n",
-                globs.pipe_action );
+            printf( "Invalid pipe descriptor '%d', valid values are -p[0..3]."
+                "\n", globs.pipe_action );
             exit( EXITBAD );
         }
     }
@@ -299,10 +302,11 @@ int main( int argc, char * * argv, char * * arg_environ )
     if ( ( s = getoptval( optv, 'j', 0 ) ) )
     {
         globs.jobs = atoi( s );
-        if (globs.jobs == 0)
+        if ( globs.jobs < 1 || globs.jobs > MAXJOBS )
         {
-            printf("Invalid value for the '-j' option.\n");
-            exit(EXITBAD);
+            printf( "Invalid value for the '-j' option, valid values are 1 "
+                "through %d.\n", MAXJOBS );
+            exit( EXITBAD );
         }
     }
 
@@ -311,6 +315,9 @@ int main( int argc, char * * argv, char * * arg_environ )
 
     if ( ( s = getoptval( optv, 'l', 0 ) ) )
         globs.timeout = atoi( s );
+
+    if ( ( s = getoptval( optv, 'm', 0 ) ) )
+        globs.max_buf = atoi( s ) * 1024;  /* convert to kb */
 
     /* Turn on/off debugging */
     for ( n = 0; ( s = getoptval( optv, 'd', n ) ); ++n )
@@ -333,10 +340,12 @@ int main( int argc, char * * argv, char * * arg_environ )
         /* n turns on levels 1-n. */
         /* +n turns on level n. */
         if ( *s == '+' )
-            globs.debug[i] = 1;
+            globs.debug[ i ] = 1;
         else while ( i )
-            globs.debug[i--] = 1;
+            globs.debug[ i-- ] = 1;
     }
+
+    constants_init();
 
     {
         PROFILE_ENTER( MAIN );
@@ -377,14 +386,14 @@ int main( int argc, char * * argv, char * * arg_environ )
 #endif
 
         /* Set JAMDATE. */
-        var_set( "JAMDATE", list_new( L0, outf_time(time(0)) ), VAR_SET );
+        var_set( root_module(), constant_JAMDATE, list_new( outf_time(time(0)) ), VAR_SET );
 
         /* Set JAM_VERSION. */
-        var_set( "JAM_VERSION",
-                 list_new( list_new( list_new( L0,
-                   newstr( VERSION_MAJOR_SYM ) ),
-                   newstr( VERSION_MINOR_SYM ) ),
-                   newstr( VERSION_PATCH_SYM ) ),
+        var_set( root_module(), constant_JAM_VERSION,
+                 list_push_back( list_push_back( list_new(
+                   object_new( VERSION_MAJOR_SYM ) ),
+                   object_new( VERSION_MINOR_SYM ) ),
+                   object_new( VERSION_PATCH_SYM ) ),
                    VAR_SET );
 
         /* Set JAMUNAME. */
@@ -394,17 +403,17 @@ int main( int argc, char * * argv, char * * arg_environ )
 
             if ( uname( &u ) >= 0 )
             {
-                var_set( "JAMUNAME",
-                         list_new(
-                             list_new(
-                                 list_new(
-                                     list_new(
-                                         list_new( L0,
-                                            newstr( u.sysname ) ),
-                                         newstr( u.nodename ) ),
-                                     newstr( u.release ) ),
-                                 newstr( u.version ) ),
-                             newstr( u.machine ) ), VAR_SET );
+                var_set( root_module(), constant_JAMUNAME,
+                         list_push_back(
+                             list_push_back(
+                                 list_push_back(
+                                     list_push_back(
+                                         list_new(
+                                            object_new( u.sysname ) ),
+                                         object_new( u.nodename ) ),
+                                     object_new( u.release ) ),
+                                 object_new( u.version ) ),
+                             object_new( u.machine ) ), VAR_SET );
             }
         }
 #endif /* unix */
@@ -414,36 +423,34 @@ int main( int argc, char * * argv, char * * arg_environ )
         /* First into the global module, with splitting, for backward
          * compatibility.
          */
-        var_defines( use_environ, 1 );
+        var_defines( root_module(), use_environ, 1 );
 
+        environ_module = bindmodule( constant_ENVIRON );
         /* Then into .ENVIRON, without splitting. */
-        enter_module( bindmodule(".ENVIRON") );
-        var_defines( use_environ, 0 );
-        exit_module( bindmodule(".ENVIRON") );
+        var_defines( environ_module, use_environ, 0 );
 
         /*
          * Jam defined variables OS & OSPLAT. We load them after environment, so
          * that setting OS in environment does not change Jam's notion of the
          * current platform.
          */
-        var_defines( othersyms, 1 );
+        var_defines( root_module(), othersyms, 1 );
 
         /* Load up variables set on command line. */
         for ( n = 0; ( s = getoptval( optv, 's', n ) ); ++n )
         {
-            char *symv[2];
+            char *symv[ 2 ];
             symv[ 0 ] = s;
             symv[ 1 ] = 0;
-            var_defines( symv, 1 );
-            enter_module( bindmodule(".ENVIRON") );
-            var_defines( symv, 0 );
-            exit_module( bindmodule(".ENVIRON") );
+            var_defines( root_module(), symv, 1 );
+            var_defines( environ_module, symv, 0 );
         }
 
         /* Set the ARGV to reflect the complete list of arguments of invocation.
          */
         for ( n = 0; n < arg_c; ++n )
-            var_set( "ARGV", list_new( L0, newstr( arg_v[n] ) ), VAR_APPEND );
+            var_set( root_module(), constant_ARGV, list_new( object_new(
+                arg_v[n] ) ), VAR_APPEND );
 
         /* Initialize built-in rules. */
         load_builtins();
@@ -459,29 +466,39 @@ int main( int argc, char * * argv, char * * arg_environ )
             }
             else
             {
-                mark_target_for_updating( arg_v[ n ] );
+                OBJECT * const target = object_new( arg_v[ n ] );
+                mark_target_for_updating( target );
+                object_free( target );
             }
         }
 
-        if (!targets_to_update())
-            mark_target_for_updating("all");
+        if ( list_empty( targets_to_update() ) )
+            mark_target_for_updating( constant_all );
 
         /* Parse ruleset. */
         {
             FRAME frame[ 1 ];
             frame_init( frame );
             for ( n = 0; ( s = getoptval( optv, 'f', n ) ); ++n )
-                parse_file( s, frame );
+            {
+                OBJECT * const filename = object_new( s );
+                parse_file( filename, frame );
+                object_free( filename );
+            }
 
             if ( !n )
-                parse_file( "+", frame );
+                parse_file( constant_plus, frame );
         }
 
         status = yyanyerrors();
 
         /* Manually touch -t targets. */
         for ( n = 0; ( s = getoptval( optv, 't', n ) ); ++n )
-            touch_target( s );
+        {
+            OBJECT * const target = object_new( s );
+            touch_target( target );
+            object_free( target );
+        }
 
         /* If an output file is specified, set globs.cmdout to that. */
         if ( ( s = getoptval( optv, 'o', 0 ) ) )
@@ -495,59 +512,37 @@ int main( int argc, char * * argv, char * * arg_environ )
         }
 
         /* The build system may set the PARALLELISM variable to override -j
-           options.  */
+         * options.
+         */
         {
-            LIST *p = L0;
-            p = var_get ("PARALLELISM");
-            if (p)
+            LIST * const p = var_get( root_module(), constant_PARALLELISM );
+            if ( !list_empty( p ) )
             {
-                int j = atoi (p->string);
-                if (j == -1)
-                {
-                    printf( "Invalid value of PARALLELISM: %s\n", p->string);
-                }
+                int const j = atoi( object_str( list_front( p ) ) );
+                if ( j < 1 || j > MAXJOBS )
+                    printf( "Invalid value of PARALLELISM: %s. Valid values "
+                        "are 1 through %d.\n", object_str( list_front( p ) ),
+                        MAXJOBS );
                 else
-                {
                     globs.jobs = j;
-                }
             }
         }
 
         /* KEEP_GOING overrides -q option. */
         {
-            LIST *p = L0;
-            p = var_get ("KEEP_GOING");
-            if (p)
-            {
-                int v = atoi (p->string);
-                if (v == 0)
-                    globs.quitquick = 1;
-                else
-                    globs.quitquick = 0;
-            }
+            LIST * const p = var_get( root_module(), constant_KEEP_GOING );
+            if ( !list_empty( p ) )
+                globs.quitquick = atoi( object_str( list_front( p ) ) ) ? 0 : 1;
         }
 
         /* Now make target. */
         {
             PROFILE_ENTER( MAIN_MAKE );
-
-            LIST * targets = targets_to_update();
-            if (targets)
-            {
-                int targets_count = list_length( targets );
-                const char * * targets2 = (const char * *)
-                    BJAM_MALLOC( targets_count * sizeof( char * ) );
-                int n = 0;
-                for ( ; targets; targets = list_next( targets ) )
-                    targets2[ n++ ] = targets->string;
-                status |= make( targets_count, targets2, anyhow );
-                free( targets );
-            }
+            LIST * const targets = targets_to_update();
+            if ( !list_empty( targets ) )
+                status |= make( targets, anyhow );
             else
-            {
                 status = last_update_now_status;
-            }
-
             PROFILE_EXIT( MAIN_MAKE );
         }
 
@@ -557,12 +552,27 @@ int main( int argc, char * * argv, char * * arg_environ )
     if ( DEBUG_PROFILE )
         profile_dump();
 
+
+#ifdef OPT_HEADER_CACHE_EXT
+    hcache_done();
+#endif
+
+    clear_targets_to_update();
+
     /* Widely scattered cleanup. */
-    var_done();
     file_done();
     rules_done();
     stamps_done();
-    str_done();
+    search_done();
+    class_done();
+    modules_done();
+    regex_done();
+    pwd_done();
+    path_done();
+    function_done();
+    list_done();
+    constants_done();
+    object_done();
 
     /* Close cmdout. */
     if ( globs.cmdout )
@@ -577,56 +587,56 @@ int main( int argc, char * * argv, char * * arg_environ )
     return status ? EXITBAD : EXITOK;
 }
 
+
+/*
+ * executable_path()
+ */
+
 #if defined(_WIN32)
 #include <windows.h>
-char *executable_path(char *argv0) {
-    char buf[1024];
-    DWORD ret = GetModuleFileName(NULL, buf, sizeof(buf));
-    if (ret == 0 || ret == sizeof(buf)) return NULL;
-    return strdup (buf);
+char * executable_path( char const * argv0 )
+{
+    char buf[ 1024 ];
+    DWORD const ret = GetModuleFileName( NULL, buf, sizeof( buf ) );
+    return ( !ret || ret == sizeof( buf ) ) ? NULL : strdup( buf );
 }
 #elif defined(__APPLE__)  /* Not tested */
 #include <mach-o/dyld.h>
-char *executable_path(char *argv0) {
-    char buf[1024];
-    uint32_t size = sizeof(buf);
-    int ret = _NSGetExecutablePath(buf, &size);
-    if (ret != 0) return NULL;
-    return strdup(buf);
+char *executable_path( char const * argv0 )
+{
+    char buf[ 1024 ];
+    uint32_t size = sizeof( buf );
+    return _NSGetExecutablePath( buf, &size ) ? NULL : strdup( buf );
 }
 #elif defined(sun) || defined(__sun) /* Not tested */
 #include <stdlib.h>
 
-char *executable_path(char *argv0) {
-    return strdup(getexecname());
+char * executable_path( char const * argv0 )
+{
+    return strdup( getexecname() );
 }
 #elif defined(__FreeBSD__)
 #include <sys/sysctl.h>
-char *executable_path(char *argv0) {
-    int mib[4];
-    mib[0] = CTL_KERN;
-    mib[1] = KERN_PROC;
-    mib[2] = KERN_PROC_PATHNAME;
-    mib[3] = -1;
-    char buf[1024];
-    size_t size = sizeof(buf);
-    sysctl(mib, 4, buf, &size, NULL, 0);
-    if (size == 0 || size == sizeof(buf)) return NULL;
-    return strndup(buf, size);
+char * executable_path( char const * argv0 )
+{
+    int mib[ 4 ] = { CTL_KERN, KERN_PROC, KERN_PROC_PATHNAME, -1 };
+    char buf[ 1024 ];
+    size_t size = sizeof( buf );
+    sysctl( mib, 4, buf, &size, NULL, 0 );
+    return ( !size || size == sizeof( buf ) ) ? NULL : strndup( buf, size );
 }
 #elif defined(__linux__)
 #include <unistd.h>
-char *executable_path(char *argv0) {
-    char buf[1024];
+char * executable_path( char const * argv0 )
+{
+    char buf[ 1024 ];
     ssize_t ret = readlink("/proc/self/exe", buf, sizeof(buf));
-    if (ret == 0 || ret == sizeof(buf)) return NULL;
-    return strndup(buf, ret);
+    return ( !ret || ret == sizeof( buf ) ) ? NULL : strndup( buf, ret );
 }
 #else
-char *executable_path(char *argv0) {
-    /* If argv0 is absolute path, assume it's the right absolute path. */
-    if (argv0[0] == "/")
-        return strdup(argv0);
-    return NULL;
+char * executable_path( char const * argv0 )
+{
+    /* If argv0 is an absolute path, assume it is the right absolute path. */
+    return argv0[ 0 ] == '/' ? strdup( argv0 ) : NULL;
 }
 #endif

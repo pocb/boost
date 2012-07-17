@@ -1,4 +1,4 @@
-//  (C) Copyright Gennadiy Rozental 2005-2010.
+//  (C) Copyright Gennadiy Rozental 2005-2011.
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at 
 //  http://www.boost.org/LICENSE_1_0.txt)
@@ -16,7 +16,7 @@
 #define BOOST_TEST_PROGRESS_MONITOR_HPP_020105GER
 
 // Boost.Test
-#include <boost/test/test_observer.hpp>
+#include <boost/test/tree/observer.hpp>
 #include <boost/test/utils/trivial_singleton.hpp>
 
 // STL
@@ -27,7 +27,6 @@
 //____________________________________________________________________________//
 
 namespace boost {
-
 namespace unit_test {
 
 // ************************************************************************** //
@@ -55,13 +54,12 @@ public:
     void    set_stream( std::ostream& );
 
 private:
-    BOOST_TEST_SINGLETON_CONS( progress_monitor_t );
+    BOOST_TEST_SINGLETON_CONS( progress_monitor_t )
 }; // progress_monitor_t
 
 BOOST_TEST_SINGLETON_INST( progress_monitor )
 
 } // namespace unit_test
-
 } // namespace boost
 
 //____________________________________________________________________________//

@@ -1,8 +1,8 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
 
-// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
-// Copyright (c) 2008-2011 Bruno Lalande, Paris, France.
-// Copyright (c) 2009-2011 Mateusz Loskot, London, UK.
+// Copyright (c) 2007-2012 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2012 Bruno Lalande, Paris, France.
+// Copyright (c) 2009-2012 Mateusz Loskot, London, UK.
 
 // Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
 // (geolib/GGL), copyright (c) 1995-2010 Geodan, Amsterdam, the Netherlands.
@@ -32,16 +32,28 @@
 #endif
 
 
-
 #include <boost/foreach.hpp>
 
 
 // Include some always-included-for-testing files
 #if ! defined(BOOST_GEOMETRY_NO_BOOST_TEST)
-#  include <boost/test/floating_point_comparison.hpp>
-#  include <boost/test/included/test_exec_monitor.hpp>
+
+// Until Boost fixes it, silence warning issued by clang:
+// warning: unused variable 'check_is_close' [-Wunused-variable]
+#ifdef __clang__
+# pragma clang diagnostic push
+# pragma clang diagnostic ignored "-Wunused-variable"
+#endif
+
+# include <boost/test/floating_point_comparison.hpp>
+# include <boost/test/included/test_exec_monitor.hpp>
 //#  include <boost/test/included/prg_exec_monitor.hpp>
-#  include <boost/test/impl/execution_monitor.ipp>
+# include <boost/test/impl/execution_monitor.ipp>
+
+#ifdef __clang__
+# pragma clang diagnostic pop
+#endif
+
 #endif
 
 
@@ -99,11 +111,11 @@ template <typename T> struct string_from_type<boost::rational<T> >
 #endif
 
 
-template <typename CoordinateType, typename T>
-inline T if_typed_tt(T value_tt, T value)
+template <typename CoordinateType, typename T1, typename T2>
+inline T1 if_typed_tt(T1 value_tt, T2 value)
 {
 #if defined(HAVE_TTMATH)
-    return boost::is_same<CoordinateType, ttmath_big>::value ? value_tt : value;
+    return boost::is_same<CoordinateType, ttmath_big>::type::value ? value_tt : value;
 #else
     return value;
 #endif

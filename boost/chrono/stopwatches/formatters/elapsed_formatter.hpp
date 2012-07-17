@@ -1,4 +1,4 @@
-//  boost/chrono/stopwatches/stopwatch_formatter.hpp  ------------------------------------------------------------//
+//  boost/chrono/stopwatches/formatters/elapsed_formatter.hpp  ------------------------------------------------------------//
 //  Copyright 2011 Vicente J. Botet Escriba
 //  Distributed under the Boost Software License, Version 1.0.
 //  See http://www.boost.org/LICENSE_1_0.txt
@@ -20,17 +20,17 @@
 #include <cassert>
 #include <iomanip>
 
-#define BOOST_CHRONO_STOPWATCHES_ELAPSED_FORMAT_DEFAULT "%1%"
+#define BOOST_CHRONO_STOPWATCHES_ELAPSED_FORMAT_DEFAULT "%1%\n"
 
 namespace boost
 {
   namespace chrono
   {
 
-    template<typename Ratio = micro, typename CharT = char,
+    template<typename Ratio, typename CharT,
         typename Traits = std::char_traits<CharT>,
         class Alloc = std::allocator<CharT> >
-    class basic_elapsed_formatter: public base_formatter<CharT, Traits>
+    class basic_elapsed_formatter: public base_formatter<CharT, Traits>, public basic_format<CharT, Traits>
     {
 
     public:
@@ -42,27 +42,21 @@ namespace boost
 
       basic_elapsed_formatter() :
         base_type(),
-            internal_fmt_(BOOST_CHRONO_STOPWATCHES_ELAPSED_FORMAT_DEFAULT),
-            fmt_(internal_fmt_)
+        format_type(BOOST_CHRONO_STOPWATCHES_ELAPSED_FORMAT_DEFAULT)
       {
       }
       basic_elapsed_formatter(ostream_type& os) :
         base_type(os),
-            internal_fmt_(BOOST_CHRONO_STOPWATCHES_ELAPSED_FORMAT_DEFAULT),
-            fmt_(internal_fmt_)
+        format_type(BOOST_CHRONO_STOPWATCHES_ELAPSED_FORMAT_DEFAULT)
       {
       }
       basic_elapsed_formatter(const char* fmt, ostream_type& os = std::cout) :
-        base_type(os), internal_fmt_(fmt), fmt_(internal_fmt_)
+        base_type(os), format_type(fmt)
       {
       }
       basic_elapsed_formatter(string_type const& fmt, ostream_type& os =
           std::cout) :
-        base_type(os), internal_fmt_(fmt), fmt_(internal_fmt_)
-      {
-      }
-      basic_elapsed_formatter(format_type & fmt, ostream_type& os = std::cout) :
-        base_type(os), fmt_(fmt)
+        base_type(os), format_type(fmt)
       {
       }
 
@@ -75,27 +69,28 @@ namespace boost
 //      }
 
       template<class Stopwatch>
-      void operator()(Stopwatch & stopwatch_, system::error_code & ec)
+      void operator()(Stopwatch & stopwatch_
+          //, system::error_code & ec= BOOST_CHRONO_THROWS
+          )
       {
         typedef typename Stopwatch::duration duration_t;
-        duration_t d = stopwatch_.elapsed(ec);
+        duration_t d = stopwatch_.elapsed();
+        //duration_t d = stopwatch_.elapsed(ec);
 
         if (d < duration_t::zero())
           return;
 
-        this->os_
-            << fmt_
-                % io::group(std::fixed, std::setprecision(this->precision_), duration_fmt(this->style_), boost::chrono::duration<
-                    double, Ratio>(d)) << std::endl;
+        duration_style_io_saver dsios(this->os_);
+        this->os_ << static_cast<format_type&>(*this)
+            % io::group(std::fixed, std::setprecision(this->precision_), duration_fmt(this->duration_style_), boost::chrono::duration<
+                    double, Ratio>(d))
+        ;
 
       }
-    private:
-      boost::format internal_fmt_;
-      boost::format& fmt_;
     };
 
-    typedef basic_elapsed_formatter<micro, char> elapsed_formatter;
-    typedef basic_elapsed_formatter<micro, wchar_t> welapsed_formatter;
+    typedef basic_elapsed_formatter<milli, char> elapsed_formatter;
+    typedef basic_elapsed_formatter<milli, wchar_t> welapsed_formatter;
 
   } // namespace chrono
 } // namespace boost

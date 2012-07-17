@@ -22,6 +22,7 @@
 #include <boost/type_traits/is_convertible.hpp>
 #include <boost/iterator/iterator_traits.hpp>
 #include <boost/limits.hpp>
+#include <boost/utility/swap.hpp>
 #include "../helpers/check_return_type.hpp"
 
 typedef long double comparison_type;
@@ -413,6 +414,7 @@ void unordered_copyable_test(X& x, Key& k, T& t, Hash& hf, Pred& eq)
     BOOST_DEDUCED_TYPENAME X::value_type* j = 0;
 
     X(i, j, 10, hf, eq);
+
     X a5(i, j, 10, hf, eq);
     X(i, j, 10, hf);
     X a6(i, j, 10, hf);

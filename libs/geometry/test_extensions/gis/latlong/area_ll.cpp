@@ -1,9 +1,9 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
 // Unit Test
 
-// Copyright (c) 2007-2011 Barend Gehrels, Amsterdam, the Netherlands.
-// Copyright (c) 2008-2011 Bruno Lalande, Paris, France.
-// Copyright (c) 2009-2011 Mateusz Loskot, London, UK.
+// Copyright (c) 2007-2012 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2012 Bruno Lalande, Paris, France.
+// Copyright (c) 2009-2012 Mateusz Loskot, London, UK.
 
 // Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
 // (geolib/GGL), copyright (c) 1995-2010 Geodan, Amsterdam, the Netherlands.
@@ -14,26 +14,20 @@
 
 #include <geometry_test_common.hpp>
 
-
 #include <boost/geometry/algorithms/area.hpp>
 #include <boost/geometry/algorithms/transform.hpp>
-
 #include <boost/geometry/geometries/geometries.hpp>
 #include <boost/geometry/geometries/point_xy.hpp>
-
+#include <boost/geometry/io/wkt/read.hpp>
 #include <boost/geometry/strategies/strategies.hpp>
 
-#include <boost/geometry/extensions/gis/io/wkt/read_wkt.hpp>
 #include <boost/geometry/extensions/gis/latlong/point_ll.hpp>
 #include <boost/geometry/extensions/gis/geographic/strategies/area_huiller_earth.hpp>
-
-
 #include <boost/geometry/extensions/gis/projections/epsg.hpp>
 #include <boost/geometry/extensions/gis/projections/parameters.hpp>
 #include <boost/geometry/extensions/gis/projections/proj/sterea.hpp>
 
 //#include <test_common/test_point.hpp>
-
 
 template <typename PRJ, typename XY, typename LL>
 void add_to_ring(PRJ const& prj, LL const& ll,
@@ -76,7 +70,7 @@ void test_area_polygon_ll(bool concave, bool hole, double perc)
 
 
     // For checking calculated area, use the Dutch projection (RD), this is EPSG code 28992
-    bg::projection::sterea_ellipsoid<LL, XY> dutch_prj(bg::projection::init(28992));
+    bg::projections::sterea_ellipsoid<LL, XY> dutch_prj(bg::projections::init(28992));
 
     // Add them in clockwise direction
     bg::model::polygon<LL> randstad;

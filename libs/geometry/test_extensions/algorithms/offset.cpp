@@ -1,7 +1,7 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
 // Unit Test
 
-// Copyright (c) 2010 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2010-2012 Barend Gehrels, Amsterdam, the Netherlands.
 
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
@@ -9,6 +9,8 @@
 
 #include <iostream>
 #include <string>
+
+#define TEST_WITH_SVG
 
 #include <geometry_test_common.hpp>
 
@@ -19,17 +21,15 @@
 #include <boost/geometry/algorithms/num_points.hpp>
 #include <boost/geometry/algorithms/unique.hpp>
 #include <boost/geometry/extensions/algorithms/offset.hpp>
-#include <boost/geometry/domains/gis/io/wkt/read_wkt_multi.hpp>
+#include <boost/geometry/multi/io/wkt/read.hpp>
 
 #include <boost/geometry/strategies/strategies.hpp>
 
-NOTE: this unit test currently does not compile, it should be updated first.
-#include <boost/geometry/strategies/buffer.hpp>
+#include <boost/geometry/extensions/strategies/buffer.hpp>
 
 
 #if defined(TEST_WITH_SVG)
 #  include <boost/geometry/multi/algorithms/envelope.hpp>
-#  include <boost/geometry/multi/core/is_multi.hpp>
 #  include <boost/geometry/extensions/io/svg/svg_mapper.hpp>
 #endif
 
@@ -67,7 +67,6 @@ void test_offset(std::string const& caseid, Geometry const& geometry,
 
     //BOOST_CHECK_EQUAL(holes, expected_hole_count);
     BOOST_CHECK_CLOSE(length, expected_length, percentage);
-
 
 #if defined(TEST_WITH_SVG)
     {

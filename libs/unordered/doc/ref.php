@@ -116,16 +116,28 @@ EOL;
           </typedef>
           <typedef name="pointer">
             <type>typename allocator_type::pointer</type>
+            <description>
+              <para>
+                <code>value_type*</code> if
+                <code>allocator_type::pointer</code> is not defined.
+              </para>
+            </description>
           </typedef>
           <typedef name="const_pointer">
             <type>typename allocator_type::const_pointer</type>
+            <description>
+              <para>
+                <code>boost::pointer_to_other&lt;pointer, value_type&gt;::type</code>
+                if <code>allocator_type::const_pointer</code> is not defined.
+              </para>
+            </description>
           </typedef>
           <typedef name="reference">
-            <type>typename allocator_type::reference</type>
+            <type>value_type&amp;</type>
             <purpose><simpara>lvalue of <type>value_type</type>.</simpara></purpose>
           </typedef>
           <typedef name="const_reference">
-            <type>typename allocator_type::const_reference</type>
+            <type>value_type const&amp;</type>
             <purpose><simpara>const lvalue of <type>value_type</type>.</simpara></purpose>
           </typedef>
           <typedef name="size_type">
@@ -320,7 +332,8 @@ EOL;
             <notes>
               <para>
                 On compilers without rvalue references, this is emulated using
-                Boost.Move.
+                Boost.Move. Note that on some compilers the copy assignment
+                operator may be used in some circumstances.
               </para>
             </notes>
             <requires>
@@ -418,7 +431,7 @@ EOL;
                 <para>In version of Boost before 1.48 this emulated the variadic pair
                       constructor from older C++0x drafts. For backwards compatability
                       this can be enabled by defining the macro
-                      <code>BOOST_UNORDERED_DEPRECATED_PAIR_CONSTRUCT</code>.
+                      <code>BOOST_UNORDERED_DEPRECATED_PAIR_CONSTRUCT</code>.</para>
               </notes>
             </method>
             <method name="emplace_hint">
@@ -459,12 +472,11 @@ EOL;
                       for rvalue references or move semantics.</para>
                 <para>Since existing <code>std::pair</code> implementations don't support
                       <code>std::piecewise_construct</code> this emulates it,
-                      but using <code>boost::unordered::piecewise_construct</code>.
+                      but using <code>boost::unordered::piecewise_construct</code>.</para>
                 <para>In version of Boost before 1.48 this emulated the variadic pair
                       constructor from older C++0x drafts. For backwards compatability
                       this can be enabled by defining the macro
-                      <code>BOOST_UNORDERED_DEPRECATED_PAIR_CONSTRUCT</code>.
-                </para>
+                      <code>BOOST_UNORDERED_DEPRECATED_PAIR_CONSTRUCT</code>.</para>
               </notes>
             </method>
             <method name="insert">
@@ -495,11 +507,70 @@ EOL;
               </notes>
             </method>
             <method name="insert">
+              <parameter name="obj">
+                <paramtype>value_type&amp;&amp;</paramtype>
+              </parameter>
+              <type><?php echo $equivalent_keys ? 'iterator' : 'std::pair&lt;iterator, bool&gt;' ?></type>
+              <description>
+                <para>Inserts <code>obj</code> in the container<?php
+                echo $equivalent_keys ? '.' :
+                    ' if and only if there is no element in the container with an equivalent '.$key_name. '.';
+                ?></para>
+              </description>
+              <returns>
+<?php if ($equivalent_keys): ?>
+                <para>An iterator pointing to the inserted element.</para>
+<?php else: ?>
+                <para>The bool component of the return type is true if an insert took place.</para>
+                <para>If an insert took place, then the iterator points to the newly inserted element. Otherwise, it points to the element with equivalent <?php echo $key_name; ?>.</para>
+<?php endif; ?>
+              </returns>
+              <throws>
+                <para>If an exception is thrown by an operation other than a call to <code>hasher</code> the function has no effect.</para>
+              </throws>
+              <notes>
+                <para>Can invalidate iterators, but only if the insert causes the load factor to be greater to or equal to the maximum load factor.</para>
+                <para>Pointers and references to elements are never invalidated.</para>
+              </notes>
+            </method>
+            <method name="insert">
               <parameter name="hint">
                 <paramtype>const_iterator</paramtype>
               </parameter>
               <parameter name="obj">
                 <paramtype>value_type const&amp;</paramtype>
+              </parameter>
+              <type>iterator</type>
+              <description>
+<?php if ($equivalent_keys): ?>
+                <para>Inserts <code>obj</code> in the container.</para>
+<?php else: ?>
+                <para>Inserts <code>obj</code> in the container if and only if there is no element in the container with an equivalent <?php echo $key_name; ?>.</para>
+<?php endif; ?>
+                <para>hint is a suggestion to where the element should be inserted.</para>
+              </description>
+              <returns>
+<?php if ($equivalent_keys): ?>
+                <para>An iterator pointing to the inserted element.</para>
+<?php else: ?>
+                <para>If an insert took place, then the iterator points to the newly inserted element. Otherwise, it points to the element with equivalent <?php echo $key_name; ?>.</para>
+<?php endif; ?>
+              </returns>
+              <throws>
+                <para>If an exception is thrown by an operation other than a call to <code>hasher</code> the function has no effect.</para>
+              </throws>
+              <notes>
+                <para>The standard is fairly vague on the meaning of the hint. But the only practical way to use it, and the only way that Boost.Unordered supports is to point to an existing element with the same <?php echo $key_name; ?>. </para>
+                <para>Can invalidate iterators, but only if the insert causes the load factor to be greater to or equal to the maximum load factor.</para>
+                <para>Pointers and references to elements are never invalidated.</para>
+              </notes>
+            </method>
+            <method name="insert">
+              <parameter name="hint">
+                <paramtype>const_iterator</paramtype>
+              </parameter>
+              <parameter name="obj">
+                <paramtype>value_type&amp;&amp;</paramtype>
               </parameter>
               <type>iterator</type>
               <description>
@@ -811,10 +882,6 @@ EOL;
               <throws>
                 <para>An exception object of type <code>std::out_of_range</code> if no such element is present.</para>
               </throws>
-              <notes>
-                <para>This is not specified in the draft standard, but that is probably an oversight. The issue has been raised in
-                  <ulink url="http://groups.google.com/group/comp.std.c++/browse_thread/thread/ab7c22a868fd370b">comp.std.c++</ulink>.</para>
-              </notes>
             </overloaded-method>
 <?php endif; ?>
           </method-group>
@@ -949,6 +1016,18 @@ EOL;
               <type>void</type>
               <description>
                 <para>Changes the number of buckets so that there at least <code>n</code> buckets, and so that the load factor is less than the maximum load factor.</para>
+                <para>Invalidates iterators, and changes the order of elements. Pointers and references to elements are not invalidated.</para>
+              </description>
+              <throws>
+                <para>The function has no effect if an exception is thrown, unless it is thrown by the container's hash function or comparison function.</para>
+              </throws>
+            </method>
+            <method name="reserve">
+              <parameter name="n">
+                <paramtype>size_type</paramtype>
+              </parameter>
+              <type>void</type>
+              <description>
                 <para>Invalidates iterators, and changes the order of elements. Pointers and references to elements are not invalidated.</para>
               </description>
               <throws>

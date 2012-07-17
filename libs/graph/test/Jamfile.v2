@@ -8,6 +8,7 @@
 # LEDA (also top level directory) at the command line of jam using -s
 
 import modules ;
+import path ;
 
 path-constant TEST_DIR : . ;
 
@@ -42,6 +43,7 @@ test-suite graph_test :
     [ run csr_graph_test.cpp : : : : : <variant>release ]
     [ run dag_longest_paths.cpp ]
     [ run dfs.cpp ../../test/build//boost_test_exec_monitor ]
+    [ run undirected_dfs.cpp ../../test/build//boost_test_exec_monitor ]
     [ compile dfs_cc.cpp ]
     [ compile dijkstra_cc.cpp ]
     [ run dijkstra_heap_performance.cpp : 10000 ]
@@ -118,29 +120,29 @@ test-suite graph_test :
     [ compile grid_graph_cc.cpp ]
     [ run grid_graph_test.cpp ]
     [ run incremental_components_test.cpp ]
+    [ run two_graphs_common_spanning_trees_test.cpp ]
     [ run random_spanning_tree_test.cpp ../build//boost_graph ]
     [ run graphml_test.cpp ../build//boost_graph : : "graphml_test.xml" ]
     [ run stoer_wagner_test.cpp ../../test/build//boost_unit_test_framework/<link>static : $(TEST_DIR) ]
     ;
 
 # Run SDB tests only when -sSDB= is set.
-if [ modules.peek : SDB ] != ""
+local SDB = [ modules.peek : SDB ] ;
+if $(SDB)
 {
-    local SDB_DEPENDENCIES =
-        <include>$(SGB) <library-file>$(SGB)/libgb.a  ;
+    local sdb-root = [ path.root [ path.make $(SDB) ] [ path.pwd ] ] ;
 
-    compile stanford_graph_cc.cpp
-        $(SDB_DEPENDENCIES)  ;
+    compile stanford_graph_cc.cpp :
+        <include>$(sdb-root) ;
 }
 
 # Run LEDA tests only when -sLEDA= is set.
-if [ modules.peek : LEDA ] != ""
+local LEDA = [ modules.peek : LEDA ] ;
+if $(LEDA)
 {
-     local LEDA_DEPENDENCIES =
-        <include>$(LEDA)/incl
-        <library-file>$(LEDA)/libG.a
-        ;
+    local leda-root = [ path.root [ path.make $(LEDA) ] [ path.pwd ] ] ;
+    local leda-include = [ path.join $(leda-root) incl ] ;
 
-    compile leda_graph_cc.cpp
-       $(LEDA_DEPENDENCIES) ;
+    compile leda_graph_cc.cpp :
+        <include>$(leda-include) ;
 }

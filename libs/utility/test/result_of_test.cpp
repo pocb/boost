@@ -5,7 +5,11 @@
 //  1.0. (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
 
-#define BOOST_RESULT_OF_USE_DECLTYPE
+#include <boost/config.hpp>
+
+#ifndef BOOST_NO_DECLTYPE
+# define BOOST_RESULT_OF_USE_DECLTYPE
+#endif
 
 // For more information, see http://www.boost.org/libs/utility
 #include <boost/utility/result_of.hpp>
@@ -193,7 +197,6 @@ int main()
   BOOST_STATIC_ASSERT((is_same<result_of<mem_func_ptr_v(X,char)>::type, int>::value));
   BOOST_STATIC_ASSERT((is_same<result_of<mem_func_ptr_cv(X,char)>::type, int>::value));
   BOOST_STATIC_ASSERT((is_same<result_of<mem_func_ptr_0(X)>::type, int>::value)); 
-  BOOST_STATIC_ASSERT((is_same<result_of<func_ptr(void)>::type, int>::value));
 
   BOOST_STATIC_ASSERT((is_same<tr1_result_of<func_ptr(char, float)>::type, int>::value));
   BOOST_STATIC_ASSERT((is_same<tr1_result_of<func_ref(char, float)>::type, int>::value));
@@ -205,6 +208,7 @@ int main()
   BOOST_STATIC_ASSERT((is_same<tr1_result_of<mem_func_ptr_cv(X,char)>::type, int>::value));
   BOOST_STATIC_ASSERT((is_same<tr1_result_of<mem_func_ptr_0(X)>::type, int>::value)); 
   BOOST_STATIC_ASSERT((is_same<tr1_result_of<func_ptr(void)>::type, int>::value));
+  BOOST_STATIC_ASSERT((is_same<tr1_result_of<func_ref(void)>::type, int>::value));
 
   BOOST_STATIC_ASSERT((is_same<result_of<result_of_member_function_template(double)>::type, double>::value));
   BOOST_STATIC_ASSERT((is_same<result_of<const result_of_member_function_template(double)>::type, const double>::value));

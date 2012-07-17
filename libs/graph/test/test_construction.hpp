@@ -7,6 +7,7 @@
 #ifndef TEST_CONSTRUCTION_HPP
 #define TEST_CONSTRUCTION_HPP
 
+#include <boost/concept/assert.hpp>
 #include <utility>
 
 /** @name Build Graph
@@ -93,7 +94,7 @@ void connect_graph(Graph& g, VertexSet const& verts, boost::mpl::false_) {
 
     std::cout << "...connect_normal\n";
     Pair *f, *l;
-    for(tie(f, l) = edge_pairs(); f != l; ++f) {
+    for(boost::tie(f, l) = edge_pairs(); f != l; ++f) {
         Pair const& e = *f;
         add_edge(verts[e.first], verts[e.second], g);
     }

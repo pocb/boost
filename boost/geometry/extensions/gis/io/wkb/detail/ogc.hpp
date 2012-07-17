@@ -1,6 +1,6 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
 
-// Copyright (c) 2009-2011 Mateusz Loskot, London, UK.
+// Copyright (c) 2009-2012 Mateusz Loskot, London, UK.
 
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
@@ -42,7 +42,8 @@ namespace boost { namespace geometry
 // };
 
 #ifndef DOXYGEN_NO_DETAIL
-namespace detail { namespace wkb {
+namespace detail { namespace wkb
+{
 
 // TODO: Replace 'struct' with scoped enum from <boost/detail/scoped_enum_emulation.hpp>
 // For older Boost, copy
