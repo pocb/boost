@@ -1,4 +1,3 @@
-boost_module(algorithm DEPENDS regex concept_check range)
-
+boost_module(algorithm DEPENDS range array type_traits static_assert utility)
 
 

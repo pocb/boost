@@ -3,18 +3,19 @@
 #----------------------------------------------------------------------------
 # Add a variable to hold the headers for the library
 set (lib_headers
-  filesystem.hpp
-  filesystem
+    heap
 )
 
 # Add a library target to the build system
-boost_library_project (filesystem
-  SRCDIRS src
+boost_library_project (heap
   TESTDIRS test
+  EXAMPLEDIRS examples
   HEADERS ${lib_headers}
   DOCDIRS doc
-  DESCRIPTION  "Provides portable facilities to query and manipulate paths, files, and directories. Note: the default version is now v3: v2 is no longer distributed."
+  DESCRIPTION  "An implementation of priority queues."
   MODULARIZED
-  AUTHORS  "Beman Dawes <bdawes -at- acm.org>"
+  AUTHORS  "Tim Blechmann <tim - at - klingt.org>"
   #  MAINTAINERS 
-  )
+)
+
+
