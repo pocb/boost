@@ -1,22 +1,20 @@
-#
-# Copyright Troy D. Straszheim
-#
-# Distributed under the Boost Software License, Version 1.0.
-# See http://www.boost.org/LICENSE_1_0.txt
-#
 #----------------------------------------------------------------------------
+# CMake framework maintained by Denis Arnaud on git://github.com/pocb/boost
+#----------------------------------------------------------------------------
+# Add a variable to hold the headers for the library
+set (lib_headers
+    algorithm
+)
 
 # Add a library target to the build system
-boost_library_project(
-  algorithm
-  #  SRCDIRS 
-  TESTDIRS  minmax/test string/test
-  # EXAMPLEDIRS minmax/example string/example
-  HEADERS algorithm
-  #  DOCDIRS 
-  DESCRIPTION  "A library of various algorithms."
+boost_library_project (algorithm
+  #  SRCDIRS
+  TESTDIRS minmax/test string/test test
+  EXAMPLEDIRS minmax/example string/example example
+  HEADERS ${lib_headers}
+  DOCDIRS doc 
+  DESCRIPTION  "A collection of general purpose algorithms."
   MODULARIZED
-  AUTHORS  "Pavol Droba <droba -at- topmail.sk>"
-           "Herve Bronnimann <hbr -at- poly.edu>"
+  AUTHORS  "Marshall Clow <mclow.lists -at- gmail.com>"
   #  MAINTAINERS 
 )
