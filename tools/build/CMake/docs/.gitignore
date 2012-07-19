@@ -1,4 +1,3 @@
-build/doctrees
-build/latex
-Makefile
-
+/build/doctrees
+/build/latex
+/Makefile
