@@ -29,7 +29,8 @@ endif (PYTHON_DEBUG_LIBRARIES AND BUILD_BOOST_PYTHON)
 # Always build the non-debug variants of the boost_python library
 set(BUILD_PYTHON_NODEBUG ON)
 
-boost_add_library(python
+colormsg (GREEN "+-- BOOST_PYTHON_SUFFIX=${BOOST_PYTHON_SUFFIX}")
+boost_add_library(python${BOOST_PYTHON_SUFFIX}
   numeric.cpp 
   list.cpp 
   long.cpp 
