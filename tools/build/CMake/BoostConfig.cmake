@@ -29,6 +29,11 @@ include(CheckCXXSourceCompiles)
 
 
 # Toolset detection.
+# Note: Known MS Visual C/C++ versions (CMake MSVC_VERSION variable),
+#       as of July 2012 (see for instance:
+#       http://cmake.org/cmake/help/v2.8.8/cmake.html#variable:MSVC):
+#       1200 = VS 6.0; 1300 = VS 7.0; 1310 = VS 7.1;
+#       1400 = VS 8.0; 1500 = VS 9.0; 1600 = VS 10.0
 if (NOT BOOST_TOOLSET)
   set(BOOST_TOOLSET "unknown")
   if (MSVC60)
@@ -51,6 +56,10 @@ if (NOT BOOST_TOOLSET)
     set(BOOST_TOOLSET "vc90")
     set(BOOST_COMPILER "msvc")
     set(BOOST_COMPILER_VERSION "9.0")
+  elseif(MSVC100)
+    set(BOOST_TOOLSET "vc100")
+    set(BOOST_COMPILER "msvc")
+    set(BOOST_COMPILER_VERSION "10.0")
   elseif(MSVC)
     set(BOOST_TOOLSET "vc")
     set(BOOST_COMPILER "msvc")
