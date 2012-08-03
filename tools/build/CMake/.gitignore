@@ -1,2 +1,12 @@
-/docs/
-/install_me/
+/build
+tmp
+*.pyc
+._*
+bjam
+project-config.jam
+bin.v2/
+dist/
+.\#*
+*.tar.*
+*.zip
+
