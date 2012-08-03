@@ -70,12 +70,8 @@
 # if defined( BOOST_CHRONO_POSIX_API )
 #   define BOOST_CHRONO_HAS_PROCESS_CLOCKS
 #   include <time.h>  //to check for CLOCK_REALTIME and CLOCK_MONOTONIC and _POSIX_THREAD_CPUTIME
-#   if defined(CLOCK_REALTIME)
-#     if defined(CLOCK_MONOTONIC)
-#        define BOOST_CHRONO_HAS_CLOCK_STEADY
-#     endif
-#   else
-#     error <time.h> does not supply CLOCK_REALTIME
+#   if defined(CLOCK_MONOTONIC)
+#      define BOOST_CHRONO_HAS_CLOCK_STEADY
 #   endif
 #   if defined(_POSIX_THREAD_CPUTIME) && !defined(BOOST_DISABLE_THREADS)
 #     define BOOST_CHRONO_HAS_THREAD_CLOCK
@@ -86,6 +82,10 @@
 #     define BOOST_CHRONO_THREAD_CLOCK_IS_STEADY true
 #   endif
 #   if defined(sun) || defined(__sun)
+#     undef BOOST_CHRONO_HAS_THREAD_CLOCK
+#     undef BOOST_CHRONO_THREAD_CLOCK_IS_STEADY
+#   endif
+#   if defined(__HP_aCC) && defined(__hpux)
 #     undef BOOST_CHRONO_HAS_THREAD_CLOCK
 #     undef BOOST_CHRONO_THREAD_CLOCK_IS_STEADY
 #   endif

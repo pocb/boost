@@ -9,6 +9,12 @@
 #define BOOST_THREAD_FUTURE_HPP
 
 #include <boost/thread/detail/config.hpp>
+
+// boost::thread::future requires exception handling
+// due to boost::exception::exception_ptr dependency
+
+#ifndef BOOST_NO_EXCEPTIONS
+
 #include <boost/detail/scoped_enum_emulation.hpp>
 #include <stdexcept>
 #include <boost/thread/detail/move.hpp>
@@ -51,6 +57,7 @@
 #else
 #define BOOST_THREAD_FUTURE unique_future
 #endif
+
 
 namespace boost
 {
@@ -1692,5 +1699,5 @@ namespace boost
 
 }
 
-
-#endif
+#endif // BOOST_NO_EXCEPTION
+#endif // header

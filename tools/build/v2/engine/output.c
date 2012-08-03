@@ -6,13 +6,14 @@
 
 #include "jam.h"
 #include "output.h"
-#include "object.h"
+
 #include <stdio.h>
+
 
 #define bjam_out (stdout)
 #define bjam_err (stderr)
 
-static void out_( char const * data, FILE * io )
+static void out_( char const * data, FILE * const io )
 {
     while ( *data )
     {
@@ -25,12 +26,12 @@ static void out_( char const * data, FILE * io )
 
 void out_action
 (
-    char const * action,
-    char const * target,
-    char const * command,
-    char const * out_data,
-    char const * err_data,
-    int exit_reason
+    char const * const action,
+    char const * const target,
+    char const * const command,
+    char const * const out_data,
+    char const * const err_data,
+    int const exit_reason
 )
 {
     /* Print out the action + target line, if the action is quiet the action
@@ -75,7 +76,7 @@ void out_action
 }
 
 
-OBJECT * outf_int( int value )
+OBJECT * outf_int( int const value )
 {
     char buffer[ 50 ];
     sprintf( buffer, "%i", value );
@@ -83,7 +84,7 @@ OBJECT * outf_int( int value )
 }
 
 
-OBJECT * outf_double( double value )
+OBJECT * outf_double( double const value )
 {
     char buffer[ 50 ];
     sprintf( buffer, "%f", value );
@@ -91,9 +92,7 @@ OBJECT * outf_double( double value )
 }
 
 
-OBJECT * outf_time( time_t value )
+OBJECT * outf_time( timestamp const * const time )
 {
-    char buffer[ 50 ];
-    strftime( buffer, 49, "%Y-%m-%d %H:%M:%SZ", gmtime( &value ) );
-    return object_new( buffer );
+    return object_new( timestamp_str( time ) );
 }

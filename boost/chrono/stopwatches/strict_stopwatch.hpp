@@ -10,7 +10,7 @@
 #include <boost/chrono/config.hpp>
 
 #include <boost/chrono/chrono.hpp>
-#include <boost/system/error_code.hpp>
+#include <boost/chrono/detail/system.hpp>
 #include <boost/chrono/thread_clock.hpp>
 #include <boost/chrono/process_cpu_clocks.hpp>
 #include <utility>
@@ -35,7 +35,7 @@ namespace boost
       BOOST_STATIC_CONSTEXPR bool is_steady =             Clock::is_steady;
 
 
-      strict_stopwatch() BOOST_NOEXCEPT :
+      strict_stopwatch() :
         start_(clock::now())
       {
       }
@@ -59,7 +59,7 @@ namespace boost
       {
       }
 
-      duration elapsed() BOOST_NOEXCEPT
+      duration elapsed()
       {
         return clock::now() - start_;
       }

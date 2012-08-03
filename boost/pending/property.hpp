@@ -8,6 +8,7 @@
 
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/if.hpp>
+#include <boost/mpl/has_xxx.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits.hpp>
 
@@ -29,10 +30,19 @@ namespace boost {
   };
 
   // Kinds of properties
+  namespace graph_introspect_detail {
+    BOOST_MPL_HAS_XXX_TRAIT_DEF(kind)
+    template <typename T, bool Cond> struct get_kind {typedef void type;};
+    template <typename T> struct get_kind<T, true> {typedef typename T::kind type;};
+  }
+
+  // Having a default is to make this trait work for any type, not just valid
+  // properties, to work around VC++ <= 10 bugs related to SFINAE in
+  // compressed_sparse_row_graph's get functions and similar
   template <class PropertyTag>
-  struct property_kind {
-    typedef typename PropertyTag::kind type;
-  };
+  struct property_kind:
+    graph_introspect_detail::get_kind<PropertyTag, graph_introspect_detail::has_kind<PropertyTag>::value>
+  {};
 
   // Some standard properties defined independently of Boost.Graph:
   enum vertex_all_t {vertex_all};
@@ -188,58 +198,6 @@ namespace boost {
     struct is_no_property
         : mpl::bool_<is_same<T, no_property>::value>
     { };
-
-    /** @internal @name Retag Property List
-     * This metafunction is used internally to normalize a property if it is
-     * actually modeling a property. Specifically this is used in Boost.Graph
-     * to map user-provided classes into bundled properties.
-     */
-    //@{
-    // One base case of the recursive form (see below). This matches any
-    // retag request that does not include a property<...> or no_property as
-    // the FinalType. This is used for generating bundles in Boost.Graph.
-    template<typename FinalTag, typename FinalType>
-    struct retag_property_list
-    {
-        typedef property<FinalTag, FinalType> type;
-        typedef FinalType retagged;
-    };
-
-    // Recursively retag the nested property list.
-    template<typename FinalTag, typename Tag, typename T, typename Base>
-    struct retag_property_list<FinalTag, property<Tag, T, Base> >
-    {
-    private:
-        typedef retag_property_list<FinalTag, Base> next;
-
-    public:
-        typedef property<Tag, T, typename next::type> type;
-        typedef typename next::retagged retagged;
-    };
-
-    // This base case will correctly deduce the final property type if the
-    // retagged property is given in property form. This should not hide
-    // the base case below.
-    // NOTE: This addresses a problem of layering bundled properties in the BGL
-    // where multiple retaggings will fail to deduce the correct retagged
-    // type.
-    template<typename FinalTag, typename FinalType>
-    struct retag_property_list<FinalTag, property<FinalTag, FinalType> >
-    {
-    public:
-        typedef property<FinalTag, FinalType> type;
-        typedef FinalType retagged;
-    };
-
-    // A final base case of the retag_property_list, this will terminate a
-    // properly structured list.
-    template<typename FinalTag>
-    struct retag_property_list<FinalTag, no_property>
-    {
-        typedef no_property type;
-        typedef no_property retagged;
-    };
-    //@}
 
     template <typename PList, typename Tag>
     class lookup_one_property_f;

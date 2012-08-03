@@ -278,7 +278,7 @@ rule get-invocation-command-nodefault ( toolset : tool :
         command = [ check-tool $(user-provided-command) ] ;
         if ! $(command) && $(.debug-configuration)
         {
-            ECHO warning: toolset $(toolset) initialization:;
+            ECHO warning: toolset $(toolset) initialization: ;
             ECHO warning: can not find user-provided command
                 '$(user-provided-command)' ;
             ECHO warning: initialized from [ errors.nearest-user-location ] ;
@@ -369,7 +369,6 @@ rule find-tool ( name : additional-paths * : path-last ? )
         return [ path.native $(result[1]) ] ;
     }
 }
-
 
 # Checks if 'command' can be found either in path or is a full name to an
 # existing file.
