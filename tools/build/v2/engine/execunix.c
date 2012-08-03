@@ -75,14 +75,14 @@ static struct tms old_time;
 
 static struct
 {
-    int      pid;            /* on win32, a real process handle */
-    int      fd[ 2 ];        /* file descriptors for stdout and stderr */
-    FILE   * stream[ 2 ];    /* child's stdout (0) and stderr (1) file stream */
-    clock_t  start_time;     /* start time of child process */
-    int      exit_reason;    /* termination status */
-    char   * buffer[ 2 ];    /* buffers to hold stdout and stderr, if any */
-    int      buf_size[ 2 ];  /* buffer sizes in bytes */
-    time_t   start_dt;       /* start of command timestamp */
+    int          pid;            /* on win32, a real process handle */
+    int          fd[ 2 ];        /* file descriptors for stdout and stderr */
+    FILE      *  stream[ 2 ];    /* child's stdout and stderr file streams */
+    clock_t      start_time;     /* start time of child process */
+    int          exit_reason;    /* termination status */
+    char      *  buffer[ 2 ];    /* buffers to hold stdout and stderr, if any */
+    int          buf_size[ 2 ];  /* buffer sizes in bytes */
+    timestamp    start_dt;       /* start of command timestamp */
 
     /* Function called when the command completes. */
     ExecCmdCallback func;
@@ -184,7 +184,7 @@ void exec_cmd
 
     /* Start the command */
 
-    cmdtab[ slot ].start_dt = time( 0 );
+    timestamp_current( &cmdtab[ slot ].start_dt );
 
     if ( 0 < globs.timeout )
     {
@@ -334,6 +334,13 @@ static int read_descriptor( int i, int s )
             }
         }
     }
+
+    /* If buffer full, ensure last buffer char is newline so that jam log
+     * contains the command status at beginning of it own line instead of
+     * appended to end of the previous output.
+     */
+    if ( globs.max_buf && globs.max_buf <= cmdtab[ i ].buf_size[ s ] )
+        cmdtab[ i ].buffer[ s ][ cmdtab[ i ].buf_size[ s ] - 2 ] = '\n';
 
     return feof( cmdtab[ i ].stream[ s ] );
 }
@@ -498,8 +505,8 @@ void exec_wait()
                         old_time.tms_cstime ) / CLOCKS_PER_SEC;
                     time_info.user   = (double)( new_time.tms_cutime -
                         old_time.tms_cutime ) / CLOCKS_PER_SEC;
-                    time_info.start  = cmdtab[ i ].start_dt;
-                    time_info.end    = time( 0 );
+                    timestamp_copy( &time_info.start, &cmdtab[ i ].start_dt );
+                    timestamp_current( &time_info.end );
                     old_time = new_time;
                 }
 

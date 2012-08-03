@@ -114,18 +114,22 @@ void assign_tests2(T*,
     }
 }
 
-boost::unordered_set<test::object,
-    test::hash, test::equal_to,
-    test::allocator<test::object> >* test_set;
-boost::unordered_multiset<test::object,
-    test::hash, test::equal_to,
-    test::allocator<test::object> >* test_multiset;
 boost::unordered_map<test::object, test::object,
     test::hash, test::equal_to,
-    test::allocator<test::object> >* test_map;
+    std::allocator<test::object> >* test_map_std_alloc;
+
+boost::unordered_set<test::object,
+    test::hash, test::equal_to,
+    test::allocator1<test::object> >* test_set;
+boost::unordered_multiset<test::object,
+    test::hash, test::equal_to,
+    test::allocator2<test::object> >* test_multiset;
+boost::unordered_map<test::object, test::object,
+    test::hash, test::equal_to,
+    test::allocator2<test::object> >* test_map;
 boost::unordered_multimap<test::object, test::object,
     test::hash, test::equal_to,
-    test::allocator<test::object> >* test_multimap;
+    test::allocator1<test::object> >* test_multimap;
 
 boost::unordered_set<test::object,
         test::hash, test::equal_to,
@@ -178,6 +182,7 @@ UNORDERED_AUTO_TEST(check_traits)
 }
 
 UNORDERED_TEST(assign_tests1, (
+        (test_map_std_alloc)
         (test_set)(test_multiset)(test_map)(test_multimap)
         (test_set_prop_assign)(test_multiset_prop_assign)(test_map_prop_assign)(test_multimap_prop_assign)
         (test_set_no_prop_assign)(test_multiset_no_prop_assign)(test_map_no_prop_assign)(test_multimap_no_prop_assign)
@@ -193,7 +198,7 @@ UNORDERED_TEST(assign_tests2, (
     ((default_generator)(generate_collisions))
 )
 
-#if !defined(BOOST_NO_0X_HDR_INITIALIZER_LIST)
+#if !defined(BOOST_NO_CXX11_HDR_INITIALIZER_LIST)
 
 UNORDERED_AUTO_TEST(assign_default_initializer_list) {
     std::cerr<<"Initializer List Tests\n";
@@ -208,7 +213,7 @@ UNORDERED_AUTO_TEST(assign_default_initializer_list) {
 
 #endif
 
-#if !defined(BOOST_NO_0X_HDR_INITIALIZER_LIST)
+#if !defined(BOOST_NO_CXX11_HDR_INITIALIZER_LIST)
 UNORDERED_AUTO_TEST(assign_initializer_list)
 {
     std::cerr<<"Initializer List Tests\n";

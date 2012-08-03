@@ -2,7 +2,8 @@
 
 # Copyright 2012. Jurko Gospodnetic
 # Distributed under the Boost Software License, Version 1.0.
-# (See accompanying file LICENSE_1_0.txt or http://www.boost.org/LICENSE_1_0.txt)
+# (See accompanying file LICENSE_1_0.txt or copy at
+# http://www.boost.org/LICENSE_1_0.txt)
 
 # This tests the SPLIT_BY_CHARACTERS rule.
 
@@ -10,15 +11,15 @@ import BoostBuild
 
 def test_invalid(params, expected_error_line):
     t = BoostBuild.Tester(pass_toolset=0)
-    t.write("file.jam", "SPLIT_BY_CHARACTERS %s ;\n" % params)
-    t.run_build_system("-ffile.jam", status=1)
-    t.expect_output_line("[*] %s" % expected_error_line)
+    t.write("file.jam", "SPLIT_BY_CHARACTERS %s ;" % params)
+    t.run_build_system(["-ffile.jam"], status=1)
+    t.expect_output_lines("[*] %s" % expected_error_line)
     t.cleanup()
 
 def test_valid():
     t = BoostBuild.Tester(pass_toolset=0)
-    t.write("jamroot.jam",
-"""import assert ;
+    t.write("jamroot.jam", """\
+import assert ;
 
 assert.result FooBarBaz : SPLIT_BY_CHARACTERS FooBarBaz : "" ;
 assert.result FooBarBaz : SPLIT_BY_CHARACTERS FooBarBaz : x ;

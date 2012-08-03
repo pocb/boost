@@ -3,7 +3,8 @@
 # Copyright 2001 Dave Abrahams
 # Copyright 2011 Steven Watanabe
 # Distributed under the Boost Software License, Version 1.0.
-# (See accompanying file LICENSE_1_0.txt or http://www.boost.org/LICENSE_1_0.txt)
+# (See accompanying file LICENSE_1_0.txt or copy at
+# http://www.boost.org/LICENSE_1_0.txt)
 
 # Tests Windows command line construction.
 #
@@ -38,18 +39,27 @@ def string_of_length(n):
 # content and always requires at least a single whitespace after the opening
 # brace in order to satisfy its Boost Jam language grammar rules.
 def test_raw_empty():
-    whitespace = "  \n\n\r\r\v\v\t\t   \t   \r\r   \n\n"
-    t = BoostBuild.Tester("-d2 -d+4", pass_d0=False, pass_toolset=0,
+    whitespace_in = "  \n\n\r\r\v\v\t\t   \t   \r\r   \n\n"
+
+    #   We tell the testing system to read its child process output as raw
+    # binary data but the bjam process we run will read its input file and
+    # write out its output as text, i.e. convert all of our "\r\n" sequences to
+    # "\n" on input and all of its "\n" characters back to "\r\n" on output.
+    # This means that any lone "\n" input characters not preceded by "\r" will
+    # get an extra "\r" added in front of it on output.
+    whitespace_out = whitespace_in.replace("\r\n", "\n").replace("\n", "\r\n")
+
+    t = BoostBuild.Tester(["-d2", "-d+4"], pass_d0=False, pass_toolset=0,
         use_test_config=False)
     t.write("file.jam", """\
 actions do_empty {%s}
 JAMSHELL = %% ;
 do_empty all ;
-""" % (whitespace))
-    t.run_build_system("-ffile.jam")
-    t.expect_output_line("do_empty all")
-    t.expect_output_line("Executing raw command directly", False)
-    if "\n%s\n" % whitespace not in t.stdout():
+""" % (whitespace_in))
+    t.run_build_system(["-ffile.jam"], universal_newlines=False)
+    t.expect_output_lines("do_empty all")
+    t.expect_output_lines("Executing raw command directly", False)
+    if "\r\n%s\r\n" % whitespace_out not in t.stdout():
         BoostBuild.annotation("failure", "Whitespace action content not found "
             "on stdout.")
         t.fail_test(1, dump_difference=False)
@@ -57,7 +67,7 @@ do_empty all ;
 
 
 def test_raw_nt(n=None, error=False):
-    t = BoostBuild.Tester("-d1 -d+4", pass_d0=False, pass_toolset=0,
+    t = BoostBuild.Tester(["-d1", "-d+4"], pass_d0=False, pass_toolset=0,
         use_test_config=False)
 
     cmd_prefix = "%s -c \"print('XXX: " % executable
@@ -100,14 +110,15 @@ do_echo all ;
         expected_status = 1
     else:
         expected_status = 0
-    t.run_build_system("-ffile.jam", status=expected_status)
+    t.run_build_system(["-ffile.jam"], status=expected_status)
     if error:
-        t.expect_output_line("Executing raw command directly", False)
-        t.expect_output_line("do_echo action is too long (%d, max 32766):" % n)
-        t.expect_output_line("XXX: *", False)
+        t.expect_output_lines("Executing raw command directly", False)
+        t.expect_output_lines("do_echo action is too long (%d, max 32766):" % n
+            )
+        t.expect_output_lines("XXX: *", False)
     else:
-        t.expect_output_line("Executing raw command directly")
-        t.expect_output_line("do_echo action is too long*", False)
+        t.expect_output_lines("Executing raw command directly")
+        t.expect_output_lines("do_echo action is too long*", False)
 
         m = re.search("^XXX: (.*)$", t.stdout(), re.MULTILINE)
         if not m:
@@ -124,7 +135,7 @@ do_echo all ;
 
 
 def test_raw_to_shell_fallback_nt():
-    t = BoostBuild.Tester("-d1 -d+4", pass_d0=False, pass_toolset=0,
+    t = BoostBuild.Tester(["-d1", "-d+4"], pass_d0=False, pass_toolset=0,
         use_test_config=False)
 
     cmd_prefix = '%s -c print(' % executable
@@ -141,12 +152,12 @@ actions do_multiline
 JAMSHELL = % ;
 do_multiline all ;
 """)
-    t.run_build_system("-ffile_multiline.jam")
-    t.expect_output_line("do_multiline all")
-    t.expect_output_line("one")
-    t.expect_output_line("two")
-    t.expect_output_line("Executing raw command directly", False)
-    t.expect_output_line("Executing using a command file and the shell: "
+    t.run_build_system(["-ffile_multiline.jam"])
+    t.expect_output_lines("do_multiline all")
+    t.expect_output_lines("one")
+    t.expect_output_lines("two")
+    t.expect_output_lines("Executing raw command directly", False)
+    t.expect_output_lines("Executing using a command file and the shell: "
         "cmd.exe /Q/C")
 
     t.write("file_redirect.jam", """\
@@ -154,25 +165,28 @@ actions do_redirect { echo one > two.txt }
 JAMSHELL = % ;
 do_redirect all ;
 """)
-    t.run_build_system("-ffile_redirect.jam")
-    t.expect_output_line("do_redirect all")
-    t.expect_output_line("one", False)
-    t.expect_output_line("Executing raw command directly", False)
-    t.expect_output_line("Executing using a command file and the shell: "
+    t.run_build_system(["-ffile_redirect.jam"])
+    t.expect_output_lines("do_redirect all")
+    t.expect_output_lines("one", False)
+    t.expect_output_lines("Executing raw command directly", False)
+    t.expect_output_lines("Executing using a command file and the shell: "
         "cmd.exe /Q/C")
     t.expect_addition("two.txt")
 
     t.write("file_pipe.jam", """\
-actions do_pipe { echo one | echo two }
+actions do_pipe
+{
+    echo one | echo two
+}
 JAMSHELL = % ;
 do_pipe all ;
 """)
-    t.run_build_system("-ffile_pipe.jam")
-    t.expect_output_line("do_pipe all")
-    t.expect_output_line("one", False)
-    t.expect_output_line("two")
-    t.expect_output_line("Executing raw command directly", False)
-    t.expect_output_line("Executing using a command file and the shell: "
+    t.run_build_system(["-ffile_pipe.jam"])
+    t.expect_output_lines("do_pipe all")
+    t.expect_output_lines("one*", False)
+    t.expect_output_lines("two")
+    t.expect_output_lines("Executing raw command directly", False)
+    t.expect_output_lines("Executing using a command file and the shell: "
         "cmd.exe /Q/C")
 
     t.write("file_single_quoted.jam", """\
@@ -180,11 +194,11 @@ actions do_single_quoted { %s'5>10'%s }
 JAMSHELL = %% ;
 do_single_quoted all ;
 """ % (cmd_prefix, cmd_suffix))
-    t.run_build_system("-ffile_single_quoted.jam")
-    t.expect_output_line("do_single_quoted all")
-    t.expect_output_line("5>10")
-    t.expect_output_line("Executing raw command directly")
-    t.expect_output_line("Executing using a command file and the shell: "
+    t.run_build_system(["-ffile_single_quoted.jam"])
+    t.expect_output_lines("do_single_quoted all")
+    t.expect_output_lines("5>10")
+    t.expect_output_lines("Executing raw command directly")
+    t.expect_output_lines("Executing using a command file and the shell: "
         "cmd.exe /Q/C", False)
     t.expect_nothing_more()
 
@@ -193,14 +207,14 @@ actions do_double_quoted { %s"5>10"%s }
 JAMSHELL = %% ;
 do_double_quoted all ;
 """ % (cmd_prefix, cmd_suffix))
-    t.run_build_system("-ffile_double_quoted.jam")
-    t.expect_output_line("do_double_quoted all")
+    t.run_build_system(["-ffile_double_quoted.jam"])
+    t.expect_output_lines("do_double_quoted all")
     # The difference between this example and the similar previous one using
     # single instead of double quotes stems from how the used Python executable
     # parses the command-line string received from Windows.
-    t.expect_output_line("False")
-    t.expect_output_line("Executing raw command directly")
-    t.expect_output_line("Executing using a command file and the shell: "
+    t.expect_output_lines("False")
+    t.expect_output_lines("Executing raw command directly")
+    t.expect_output_lines("Executing using a command file and the shell: "
         "cmd.exe /Q/C", False)
     t.expect_nothing_more()
 
@@ -209,11 +223,11 @@ actions do_escaped_quote { %s\\"5>10\\"%s }
 JAMSHELL = %% ;
 do_escaped_quote all ;
 """ % (cmd_prefix, cmd_suffix))
-    t.run_build_system("-ffile_escaped_quote.jam")
-    t.expect_output_line("do_escaped_quote all")
-    t.expect_output_line("5>10")
-    t.expect_output_line("Executing raw command directly", False)
-    t.expect_output_line("Executing using a command file and the shell: "
+    t.run_build_system(["-ffile_escaped_quote.jam"])
+    t.expect_output_lines("do_escaped_quote all")
+    t.expect_output_lines("5>10")
+    t.expect_output_lines("Executing raw command directly", False)
+    t.expect_output_lines("Executing using a command file and the shell: "
         "cmd.exe /Q/C")
     t.expect_nothing_more()
 

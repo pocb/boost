@@ -162,12 +162,12 @@ namespace move_tests
 #elif defined(BOOST_HAS_NRVO)
             BOOST_TEST(
                 test::global_object_count.constructions - count.constructions <=
-                (test::is_map<T>::value ? 50 : 25));
+                (test::is_set<T>::value ? 25 : 50));
             BOOST_TEST(count.instances == test::global_object_count.instances);
 #else
             BOOST_TEST(
                 test::global_object_count.constructions - count.constructions <=
-                (test::is_map<T>::value ? 100 : 50));
+                (test::is_set<T>::value ? 50 : 100));
             BOOST_TEST(count.instances == test::global_object_count.instances);
 #endif
             test::check_container(y, v);
@@ -316,18 +316,22 @@ namespace move_tests
         }
     }
 
-    boost::unordered_set<test::object,
-        test::hash, test::equal_to,
-        test::allocator<test::object> >* test_set;
-    boost::unordered_multiset<test::object,
-        test::hash, test::equal_to,
-        test::allocator<test::object> >* test_multiset;
     boost::unordered_map<test::object, test::object,
         test::hash, test::equal_to,
-        test::allocator<test::object> >* test_map;
+        std::allocator<test::object> >* test_map_std_alloc;
+
+    boost::unordered_set<test::object,
+        test::hash, test::equal_to,
+        test::allocator2<test::object> >* test_set;
+    boost::unordered_multiset<test::object,
+        test::hash, test::equal_to,
+        test::allocator1<test::object> >* test_multiset;
+    boost::unordered_map<test::object, test::object,
+        test::hash, test::equal_to,
+        test::allocator1<test::object> >* test_map;
     boost::unordered_multimap<test::object, test::object,
         test::hash, test::equal_to,
-        test::allocator<test::object> >* test_multimap;
+        test::allocator2<test::object> >* test_multimap;
 
 boost::unordered_set<test::object,
         test::hash, test::equal_to,
@@ -367,12 +371,14 @@ boost::unordered_multimap<test::object, test::object,
     using test::generate_collisions;
 
     UNORDERED_TEST(move_construct_tests1, (
+            (test_map_std_alloc)
             (test_set)(test_multiset)(test_map)(test_multimap)
             (test_set_prop_move)(test_multiset_prop_move)(test_map_prop_move)(test_multimap_prop_move)
             (test_set_no_prop_move)(test_multiset_no_prop_move)(test_map_no_prop_move)(test_multimap_no_prop_move)
         )
     )
     UNORDERED_TEST(move_assign_tests1, (
+            (test_map_std_alloc)
             (test_set)(test_multiset)(test_map)(test_multimap)
             (test_set_prop_move)(test_multiset_prop_move)(test_map_prop_move)(test_multimap_prop_move)
             (test_set_no_prop_move)(test_multiset_no_prop_move)(test_map_no_prop_move)(test_multimap_no_prop_move)

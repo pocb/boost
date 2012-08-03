@@ -2,7 +2,8 @@
 # Copyright 2002, 2005, 2006 Rene Rivera
 # Copyright 2002, 2003, 2004, 2005, 2006 Vladimir Prus
 # Distributed under the Boost Software License, Version 1.0.
-# (See accompanying file LICENSE_1_0.txt or http://www.boost.org/LICENSE_1_0.txt)
+# (See accompanying file LICENSE_1_0.txt or copy at
+# http://www.boost.org/LICENSE_1_0.txt)
 
 # Implements project representation and loading. Each project is represented by:
 #  - a module where all the Jamfile content live.
@@ -35,7 +36,6 @@
 # their project id.
 
 import "class" : new ;
-import errors ;
 import modules ;
 import path ;
 import print ;
@@ -56,18 +56,18 @@ rule load ( jamfile-location )
     }
 
     local module-name = [ module-name $(jamfile-location) ] ;
-    # If Jamfile is already loaded, don't try again.
+    # If Jamfile is already loaded, do not try again.
     if ! $(module-name) in $(.jamfile-modules)
     {
         load-jamfile $(jamfile-location) : $(module-name) ;
 
         # We want to make sure that child project are loaded only after parent
         # projects. In particular, because parent projects define attributes
-        # which are inherited by children, and we don't want children to be
-        # loaded before parent has defined everything.
+        # which are then inherited by children, and we do not want children to
+        # be loaded before parent has defined everything.
         #
         # While "build-project" and "use-project" can potentially refer to child
-        # projects from parent projects, we don't immediately load child
+        # projects from parent projects, we do not immediately load child
         # projects when seeing those attributes. Instead, we record the minimal
         # information to be used only later.
         load-used-projects $(module-name) ;
@@ -85,7 +85,6 @@ rule load-used-projects ( module-name )
     {
         local id = $(used[1]) ;
         local where = $(used[2]) ;
-
         project.use $(id) : [ path.root [ path.make $(where) ] $(location) ] ;
         used = $(used[3-]) ;
     }
@@ -104,14 +103,12 @@ JAMROOT ?= project-root.jam [Jj]amroot [Jj]amroot.jam ;
 rule load-parent ( location )
 {
     local found = [ path.glob-in-parents $(location) : $(JAMROOT) $(JAMFILE) ] ;
-
     if ! $(found)
     {
         ECHO error: Could not find parent for project at '$(location)' ;
         EXIT error: Did not find Jamfile.jam or Jamroot.jam in any parent
             directory. ;
     }
-
     return [ load $(found[1]:D) ] ;
 }
 
@@ -124,6 +121,7 @@ rule act-as-jamfile ( module : location )
 {
     if [ module-name $(location) ] in $(.jamfile-modules)
     {
+        import errors ;
         errors.error "Jamfile was already loaded for '$(location)'" ;
     }
     # Set up non-default mapping from location to module.
@@ -207,8 +205,8 @@ JAMFILE ?= [Bb]uild.jam [Jj]amfile.v2 [Jj]amfile [Jj]amfile.jam ;
 # directory given in it.
 #
 rule find-jamfile (
-    dir # The directory(s) to look for a Jamfile.
-    parent-root ? # Optional flag indicating to search for the parent Jamfile.
+    dir            # The directory(s) to look for a Jamfile.
+    parent-root ?  # Optional flag indicating to search for the parent Jamfile.
     : no-errors ?
     )
 {
@@ -261,6 +259,7 @@ rule find-jamfile (
     #
     if ! $(no-errors) && ! $(jamfile-to-load)
     {
+        import errors ;
         errors.error Unable to load Jamfile.
             : Could not find a Jamfile in directory '$(dir)'.
             : Attempted to find it with pattern '$(JAMFILE:J=" ")'.
@@ -275,10 +274,7 @@ rule find-jamfile (
 # the file as indicated by the JAMFILE patterns. Effect of calling this rule
 # twice with the same 'dir' is undefined.
 #
-local rule load-jamfile (
-    dir  # The directory of the project Jamfile.
-    : jamfile-module
-    )
+local rule load-jamfile ( dir : jamfile-module )
 {
     # See if the Jamfile is where it should be.
     #
@@ -290,22 +286,21 @@ local rule load-jamfile (
 
     if $(jamfile-to-load[2])
     {
-        errors.error "Multiple Jamfiles found at '$(dir)'"
-          :  "Filenames are: " $(jamfile-to-load:D=) ;
+        import errors ;
+        errors.error "Multiple Jamfiles found at '$(dir)'" :
+            "Filenames are: " $(jamfile-to-load:D=) ;
     }
 
-    # Now load the Jamfile in it's own context.
-    # The call to 'initialize' may load parent Jamfile, which might have
-    # 'use-project' statement that causes a second attempt to load the
-    # same project we're loading now.  Checking inside .jamfile-modules
-    # prevents that second attempt from messing up.
+    # Now load the Jamfile in its own context.
+    # The call to 'initialize' may load the parent Jamfile, which might contain
+    # a 'use-project' statement, causing a second attempt to load the same
+    # project we are loading now. Checking inside .jamfile-modules prevents that
+    # second attempt from messing things up.
     if ! $(jamfile-module) in $(.jamfile-modules)
     {
-
         # Initialize the Jamfile module before loading.
-        #
-        initialize $(jamfile-module) : [ path.parent $(jamfile-to-load) ]
-            : $(jamfile-to-load:BS) ;
+        initialize $(jamfile-module) : [ path.parent $(jamfile-to-load) ] :
+            $(jamfile-to-load:BS) ;
 
         if ! $(jamfile-module) in $(.jamfile-modules)
         {
@@ -314,7 +309,8 @@ local rule load-jamfile (
             local saved-project = $(.current-project) ;
 
             mark-as-user $(jamfile-module) ;
-            modules.load $(jamfile-module) : [ path.native $(jamfile-to-load) ] : . ;
+            modules.load $(jamfile-module) : [ path.native $(jamfile-to-load) ]
+                : . ;
             if [ MATCH ($(JAMROOT)) : $(jamfile-to-load:BS) ]
             {
                 jamfile = [ find-jamfile $(dir) : no-errors ] ;
@@ -327,24 +323,24 @@ local rule load-jamfile (
             # Now do some checks.
             if $(.current-project) != $(saved-project)
             {
-                errors.error "The value of the .current-project variable has magically"
-                    : "changed after loading a Jamfile. This means some of the targets"
-                    : "might be defined in the wrong project."
-                    : "after loading" $(jamfile-module)
-                    : "expected value" $(saved-project)
-                    : "actual value" $(.current-project) ;
+                import errors ;
+                errors.error
+                    The value of the .current-project variable has magically
+                    : changed after loading a Jamfile. This means some of the
+                    : targets might be defined in the wrong project.
+                    : after loading $(jamfile-module)
+                    : expected value $(saved-project)
+                    : actual value $(.current-project) ;
             }
 
             if $(.global-build-dir)
             {
-                local id           = [ attribute $(jamfile-module) id           ] ;
-                local project-root = [ attribute $(jamfile-module) project-root ] ;
-                local location     = [ attribute $(jamfile-module) location     ] ;
-
-                if $(location) && $(project-root) = $(dir)
+                if [ attribute $(jamfile-module) location ] && ! [ attribute
+                    $(jamfile-module) id ]
                 {
-                    # This is Jamroot.
-                    if ! $(id)
+                    local project-root = [ attribute $(jamfile-module)
+                        project-root ] ;
+                    if $(project-root) = $(dir)
                     {
                         ECHO "warning: the --build-dir option was specified" ;
                         ECHO "warning: but Jamroot at '$(dir)'" ;
@@ -431,8 +427,8 @@ rule initialize (
         }
         else
         {
-            # It's either jamroot or standalone project. If it's jamroot,
-            # inherit from user-config.
+            # We have either jamroot or a standalone project. If it is jamroot,
+            # inherit from user-config (or project-config if it exists).
             if $(location)
             {
                 # If project-config module exist, inherit from it.
@@ -450,38 +446,46 @@ rule initialize (
     }
 
     # TODO: need to consider if standalone projects can do anything but define
-    # prebuilt targets. If so, we need to give it a more sensible "location", so
-    # that source paths are correct.
+    # prebuilt targets. If so, we need to give them a more sensible "location",
+    # so that source paths are correct.
     location ?= "" ;
     # Create the module for the Jamfile first.
     module $(module-name)
     {
     }
 
-    # load-parent can end up loading this module again.
-    # Make sure this isn't duplicated.
-    if ! $($(module-name).attributes) {
-
+    # load-parent can end up loading this module again. Make sure this is not
+    # duplicated.
+    if ! $($(module-name).attributes)
+    {
         $(module-name).attributes = [ new project-attributes $(location)
             $(module-name) ] ;
         local attributes = $($(module-name).attributes) ;
 
         if $(location)
         {
-            $(attributes).set source-location : [ path.make $(location) ] : exact ;
+            $(attributes).set source-location : [ path.make $(location) ] :
+                exact ;
         }
-        else if ! $(module-name) in test-config site-config user-config project-config
+        else
         {
-            # This is a standalone project with known location. Set source location
-            # so that it can declare targets. This is intended so that you can put
-            # a .jam file in your sources and use it via 'using'. Standard modules
-            # (in 'tools' subdir) may not assume source dir is set.
-            local s = [ modules.binding $(module-name) ] ;
-            if ! $(s)
+            local cfgs = test site user project ;
+            if ! $(module-name) in $(cfgs)-config
             {
-                errors.error "Could not determine project location $(module-name)" ;
+                # This is a standalone project with known location. Set its
+                # source location so it can declare targets. This is needed so
+                # you can put a .jam file with your sources and use it via
+                # 'using'. Standard modules (in the 'tools' subdir) may not
+                # assume source dir is set.
+                local s = [ modules.binding $(module-name) ] ;
+                if ! $(s)
+                {
+                    import errors ;
+                    errors.error Could not determine project location
+                        $(module-name) ;
+                }
+                $(attributes).set source-location : $(s:D) : exact ;
             }
-            $(attributes).set source-location : $(s:D) : exact ;
         }
 
         $(attributes).set requirements       : [ property-set.empty ] : exact ;
@@ -584,7 +588,6 @@ class project-attributes
 {
     import property ;
     import property-set ;
-    import errors ;
     import path ;
     import print ;
     import sequence ;
@@ -615,13 +618,12 @@ class project-attributes
 
             if $(result[1]) = "@error"
             {
+                import errors : error : errors.error ;
                 errors.error Requirements for project at '$(self.location)'
                     conflict with parent's. : Explanation: $(result[2-]) ;
             }
-            else
-            {
-                self.requirements = $(result) ;
-            }
+
+            self.requirements = $(result) ;
         }
         else if $(attribute) = "usage-requirements"
         {
@@ -636,11 +638,12 @@ class project-attributes
             local non-free = [ property.remove free : $(unconditional) ] ;
             if $(non-free)
             {
+                import errors : error : errors.error ;
                 errors.error usage-requirements $(specification) have non-free
                     properties $(non-free) ;
             }
-            local t = [ property.translate-paths $(specification)
-                                      : $(self.location) ] ;
+            local t = [ property.translate-paths $(specification) :
+                $(self.location) ] ;
             if $(self.usage-requirements)
             {
                 self.usage-requirements = [ property-set.create
@@ -666,18 +669,18 @@ class project-attributes
         }
         else if $(attribute) = "build-dir"
         {
-            self.build-dir = [ path.root
-                [ path.make $(specification) ] $(self.location) ] ;
+            self.build-dir = [ path.root [ path.make $(specification) ]
+                $(self.location) ] ;
         }
         else if $(attribute) = "id"
         {
-            id = [ path.root $(specification) / ] ;
-            project.register-id $(id) : $(self.project-module) ;
-            self.id = $(id) ;
+            self.id = [ path.root $(specification) / ] ;
+            project.register-id $(self.id) : $(self.project-module) ;
         }
         else if ! $(attribute) in "default-build" "location" "parent"
             "projects-to-build" "project-root" "source-location"
         {
+            import errors : error : errors.error ;
             errors.error Invalid project attribute '$(attribute)' specified for
                 project at '$(self.location)' ;
         }
@@ -698,16 +701,16 @@ class project-attributes
     #
     rule print ( )
     {
-        local id = $(self.id) ; id ?= (none) ;
-        local parent = $(self.parent) ; parent ?= (none) ;
+        local id = $(self.id:E=(none)) ;
+        local parent = $(self.parent:E=(none)) ;
         print.section "'"$(id)"'" ;
         print.list-start ;
         print.list-item "Parent project:" $(parent) ;
         print.list-item "Requirements:" [ $(self.requirements).raw ] ;
         print.list-item "Default build:" $(self.default-build) ;
         print.list-item "Source location:" $(self.source-location) ;
-        print.list-item "Projects to build:"
-                        [ sequence.insertion-sort $(self.projects-to-build) ] ;
+        print.list-item "Projects to build:" [ sequence.insertion-sort
+            $(self.projects-to-build) ] ;
         print.list-end ;
     }
 }
@@ -783,9 +786,9 @@ rule use ( id : location )
         if $($(id).jamfile-module) && ( $($(id).jamfile-module) !=
             $(project-module) )
         {
+            import errors ;
             errors.user-error Attempt to redeclare already existing project id
-                '$(id)'
-                location '$(location)' ;
+                '$(id)' location '$(location)' ;
         }
         $(id).jamfile-module = $(project-module) ;
     }
@@ -826,7 +829,8 @@ rule extension ( id : options * : * )
         # Create the project itself, i.e. the attributes. All extensions are
         # created in the "/ext" project space.
         project /ext/$(1) : $(2) : $(3) : $(4) : $(5) : $(6) : $(7) : $(8) :
-            $(9) ;
+            $(9) : $(10) : $(11) : $(12) : $(13) : $(14) : $(15) : $(16) : $(17)
+            : $(18) : $(19) ;
         local attributes = [ project.attributes $(__name__) ] ;
 
         # Inherit from the root project of whomever is defining us.
@@ -895,13 +899,15 @@ module project-rules
         local caller = [ CALLER_MODULE ] ;
         local caller-location = [ modules.binding $(caller) ] ;
         modules.poke : BOOST_BUILD_PATH : $(caller-location:D) $(x) ;
-        toolset.using $(1) : $(2) : $(3) : $(4) : $(5) : $(6) : $(7) : $(8) : $(9) ;
+        toolset.using $(1) : $(2) : $(3) : $(4) : $(5) : $(6) : $(7) : $(8) :
+            $(9) : $(10) : $(11) : $(12) : $(13) : $(14) : $(15) : $(16) : $(17)
+            : $(18) : $(19) ;
         modules.poke : BOOST_BUILD_PATH : $(x) ;
 
-        # The above might have clobbered .current-project. Restore the correct
-        # value.
-        modules.poke project : .current-project
-            : [ project.target $(caller) ] ;
+        # The above might have clobbered .current-project (newly created project
+        # instances automatically get set as the 'current' project). Restore the
+        # correct value.
+        modules.poke project : .current-project : [ project.target $(caller) ] ;
     }
 
     import modules ;
@@ -921,7 +927,6 @@ module project-rules
 
     rule project ( id ? : options * : * )
     {
-        import errors ;
         import path ;
         import project ;
 
@@ -969,6 +974,7 @@ module project-rules
                     if $(explicit-build-dir) &&
                         [ path.is-rooted $(explicit-build-dir) ]
                     {
+                        import errors ;
                         errors.user-error Absolute directory specified via
                             'build-dir' project attribute : Do not know how to
                             combine that with the --build-dir option. ;
@@ -986,6 +992,7 @@ module project-rules
                 # Not Jamroot.
                 if $(explicit-build-dir)
                 {
+                    import errors ;
                     errors.user-error When --build-dir is specified, the
                         'build-dir' project : attribute is allowed only for
                         top-level 'project' invocations ;
@@ -998,10 +1005,7 @@ module project-rules
     # normal variables but should not be changed. They are applied to every
     # child Jamfile.
     #
-    rule constant (
-        name  # Variable name of the constant.
-        : value +  # Value of the constant.
-    )
+    rule constant ( name : value + )
     {
         import project ;
         local caller = [ CALLER_MODULE ] ;
@@ -1013,10 +1017,7 @@ module project-rules
     # is adjusted to be relative to the invocation directory. The given value
     # path is taken to be either absolute, or relative to this project root.
     #
-    rule path-constant (
-        name  # Variable name of the constant.
-        : value +  # Value of the constant.
-        )
+    rule path-constant ( name : value + )
     {
         import project ;
         local caller = [ CALLER_MODULE ] ;
@@ -1029,9 +1030,8 @@ module project-rules
         import modules ;
         # See comment in 'load' for explanation.
         local caller = [ CALLER_MODULE ] ;
-        modules.poke $(caller) : .used-projects :
-            [ modules.peek $(caller) : .used-projects ]
-            $(id) $(where) ;
+        modules.poke $(caller) : .used-projects : [ modules.peek $(caller) :
+            .used-projects ] $(id) $(where) ;
     }
 
     rule build-project ( dir )
@@ -1039,7 +1039,6 @@ module project-rules
         import project ;
         local caller = [ CALLER_MODULE ] ;
         local attributes = [ project.attributes $(caller) ] ;
-
         local now = [ $(attributes).get projects-to-build ] ;
         $(attributes).set projects-to-build : $(now) $(dir) ;
     }
@@ -1077,9 +1076,9 @@ module project-rules
     rule glob-tree ( wildcards + : excludes * )
     {
         import project ;
-
         if $(wildcards:D) || $(excludes:D)
         {
+            import errors ;
             errors.user-error The patterns to 'glob-tree' may not include
                 directory ;
         }
@@ -1110,10 +1109,12 @@ module project-rules
     rule option ( name : value )
     {
         local m = [ CALLER_MODULE ] ;
-        if $(m) != site-config && $(m) != user-config && $(m) != project-config
+        local cfgs = project site test user ;
+        if ! $(m) in $(cfgs)-config
         {
             import errors ;
-            errors.error "The 'option' rule may be used only in site-config or user-config" ;
+            errors.error The 'option' rule may only be used "in" Boost Build
+                configuration files. ;
         }
         import option ;
         option.set $(name) : $(value) ;
