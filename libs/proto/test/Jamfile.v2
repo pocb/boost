@@ -26,7 +26,9 @@ test-suite "proto"
         [ run deep_copy.cpp ]
         [ run display_expr.cpp ]
         [ run deduce_domain.cpp ]
+        [ run env_var.cpp ]
         [ run examples.cpp ]
+        [ run external_transforms.cpp ]
         [ run lambda.cpp ]
         [ run make_expr.cpp ]
         [ run matches.cpp ]
@@ -38,6 +40,7 @@ test-suite "proto"
         [ run mem_ptr.cpp : : : <toolset>msvc:<cxxflags>/wd4355 ]
         [ run noinvoke.cpp ]
         [ run pack_expansion.cpp ]
+        [ run protect.cpp ]
         [ compile bug2407.cpp ]
     ;
 
