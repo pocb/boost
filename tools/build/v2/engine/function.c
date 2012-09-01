@@ -1,7 +1,8 @@
 /*
- *  Copyright 2011 Steven Watanabe
- *  Distributed under the Boost Software License, Version 1.0.
- *  (See accompanying file LICENSE_1_0.txt or http://www.boost.org/LICENSE_1_0.txt)
+ * Copyright 2011 Steven Watanabe
+ * Distributed under the Boost Software License, Version 1.0.
+ * (See accompanying file LICENSE_1_0.txt or copy at
+ * http://www.boost.org/LICENSE_1_0.txt)
  */
 
 #include "jam.h"
@@ -37,83 +38,83 @@ int glob( char const * s, char const * c );
 void backtrace( FRAME * );
 void backtrace_line( FRAME * );
 
-#define INSTR_PUSH_EMPTY                    0
-#define INSTR_PUSH_CONSTANT                 1
-#define INSTR_PUSH_ARG                      2
-#define INSTR_PUSH_VAR                      3
-#define INSTR_PUSH_VAR_FIXED                57
-#define INSTR_PUSH_GROUP                    4
-#define INSTR_PUSH_RESULT                   5
-#define INSTR_PUSH_APPEND                   6
-#define INSTR_SWAP                          7
+#define INSTR_PUSH_EMPTY                   0
+#define INSTR_PUSH_CONSTANT                1
+#define INSTR_PUSH_ARG                     2
+#define INSTR_PUSH_VAR                     3
+#define INSTR_PUSH_VAR_FIXED               57
+#define INSTR_PUSH_GROUP                   4
+#define INSTR_PUSH_RESULT                  5
+#define INSTR_PUSH_APPEND                  6
+#define INSTR_SWAP                         7
 
-#define INSTR_JUMP_EMPTY                    8
-#define INSTR_JUMP_NOT_EMPTY                9
+#define INSTR_JUMP_EMPTY                   8
+#define INSTR_JUMP_NOT_EMPTY               9
 
-#define INSTR_JUMP                          10
-#define INSTR_JUMP_LT                       11
-#define INSTR_JUMP_LE                       12
-#define INSTR_JUMP_GT                       13
-#define INSTR_JUMP_GE                       14
-#define INSTR_JUMP_EQ                       15
-#define INSTR_JUMP_NE                       16
-#define INSTR_JUMP_IN                       17
-#define INSTR_JUMP_NOT_IN                   18
+#define INSTR_JUMP                         10
+#define INSTR_JUMP_LT                      11
+#define INSTR_JUMP_LE                      12
+#define INSTR_JUMP_GT                      13
+#define INSTR_JUMP_GE                      14
+#define INSTR_JUMP_EQ                      15
+#define INSTR_JUMP_NE                      16
+#define INSTR_JUMP_IN                      17
+#define INSTR_JUMP_NOT_IN                  18
 
-#define INSTR_JUMP_NOT_GLOB                 19
+#define INSTR_JUMP_NOT_GLOB                19
 
-#define INSTR_FOR_INIT                      56
-#define INSTR_FOR_LOOP                      20
+#define INSTR_FOR_INIT                     56
+#define INSTR_FOR_LOOP                     20
 
-#define INSTR_SET_RESULT                    21
-#define INSTR_RETURN                        22
-#define INSTR_POP                           23
+#define INSTR_SET_RESULT                   21
+#define INSTR_RETURN                       22
+#define INSTR_POP                          23
 
-#define INSTR_PUSH_LOCAL                    24
-#define INSTR_POP_LOCAL                     25
-#define INSTR_SET                           26
-#define INSTR_APPEND                        27
-#define INSTR_DEFAULT                       28
+#define INSTR_PUSH_LOCAL                   24
+#define INSTR_POP_LOCAL                    25
+#define INSTR_SET                          26
+#define INSTR_APPEND                       27
+#define INSTR_DEFAULT                      28
 
-#define INSTR_PUSH_LOCAL_FIXED              58
-#define INSTR_POP_LOCAL_FIXED               59
-#define INSTR_SET_FIXED                     60
-#define INSTR_APPEND_FIXED                  61
-#define INSTR_DEFAULT_FIXED                 62
+#define INSTR_PUSH_LOCAL_FIXED             58
+#define INSTR_POP_LOCAL_FIXED              59
+#define INSTR_SET_FIXED                    60
+#define INSTR_APPEND_FIXED                 61
+#define INSTR_DEFAULT_FIXED                62
 
-#define INSTR_PUSH_LOCAL_GROUP              29
-#define INSTR_POP_LOCAL_GROUP               30
-#define INSTR_SET_GROUP                     31
-#define INSTR_APPEND_GROUP                  32
-#define INSTR_DEFAULT_GROUP                 33
+#define INSTR_PUSH_LOCAL_GROUP             29
+#define INSTR_POP_LOCAL_GROUP              30
+#define INSTR_SET_GROUP                    31
+#define INSTR_APPEND_GROUP                 32
+#define INSTR_DEFAULT_GROUP                33
 
-#define INSTR_PUSH_ON                       34
-#define INSTR_POP_ON                        35
-#define INSTR_SET_ON                        36
-#define INSTR_APPEND_ON                     37
-#define INSTR_DEFAULT_ON                    38
+#define INSTR_PUSH_ON                      34
+#define INSTR_POP_ON                       35
+#define INSTR_SET_ON                       36
+#define INSTR_APPEND_ON                    37
+#define INSTR_DEFAULT_ON                   38
 
-#define INSTR_CALL_RULE                     39
+#define INSTR_CALL_RULE                    39
 
-#define INSTR_APPLY_MODIFIERS               40
-#define INSTR_APPLY_INDEX                   41
-#define INSTR_APPLY_INDEX_MODIFIERS         42
-#define INSTR_APPLY_MODIFIERS_GROUP         43
-#define INSTR_APPLY_INDEX_GROUP             44
-#define INSTR_APPLY_INDEX_MODIFIERS_GROUP   45
-#define INSTR_COMBINE_STRINGS               46
+#define INSTR_APPLY_MODIFIERS              40
+#define INSTR_APPLY_INDEX                  41
+#define INSTR_APPLY_INDEX_MODIFIERS        42
+#define INSTR_APPLY_MODIFIERS_GROUP        43
+#define INSTR_APPLY_INDEX_GROUP            44
+#define INSTR_APPLY_INDEX_MODIFIERS_GROUP  45
+#define INSTR_COMBINE_STRINGS              46
 
-#define INSTR_INCLUDE                       47
-#define INSTR_RULE                          48
-#define INSTR_ACTIONS                       49
-#define INSTR_PUSH_MODULE                   50
-#define INSTR_POP_MODULE                    51
-#define INSTR_CLASS                         52
-#define INSTR_BIND_MODULE_VARIABLES         63
+#define INSTR_INCLUDE                      47
+#define INSTR_RULE                         48
+#define INSTR_ACTIONS                      49
+#define INSTR_PUSH_MODULE                  50
+#define INSTR_POP_MODULE                   51
+#define INSTR_CLASS                        52
+#define INSTR_BIND_MODULE_VARIABLES        63
 
-#define INSTR_APPEND_STRINGS                53
-#define INSTR_WRITE_FILE                    54
-#define INSTR_OUTPUT_STRINGS                55
+#define INSTR_APPEND_STRINGS               53
+#define INSTR_WRITE_FILE                   54
+#define INSTR_OUTPUT_STRINGS               55
 
 typedef struct instruction
 {
@@ -138,7 +139,8 @@ typedef struct _subaction
 #define FUNCTION_BUILTIN    0
 #define FUNCTION_JAM        1
 
-struct argument {
+struct argument
+{
     int flags;
 #define ARG_ONE 0
 #define ARG_OPTIONAL 1
@@ -150,7 +152,8 @@ struct argument {
     int index;
 };
 
-struct arg_list {
+struct arg_list
+{
     int size;
     struct argument * args;
 };
@@ -198,7 +201,7 @@ typedef struct _python_function
     PyObject * python_function;
 } PYTHON_FUNCTION;
 
-static LIST * call_python_function( PYTHON_FUNCTION * function, FRAME * frame );
+static LIST * call_python_function( PYTHON_FUNCTION *, FRAME * );
 
 #endif
 
@@ -215,7 +218,7 @@ STACK * stack_global()
     static STACK result;
     if ( !stack )
     {
-        int size = 1 << 21;
+        int const size = 1 << 21;
         stack = BJAM_MALLOC( size );
         result.data = (char *)stack + size;
     }
@@ -224,7 +227,7 @@ STACK * stack_global()
 
 static void check_alignment( STACK * s )
 {
-    assert( (unsigned long)s->data % sizeof( LIST * ) == 0 );
+    assert( (size_t)s->data % sizeof( LIST * ) == 0 );
 }
 
 void * stack_allocate( STACK * s, int size )
@@ -249,7 +252,7 @@ void stack_push( STACK * s, LIST * l )
 
 LIST * stack_pop( STACK * s )
 {
-    LIST * result = *(LIST * *)s->data;
+    LIST * const result = *(LIST * *)s->data;
     stack_deallocate( s, sizeof( LIST * ) );
     return result;
 }
@@ -275,7 +278,7 @@ void stack_set( STACK * s, int n, LIST * value )
 void * stack_get( STACK * s )
 {
     check_alignment( s );
-    return (LIST * *)s->data;
+    return s->data;
 }
 
 LIST * frame_get_local( FRAME * frame, int idx )
@@ -1021,56 +1024,116 @@ static LIST * apply_subscript_and_modifiers( STACK * s, int n )
     return result;
 }
 
+
+/*
+ * expand() - expands a list of concatenated strings and variable refereces
+ *
+ * Takes a list of expansion items - each representing one element to be
+ * concatenated and each containing a list of its values. Returns a list of all
+ * possible values constructed by selecting a single value from each of the
+ * elements and concatenating them together.
+ *
+ * For example, in the following code:
+ *
+ *     local a = one two three four ;
+ *     local b = foo bar ;
+ *     ECHO /$(a)/$(b)/$(a)/ ;
+ *
+ *   When constructing the result of /$(a)/$(b)/ this function would get called
+ * with the following 7 expansion items:
+ *     1. /
+ *     2. one two three four
+ *     3. /
+ *     4. foo bar
+ *     5. /
+ *     6. one two three four
+ *     7. /
+ *
+ *   And would result in a list containing 32 values:
+ *     1. /one/foo/one/
+ *     2. /one/foo/two/
+ *     3. /one/foo/three/
+ *     4. /one/foo/four/
+ *     5. /one/bar/one/
+ *     ...
+ *
+ */
+
 typedef struct expansion_item
 {
-    LISTITER elem;
-    LIST * saved;
-    int size;
+    /* Item's value list initialized prior to calling expand(). */
+    LIST * values;
+
+    /* Internal data initialized and used inside expand(). */
+    LISTITER current;  /* Currently used value. */
+    int size;          /* Concatenated string length prior to concatenating the
+                        * item's current value.
+                        */
 } expansion_item;
 
-static LIST * expand( expansion_item * elem, int length )
+static LIST * expand( expansion_item * items, int const length )
 {
     LIST * result = L0;
     string buf[ 1 ];
     int size = 0;
     int i;
+
     assert( length > 0 );
     for ( i = 0; i < length; ++i )
     {
-        int max = 0;
-        LISTITER iter = elem[ i ].elem;
-        LISTITER const end = list_end( elem[ i ].saved );
-        if ( iter == end ) return result;
-        for ( ; iter != end; iter = list_next( iter ) )
+        LISTITER iter = list_begin( items[ i ].values );
+        LISTITER const end = list_end( items[ i ].values );
+
+        /* If any of the items has no values - the result is an empty list. */
+        if ( iter == end ) return L0;
+
+        /* Set each item's 'current' to its first listed value. This indicates
+         * each item's next value to be used when constructing the list of all
+         * possible concatenated values.
+         */
+        items[ i ].current = iter;
+
+        /* Calculate the longest concatenated string length - to know how much
+         * memory we need to allocate as a buffer for holding the concatenated
+         * strings.
+         */
         {
-            int const len = strlen( object_str( list_item( iter ) ) );
-            if ( len > max ) max = len;
+            int max = 0;
+            for ( ; iter != end; iter = list_next( iter ) )
+            {
+                int const len = strlen( object_str( list_item( iter ) ) );
+                if ( len > max ) max = len;
+            }
+            size += max;
         }
-        size += max;
     }
+
     string_new( buf );
     string_reserve( buf, size );
+
     i = 0;
+    while ( i >= 0 )
     {
-    loop:
         for ( ; i < length; ++i )
         {
-            elem[ i ].size = buf->size;
-            string_append( buf, object_str( list_item( elem[ i ].elem ) ) );
+            items[ i ].size = buf->size;
+            string_append( buf, object_str( list_item( items[ i ].current ) ) );
         }
         result = list_push_back( result, object_new( buf->value ) );
         while ( --i >= 0 )
         {
-            if ( list_next( elem[ i ].elem ) != list_end( elem[ i ].saved ) )
+            if ( list_next( items[ i ].current ) != list_end( items[ i ].values
+                ) )
             {
-                elem[ i ].elem = list_next( elem[ i ].elem );
-                string_truncate( buf, elem[ i ].size );
-                goto loop;
+                items[ i ].current = list_next( items[ i ].current );
+                string_truncate( buf, items[ i ].size );
+                break;
             }
             else
-                elem[ i ].elem = list_begin( elem[ i ].saved );
+                items[ i ].current = list_begin( items[ i ].values );
         }
     }
+
     string_free( buf );
     return result;
 }
@@ -3123,7 +3186,7 @@ static void argument_list_print( struct arg_list * args, int num_args )
                 if ( j ) printf( " " );
                 if ( formal_arg->type_name )
                     printf( "%s ", object_str( formal_arg->type_name ) );
-                printf( "%s", formal_arg->arg_name );
+                printf( "%s", object_str( formal_arg->arg_name ) );
                 switch ( formal_arg->flags )
                 {
                 case ARG_OPTIONAL: printf( " ?" ); break;
@@ -4049,16 +4112,13 @@ LIST * function_run( FUNCTION * function_, FRAME * frame, STACK * s )
 
         case INSTR_COMBINE_STRINGS:
         {
-            LIST * result;
-            size_t buffer_size = code->arg * sizeof( expansion_item );
-            LIST * * stack_pos = stack_get( s );
+            size_t const buffer_size = code->arg * sizeof( expansion_item );
+            LIST * * const stack_pos = stack_get( s );
             expansion_item * items = stack_allocate( s, buffer_size );
+            LIST * result;
             int i;
             for ( i = 0; i < code->arg; ++i )
-            {
-                items[ i ].saved = stack_pos[ i ];
-                items[ i ].elem = list_begin( items[ i ].saved );
-            }
+                items[ i ].values = stack_pos[ i ];
             result = expand( items, code->arg );
             stack_deallocate( s, buffer_size );
             for ( i = 0; i < code->arg; ++i )

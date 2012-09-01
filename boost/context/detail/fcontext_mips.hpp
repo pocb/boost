@@ -7,6 +7,8 @@
 #ifndef BOOST_CTX_DETAIL_FCONTEXT_MIPS_H
 #define BOOST_CTX_DETAIL_FCONTEXT_MIPS_H
 
+#include <cstddef>
+
 #include <boost/config.hpp>
 #include <boost/cstdint.hpp>
 
@@ -27,11 +29,11 @@ extern "C" {
 
 struct stack_t
 {
-    void    *   base;
-    void    *   limit;
+    void    *   sp;
+    std::size_t size;
 
     stack_t() :
-        base( 0), limit( 0)
+        sp( 0), size( 0)
     {}
 };
 

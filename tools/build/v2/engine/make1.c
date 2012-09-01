@@ -882,7 +882,7 @@ static void make1c_closure
      * commands if we were asked to stop the build in case of any errors.
      */
     if ( t->status == EXEC_CMD_INTR ||
-        t->status == EXEC_CMD_FAIL && globs.quitquick )
+        ( t->status == EXEC_CMD_FAIL && globs.quitquick ) )
         ++intr;
 
     /* If the command was not successful remove all of its targets not marked as
@@ -944,8 +944,9 @@ static void swap_settings
  *
  * Essentially copies a chain of ACTIONs to a chain of CMDs, grouping
  * RULE_TOGETHER actions, splitting RULE_PIECEMEAL actions, and handling
- * RULE_NEWSRCS actions. The result is a chain of CMDs which can be expanded by
- * var_string() and executed using exec_cmd().
+ * RULE_NEWSRCS actions. The result is a chain of CMDs which has already had all
+ * of its embedded variable references expanded and can now be executed using
+ * exec_cmd().
  */
 
 static CMD * make1cmds( TARGET * t )

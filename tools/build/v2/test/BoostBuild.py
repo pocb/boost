@@ -837,30 +837,43 @@ class Tester(TestCmd.TestCmd):
         by the used Boost Jam executable.
 
         """
-        p = subprocess.Popen([self.program[0], "-v"], stdout=subprocess.PIPE,
-            universal_newlines=True)
-        out, err = p.communicate()
+        dir = tempfile.mkdtemp("bjam_version_info")
+        try:
+            jam_script = "timestamp_resolution.jam"
+            f = open(os.path.join(dir, jam_script), "w")
+            try:
+                f.write("EXIT $(JAM_TIMESTAMP_RESOLUTION) : 0 ;")
+            finally:
+                f.close()
+            p = subprocess.Popen([self.program[0], "-d0", "-f%s" % jam_script],
+                stdout=subprocess.PIPE, cwd=dir, universal_newlines=True)
+            out, err = p.communicate()
+        finally:
+            shutil.rmtree(dir, ignore_errors=False)
+
         if p.returncode != 0:
             raise TestEnvironmentError("Unexpected return code (%s) when "
-                "detecting Boost Jam version information." % p.returncode)
+                "detecting Boost Jam's minimum supported path modification "
+                "timestamp resolution version information." % p.returncode)
         if err:
             raise TestEnvironmentError("Unexpected error output (%s) when "
-                "detecting Boost Jam version information." % err)
+                "detecting Boost Jam's minimum supported path modification "
+                "timestamp resolution version information." % err)
 
-        r = re.search("^Minimum supported file modification timestamp "
-            "resolution:\n\\s+([0-9]{2}):([0-9]{2}):([0-9]{2}\\.[0-9]{9}) "
-            "seconds$", out, re.MULTILINE)
+        r = re.match("([0-9]{2}):([0-9]{2}):([0-9]{2}\\.[0-9]{9})$", out)
         if not r:
             # Older Boost Jam versions did not report their minimum supported
-            # file modification timestamp resolution and did not actually
-            # support file modification timestamp resolutions finer than 1
+            # path modification timestamp resolution and did not actually
+            # support path modification timestamp resolutions finer than 1
             # second.
+            # TODO: Phase this support out to avoid such fallback code from
+            # possibly covering up other problems.
             return 1
         if r.group(1) != "00" or r.group(2) != "00":  # hours, minutes
             raise TestEnvironmentError("Boost Jam with too coarse minimum "
-                "supported file modification timestamp resolution (%s:%s:%s)."
+                "supported path modification timestamp resolution (%s:%s:%s)."
                 % (r.group(1), r.group(2), r.group(3)))
-        return float(r.group(3))   # seconds.nanoseconds
+        return float(r.group(3))  # seconds.nanoseconds
 
     def __ensure_newer_than_last_build(self, path):
         """
@@ -876,6 +889,28 @@ class Tester(TestCmd.TestCmd):
             self.__wait_for_time_change(path, touch=True, last_build_time=True)
 
     def __expect_lines(self, data, lines, expected):
+        """
+          Checks whether the given data contains the given lines.
+
+          Data may be specified as a single string containing text lines
+        separated by newline characters.
+
+          Lines may be specified in any of the following forms:
+            * Single string containing text lines separated by newlines - the
+              given lines are searched for in the given data without any extra
+              data lines between them.
+            * Container of strings containing text lines separated by newlines
+              - the given lines are searched for in the given data with extra
+              data lines allowed between lines belonging to different strings.
+            * Container of strings containing text lines separated by newlines
+              and containers containing strings - the same as above with the
+              internal containers containing strings being interpreted as if
+              all their content was joined together into a single string
+              separated by newlines.
+
+          A newline at the end of any multi-line lines string is interpreted as
+        an expected extra trailig empty line.
+        """
         # str.splitlines() trims at most one trailing newline while we want the
         # trailing newline to indicate that there should be an extra empty line
         # at the end.
@@ -892,9 +927,8 @@ class Tester(TestCmd.TestCmd):
             expanded = []
             for x in lines:
                 if x.__class__ is str:
-                    expanded.extend(splitlines(x))
-                else:
-                    expanded.append(x)
+                    x = splitlines(x)
+                expanded.append(x)
             lines = expanded
 
         if _contains_lines(data, lines) != bool(expected):

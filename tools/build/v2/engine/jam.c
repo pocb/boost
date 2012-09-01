@@ -12,10 +12,11 @@
  * ALL WARRANTIES ARE HEREBY DISCLAIMED.
  */
 
-/*  This file is ALSO:
- *  Copyright 2001-2004 David Abrahams.
- *  Distributed under the Boost Software License, Version 1.0.
- *  (See accompanying file LICENSE_1_0.txt or http://www.boost.org/LICENSE_1_0.txt)
+/* This file is ALSO:
+ * Copyright 2001-2004 David Abrahams.
+ * Distributed under the Boost Software License, Version 1.0.
+ * (See accompanying file LICENSE_1_0.txt or copy at
+ * http://www.boost.org/LICENSE_1_0.txt)
  */
 
 /*
@@ -97,29 +98,28 @@
 
 
 #include "jam.h"
-#include "option.h"
 #include "patchlevel.h"
 
-/* These get various function declarations. */
-#include "lists.h"
-#include "parse.h"
-#include "variable.h"
-#include "compile.h"
 #include "builtins.h"
-#include "rules.h"
-#include "object.h"
-#include "scan.h"
-#include "timestamp.h"
-#include "make.h"
-#include "strings.h"
-#include "filesys.h"
-#include "output.h"
-#include "search.h"
 #include "class.h"
+#include "compile.h"
 #include "constants.h"
+#include "filesys.h"
 #include "function.h"
-#include "pwd.h"
 #include "hcache.h"
+#include "lists.h"
+#include "make.h"
+#include "object.h"
+#include "option.h"
+#include "output.h"
+#include "parse.h"
+#include "pwd.h"
+#include "rules.h"
+#include "scan.h"
+#include "search.h"
+#include "strings.h"
+#include "timestamp.h"
+#include "variable.h"
 
 /* Macintosh is "special" */
 #ifdef OS_MAC
@@ -261,23 +261,13 @@ int main( int argc, char * * argv, char * * arg_environ )
     /* Version info. */
     if ( ( s = getoptval( optv, 'v', 0 ) ) )
     {
-        timestamp fmt_resolution[ 1 ];
-        file_supported_fmt_resolution( fmt_resolution );
-
-        printf( "Boost.Jam  " );
-        printf( "Version %s. %s.\n", VERSION, OSMINOR );
-        printf( "\n" );
-        printf( "Minimum supported file modification timestamp resolution:\n" );
-        printf( "   %s seconds\n", timestamp_timestr( fmt_resolution ) );
-        printf( "\n" );
-        printf( "Copyright information:\n" );
+        printf( "Boost.Jam  Version %s. %s.\n", VERSION, OSMINOR );
         printf( "   Copyright 1993-2002 Christopher Seiwald and Perforce "
             "Software, Inc.\n" );
         printf( "   Copyright 2001 David Turner.\n" );
         printf( "   Copyright 2001-2004 David Abrahams.\n" );
         printf( "   Copyright 2002-2008 Rene Rivera.\n" );
         printf( "   Copyright 2003-2008 Vladimir Prus.\n" );
-
         return EXITOK;
     }
 
@@ -430,7 +420,15 @@ int main( int argc, char * * argv, char * * arg_environ )
                              object_new( u.machine ) ), VAR_SET );
             }
         }
-#endif /* unix */
+#endif  /* unix */
+
+        /* Set JAM_TIMESTAMP_RESOLUTION. */
+        {
+            timestamp fmt_resolution[ 1 ];
+            file_supported_fmt_resolution( fmt_resolution );
+            var_set( root_module(), constant_JAM_TIMESTAMP_RESOLUTION, list_new(
+                object_new( timestamp_timestr( fmt_resolution ) ) ), VAR_SET );
+        }
 
         /* Load up environment variables. */
 
@@ -607,6 +605,7 @@ int main( int argc, char * * argv, char * * arg_environ )
  */
 
 #if defined(_WIN32)
+# define WIN32_LEAN_AND_MEAN
 # include <windows.h>
 char * executable_path( char const * argv0 )
 {
@@ -622,14 +621,15 @@ char *executable_path( char const * argv0 )
     uint32_t size = sizeof( buf );
     return _NSGetExecutablePath( buf, &size ) ? NULL : strdup( buf );
 }
-#elif defined(sun) || defined(__sun) /* Not tested */
+#elif defined(sun) || defined(__sun)  /* Not tested */
 # include <stdlib.h>
-
 char * executable_path( char const * argv0 )
 {
     return strdup( getexecname() );
 }
 #elif defined(__FreeBSD__)
+# include <stdlib.h>
+# include <string.h>
 # include <sys/sysctl.h>
 char * executable_path( char const * argv0 )
 {
@@ -637,15 +637,45 @@ char * executable_path( char const * argv0 )
     char buf[ 1024 ];
     size_t size = sizeof( buf );
     sysctl( mib, 4, buf, &size, NULL, 0 );
-    return ( !size || size == sizeof( buf ) ) ? NULL : strndup( buf, size );
+    if ( size && size != sizeof( buf ) )
+    {
+        /* Using strndup() here might not work with older glibc installations as
+         * their headers do not declare that function unless certain symbols are
+         * defined. We could work around this issue by defining appropriate
+         * symbols but they depend on the exact glibc version used so simply
+         * using malloc()/strncpy() seems like a cleaner solution.
+         *
+         * Note: such old glibc installations have so far only been found on
+         * Linux and not Free-BSD installations but using the same logic on
+         * Free-BSD seems like something that could not hurt.
+         */
+        char * const result = (char *)malloc( size );
+        if ( result )
+            return strncpy( result, buf, size );
+    }
+    return NULL;
 }
 #elif defined(__linux__)
+# include <stdlib.h>
+# include <string.h>
 # include <unistd.h>
 char * executable_path( char const * argv0 )
 {
     char buf[ 1024 ];
-    ssize_t const ret = readlink( "/proc/self/exe", buf, sizeof( buf ) );
-    return ( !ret || ret == sizeof( buf ) ) ? NULL : strndup( buf, ret );
+    ssize_t const size = readlink( "/proc/self/exe", buf, sizeof( buf ) );
+    if ( size && size != sizeof( buf ) )
+    {
+        /* Using strndup() here might not work with older glibc installations as
+         * their headers do not declare that function unless certain symbols are
+         * defined. We could work around this issue by defining appropriate
+         * symbols but they depend on the exact glibc version used so simply
+         * using malloc()/strncpy() seems like a cleaner solution.
+         */
+        char * const result = (char *)malloc( size );
+        if ( result )
+            return strncpy( result, buf, size );
+    }
+    return NULL;
 }
 #else
 char * executable_path( char const * argv0 )

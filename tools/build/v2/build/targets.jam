@@ -1,9 +1,8 @@
 # Copyright Vladimir Prus 2002.
 # Copyright Rene Rivera 2006.
-#
 # Distributed under the Boost Software License, Version 1.0.
-#    (See accompanying file LICENSE_1_0.txt or copy at
-#          http://www.boost.org/LICENSE_1_0.txt)
+# (See accompanying file LICENSE_1_0.txt or copy at
+# http://www.boost.org/LICENSE_1_0.txt)
 
 # Supports 'abstract' targets, which are targets explicitly defined in a
 # Jamfile.
@@ -23,7 +22,7 @@
 # create an instance of that class and add it to the list of alternatives for
 # the main target.
 #
-# Rules supplied by the build system will use only targets derived from
+# Rules supplied by the build system will use only targets derived from the
 # 'basic-target' class, which will provide some default behaviour. There will be
 # different classes derived from it such as 'make-target', created by the 'make'
 # rule, and 'typed-target', created by rules such as 'exe' and 'lib'.
@@ -210,8 +209,8 @@ class project-target : abstract-target
         }
     }
 
-    # This is needed only by the 'make' rule. Need to find the way to make
-    # 'make' work without this method.
+    # This is needed only by the 'make' rule. Need to find a way to make 'make'
+    # work without this method.
     #
     rule project-module ( )
     {
@@ -373,11 +372,17 @@ class project-target : abstract-target
             }
             else
             {
-                # TODO: This extra error message will not get displayed most
-                # likely due to some buggy refactoring. Refactor the code so the
-                # message gets diplayed again.
-                extra-error-message = error: could not find project
+                extra-error-message = could not resolve project reference
                     '$(project-part)' ;
+                if ! [ path.is-rooted $(project-part) ]
+                {
+                    local rooted = [ path.root $(project-part) / ] ;
+                    if [ project.is-registered-id $(rooted) ]
+                    {
+                        extra-error-message += - possibly missing a leading
+                            slash ('/') character. ;
+                    }
+                }
             }
         }
         else
@@ -418,7 +423,7 @@ class project-target : abstract-target
             }
         }
 
-        return $(result) ;
+        return $(result:E="") $(extra-error-message) ;
     }
 
     # Find and return the target with the specified id, treated relative to
@@ -429,9 +434,12 @@ class project-target : abstract-target
     rule find ( id : no-error ? )
     {
         local v = $(.id.$(id)) ;
+        local extra-error-message ;
         if ! $(v)
         {
-            v = [ find-really $(id) ] ;
+            local r = [ find-really $(id) ] ;
+            v = $(r[1]) ;
+            extra-error-message = $(r[2-]) ;
             if ! $(v)
             {
                 v = none ;
@@ -443,18 +451,15 @@ class project-target : abstract-target
         {
             return $(v) ;
         }
-        else
+        else if ! $(no-error)
         {
-            if ! $(no-error)
-            {
-                local current-location = [ get location ] ;
-                ECHO "error: Unable to find file or target named" ;
-                ECHO "error:     '$(id)'" ;
-                ECHO "error: referred from project at" ;
-                ECHO "error:     '$(current-location)'" ;
-                ECHO $(extra-error-message) ;
-                EXIT ;
-            }
+            local current-location = [ get location ] ;
+            import errors : user-error : errors.user-error ;
+            errors.user-error Unable to find file or target named
+                : "   " '$(id)'
+                : referred to from project at
+                : "   " '$(current-location)'
+                : $(extra-error-message) ;
         }
     }
 
@@ -687,7 +692,7 @@ class main-target : abstract-target
     }
 
     # Select an alternative for this main target, by finding all alternatives
-    # which requirements are satisfied by 'properties' and picking the one with
+    # whose requirements are satisfied by 'properties' and picking the one with
     # the longest requirements set. Returns the result of calling 'generate' on
     # that alternative.
     #
@@ -1059,14 +1064,16 @@ rule common-properties2 ( build-request requirements )
     # do.
     #
     build-request = [ $(build-request).add-defaults ] ;
-    # Features added by 'add-default' can be composite and expand to features
-    # without default values -- so they are not added yet. It could be clearer/
-    # /faster to expand only newly added properties but that is not critical.
+    # Features added by 'add-defaults' can be composite and expand to features
+    # without default values -- which therefore have not been added yet. It
+    # could be clearer/faster to expand only newly added properties but that is
+    # not critical.
     build-request = [ $(build-request).expand ] ;
 
     return [ evaluate-requirements $(requirements) : $(build-request) :
         refined ] ;
 }
+
 
 rule push-target ( target )
 {
@@ -1108,7 +1115,8 @@ class basic-target : abstract-target
         abstract-target.__init__ $(name) : $(project) ;
 
         self.sources = $(sources) ;
-        if ! $(requirements) {
+        if ! $(requirements)
+        {
             requirements = [ property-set.empty ] ;
         }
         self.requirements = $(requirements) ;
@@ -1126,8 +1134,8 @@ class basic-target : abstract-target
         if $(sources:G)
         {
             import errors : user-error : errors.user-error ;
-            errors.user-error properties found in the 'sources' parameter for
-                [ full-name ] ;
+            errors.user-error properties found "in" the 'sources' parameter
+                "for" [ full-name ] ;
         }
     }
 
@@ -1146,8 +1154,8 @@ class basic-target : abstract-target
         {
             for local s in $(self.sources)
             {
-                self.source-targets +=
-                  [ targets.resolve-reference $(s) : $(self.project) ] ;
+                self.source-targets += [ targets.resolve-reference $(s) :
+                    $(self.project) ] ;
             }
         }
         return $(self.source-targets) ;
@@ -1203,7 +1211,8 @@ class basic-target : abstract-target
     }
 
     # Takes a target reference, which might be either target id or a dependency
-    # property, and generates that target using 'property-set' as build request.
+    # property, and generates that target using 'property-set' as a build
+    # request.
     #
     # The results are added to the variable called 'result-var'. Usage
     # requirements are added to the variable called 'usage-requirements-var'.
@@ -1296,7 +1305,7 @@ class basic-target : abstract-target
                 # We might get duplicate sources, for example if we link to two
                 # libraries having the same <library> usage requirement. Use
                 # stable sort, since for some targets the order is important,
-                # e.g. RUN_PY target need a python source to come first.
+                # e.g. RUN_PY targets need a python source to come first.
                 source-targets = [ sequence.unique $(source-targets) : stable ]
                     ;
 
@@ -1496,7 +1505,8 @@ class typed-target : basic-target
 
     rule construct ( name : source-targets * : property-set )
     {
-        local r = [ generators.construct $(self.project) $(name:S=) : $(self.type)
+        local r = [ generators.construct $(self.project) $(name:S=)
+            : $(self.type)
             : [ property-set.create [ $(property-set).raw ]
                 <main-target-type>$(self.type) ]
             : $(source-targets) : true ] ;
@@ -1505,15 +1515,15 @@ class typed-target : basic-target
             ECHO "warn: Unable to construct" [ full-name ] ;
 
             # Are there any top-level generators for this type/property set.
-            if ! [ generators.find-viable-generators $(self.type)
-                : $(property-set) ]
+            if ! [ generators.find-viable-generators $(self.type) :
+                $(property-set) ]
             {
                 ECHO "error: no generators were found for type '$(self.type)'" ;
                 ECHO "error: and the requested properties" ;
                 ECHO "error: make sure you've configured the needed tools" ;
                 ECHO "See http://boost.org/boost-build2/doc/html/bbv2/advanced/configuration.html" ;
-                ECHO "To debug this problem, try the --debug-generators option." ;
-                EXIT ;
+                EXIT "To debug this problem, try the --debug-generators option."
+                    ;
             }
         }
         return $(r) ;
@@ -1632,38 +1642,35 @@ rule main-target-alternative ( target )
 }
 
 
-# Creates a new metargets with the specified properties, using 'klass' as
-# the class. The 'name', 'sources',
-# 'requirements', 'default-build' and 'usage-requirements' are assumed to be in
-# the form specified by the user in Jamfile corresponding to 'project'.
+# Creates a metatarget with the specified properties, using 'klass' as the
+# class. The 'name', 'sources', 'requirements', 'default-build' and
+# 'usage-requirements' are assumed to be in the form specified by the user in
+# the Jamfile corresponding to 'project'.
 #
 rule create-metatarget ( klass : project : name : sources * : requirements * :
     default-build * : usage-requirements * )
 {
-    return [
-        targets.main-target-alternative
-        [ new $(klass) $(name) : $(project)
-            : [ targets.main-target-sources $(sources) : $(name) ]
-            : [ targets.main-target-requirements $(requirements) : $(project) ]
-            : [ targets.main-target-default-build $(default-build) : $(project) ]
-            : [ targets.main-target-usage-requirements $(usage-requirements) : $(project) ]
-        ] ] ;
+    return [ targets.main-target-alternative [ new $(klass) $(name) : $(project)
+        : [ targets.main-target-sources $(sources) : $(name) ]
+        : [ targets.main-target-requirements $(requirements) : $(project) ]
+        : [ targets.main-target-default-build $(default-build) : $(project) ]
+        : [ targets.main-target-usage-requirements $(usage-requirements) :
+            $(project) ] ] ] ;
 }
 
 
 # Creates a typed-target with the specified properties. The 'name', 'sources',
 # 'requirements', 'default-build' and 'usage-requirements' are assumed to be in
-# the form specified by the user in Jamfile corresponding to 'project'.
+# the form specified by the user in the Jamfile corresponding to 'project'.
 #
 rule create-typed-target ( type : project : name : sources * : requirements * :
     default-build * : usage-requirements * )
 {
-    return [
-        targets.main-target-alternative
-        [ new typed-target $(name) : $(project) : $(type)
-            : [ targets.main-target-sources $(sources) : $(name) ]
-            : [ targets.main-target-requirements $(requirements) : $(project) ]
-            : [ targets.main-target-default-build $(default-build) : $(project) ]
-            : [ targets.main-target-usage-requirements $(usage-requirements) : $(project) ]
-        ] ] ;
+    return [ targets.main-target-alternative [ new typed-target $(name) :
+        $(project) : $(type)
+        : [ targets.main-target-sources $(sources) : $(name) ]
+        : [ targets.main-target-requirements $(requirements) : $(project) ]
+        : [ targets.main-target-default-build $(default-build) : $(project) ]
+        : [ targets.main-target-usage-requirements $(usage-requirements) :
+            $(project) ] ] ] ;
 }

@@ -11,7 +11,8 @@
 # pragma once
 #endif
 
-#include <boost/assert.hpp>
+#include <cstddef>
+
 #include <boost/config.hpp>
 #include <boost/cstdint.hpp>
 
@@ -35,11 +36,12 @@ extern "C" {
 
 struct stack_t
 {
-    void    *   base;
+    void    *   sp;
+    std::size_t size;
     void    *   limit;
 
     stack_t() :
-        base( 0), limit( 0)
+        sp( 0), size( 0), limit( 0)
     {}
 };
 

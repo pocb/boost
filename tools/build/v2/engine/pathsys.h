@@ -21,21 +21,17 @@
 #ifndef PATHSYS_VP_20020211_H
 #define PATHSYS_VP_20020211_H
 
-#include "jam.h"
 #include "object.h"
 #include "strings.h"
 
 
-typedef struct _pathname PATHNAME;
-typedef struct _pathpart PATHPART;
-
-struct _pathpart
+typedef struct _pathpart
 {
     char const * ptr;
-    int          len;
-};
+    int len;
+} PATHPART;
 
-struct _pathname
+typedef struct _pathname
 {
     PATHPART part[ 6 ];
 
@@ -45,36 +41,28 @@ struct _pathname
 #define f_base    part[ 3 ]
 #define f_suffix  part[ 4 ]
 #define f_member  part[ 5 ]
-};
+} PATHNAME;
 
-void path_build( PATHNAME * f, string * file );
-void path_parse( char const * file, PATHNAME * f );
-void path_parent( PATHNAME * f );
 
-#ifdef NT
+void path_build( PATHNAME *, string * file );
+void path_parse( char const * file, PATHNAME * );
+void path_parent( PATHNAME * );
 
-/* Returns object_new-allocated string with long equivivalent of 'short_name'.
- * If none exists, i.e. 'short_path' is already long, it is returned unaltered.
- */
-OBJECT * short_path_to_long_path( OBJECT * short_path );
-
-#endif
-
-/* Given a path, returns an object that can be used as a unique key for that
- * path. Equivalent paths such as a/b, A\B, and a\B on NT all yield the same
- * key.
+/* Given a path, returns an object containing an equivalent path in canonical
+ * format that can be used as a unique key for that path. Equivalent paths such
+ * as a/b, A\B, and a\B on NT all yield the same key.
  */
 OBJECT * path_as_key( OBJECT * path );
 
 /* Called as an optimization when we know we have a path that is already in its
- * long form. Avoids the need for some subsequent path_as_key() call to do a
- * potentially expensive short-->long path conversion.
+ * canonical/long/key form. Avoids the need for some subsequent path_as_key()
+ * call to do a potentially expensive path conversion requiring access to the
+ * actual underlying file system.
  */
-void path_key__register_long_path( OBJECT * long_path );
+void path_register_key( OBJECT * canonic_path );
 
-#ifdef USE_PATHUNIX
 /* Returns a static pointer to the system dependent path to the temporary
- * directory. NOTE: *without* a trailing path separator.
+ * directory. NOTE: Does *not* include a trailing path separator.
  */
 string const * path_tmpdir( void );
 
@@ -83,7 +71,6 @@ OBJECT * path_tmpnam( void );
 
 /* Returns a new temporary path. */
 OBJECT * path_tmpfile( void );
-#endif
 
 /* Give the first argument to 'main', return a full path to our executable.
  * Returns null in the unlikely case it cannot be determined. Caller is

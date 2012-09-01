@@ -26,7 +26,7 @@
  *  -------------------------------------------------------------  *
  *  | 104 | 112 |                                               |  *
  *  -------------------------------------------------------------  *
- *  |sbase|slimt|                                               |  *
+ *  |  sp | size|                                               |  *
  *  -------------------------------------------------------------  *
  *  -------------------------------------------------------------  *
  *  |  15 |  16 |  17 |  18 |  19 |  20 |                       |  *
@@ -109,19 +109,20 @@ make_fcontext:
 .cpload $t9
 .set    reorder
 #endif
-    sw      $a0, ($a0)          # save the current context
     sw      $gp, 24($a0)        # save global pointer
-    sw      $a1, 96($a0)        # save the address of the context function
-    lw      $t0, 104($a0)       # load the stack base
+    sw      $a1, 96($a0)        # save address of context function
+    lw      $t0, 104($a0)       # load address of context stack base
+    lw      $t1, 112($a0)       # load size of context stack
+    add     $t0, $t1, $t0       # compute start address of context stack
 
     sub     $sp, $sp, 28
     sw      $ra, 24($sp)
     sw      $a0, 20($sp)
-    move    $a0, $t0            # stack pointer as arg for align_stack
-    lw      $t9, %call16(align_stack)($gp) # align stack
-    jalr    $t9
+    move    $a0, $t0                       # context stack pointer as arg for align_stack
+    lw      $t9, %call16(align_stack)($gp) # address of align_stack
+    jalr    $t9                            # call align_stack
     nop
-    move    $t0, $v0            # begin of aligned stack 
+    move    $t0, $v0            # begin of aligned context stack
     lw      $ra, 24($sp)
     lw      $a0, 20($sp)
     addi    $sp, $sp, 28

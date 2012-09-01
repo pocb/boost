@@ -4,10 +4,11 @@
  * This file is part of Jam - see jam.c for Copyright information.
  */
 
-/*  This file is ALSO:
- *  Copyright 2001-2004 David Abrahams.
- *  Distributed under the Boost Software License, Version 1.0.
- *  (See accompanying file LICENSE_1_0.txt or http://www.boost.org/LICENSE_1_0.txt)
+/* This file is ALSO:
+ * Copyright 2001-2004 David Abrahams.
+ * Distributed under the Boost Software License, Version 1.0.
+ * (See accompanying file LICENSE_1_0.txt or copy at
+ * http://www.boost.org/LICENSE_1_0.txt)
  */
 
 #include "jam.h"
@@ -37,7 +38,7 @@ static struct hash * explicit_bindings = 0;
 
 void call_bind_rule( OBJECT * target_, OBJECT * boundname_ )
 {
-    LIST * bind_rule = var_get( root_module(), constant_BINDRULE );
+    LIST * const bind_rule = var_get( root_module(), constant_BINDRULE );
     if ( !list_empty( bind_rule ) )
     {
         OBJECT * target = object_copy( target_ );
@@ -80,8 +81,9 @@ void call_bind_rule( OBJECT * target_, OBJECT * boundname_ )
  * LOCATE setting, stop and return the location. In case of a previous target,
  * return its name via the 'another_target' argument.
  *
- * This bevahiour allows handling dependencies on generated files. If caller
- * does not expect that the target is generated, 0 can be passed as
+ * This behaviour allows handling dependencies on generated files.
+ *
+ * If caller does not expect that the target is generated, 0 can be passed as
  * 'another_target'.
  */
 
@@ -235,8 +237,7 @@ OBJECT * search( OBJECT * target, timestamp * const time,
 
 static void free_binding( void * xbinding, void * data )
 {
-    BINDING * const binding = (BINDING *)xbinding;
-    object_free( binding->binding );
+    object_free( ( (BINDING *)xbinding )->binding );
 }
 
 
@@ -244,7 +245,7 @@ void search_done( void )
 {
     if ( explicit_bindings )
     {
-        hashenumerate( explicit_bindings, free_binding, (void *)0 );
+        hashenumerate( explicit_bindings, free_binding, 0 );
         hashdone( explicit_bindings );
     }
 }
