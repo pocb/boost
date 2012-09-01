@@ -1,7 +1,6 @@
 # Copyright 2002-2006. Vladimir Prus
 # Copyright 2003-2004. Dave Abrahams
 # Copyright 2003-2006. Rene Rivera
-#
 # Distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE_1_0.txt or copy at
 # http://www.boost.org/LICENSE_1_0.txt)
@@ -17,12 +16,10 @@
 # beginning, and it never ends in slash, except for path consisting of slash
 # only.
 
-import errors ;
 import modules ;
 import regex ;
 import sequence ;
 import set ;
-import version ;
 
 
 os = [ modules.peek : OS ] ;
@@ -124,6 +121,7 @@ rule parent ( path )
     }
     else
     {
+        import errors ;
         errors.error "Path '$(path)' has no parent" ;
     }
 }
@@ -140,13 +138,13 @@ rule reverse ( path )
     }
     else
     {
-        local tokens = [ regex.split $(path) "/" ] ;
+        local tokens = [ regex.split $(path) / ] ;
         local tokens2 ;
         for local i in $(tokens)
         {
             tokens2 += .. ;
         }
-        return [ sequence.join $(tokens2) : "/" ] ;
+        return [ sequence.join $(tokens2) : / ] ;
     }
 }
 
@@ -166,30 +164,11 @@ rule join ( elements + )
         {
             if [ is-rooted $(e) ]
             {
+                import errors ;
                 errors.error only the first element may be rooted ;
             }
         }
-        if [ version.check-jam-version 3 1 17 ]
-        {
-            return [ NORMALIZE_PATH "$(elements)" ] ;
-        }
-        else
-        {
-            # Boost Jam prior to version 3.1.17 had problems with its
-            # NORMALIZE_PATH rule in case you passed it a leading backslash
-            # instead of a slash, in some cases when you sent it an empty
-            # initial path element and possibly some others. At least some of
-            # those cases were being hit and relied upon when calling this rule
-            # from the path.make-NT rule.
-            if ! $(elements[1]) && $(elements[2])
-            {
-                return [ NORMALIZE_PATH "/" "$(elements[2-])" ] ;
-            }
-            else
-            {
-                return [ NORMALIZE_PATH "$(elements)" ] ;
-            }
-        }
+        return [ NORMALIZE_PATH "$(elements)" ] ;
     }
 }
 
@@ -320,13 +299,13 @@ NATIVE_RULE path : exists ;
 rule all-parents ( path : upper_limit ? : cwd ? )
 {
     cwd ?= [ pwd ] ;
-    local path_ele = [ regex.split [ root $(path) $(cwd) ] "/" ] ;
+    local path_ele = [ regex.split [ root $(path) $(cwd) ] / ] ;
 
     if ! $(upper_limit)
     {
         upper_limit = / ;
     }
-    local upper_ele = [ regex.split [ root $(upper_limit) $(cwd) ] "/" ] ;
+    local upper_ele = [ regex.split [ root $(upper_limit) $(cwd) ] / ] ;
 
     # Leave only elements in 'path_ele' below 'upper_ele'.
     while $(path_ele) && ( $(upper_ele[1]) = $(path_ele[1]) )
@@ -338,6 +317,7 @@ rule all-parents ( path : upper_limit ? : cwd ? )
     # Have all upper elements been removed ?
     if $(upper_ele)
     {
+        import errors ;
         errors.error "$(upper_limit) is not prefix of $(path)" ;
     }
 
@@ -407,6 +387,7 @@ rule relative ( child parent : no-error ? )
                 }
                 else
                 {
+                    import errors ;
                     errors.error $(child) is not a subdir of $(parent) ;
                 }
             }
@@ -476,6 +457,7 @@ rule makedirs ( path )
         {
             if ! [ MAKEDIR $(native) ]
             {
+                import errors ;
                 errors.error "Could not create directory '$(path)'" ;
                 result = ;
             }
@@ -494,21 +476,7 @@ rule makedirs ( path )
 #
 rule make-NT ( native )
 {
-    local result ;
-
-    if [ version.check-jam-version 3 1 17 ]
-    {
-        result = [ NORMALIZE_PATH $(native) ] ;
-    }
-    else
-    {
-        # This old implementation is really fragile due to a not so clear way
-        # NORMALIZE_PATH rule worked in Boost.Jam versions prior to 3.1.17. E.g.
-        # path.join would mostly ignore empty path elements but would root the
-        # joined path in case the initial two path elements were empty or some
-        # similar accidental wierdness.
-        result = [ path.join [ regex.split $(native) "[/\\]" ] ] ;
-    }
+    local result = [ NORMALIZE_PATH $(native) ] ;
 
     # We need to add an extra '/' in front in case this is a rooted Windows path
     # starting with a drive letter and not a path separator character since the
@@ -534,7 +502,7 @@ rule native-NT ( path )
     {
         result = [ MATCH "^/?(.*)" : $(path) ] ;
     }
-    result = [ sequence.join [ regex.split $(result) "/" ] : "\\" ] ;
+    result = [ sequence.join [ regex.split $(result) / ] : \\ ] ;
     return $(result) ;
 }
 
@@ -544,6 +512,7 @@ rule make-UNIX ( native )
     # VP: I have no idea now 'native' can be empty here! But it can!
     if ! $(native)
     {
+        import errors ;
         errors.error "Empty path passed to 'make-UNIX'" ;
     }
     else
@@ -585,7 +554,8 @@ rule native-CYGWIN ( path )
 #
 rule split-path-VMS ( native )
 {
-    local matches = [ MATCH ([a-zA-Z0-9_-]+:)?(\\[[^\]]*\\])?(.*)?$   : $(native) ] ;
+    local matches = [ MATCH ([a-zA-Z0-9_-]+:)?(\\[[^\]]*\\])?(.*)?$ : $(native)
+        ] ;
     local device = $(matches[1]) ;
     local dir = $(matches[2]) ;
     local file = $(matches[3]) ;
@@ -606,6 +576,7 @@ rule make-VMS ( native )
 {
     if [ MATCH ^(\\[[a-zA-Z0-9]) : $(native) ]
     {
+        import errors ;
         errors.error "Can't handle default-device absolute paths: " $(native) ;
     }
 
@@ -697,10 +668,9 @@ rule native-VMS ( path )
     #
     # This is no exact science, just guess work:
     #
-    # If the last part of the current path spec
-    # includes some chars, followed by a dot,
-    # optionally followed by more chars -
-    # then it is a file (keep your fingers crossed).
+    # If the last part of the current path spec includes some chars, followed by
+    # a dot, optionally followed by more chars - then it is a file (keep your
+    # fingers crossed).
     #
     split = [ regex.split $(dir) / ] ;
     local maybe_file = $(split[-1]) ;
@@ -802,8 +772,10 @@ rule __test__ ( )
     local CWD = "/home/ghost/build" ;
     assert.result : all-parents . : . : $(CWD) ;
     assert.result . .. ../.. ../../..  : all-parents "Jamfile" : "" : $(CWD) ;
-    assert.result foo . .. ../.. ../../.. : all-parents "foo/Jamfile" : "" : $(CWD) ;
-    assert.result ../Work .. ../.. ../../.. : all-parents "../Work/Jamfile" : "" : $(CWD) ;
+    assert.result foo . .. ../.. ../../.. : all-parents "foo/Jamfile" : "" :
+        $(CWD) ;
+    assert.result ../Work .. ../.. ../../.. : all-parents "../Work/Jamfile" : ""
+        : $(CWD) ;
 
     local CWD = "/home/ghost" ;
     assert.result . .. : all-parents "Jamfile" : "/home" : $(CWD) ;
@@ -826,7 +798,8 @@ rule __test__ ( )
     assert.result "foo/bar" : make "foo/././././bar" ;
     assert.result "/foo" : make "\\foo" ;
     assert.result "/D:/My Documents" : make "D:\\My Documents" ;
-    assert.result "/c:/boost/tools/build/new/project.jam" : make "c:\\boost\\tools\\build\\test\\..\\new\\project.jam" ;
+    assert.result "/c:/boost/tools/build/new/project.jam" : make
+        "c:\\boost\\tools\\build\\test\\..\\new\\project.jam" ;
 
     # Test processing 'invalid' paths containing multiple successive path
     # separators.
@@ -842,7 +815,8 @@ rule __test__ ( )
     assert.result "foo/bar" : make "foo//\\//\\\\bar//\\//\\\\\\//\\//\\\\" ;
     assert.result "foo" : make "foo/bar//.." ;
     assert.result "foo/bar" : make "foo/bar/giz//.." ;
-    assert.result "foo/giz" : make "foo//\\//\\\\bar///\\\\//\\\\////\\/..///giz\\//\\\\\\//\\//\\\\" ;
+    assert.result "foo/giz" : make
+        "foo//\\//\\\\bar///\\\\//\\\\////\\/..///giz\\//\\\\\\//\\//\\\\" ;
     assert.result "../../../foo" : make "..///.//..///.//..////foo///" ;
 
     # Test processing 'invalid' rooted paths with too many '..' path elements
@@ -908,7 +882,8 @@ rule __test__ ( )
     assert.result "giz.h" : make "giz.h" ;
     assert.result "foo/bar/giz.h" : make "[.foo.bar]giz.h" ;
     assert.result "/disk:/my_docs" : make "disk:[my_docs]" ;
-    assert.result "/disk:/boost/tools/build/new/project.jam" : make "disk:[boost.tools.build.test.-.new]project.jam" ;
+    assert.result "/disk:/boost/tools/build/new/project.jam" : make
+        "disk:[boost.tools.build.test.-.new]project.jam" ;
 
     #
     # Special case (adds '.' to end of file w/o extension to disambiguate from
@@ -930,7 +905,8 @@ rule __test__ ( )
     assert.result "disk:[my_docs.work]" : native "/disk:/my_docs/work" ;
     assert.result "giz.h" : native "giz.h" ;
     assert.result "disk:Jamfile." : native "/disk:Jamfile." ;
-    assert.result "disk:[my_docs.work]Jamfile." : native "/disk:/my_docs/work/Jamfile." ;
+    assert.result "disk:[my_docs.work]Jamfile." : native
+        "/disk:/my_docs/work/Jamfile." ;
 
     modules.poke path : os : $(save-os) ;
 }

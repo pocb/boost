@@ -11,7 +11,9 @@
 import build-request ;
 import builtin ;
 import "class" : new ;
+import configure ;
 import feature ;
+import generators ;
 import make ;
 import modules ;
 import os ;
@@ -25,8 +27,6 @@ import toolset ;
 import utility ;
 import version ;
 import virtual-target ;
-import generators ;
-import configure ;
 
 
 ################################################################################
@@ -41,12 +41,6 @@ import configure ;
 # Flag indicating we should display additional debugging information related to
 # locating and loading Boost Build configuration files.
 .debug-config = [ MATCH ^(--debug-configuration)$ : $(.argv) ] ;
-
-# The cleaning is tricky. Say, if user says 'bjam --clean foo' where 'foo' is a
-# directory, then we want to clean targets which are in 'foo' as well as those
-# in any children Jamfiles under foo but not in any unrelated Jamfiles. To
-# achieve this we collect a list of projects under which cleaning is allowed.
-.project-targets = ;
 
 # Virtual targets obtained when building main targets references on the command
 # line. When running 'bjam --clean main_target' we want to clean only files
@@ -125,13 +119,17 @@ rule set-post-build-hook ( function )
 #
 local rule actual-clean-targets ( )
 {
-    # Construct a list of projects explicitly detected as targets on this build
-    # system run. These are the projects under which cleaning is allowed.
+    # The cleaning is tricky. Say, if user says 'bjam --clean foo' where 'foo'
+    # is a directory, then we want to clean targets which are in 'foo' as well
+    # as those in any children Jamfiles under foo but not in any unrelated
+    # Jamfiles. To achieve this we first mark all projects explicitly detected
+    # as targets for this build system run as needing to be cleaned.
     for local t in $(targets)
     {
         if [ class.is-a $(t) : project-target ]
         {
-            .project-targets += [ $(t).project-module ] ;
+            local project = [ $(t).project-module ] ;
+            .should-clean-project.$(project) = true ;
         }
     }
 
@@ -148,16 +146,13 @@ local rule actual-clean-targets ( )
     local to-clean ;
     for local t in [ virtual-target.all-targets ]
     {
+        # Remove only derived targets and only those asked to be cleaned,
+        # whether directly or by belonging to one of the removed projects.
         local p = [ $(t).project ] ;
-
-        # Remove only derived targets.
-        if [ $(t).action ]
+        if [ $(t).action ] && ( $(t) in $(targets-to-clean) ||
+            [ should-clean-project [ $(p).project-module ] ] )
         {
-            if $(t) in $(targets-to-clean) ||
-                [ should-clean-project [ $(p).project-module ] ] = true
-            {
-                to-clean += $(t) ;
-            }
+            to-clean += $(t) ;
         }
     }
 
@@ -318,8 +313,8 @@ local rule load-configuration-files
     }
     if $(test-config)
     {
-        local where =
-            [ load-config test-config : $(test-config:BS) : $(test-config:D) ] ;
+        local where = [ load-config test-config : $(test-config:BS) :
+            $(test-config:D) ] ;
         if $(where)
         {
             if $(.debug-config)
@@ -401,9 +396,9 @@ local rule load-configuration-files
     # We look for project-config.jam from "." upward. I am not sure this is 100%
     # right decision, we might as well check for it only alongside the Jamroot
     # file. However:
-    # - We need to load project-root.jam before Jamroot
-    # - We probably need to load project-root.jam even if there is no Jamroot -
-    #   e.g. to implement automake-style out-of-tree builds.
+    # - We need to load project-config.jam before Jamroot
+    # - We probably need to load project-config.jam even if there is no Jamroot
+    #   - e.g. to implement automake-style out-of-tree builds.
     local file = [ path.glob "." : project-config.jam ] ;
     if ! $(file)
     {
@@ -414,6 +409,8 @@ local rule load-configuration-files
         initialize-config-module project-config : $(file:D) ;
         load-config project-config : project-config.jam : $(file:D) ;
     }
+
+    project.end-load ;
 }
 
 
@@ -484,7 +481,7 @@ local rule process-explicit-toolset-requests
         # Make sure we get an appropriate property into the build request in
         # case toolset has been specified using the "--toolset=..." command-line
         # option form.
-        if ! $(t) in $(.argv) && ! $(t) in $(feature-toolsets)
+        if ! $(t) in $(.argv) $(feature-toolsets)
         {
             if $(.debug-config)
             {
@@ -499,24 +496,21 @@ local rule process-explicit-toolset-requests
 }
 
 
-# Returns 'true' if the given 'project' is equal to or is a (possibly indirect)
-# child to any of the projects requested to be cleaned in this build system run.
-# Returns 'false' otherwise. Expects the .project-targets list to have already
-# been constructed.
+# Returns whether the given project (identifed by its project module) should be
+# cleaned because it or any of its parent projects have already been marked as
+# needing to be cleaned in this build. As an optimization, will explicitly mark
+# all encountered project needing to be cleaned in case thay have not already
+# been marked so.
 #
 local rule should-clean-project ( project )
 {
-    if ! $(.should-clean-project.$(project))
+    if ! $(.should-clean-project.$(project))-is-defined
     {
-        local r = false ;
-        if $(project) in $(.project-targets)
-        {
-            r = true ;
-        }
-        else
+        local r = "" ;
+        if ! [ project.is-jamroot-module $(project) ]
         {
             local parent = [ project.attribute $(project) parent-module ] ;
-            if $(parent) && $(parent) != user-config
+            if $(parent)
             {
                 r = [ should-clean-project $(parent) ] ;
             }
@@ -546,20 +540,23 @@ local rule should-clean-project ( project )
 
     load-configuration-files ;
 
+    # Load explicitly specified toolset modules.
     local extra-properties = [ process-explicit-toolset-requests ] ;
 
-    # We always load project in "." so that 'use-project' directives have any
-    # chance of being seen. Otherwise, we would not be able to refer to
-    # subprojects using target ids.
+    # Load the actual project build script modules. We always load the project
+    # in the current folder so 'use-project' directives have any chance of being
+    # seen. Otherwise, we would not be able to refer to subprojects using target
+    # ids.
     local current-project ;
-    if [ project.find "." : "." ]
     {
-        current-project = [ project.target [ project.load "." ] ] ;
+        local current-module = [ project.find "." : "." ] ;
+        if $(current-module)
+        {
+            current-project = [ project.target $(current-module) ] ;
+        }
     }
 
-
-    # In case there are no toolsets currently defined makes the build run using
-    # the default toolset.
+    # Load the default toolset module if no other has already been specified.
     if ! [ feature.values <toolset> ]
     {
         local default-toolset = $(.default-toolset) ;
@@ -594,6 +591,11 @@ local rule should-clean-project ( project )
 
     # Parse command line for targets and properties. Note that this requires
     # that all project files already be loaded.
+    # FIXME: This is not entirely true. Additional project files may be loaded
+    # only later via the project.find() rule when dereferencing encountered
+    # target ids containing explicit project references. See what to do about
+    # those as such 'lazy loading' may cause problems that are then extremely
+    # difficult to debug.
     local build-request = [ build-request.from-command-line $(.argv)
         $(extra-properties) ] ;
     local target-ids = [ $(build-request).get-at 1 ] ;
@@ -624,8 +626,8 @@ local rule should-clean-project ( project )
     if ! $(current-project) && ! $(target-ids)
     {
         import errors ;
-        errors.user-error error: no Jamfile "in" current directory found, and no
-            target references specified. ;
+        errors.user-error no Jamfile "in" current directory found, and no target
+            references specified. ;
     }
 
 
