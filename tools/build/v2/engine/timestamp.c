@@ -4,10 +4,11 @@
  * This file is part of Jam - see jam.c for Copyright information.
  */
 
-/*  This file is ALSO:
- *  Copyright 2001-2004 David Abrahams.
- *  Distributed under the Boost Software License, Version 1.0.
- *  (See accompanying file LICENSE_1_0.txt or http://www.boost.org/LICENSE_1_0.txt)
+/* This file is ALSO:
+ * Copyright 2001-2004 David Abrahams.
+ * Distributed under the Boost Software License, Version 1.0.
+ * (See accompanying file LICENSE_1_0.txt or
+ * http://www.boost.org/LICENSE_1_0.txt)
  */
 
 /*
@@ -37,7 +38,8 @@
  * BINDING - all known files
  */
 
-typedef struct _binding {
+typedef struct _binding
+{
     OBJECT * name;
     short flags;
 
@@ -56,6 +58,7 @@ typedef struct _binding {
 } BINDING;
 
 static struct hash * bindhash = 0;
+
 static void time_enter( void *, OBJECT *, int const found,
     timestamp const * const );
 
@@ -106,9 +109,9 @@ void timestamp_clear( timestamp * const time )
 
 int timestamp_cmp( timestamp const * const lhs, timestamp const * const rhs )
 {
-    if ( lhs->secs == rhs->secs )
-        return lhs->nsecs - rhs->nsecs;
-    return lhs->secs - rhs->secs;
+    return lhs->secs == rhs->secs
+        ? lhs->nsecs - rhs->nsecs
+        : lhs->secs - rhs->secs;
 }
 
 
@@ -166,92 +169,88 @@ void timestamp_from_path( timestamp * const time, OBJECT * const path )
     b = (BINDING *)hash_insert( bindhash, normalized_path, &found );
     if ( !found )
     {
-        b->name = object_copy( normalized_path );  /* never freed */
+        b->name = object_copy( normalized_path );
         b->flags = 0;
         b->progress = BIND_INIT;
         timestamp_clear( &b->time );
     }
 
-    if ( b->progress != BIND_INIT )
-        goto afterscanning;
-
-    b->progress = BIND_NOENTRY;
-
-    /* Not found - have to scan for it. */
-    path_parse( object_str( normalized_path ), &f1 );
-
-    /* Scan directory if not already done so. */
+    if ( b->progress == BIND_INIT )
     {
-        int found;
-        BINDING * b;
-        OBJECT * name;
+        b->progress = BIND_NOENTRY;
 
-        f2 = f1;
-        f2.f_grist.len = 0;
-        path_parent( &f2 );
-        path_build( &f2, buf );
+        /* Not found - have to scan for it. */
+        path_parse( object_str( normalized_path ), &f1 );
 
-        name = object_new( buf->value );
-
-        b = (BINDING *)hash_insert( bindhash, name, &found );
-        if ( !found )
+        /* Scan directory if not already done so. */
         {
-            b->name = object_copy( name );
-            b->flags = 0;
-            b->progress = BIND_INIT;
-            timestamp_clear( &b->time );
+            int found;
+            BINDING * b;
+            OBJECT * name;
+
+            f2 = f1;
+            f2.f_grist.len = 0;
+            path_parent( &f2 );
+            path_build( &f2, buf );
+
+            name = object_new( buf->value );
+
+            b = (BINDING *)hash_insert( bindhash, name, &found );
+            if ( !found )
+            {
+                b->name = object_copy( name );
+                b->flags = 0;
+                b->progress = BIND_INIT;
+                timestamp_clear( &b->time );
+            }
+
+            if ( !( b->flags & BIND_SCANNED ) )
+            {
+                file_dirscan( name, time_enter, bindhash );
+                b->flags |= BIND_SCANNED;
+            }
+
+            object_free( name );
         }
 
-        if ( !( b->flags & BIND_SCANNED ) )
+        /* Scan archive if not already done so. */
+        if ( f1.f_member.len )
         {
-            file_dirscan( name, time_enter, bindhash );
-            b->flags |= BIND_SCANNED;
-        }
+            int found;
+            BINDING * b;
+            OBJECT * name;
 
-        object_free( name );
+            f2 = f1;
+            f2.f_grist.len = 0;
+            f2.f_member.len = 0;
+            string_truncate( buf, 0 );
+            path_build( &f2, buf );
+
+            name = object_new( buf->value );
+
+            b = (BINDING *)hash_insert( bindhash, name, &found );
+            if ( !found )
+            {
+                b->name = object_copy( name );
+                b->flags = 0;
+                b->progress = BIND_INIT;
+                timestamp_clear( &b->time );
+            }
+
+            if ( !( b->flags & BIND_SCANNED ) )
+            {
+                file_archscan( buf->value, time_enter, bindhash );
+                b->flags |= BIND_SCANNED;
+            }
+
+            object_free( name );
+        }
     }
-
-    /* Scan archive if not already done so. */
-    if ( f1.f_member.len )
-    {
-        int found;
-        BINDING * b;
-        OBJECT * name;
-
-        f2 = f1;
-        f2.f_grist.len = 0;
-        f2.f_member.len = 0;
-        string_truncate( buf, 0 );
-        path_build( &f2, buf );
-
-        name = object_new( buf->value );
-
-        b = (BINDING *)hash_insert( bindhash, name, &found );
-        if ( !found )
-        {
-            b->name = object_copy( name );
-            b->flags = 0;
-            b->progress = BIND_INIT;
-            timestamp_clear( &b->time );
-        }
-
-        if ( !( b->flags & BIND_SCANNED ) )
-        {
-            file_archscan( buf->value, time_enter, bindhash );
-            b->flags |= BIND_SCANNED;
-        }
-
-        object_free( name );
-    }
-
-    afterscanning:
 
     if ( b->progress == BIND_SPOTTED )
-    {
-         b->progress = file_time( b->name, &b->time ) < 0
+        b->progress = file_time( b->name, &b->time ) < 0
             ? BIND_MISSING
             : BIND_FOUND;
-    }
 
     if ( b->progress == BIND_FOUND )
         timestamp_copy( time, &b->time );
@@ -356,7 +355,7 @@ void timestamp_done()
 {
     if ( bindhash )
     {
-        hashenumerate( bindhash, free_timestamps, (void *)0 );
+        hashenumerate( bindhash, free_timestamps, 0 );
         hashdone( bindhash );
     }
 }

@@ -71,10 +71,44 @@ namespace boost { namespace fusion
           : base(seq)
         {}
 
-        explicit deque(typename detail::call_param<Head>::type head
-          , typename detail::call_param<Tail>::type... tail)
-          : base(detail::deque_keyed_values<Head, Tail...>::call(head, tail...))
+        template <typename ...Elements>
+        deque(deque<Elements...>& seq)
+          : base(seq)
         {}
+
+#if !defined(BOOST_NO_RVALUE_REFERENCES)
+        template <typename ...Elements>
+        deque(deque<Elements...>&& seq)
+          : base(std::forward<deque<Elements...>>(seq))
+        {}
+#endif
+
+        deque(deque const& seq)
+          : base(seq)
+        {}
+
+#if !defined(BOOST_NO_RVALUE_REFERENCES)
+        deque(deque&& seq)
+          : base(std::forward<deque>(seq))
+        {}
+#endif
+
+        explicit deque(Head const& head, Tail const&... tail)
+          : base(detail::deque_keyed_values<Head, Tail...>::construct(head, tail...))
+        {}
+
+        template <typename Head_, typename ...Tail_>
+        explicit deque(Head_ const& head, Tail_ const&... tail)
+          : base(detail::deque_keyed_values<Head_, Tail_...>::construct(head, tail...))
+        {}
+
+#if !defined(BOOST_NO_RVALUE_REFERENCES)
+        template <typename Head_, typename ...Tail_>
+        explicit deque(Head_&& head, Tail_&&... tail)
+          : base(detail::deque_keyed_values<Head, Tail...>
+                ::forward_(std::forward<Head_>(head), std::forward<Tail_>(tail)...))
+        {}
+#endif
 
         template <typename Sequence>
         explicit deque(Sequence const& seq
@@ -95,6 +129,16 @@ namespace boost { namespace fusion
             base::operator=(rhs);
             return *this;
         }
+
+#if !defined(BOOST_NO_RVALUE_REFERENCES)
+        template <typename T>
+        deque& operator=(T&& rhs)
+        {
+            base::operator=(std::forward<T>(rhs));
+            return *this;
+        }
+#endif
+
     };
 }}
 

@@ -4,21 +4,19 @@
  * This file is part of Jam - see jam.c for Copyright information.
  */
 
-# include "jam.h"
-# include "object.h"
-# include "lists.h"
-# include "assert.h"
-
 /*
  * lists.c - maintain lists of objects
- *
- * 08/23/94 (seiwald) - new list_append()
- * 09/07/00 (seiwald) - documented lol_*() functions
  */
+
+#include "jam.h"
+#include "lists.h"
+
+#include <assert.h>
+
 
 struct freelist_node { struct freelist_node * next; };
 
-static struct freelist_node *freelist[ 32 ];  /* junkpile for list_free() */
+static struct freelist_node * freelist[ 32 ];  /* junkpile for list_dealloc() */
 
 static unsigned get_bucket( unsigned size )
 {
@@ -27,7 +25,7 @@ static unsigned get_bucket( unsigned size )
     return bucket;
 }
 
-static LIST * list_alloc( unsigned size )
+static LIST * list_alloc( unsigned const size )
 {
     unsigned const bucket = get_bucket( size );
     if ( freelist[ bucket ] )
@@ -103,21 +101,9 @@ LISTITER list_end( LIST * l )
 
 LIST * list_new( OBJECT * value )
 {
-    LIST * head;
-    if ( freelist[ 0 ] )
-    {
-        struct freelist_node * result = freelist[ 0 ];
-        freelist[ 0 ] = result->next;
-        head = (LIST *)result;
-    }
-    else
-    {
-        head = BJAM_MALLOC( sizeof( LIST * ) + sizeof( OBJECT * ) );
-    }
-
+    LIST * const head = list_alloc( 1 ) ;
     head->impl.size = 1;
     list_begin( head )[ 0 ] = value;
-
     return head;
 }
 
@@ -254,7 +240,7 @@ void list_free( LIST * head )
 LIST * list_pop_front( LIST * l )
 {
     unsigned size = list_length( l );
-    assert( size != 0 );
+    assert( size );
     --size;
     object_free( list_front( l ) );
 
@@ -283,7 +269,6 @@ LIST * list_reverse( LIST * l )
 {
     int size = list_length( l );
     if ( size == 0 ) return L0;
-    else
     {
         LIST * const result = list_alloc( size );
         int i;

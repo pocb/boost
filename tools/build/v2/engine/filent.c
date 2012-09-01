@@ -4,11 +4,12 @@
  * This file is part of Jam - see jam.c for Copyright information.
  */
 
-/*  This file is ALSO:
- *  Copyright 2001-2004 David Abrahams.
- *  Copyright 2005 Rene Rivera.
- *  Distributed under the Boost Software License, Version 1.0.
- *  (See accompanying file LICENSE_1_0.txt or http://www.boost.org/LICENSE_1_0.txt)
+/* This file is ALSO:
+ * Copyright 2001-2004 David Abrahams.
+ * Copyright 2005 Rene Rivera.
+ * Distributed under the Boost Software License, Version 1.0.
+ * (See accompanying file LICENSE_1_0.txt or copy at
+ * http://www.boost.org/LICENSE_1_0.txt)
  */
 
 /*
@@ -68,7 +69,7 @@ int file_collect_dir_content_( file_info_t * const d )
     f.f_dir.ptr = object_str( d->name );
     f.f_dir.len = d_length;
 
-    /* Prepare file search specification for the findfirst() API. */
+    /* Prepare file search specification for the FindXXX() Windows API. */
     if ( !d_length )
         string_copy( pathspec, ".\\*" );
     else
@@ -85,7 +86,7 @@ int file_collect_dir_content_( file_info_t * const d )
     }
 
     /* The following code for collecting information about all files in a folder
-     * needs to be synchronized with how the file_query() operation is
+     * needs to be kept synchronized with how the file_query() operation is
      * implemented (collects information about a single file).
      */
     {
@@ -107,11 +108,12 @@ int file_collect_dir_content_( file_info_t * const d )
 
             f.f_base.ptr = finfo.cFileName;
             f.f_base.len = strlen( finfo.cFileName );
+
             string_truncate( pathname, 0 );
             path_build( &f, pathname );
 
             pathname_obj = object_new( pathname->value );
-            path_key__register_long_path( pathname_obj );
+            path_register_key( pathname_obj );
             files = list_push_back( files, pathname_obj );
             {
                 file_info_t * const ff = file_info( pathname_obj );
@@ -186,7 +188,7 @@ int file_mkdir( char const * const path )
  * file_query_() - query information about a path from the OS
  *
  * The following code for collecting information about a single file needs to be
- * synchronized with how the file_collect_dir_content_() operation is
+ * kept synchronized with how the file_collect_dir_content_() operation is
  * implemented (collects information about all files in a folder).
  */
 
@@ -239,7 +241,8 @@ void file_supported_fmt_resolution( timestamp * const t )
 
 #define ARFMAG  "`\n"
 
-struct ar_hdr {
+struct ar_hdr
+{
     char ar_name[ 16 ];
     char ar_date[ 12 ];
     char ar_uid[ 6 ];

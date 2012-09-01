@@ -4,10 +4,11 @@
  * This file is part of Jam - see jam.c for Copyright information.
  */
 
-/*  This file is ALSO:
- *  Copyright 2001-2004 David Abrahams.
- *  Distributed under the Boost Software License, Version 1.0.
- *  (See accompanying file LICENSE_1_0.txt or http://www.boost.org/LICENSE_1_0.txt)
+/* This file is ALSO:
+ * Copyright 2001-2004 David Abrahams.
+ * Distributed under the Boost Software License, Version 1.0.
+ * (See accompanying file LICENSE_1_0.txt or copy at
+ * http://www.boost.org/LICENSE_1_0.txt)
  */
 
 /*
@@ -30,14 +31,14 @@
 
 #ifdef NT
 
-#include <fcntl.h>
-#include <stdlib.h>
-#include <stdio.h>
 #include <ctype.h>
+#include <fcntl.h>
 #include <malloc.h>
 #ifndef __MWERKS__
     #include <memory.h>
 #endif
+#include <stdio.h>
+#include <stdlib.h>
 #include <signal.h>
 #include <string.h>
 #include <time.h>
@@ -48,9 +49,7 @@
 #define SPLITPATH ';'
 #define MAXLINE (undefined__see_execnt_c)  /* max chars per command line */
 #define USE_EXECNT
-#define USE_PATHUNIX
 #define PATH_DELIM '\\'
-#define DOWNSHIFT_PATHS
 
 /* AS400 cross-compile from NT. */
 
@@ -68,7 +67,8 @@
     #undef HAVE_POPEN
 #endif
 
-# endif
+#endif  /* #ifdef NT */
+
 
 /*
  * Windows MingW32
@@ -92,11 +92,10 @@
 #define SPLITPATH ';'
 #define MAXLINE 996  /* max chars per command line */
 #define USE_EXECUNIX
-#define USE_PATHUNIX
 #define PATH_DELIM '\\'
-#define DOWNSHIFT_PATHS
 
-#endif
+#endif  /* #ifdef MINGW */
+
 
 /*
  * God fearing UNIX.
@@ -107,7 +106,6 @@
 #define OSMAJOR "UNIX=true"
 #define USE_EXECUNIX
 #define USE_FILEUNIX
-#define USE_PATHUNIX
 #define PATH_DELIM '/'
 
 #ifdef _AIX
@@ -324,7 +322,8 @@
     #include <malloc.h>
 #endif
 
-#endif
+#endif  /* #ifndef OSMINOR */
+
 
 /*
  * OSPLAT definitions - suppressed when it is a one-of-a-kind.
@@ -362,7 +361,6 @@
     #define OSPLAT "OSPLAT=X86_64"
 #endif
 
-
 #if defined( __sparc__ ) || \
     defined( __sparc   )
     #define OSPLAT "OSPLAT=SPARC"
@@ -387,6 +385,7 @@
 #ifndef OSPLAT
     #define OSPLAT ""
 #endif
+
 
 /*
  * Jam implementation misc.
@@ -430,8 +429,12 @@ struct globs
     long   timeout;             /* number of seconds to limit actions to,
                                  * default 0 for no limit.
                                  */
-    int    dart;                /* output build and test results formatted for Dart */
-    int    max_buf;             /* maximum amount of output saved from target (kb) */
+    int    dart;                /* output build and test results formatted for
+                                 * Dart
+                                 */
+    int    max_buf;             /* maximum amount of output saved from target
+                                 * (kb)
+                                 */
 };
 
 extern struct globs globs;

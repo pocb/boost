@@ -102,6 +102,11 @@ BOOST_CHECK_INTEGRAL_CONSTANT((::tt::is_convertible<const int*, int[3]>::value),
 BOOST_CHECK_INTEGRAL_CONSTANT((::tt::is_convertible<const int&, int>::value), true);
 #ifndef BOOST_NO_RVALUE_REFERENCES
 BOOST_CHECK_INTEGRAL_CONSTANT((::tt::is_convertible<const int&&, int>::value), true);
+BOOST_CHECK_INTEGRAL_CONSTANT((::tt::is_convertible<int&&, const int&>::value), true);
+#if !defined(__GNUC__) || ((__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ > 6)))
+// Machinary required to support this, not available prior to gcc-4.7.0:
+BOOST_CHECK_INTEGRAL_CONSTANT((::tt::is_convertible<int, int&>::value), false);
+#endif
 #endif
 BOOST_CHECK_INTEGRAL_CONSTANT((::tt::is_convertible<int(&)[4], const int*>::value), true);
 BOOST_CHECK_INTEGRAL_CONSTANT((::tt::is_convertible<int(&)(int), int(*)(int)>::value), true);
