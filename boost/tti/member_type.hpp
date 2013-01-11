@@ -1,11 +1,11 @@
 
-//  (C) Copyright Edward Diener 2011
+//  (C) Copyright Edward Diener 2011,2012
 //  Use, modification and distribution are subject to the Boost Software License,
 //  Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt).
 
-#if !defined(TTI_MEMBER_TYPE_HPP)
-#define TTI_MEMBER_TYPE_HPP
+#if !defined(BOOST_TTI_MEMBER_TYPE_HPP)
+#define BOOST_TTI_MEMBER_TYPE_HPP
   
 #include <boost/config.hpp>
 #include <boost/mpl/eval_if.hpp>
@@ -56,8 +56,8 @@
     
 */
 #define BOOST_TTI_TRAIT_MEMBER_TYPE(trait,name) \
-    TTI_DETAIL_TRAIT_HAS_TYPE_MEMBER_TYPE(trait,name) \
-    TTI_DETAIL_TRAIT_MEMBER_TYPE(trait,name) \
+    BOOST_TTI_DETAIL_TRAIT_HAS_TYPE_MEMBER_TYPE(trait,name) \
+    BOOST_TTI_DETAIL_TRAIT_MEMBER_TYPE(trait,name) \
     template<class TTI_T> \
     struct trait : \
       boost::mpl::eval_if \
@@ -145,4 +145,4 @@ namespace boost
     }
   }
   
-#endif // TTI_MEMBER_TYPE_HPP
+#endif // BOOST_TTI_MEMBER_TYPE_HPP

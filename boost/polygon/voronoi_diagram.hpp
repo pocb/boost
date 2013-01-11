@@ -11,9 +11,12 @@
 #define BOOST_POLYGON_VORONOI_DIAGRAM
 
 #include <vector>
+#include <utility>
 
 #include "detail/voronoi_ctypes.hpp"
 #include "detail/voronoi_structures.hpp"
+
+#include "voronoi_geometry_type.hpp"
 
 namespace boost {
 namespace polygon {
@@ -30,30 +33,29 @@ class voronoi_edge;
 // Cell may contain point or segment site inside.
 template <typename T>
 class voronoi_cell {
-public:
+ public:
   typedef T coordinate_type;
   typedef std::size_t color_type;
   typedef voronoi_edge<coordinate_type> voronoi_edge_type;
   typedef std::size_t source_index_type;
-  typedef detail::SourceCategory source_category_type;
+  typedef SourceCategory source_category_type;
 
-  voronoi_cell(const source_index_type& source_index,
-               const source_category_type& source_category,
-               voronoi_edge_type* edge) :
+  voronoi_cell(source_index_type source_index,
+               source_category_type source_category) :
       source_index_(source_index),
-      incident_edge_(edge),
+      incident_edge_(NULL),
       color_(source_category) {}
 
   // Returns true if the cell contains point site, false else.
   bool contains_point() const {
     source_category_type source_category = this->source_category();
-    return detail::belongs(source_category, detail::GEOMETRY_CATEGORY_POINT);
+    return belongs(source_category, GEOMETRY_CATEGORY_POINT);
   }
 
   // Returns true if the cell contains segment site, false else.
   bool contains_segment() const {
     source_category_type source_category = this->source_category();
-    return detail::belongs(source_category, detail::GEOMETRY_CATEGORY_SEGMENT);
+    return belongs(source_category, GEOMETRY_CATEGORY_SEGMENT);
   }
 
   source_index_type source_index() const {
@@ -61,8 +63,7 @@ public:
   }
 
   source_category_type source_category() const {
-    return static_cast<source_category_type>(
-        color_ & detail::SOURCE_CATEGORY_BITMASK);
+    return static_cast<source_category_type>(color_ & SOURCE_CATEGORY_BITMASK);
   }
 
   // Degenerate cells don't have any incident edges.
@@ -73,16 +74,16 @@ public:
   void incident_edge(voronoi_edge_type* e) { incident_edge_ = e; }
 
   color_type color() const { return color_ >> BITS_SHIFT; }
-  void color(const color_type& color) const {
+  void color(color_type color) const {
     color_ &= BITS_MASK;
     color_ |= color << BITS_SHIFT;
   }
 
-private:
+ private:
   // 5 color bits are reserved.
   enum Bits {
     BITS_SHIFT = 0x5,
-    BITS_MASK = 0x1F,
+    BITS_MASK = 0x1F
   };
 
   source_index_type source_index_;
@@ -97,17 +98,15 @@ private:
 //   3) mutable color member
 template <typename T>
 class voronoi_vertex {
-public:
+ public:
   typedef T coordinate_type;
   typedef std::size_t color_type;
   typedef voronoi_edge<coordinate_type> voronoi_edge_type;
 
-  voronoi_vertex(const coordinate_type& x,
-                 const coordinate_type& y,
-                 voronoi_edge_type* edge) :
+  voronoi_vertex(const coordinate_type& x, const coordinate_type& y) :
       x_(x),
       y_(y),
-      incident_edge_(edge),
+      incident_edge_(NULL),
       color_(0) {}
 
   const coordinate_type& x() const { return x_; }
@@ -120,16 +119,16 @@ public:
   void incident_edge(voronoi_edge_type* e) { incident_edge_ = e; }
 
   color_type color() const { return color_ >> BITS_SHIFT; }
-  void color(const color_type& color) const {
+  void color(color_type color) const {
     color_ &= BITS_MASK;
     color_ |= color << BITS_SHIFT;
   }
 
-private:
+ private:
   // 5 color bits are reserved.
   enum Bits {
     BITS_SHIFT = 0x5,
-    BITS_MASK = 0x1F,
+    BITS_MASK = 0x1F
   };
 
   coordinate_type x_;
@@ -149,7 +148,7 @@ private:
 //   6) mutable color member
 template <typename T>
 class voronoi_edge {
-public:
+ public:
   typedef T coordinate_type;
   typedef voronoi_cell<coordinate_type> voronoi_cell_type;
   typedef voronoi_vertex<coordinate_type> voronoi_vertex_type;
@@ -179,7 +178,6 @@ public:
 
   voronoi_vertex_type* vertex1() { return twin_->vertex0(); }
   const voronoi_vertex_type* vertex1() const { return twin_->vertex0(); }
-  void vertex1(voronoi_vertex_type* v) { twin_->vertex0(v); }
 
   voronoi_edge_type* twin() { return twin_; }
   const voronoi_edge_type* twin() const { return twin_; }
@@ -195,21 +193,13 @@ public:
 
   // Returns a pointer to the rotation next edge
   // over the starting point of the half-edge.
-  voronoi_edge_type* rot_next() {
-    return (vertex_) ? prev_->twin() : NULL;
-  }
-  const voronoi_edge_type* rot_next() const {
-    return (vertex_) ? prev_->twin() : NULL;
-  }
+  voronoi_edge_type* rot_next() { return prev_->twin(); }
+  const voronoi_edge_type* rot_next() const { return prev_->twin(); }
 
   // Returns a pointer to the rotation prev edge
   // over the starting point of the half-edge.
-  voronoi_edge_type* rot_prev() {
-    return (vertex_) ? twin_->next() : NULL;
-  }
-  const voronoi_edge_type* rot_prev() const {
-    return (vertex_) ? twin_->next() : NULL;
-  }
+  voronoi_edge_type* rot_prev() { return twin_->next(); }
+  const voronoi_edge_type* rot_prev() const { return twin_->next(); }
 
   // Returns true if the edge is finite (segment, parabolic arc).
   // Returns false if the edge is infinite (ray, line).
@@ -244,19 +234,19 @@ public:
   }
 
   color_type color() const { return color_ >> BITS_SHIFT; }
-  void color(const color_type& color) const {
+  void color(color_type color) const {
     color_ &= BITS_MASK;
     color_ |= color << BITS_SHIFT;
   }
 
-private:
+ private:
   // 5 color bits are reserved.
   enum Bits {
     BIT_IS_LINEAR = 0x1,  // linear is opposite to curved
     BIT_IS_PRIMARY = 0x2,  // primary is opposite to secondary
 
     BITS_SHIFT = 0x5,
-    BITS_MASK = 0x1F,
+    BITS_MASK = 0x1F
   };
 
   voronoi_cell_type* cell_;
@@ -274,7 +264,7 @@ struct voronoi_diagram_traits {
   typedef voronoi_vertex<coordinate_type> vertex_type;
   typedef voronoi_edge<coordinate_type> edge_type;
   typedef class {
-  public:
+   public:
     enum { ULPS = 128 };
     bool operator()(const vertex_type& v1, const vertex_type& v2) const {
       return (ulp_cmp(v1.x(), v2.x(), ULPS) ==
@@ -282,7 +272,7 @@ struct voronoi_diagram_traits {
              (ulp_cmp(v1.y(), v2.y(), ULPS) ==
               detail::ulp_comparison<T>::EQUAL);
     }
-  private:
+   private:
     typename detail::ulp_comparison<T> ulp_cmp;
   } vertex_equality_predicate_type;
 };
@@ -291,76 +281,27 @@ struct voronoi_diagram_traits {
 // CCW ordering is used on the faces perimeter and around the vertices.
 template <typename T, typename TRAITS = voronoi_diagram_traits<T> >
 class voronoi_diagram {
-public:
+ public:
   typedef typename TRAITS::coordinate_type coordinate_type;
   typedef typename TRAITS::cell_type cell_type;
   typedef typename TRAITS::vertex_type vertex_type;
   typedef typename TRAITS::edge_type edge_type;
 
   typedef std::vector<cell_type> cell_container_type;
-  typedef typename cell_container_type::iterator cell_iterator;
   typedef typename cell_container_type::const_iterator const_cell_iterator;
 
   typedef std::vector<vertex_type> vertex_container_type;
-  typedef typename vertex_container_type::iterator vertex_iterator;
   typedef typename vertex_container_type::const_iterator const_vertex_iterator;
 
   typedef std::vector<edge_type> edge_container_type;
-  typedef typename edge_container_type::iterator edge_iterator;
   typedef typename edge_container_type::const_iterator const_edge_iterator;
 
-  // This builder class is mainly used to hide from the user methods that
-  // construct the Voronoi diagram.
-  class voronoi_diagram_builder {
-  public:
-    void vd(voronoi_diagram* vd) {
-      vd_ = vd;
-    }
-
-    bool done() {
-      return vd_ == NULL;
-    }
-
-    void reserve(int num_sites) {
-      vd_->reserve(num_sites);
-    }
-
-    template <typename SEvent>
-    void process_single_site(const SEvent& site) {
-      vd_->process_single_site(site);
-    }
-
-    template <typename SEvent>
-    std::pair<void*, void*> insert_new_edge(
-        const SEvent& site1, const SEvent& site2) {
-      return vd_->insert_new_edge(site1, site2);
-    }
-
-    template <typename SEvent, typename CEvent>
-    std::pair<void*, void*> insert_new_edge(
-        const SEvent& site1, const SEvent& site3, const CEvent& circle,
-        void* data12, void* data23) {
-      return vd_->insert_new_edge(site1, site3, circle, data12, data23);
-    }
-
-    void build() {
-      vd_->build();
-      vd_ = NULL;
-    }
-
-  private:
-    voronoi_diagram* vd_;
-  };
-
-  voronoi_diagram() {
-    builder_.vd(&(*this));
-  }
+  voronoi_diagram() {}
 
   void clear() {
     cells_.clear();
     vertices_.clear();
     edges_.clear();
-    builder_.vd(&(*this));
   }
 
   const cell_container_type& cells() const {
@@ -380,10 +321,6 @@ public:
   }
 
   std::size_t num_edges() const {
-    return edges_.size() >> 1;
-  }
-
-  std::size_t num_half_edges() const {
     return edges_.size();
   }
 
@@ -391,61 +328,24 @@ public:
     return vertices_.size();
   }
 
-  voronoi_diagram_builder* builder() {
-    if (builder_.done()) {
-      return NULL;
-    } else {
-      return &builder_;
-    }
-  }
-
-private:
-  typedef typename TRAITS::vertex_equality_predicate_type
-    vertex_equality_predicate_type;
-
-  friend class voronoi_diagram_builder;
-
-  void reserve(int num_sites) {
+  void _reserve(int num_sites) {
     cells_.reserve(num_sites);
     vertices_.reserve(num_sites << 1);
     edges_.reserve((num_sites << 2) + (num_sites << 1));
   }
 
-  template <typename SEvent>
-  bool is_primary_edge(const SEvent& site1, const SEvent& site2) const {
-    bool flag1 = site1.is_segment();
-    bool flag2 = site2.is_segment();
-    if (flag1 && !flag2) {
-      return (site1.point0() != site2.point0()) &&
-             (site1.point1() != site2.point0());
-    }
-    if (!flag1 && flag2) {
-      return (site2.point0() != site1.point0()) &&
-             (site2.point1() != site1.point0());
-    }
-    return true;
-  }
-
-  template <typename SEvent>
-  bool is_linear_edge(const SEvent& site1, const SEvent& site2) const {
-    if (!is_primary_edge(site1, site2)) {
-      return true;
-    }
-    return !(site1.is_segment() ^ site2.is_segment());
-  }
-
-  template <typename SEvent>
-  void process_single_site(const SEvent& site) {
-    cells_.push_back(cell_type(
-         site.initial_index(), site.source_category(), NULL));
+  template <typename CT>
+  void _process_single_site(const detail::site_event<CT>& site) {
+    cells_.push_back(cell_type(site.initial_index(), site.source_category()));
   }
 
   // Insert a new half-edge into the output data structure.
   // Takes as input left and right sites that form a new bisector.
   // Returns a pair of pointers to a new half-edges.
-  template <typename SEvent>
-  std::pair<void*, void*> insert_new_edge(
-      const SEvent& site1, const SEvent& site2) {
+  template <typename CT>
+  std::pair<void*, void*> _insert_new_edge(
+      const detail::site_event<CT>& site1,
+      const detail::site_event<CT>& site2) {
     // Get sites' indexes.
     int site_index1 = site1.sorted_index();
     int site_index2 = site2.sorted_index();
@@ -464,13 +364,13 @@ private:
     // Add the initial cell during the first edge insertion.
     if (cells_.empty()) {
       cells_.push_back(cell_type(
-          site1.initial_index(), site1.source_category(), NULL));
+          site1.initial_index(), site1.source_category()));
     }
 
     // The second site represents a new site during site event
     // processing. Add a new cell to the cell records.
     cells_.push_back(cell_type(
-      site2.initial_index(), site2.source_category(), NULL));
+        site2.initial_index(), site2.source_category()));
 
     // Set up pointers to cells.
     edge1.cell(&cells_[site_index1]);
@@ -490,15 +390,17 @@ private:
   // that corresponds to the intersection point of the two old half-edges,
   // pointers to those half-edges. Half-edges' direction goes out of the
   // new Voronoi vertex point. Returns a pair of pointers to a new half-edges.
-  template <typename SEvent, typename CEvent>
-  std::pair<void*, void*> insert_new_edge(
-      const SEvent& site1, const SEvent& site3, const CEvent& circle,
+  template <typename CT1, typename CT2>
+  std::pair<void*, void*> _insert_new_edge(
+      const detail::site_event<CT1>& site1,
+      const detail::site_event<CT1>& site3,
+      const detail::circle_event<CT2>& circle,
       void* data12, void* data23) {
     edge_type* edge12 = static_cast<edge_type*>(data12);
     edge_type* edge23 = static_cast<edge_type*>(data23);
 
     // Add a new Voronoi vertex.
-    vertices_.push_back(vertex_type(circle.x(), circle.y(), NULL));
+    vertices_.push_back(vertex_type(circle.x(), circle.y()));
     vertex_type& new_vertex = vertices_.back();
 
     // Update vertex pointers of the old edges.
@@ -537,7 +439,7 @@ private:
     return std::make_pair(&new_edge1, &new_edge2);
   }
 
-  void build() {
+  void _build() {
     // Remove degenerate edges.
     edge_iterator last_edge = edges_.begin();
     for (edge_iterator it = edges_.begin(); it != edges_.end(); it += 2) {
@@ -647,6 +549,36 @@ private:
     }
   }
 
+ private:
+  typedef typename cell_container_type::iterator cell_iterator;
+  typedef typename vertex_container_type::iterator vertex_iterator;
+  typedef typename edge_container_type::iterator edge_iterator;
+  typedef typename TRAITS::vertex_equality_predicate_type
+    vertex_equality_predicate_type;
+
+  template <typename SEvent>
+  bool is_primary_edge(const SEvent& site1, const SEvent& site2) const {
+    bool flag1 = site1.is_segment();
+    bool flag2 = site2.is_segment();
+    if (flag1 && !flag2) {
+      return (site1.point0() != site2.point0()) &&
+             (site1.point1() != site2.point0());
+    }
+    if (!flag1 && flag2) {
+      return (site2.point0() != site1.point0()) &&
+             (site2.point1() != site1.point0());
+    }
+    return true;
+  }
+
+  template <typename SEvent>
+  bool is_linear_edge(const SEvent& site1, const SEvent& site2) const {
+    if (!is_primary_edge(site1, site2)) {
+      return true;
+    }
+    return !(site1.is_segment() ^ site2.is_segment());
+  }
+
   // Remove degenerate edge.
   void remove_edge(edge_type* edge) {
     // Update the endpoints of the incident edges to the second vertex.
@@ -676,8 +608,6 @@ private:
   cell_container_type cells_;
   vertex_container_type vertices_;
   edge_container_type edges_;
-
-  voronoi_diagram_builder builder_;
   vertex_equality_predicate_type vertex_equality_predicate_;
 
   // Disallow copy constructor and operator=

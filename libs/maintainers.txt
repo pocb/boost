@@ -16,7 +16,7 @@ any                   Alexander Nasonov <alexander.nasonov -at- gmail.com>
 array                 Marshall Clow <marshall -at- idio.com>
 asio                  Chris Kohlhoff <chris -at- kohlhoff.com>
 assign                Thorsten Ottosen <nesotto -at- cs.auc.dk>
-atomic                Helge Bahmann <hcb -at- chaoticmind.net>
+atomic                Helge Bahmann <hcb -at- chaoticmind.net>, Tim Blechmann <tim -at- klingt.org>
 bimap                 Matias Capeletto <matias.capeletto -at- gmail.com>
 bind                  Peter Dimov <pdimov -at- mmltd.net>
 chrono                Vicente J. Botet Escriba <vicente.botet -at- wanadoo.fr>
@@ -24,7 +24,8 @@ circular_buffer       Jan Gaspar <jano_gaspar -at- yahoo.com>
 concept_check         Jeremy Siek <jeremy.siek -at- gmail.com>
 config                John Maddock <john -at- johnmaddock.co.uk>
 container             Ion Gaztanaga <igaztanaga -at- gmail.com>
-context               Oliver Kowalke <oliver.kowalke -at- gmx.de>
+context               Oliver Kowalke <oliver.kowalke -at- gmail.com>
+coroutine             Oliver Kowalke <oliver.kowalke -at- gmail.com>
 conversion            Antony Polukhin <antoshkka -at- gmail.com>
 crc                   Daryle Walker <darylew -at- hotmail.com>
 date_time             Jeff Garland <jeff -at- crystalclearsoftware.com>
@@ -66,8 +67,10 @@ mpl                   Aleksey Gurtovoy <agurtovoy -at- meta-comm.com>
 msm                   Christophe Henry <christophe.j.henry -at-  googlemail.com>
 multi_array           Ronald Garcia <garcia -at- osl.iu.edu>
 multi_index           Joaquin M Lopez Munoz <joaquin -at- tid.es>
+multiprecision        John Maddock <john -at- johnmaddock.co.uk>, christopher Kormanyos <e_float -at- yahoo.com>
 numeric/conversion    Fernando Cacciola <fernando_cacciola -at- ciudad.com.ar>, Brandon Kohn <blkohn -at- hotmail.com>
 numeric/interval      Sylvain Pion <Sylvain.Pion -at- sophia.inria.fr>, Herve Bronnimann <hbr -at- poly.edu>, Guillaume Melquiond <guillaume.melquiond -at- ens-lyon.fr>
+numeric/odeint        Karsten Ahnert <karsten.ahnert -at- gmx.de>, Mario Mulansky <mario.mulansky -at- gmx.net>
 numeric/ublas         Michael Stevens <michael -at- michael-stevens.de>
 optional              Fernando Cacciola <fernando_cacciola -at- ciudad.com.ar>
 operators             Daniel Frey <d.frey -at- gmx.de>
@@ -83,7 +86,7 @@ proto                 Eric Niebler <eric -at- boostpro.com>
 ptr_container         Thorsten Ottosen <nesotto -at- cs.auc.dk>
 python                Ralf Grosse-Kunstleve <rwgrosse-kunstleve -at- lbl.gov>, Ravi Rajagopal <lists_ravi -at- lavabit.com>
 random                Steven Watanabe <watanabesj -at- gmail.com>
-range                 Neil Groves <neilgroves -at- googlemail.com>
+range                 Neil Groves <neilgroves -at- googlemail.com>, Nathan Ridge <zeratul976 -at- hotmail.com>
 ratio                 Vicente J. Botet Escriba <vicente.botet -at- wanadoo.fr>
 rational              Jonathan Turkanis <turkanis -at- coderage.com>
 regex                 John Maddock <john -at- johnmaddock.co.uk>
@@ -96,7 +99,7 @@ spirit                Joel de Guzman <joel -at- boost-consulting.com>, Hartmut K
 statechart            Andreas Huber <ahd6974-boostorg -at- yahoo.com>
 static_assert         John Maddock <john -at- johnmaddock.co.uk>
 test                  Gennadiy Rozental <gennadiy.rozental -at- thomson.com>
-thread                Anthony Williams <anthony -at- justsoftwaresolutions.co.uk>, Roland Schwarz <roland.schwarz -at- chello.at>
+thread                Anthony Williams <anthony -at- justsoftwaresolutions.co.uk>, Roland Schwarz <roland.schwarz -at- chello.at>, Vicente J. Botet Escriba <vicente.botet -at- wanadoo.fr>
 timer                 Beman Dawes <bdawes -at- acm.org>
 tokenizer             John R. Bandela <jbandela -at- ufl.edu>
 tr1                   John Maddock <john -at- johnmaddock.co.uk>
@@ -114,5 +117,6 @@ uuid                  Andy Tompkins <atompkins -at- fastmail.fm>
 variant               Eric Friedman <ericbrandon -at- gmail.com>
 wave                  Hartmut Kaiser <hartmut.kaiser -at- gmail.com>
 xpressive             Eric Niebler <eric -at- boostpro.com>
+
 
 

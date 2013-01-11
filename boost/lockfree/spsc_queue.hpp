@@ -13,6 +13,7 @@
 #include <algorithm>
 
 #include <boost/array.hpp>
+#include <boost/assert.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/static_assert.hpp>
 
@@ -95,7 +96,7 @@ protected:
         if (avail == 0)
             return 0;
 
-        input_count = std::min(input_count, avail);
+        input_count = (std::min)(input_count, avail);
 
         size_t new_write_index = write_index + input_count;
 
@@ -130,7 +131,7 @@ protected:
             return begin;
 
         size_t input_count = std::distance(begin, end);
-        input_count = std::min(input_count, avail);
+        input_count = (std::min)(input_count, avail);
 
         size_t new_write_index = write_index + input_count;
 
@@ -180,7 +181,7 @@ protected:
         if (avail == 0)
             return 0;
 
-        output_count = std::min(output_count, avail);
+        output_count = (std::min)(output_count, avail);
 
         size_t new_read_index = read_index + output_count;
 
@@ -496,7 +497,7 @@ public:
     // @{
     spsc_queue(void)
     {
-        BOOST_STATIC_ASSERT(!runtime_sized);
+        BOOST_ASSERT(!runtime_sized);
     }
 
     template <typename U>
@@ -509,7 +510,7 @@ public:
     explicit spsc_queue(allocator const & alloc)
     {
         // just for API compatibility: we don't actually need an allocator
-        BOOST_STATIC_ASSERT(!runtime_sized);
+        BOOST_ASSERT(!runtime_sized);
     }
     // @}
 
@@ -522,7 +523,7 @@ public:
     explicit spsc_queue(size_type element_count):
         base_type(element_count)
     {
-        BOOST_STATIC_ASSERT(runtime_sized);
+        BOOST_ASSERT(runtime_sized);
     }
 
     template <typename U>
@@ -535,7 +536,7 @@ public:
     spsc_queue(size_type element_count, allocator_arg const & alloc):
         base_type(alloc, element_count)
     {
-        BOOST_STATIC_ASSERT(runtime_sized);
+        BOOST_ASSERT(runtime_sized);
     }
     // @}
 

@@ -1,4 +1,4 @@
-//  (C) Copyright Gennadiy Rozental 2005-2010.
+//  (C) Copyright Gennadiy Rozental 2005-2012.
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at 
 //  http://www.boost.org/LICENSE_1_0.txt)
@@ -9,7 +9,7 @@
 //
 //  Version     : $Revision$
 //
-//  Description : implements XML Log formatter
+//  Description : implements OF_XML Log formatter
 // ***************************************************************************
 
 #ifndef BOOST_TEST_XML_LOG_FORMATTER_IPP_020105GER
@@ -39,7 +39,7 @@ namespace output {
 
 static const_string tu_type_name( test_unit const& tu )
 {
-    return tu.p_type == tut_case ? "TestCase" : "TestSuite";
+    return tu.p_type == TUT_CASE ? "TestCase" : "TestSuite";
 }
 
 // ************************************************************************** //
@@ -80,7 +80,13 @@ xml_log_formatter::log_build_info( std::ostream& ostr )
 void
 xml_log_formatter::test_unit_start( std::ostream& ostr, test_unit const& tu )
 {
-    ostr << "<" << tu_type_name( tu ) << " name" << attr_value() << tu.p_name.get() << ">";
+    ostr << "<" << tu_type_name( tu ) << " name" << attr_value() << tu.p_name.get();
+
+    if( !tu.p_file_name.get().empty() )
+        ostr << BOOST_TEST_L( " file" ) << attr_value() << tu.p_file_name
+             << BOOST_TEST_L( " line" ) << attr_value() << tu.p_line_num;
+
+    ostr << ">";
 }
 
 //____________________________________________________________________________//
@@ -88,7 +94,7 @@ xml_log_formatter::test_unit_start( std::ostream& ostr, test_unit const& tu )
 void
 xml_log_formatter::test_unit_finish( std::ostream& ostr, test_unit const& tu, unsigned long elapsed )
 {
-    if( tu.p_type == tut_case )
+    if( tu.p_type == TUT_CASE )
         ostr << "<TestingTime>" << elapsed << "</TestingTime>";
         
     ostr << "</" << tu_type_name( tu ) << ">";

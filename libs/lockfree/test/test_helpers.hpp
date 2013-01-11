@@ -1,3 +1,9 @@
+//  Copyright (C) 2011 Tim Blechmann
+//
+//  Distributed under the Boost Software License, Version 1.0. (See
+//  accompanying file LICENSE_1_0.txt or copy at
+//  http://www.boost.org/LICENSE_1_0.txt)
+
 #ifndef BOOST_LOCKFREE_TEST_HELPERS
 #define BOOST_LOCKFREE_TEST_HELPERS
 
@@ -22,8 +28,8 @@ class static_hashed_set
 public:
     int calc_index(int_type id)
     {
-		// knuth hash ... does not need to be good, but has to be portable
-		size_t factor = size_t((float)buckets * 1.616f);
+        // knuth hash ... does not need to be good, but has to be portable
+        size_t factor = size_t((float)buckets * 1.616f);
 
         return ((size_t)id * factor) % buckets;
     }
@@ -64,9 +70,9 @@ public:
             return false;
     }
 
-    int count_nodes(void) const
+    std::size_t count_nodes(void) const
     {
-        int ret = 0;
+        std::size_t ret = 0;
         for (int i = 0; i != buckets; ++i) {
             boost::mutex::scoped_lock lock (ref_mutex[i]);
             ret += data[i].size();

@@ -1,4 +1,4 @@
-//  (C) Copyright Gennadiy Rozental 2005-2010.
+//  (C) Copyright Gennadiy Rozental 2005-2012.
 //  Use, modification, and distribution are subject to the
 //  Boost Software License, ELOG_VER 1.0. (See accompanying file
 //  http://www.boost.org/LICENSE_1_0.txt)
@@ -40,9 +40,9 @@
 
 namespace boost {
 
-using namespace ::boost::unit_test;
-
 namespace itest {
+
+using namespace ::boost::unit_test;
 
 // ************************************************************************** //
 // **************    logged expectation test implementation    ************** //

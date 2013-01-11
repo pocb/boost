@@ -10,10 +10,21 @@
 #ifndef BOOST_POLYGON_DETAIL_VORONOI_CTYPES
 #define BOOST_POLYGON_DETAIL_VORONOI_CTYPES
 
+#ifndef BOOST_POLYGON_NO_DEPS
+#include <boost/cstdint.hpp>
+#else
+namespace boost {
+  typedef int int32_t;
+  typedef long long int64_t;
+  typedef unsigned int uint32_t;
+  typedef unsigned long long uint64_t;
+};
+#endif
+
 #include <cmath>
 #include <cstring>
-
-#include <boost/cstdint.hpp>
+#include <utility>
+#include <vector>
 
 namespace boost {
 namespace polygon {
@@ -70,19 +81,19 @@ struct extened_exponent_fpt_traits;
 
 template <>
 class extened_exponent_fpt_traits<fpt64> {
-public:
+ public:
   typedef int exp_type;
-  static const int kMaxSignificantExpDif;
+  enum {
+    MAX_SIGNIFICANT_EXP_DIF = 54
+  };
 };
-
-const int extened_exponent_fpt_traits<fpt64>::kMaxSignificantExpDif = 54;
 
 // Floating point type wrapper. Allows to extend exponent boundaries to the
 // integer type range. This class does not handle division by zero, subnormal
 // numbers or NaNs.
 template <typename _fpt, typename _traits = extened_exponent_fpt_traits<_fpt> >
 class extended_exponent_fpt {
-public:
+ public:
   typedef _fpt fpt_type;
   typedef typename _traits::exp_type exp_type;
 
@@ -113,11 +124,11 @@ public:
 
   extended_exponent_fpt operator+(const extended_exponent_fpt& that) const {
     if (this->val_ == 0.0 ||
-        that.exp_ > this->exp_ + _traits::kMaxSignificantExpDif) {
+        that.exp_ > this->exp_ + _traits::MAX_SIGNIFICANT_EXP_DIF) {
       return that;
     }
     if (that.val_ == 0.0 ||
-        this->exp_ > that.exp_ + _traits::kMaxSignificantExpDif) {
+        this->exp_ > that.exp_ + _traits::MAX_SIGNIFICANT_EXP_DIF) {
       return *this;
     }
     if (this->exp_ >= that.exp_) {
@@ -133,11 +144,11 @@ public:
 
   extended_exponent_fpt operator-(const extended_exponent_fpt& that) const {
     if (this->val_ == 0.0 ||
-        that.exp_ > this->exp_ + _traits::kMaxSignificantExpDif) {
+        that.exp_ > this->exp_ + _traits::MAX_SIGNIFICANT_EXP_DIF) {
       return extended_exponent_fpt(-that.val_, that.exp_);
     }
     if (that.val_ == 0.0 ||
-        this->exp_ > that.exp_ + _traits::kMaxSignificantExpDif) {
+        this->exp_ > that.exp_ + _traits::MAX_SIGNIFICANT_EXP_DIF) {
       return *this;
     }
     if (this->exp_ >= that.exp_) {
@@ -193,7 +204,7 @@ public:
     return std::ldexp(val_, exp_);
   }
 
-private:
+ private:
   fpt_type val_;
   exp_type exp_;
 };
@@ -223,10 +234,7 @@ bool is_zero(const extended_exponent_fpt<_fpt>& that) {
 // Supports next set of arithmetic operations: +, -, *.
 template<std::size_t N>
 class extended_int {
-public:
-  static const uint64 kUInt64LowMask;
-  static const uint64 kUInt64HighMask;
-
+ public:
   extended_int() {}
 
   extended_int(int32 that) {
@@ -243,12 +251,12 @@ public:
 
   extended_int(int64 that) {
     if (that > 0) {
-      this->chunks_[0] = static_cast<uint32>(that & kUInt64LowMask);
+      this->chunks_[0] = static_cast<uint32>(that);
       this->chunks_[1] = that >> 32;
       this->count_ = this->chunks_[1] ? 2 : 1;
     } else if (that < 0) {
       that = -that;
-      this->chunks_[0] = static_cast<uint32>(that & kUInt64LowMask);
+      this->chunks_[0] = static_cast<uint32>(that);
       this->chunks_[1] = that >> 32;
       this->count_ = this->chunks_[1] ? -2 : -1;
     } else {
@@ -264,7 +272,8 @@ public:
       this->count_ = -this->count_;
   }
 
-  extended_int(const extended_int& that) {
+  template<std::size_t M>
+  extended_int(const extended_int<M>& that) {
     this->count_ = that.count();
     std::memcpy(this->chunks_, that.chunks(), that.size() * sizeof(uint32));
   }
@@ -284,12 +293,12 @@ public:
 
   extended_int& operator=(int64 that) {
     if (that > 0) {
-      this->chunks_[0] = static_cast<uint32>(that & kUInt64LowMask);
+      this->chunks_[0] = static_cast<uint32>(that);
       this->chunks_[1] = that >> 32;
       this->count_ = this->chunks_[1] ? 2 : 1;
     } else if (that < 0) {
       that = -that;
-      this->chunks_[0] = static_cast<uint32>(that & kUInt64LowMask);
+      this->chunks_[0] = static_cast<uint32>(that);
       this->chunks_[1] = that >> 32;
       this->count_ = this->chunks_[1] ? -2 : -1;
     } else {
@@ -298,7 +307,8 @@ public:
     return *this;
   }
 
-  extended_int& operator=(const extended_int& that) {
+  template<std::size_t M>
+  extended_int& operator=(const extended_int<M>& that) {
     this->count_ = that.count();
     std::memcpy(this->chunks_, that.chunks(), that.size() * sizeof(uint32));
     return *this;
@@ -482,7 +492,7 @@ public:
     return std::ldexp(p.first, p.second);
   }
 
-private:
+ private:
   void add(const uint32* c1, std::size_t sz1,
            const uint32* c2, std::size_t sz2) {
     if (sz1 < sz2) {
@@ -493,16 +503,16 @@ private:
     uint64 temp = 0;
     for (std::size_t i = 0; i < sz2; ++i) {
       temp += static_cast<uint64>(c1[i]) + static_cast<uint64>(c2[i]);
-      this->chunks_[i] = static_cast<uint32>(temp & kUInt64LowMask);
+      this->chunks_[i] = static_cast<uint32>(temp);
       temp >>= 32;
     }
     for (std::size_t i = sz2; i < sz1; ++i) {
       temp += static_cast<uint64>(c1[i]);
-      this->chunks_[i] = static_cast<uint32>(temp & kUInt64LowMask);
+      this->chunks_[i] = static_cast<uint32>(temp);
       temp >>= 32;
     }
     if (temp && (this->count_ != N)) {
-      this->chunks_[this->count_] = static_cast<uint32>(temp & kUInt64LowMask);
+      this->chunks_[this->count_] = static_cast<uint32>(temp);
       ++this->count_;
     }
   }
@@ -561,14 +571,14 @@ private:
         if (second >= sz2)
           continue;
         tmp = static_cast<uint64>(c1[first]) * static_cast<uint64>(c2[second]);
-        cur += tmp & kUInt64LowMask;
+        cur += static_cast<uint32>(tmp);
         nxt += tmp >> 32;
       }
-      this->chunks_[shift] = static_cast<uint32>(cur & kUInt64LowMask);
+      this->chunks_[shift] = static_cast<uint32>(cur);
       cur = nxt + (cur >> 32);
     }
     if (cur && (this->count_ != N)) {
-      this->chunks_[this->count_] = static_cast<uint32>(cur & kUInt64LowMask);
+      this->chunks_[this->count_] = static_cast<uint32>(cur);
       ++this->count_;
     }
   }
@@ -576,11 +586,6 @@ private:
   uint32 chunks_[N];
   int32 count_;
 };
-
-template <std::size_t N>
-const uint64 extended_int<N>::kUInt64LowMask = 0x00000000ffffffffULL;
-template <std::size_t N>
-const uint64 extended_int<N>::kUInt64HighMask = 0xffffffff00000000ULL;
 
 template <std::size_t N>
 bool is_pos(const extended_int<N>& that) {

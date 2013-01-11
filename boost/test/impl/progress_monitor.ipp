@@ -1,4 +1,4 @@
-//  (C) Copyright Gennadiy Rozental 2005-2010.
+//  (C) Copyright Gennadiy Rozental 2005-2012.
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
@@ -83,7 +83,7 @@ progress_monitor_t::test_unit_finish( test_unit const& tu, unsigned long )
 {
     BOOST_TEST_SCOPE_SETCOLOR( *s_pm_impl().m_stream, term_attr::BRIGHT, term_color::MAGENTA );
 
-    if( tu.p_type == tut_case )
+    if( tu.p_type == TUT_CASE )
         ++(*s_pm_impl().m_progress_display);
 }
 

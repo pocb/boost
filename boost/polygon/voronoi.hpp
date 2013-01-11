@@ -18,17 +18,11 @@
 #include "voronoi_diagram.hpp"
 
 // Public methods to compute Voronoi diagram.
-// PC - container of input points (should supports forward iterator).
-// SC - container of input segments (should supports forward iterator).
-// output - Voronoi output data structure to hold Voronoi diagram.
-// Segment class should provide low(), high() methods to access its endpoints.
-// The assumption is made that input doesn't contain segments that intersect
-// or points lying on the segments. Also coordinates of the points and of the
-// endpoints of the segments should belong to the signed integer range
-// [-2^31, 2^31-1]. To use wider input coordinate range use voronoi_builder
-// structure with user provided coordinate type traits.
-// Complexity - O(N*logN), memory usage - O(N),
-// where N is the total number of points and segments.
+// Coordinates of the points and of the endpoints of the segments should belong
+// to the 32-bit signed integer range [-2^31, 2^31-1]. To use wider input
+// coordinate range voronoi_builder configuration via coordinate type traits is
+// is required.
+// Complexity - O(N*logN), memory usage - O(N), N - number of input objects.
 namespace boost {
 namespace polygon {
 
@@ -39,10 +33,10 @@ typename enable_if<
       typename geometry_concept<Point>::type
     >::type
   >::type,
-  void
+  std::size_t
 >::type
-insert(const Point &point, VB *vb) {
-  vb->insert_point(x(point), y(point));
+insert(const Point& point, VB* vb) {
+  return vb->insert_point(x(point), y(point));
 }
 
 template <typename PointIterator, typename VB>
@@ -56,7 +50,7 @@ typename enable_if<
   >::type,
   void
 >::type
-insert(PointIterator first, const PointIterator last, VB *vb) {
+insert(PointIterator first, const PointIterator last, VB* vb) {
   for (PointIterator it = first; it != last; ++it) {
     insert(*it, vb);
   }
@@ -69,10 +63,12 @@ typename enable_if<
       typename geometry_concept<Segment>::type
     >::type
   >::type,
-  void
+  std::size_t
 >::type
-insert(const Segment &segment, VB *vb) {
-  vb->insert_segment(x(low(segment)), y(low(segment)), x(high(segment)), y(high(segment)));
+insert(const Segment& segment, VB* vb) {
+  return vb->insert_segment(
+      x(low(segment)), y(low(segment)),
+      x(high(segment)), y(high(segment)));
 }
 
 template <typename SegmentIterator, typename VB>
@@ -86,7 +82,7 @@ typename enable_if<
   >::type,
   void
 >::type
-insert(SegmentIterator first, SegmentIterator last, VB *vb) {
+insert(SegmentIterator first, SegmentIterator last, VB* vb) {
   for (SegmentIterator it = first; it != last; ++it) {
     insert(*it, vb);
   }
@@ -103,7 +99,7 @@ typename enable_if<
   >::type,
   void
 >::type
-construct_voronoi(PointIterator first, PointIterator last, VD *vd) {
+construct_voronoi(PointIterator first, PointIterator last, VD* vd) {
   default_voronoi_builder builder;
   insert(first, last, &builder);
   builder.construct(vd);
@@ -120,7 +116,7 @@ typename enable_if<
   >::type,
   void
 >::type
-construct_voronoi(SegmentIterator first, SegmentIterator last, VD *vd) {
+construct_voronoi(SegmentIterator first, SegmentIterator last, VD* vd) {
   default_voronoi_builder builder;
   insert(first, last, &builder);
   builder.construct(vd);
@@ -147,7 +143,7 @@ typename enable_if<
   void
 >::type
 construct_voronoi(PointIterator p_first, PointIterator p_last,
-    SegmentIterator s_first, SegmentIterator s_last, VD *vd) {
+    SegmentIterator s_first, SegmentIterator s_last, VD* vd) {
   default_voronoi_builder builder;
   insert(p_first, p_last, &builder);
   insert(s_first, s_last, &builder);

@@ -1,4 +1,4 @@
-//  (C) Copyright Gennadiy Rozental 2005-2010.
+//  (C) Copyright Gennadiy Rozental 2005-2012.
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
@@ -202,22 +202,6 @@ unit_test_log_t::test_unit_skipped( test_unit const& tu )
         *this << log::end();
 
     s_log_impl().m_log_formatter->test_unit_skipped( s_log_impl().stream(), tu );
-}
-
-//____________________________________________________________________________//
-
-void
-unit_test_log_t::test_unit_aborted( test_unit const& )
-{
-    // do nothing
-}
-
-//____________________________________________________________________________//
-
-void
-unit_test_log_t::assertion_result( bool )
-{
-    // do nothing
 }
 
 //____________________________________________________________________________//
@@ -442,7 +426,7 @@ unit_test_log_t::set_format( output_format log_format )
     if( s_log_impl().m_entry_in_progress )
         return;
 
-    if( log_format == CLF )
+    if( log_format == OF_CLF )
         set_formatter( new output::compiler_log_formatter );
     else
         set_formatter( new output::xml_log_formatter );

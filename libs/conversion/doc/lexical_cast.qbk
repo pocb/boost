@@ -83,7 +83,7 @@ Following example takes part of the string and converts it to `int`:
 ``
 int convert_strings_part(const std::string& s, std::size_t pos, std::size_t n) 
 {
-    return boost::lexical_cast<int>(s.c_str() + pos, n);
+    return boost::lexical_cast<int>(s.data() + pos, n);
 }
 ``
 [endsect]
@@ -107,8 +107,8 @@ Library features defined in [@boost:boost/lexical_cast.hpp boost/lexical_cast.hp
 Returns the result of streaming arg into a standard library string-based stream and then out as a Target object. Where Target is either `std::string` or `std::wstring`, stream extraction takes the whole content of the string, including spaces, rather than relying on the default `operator>>` behavior. If the conversion is unsuccessful, a `bad_lexical_cast` exception is thrown.
 
 ``
-    template <typename Target, typename CharType>
-      Target lexical_cast(const CharType* chars, std::size_t count);
+    template <typename Target>
+      Target lexical_cast(const AnyCharacterType* chars, std::size_t count);
 ``
 Takes an array of `count` characters as input parameter and streams them out as a Target object. If the conversion is unsuccessful, a `bad_lexical_cast` exception is thrown. This call may be useful for processing nonzero terminated array of characters or processing just some part of character array.
 
@@ -119,14 +119,13 @@ The requirements on the argument and result types for both functions are:
 * Target is CopyConstructible [20.1.3].
 * Target is DefaultConstructible, meaning that it is possible to default-initialize an object of that type [8.5, 20.1.4].
 
-The character type of the underlying stream is assumed to be `char` unless either the `Source` or the `Target` requires wide-character streaming, in which case the underlying stream uses `wchar_t`, `char16_t` or `char32_t`. Wide-character streaming is currently detected for:
+The character type of the underlying stream is assumed to be `char` unless either the `Source` or the `Target` requires wide-character streaming, in which case the underlying stream uses `wchar_t`. Following types also can use `char16_t` or `char32_t` for wide-character streaming:
 
-* Single character: `wchar_t`, `char16_t`, `char32_t`
-* Arrays of characters: `wchar_t *`, `char16_t *`, `char32_t *`, `const wchar_t *`, `const char16_t *`, `const char32_t *`
+* Single character: `char16_t`, `char32_t`
+* Arrays of characters: `char16_t *`, `char32_t *`, `const char16_t *`, `const char32_t *`
 * Strings: `std::basic_string`, `boost::containers::basic_string`
 * `boost::iterator_range<WideCharPtr>`, where `WideCharPtr` is a pointer to wide-character or pointer to const wide-character
 * `boost::array<CharT, N>` and `std::array<CharT, N>`, `boost::array<const CharT, N>` and `std::array<const CharT, N>` 
-
 
 [important Many compilers and runtime libraries fail to make conversions using new Unicode characters. Make sure that the following code compiles and outputs nonzero values, before using new types:
 ``
@@ -235,7 +234,7 @@ It breaks my `operator>>` that works only in presence of this flag. Can you remo
   * [*Answer:]      May be in a future version. There is no requirement in
 __proposallong__ to reset the flag but
 remember that __proposalshort__ is not yet accepted by the committee. By the way, it's a great opportunity to
-make your `operator>>` conform to the standard.
+make your `operator>>` more general.
 Read a good C++ book, study `std::sentry` and [@boost:libs/io/doc/ios_state.html `ios_state_saver`].
 
 [pre
@@ -267,11 +266,15 @@ limitation of compiler options that you use.
 ]
 
 * [*Question:]    What is the fastest way to convert a non zero terminated string or a substring using `boost::lexical_cast`?
-  * [*Answer:]      Use `boost::iterator_range` for conversion or `lexical_cast` overload with two parameters. For example, if you whant to convert to `int` two characters from a string `str`, you shall write `lexical_cast<int>(make_iterator_range(str.c_str(), str.c_str() + 2));` or `lexical_cast<int>(str.c_str(), 2);`.
+  * [*Answer:]      Use `boost::iterator_range` for conversion or `lexical_cast` overload with two parameters. For example, if you whant to convert to `int` two characters from a string `str`, you shall write `lexical_cast<int>(make_iterator_range(str.data(), str.data() + 2));` or `lexical_cast<int>(str.data(), 2);`.
 
 [endsect]
 
 [section Changes]
+
+* [*boost 1.53.0 :]
+
+    * Much better input and output streams detection for user defined types.
 
 * [*boost 1.52.0 :]
 

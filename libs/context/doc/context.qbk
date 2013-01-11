@@ -41,7 +41,6 @@
 [def __threads__ ['threads]]
 [def __tls__ ['thread-local storage]]
 [def __stack_allocator__ ['StackAllocator]]
-[def __stack_allocator_concept__ ['StackAllocator concept]]
 
 [def __fcontext__ ['fcontext_t]]
 [def __ucontext__ ['ucontext_t]]
@@ -60,7 +59,7 @@
 [def __stack_helper__ ['stack_helper]]
 [def __yield__ ['yield]]
 
-[def __context_ns__ ['boost::ctx]]
+[def __context_ns__ ['boost::context]]
 
 [include overview.qbk]
 [include requirements.qbk]

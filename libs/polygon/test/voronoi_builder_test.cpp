@@ -8,6 +8,9 @@
 // See http://www.boost.org for updates, documentation, and revision history.
 
 #include <ctime>
+#include <limits>
+#include <list>
+#include <vector>
 
 #define BOOST_TEST_MODULE voronoi_builder_test
 #include <boost/mpl/list.hpp>
@@ -16,8 +19,9 @@
 
 #include <boost/polygon/polygon.hpp>
 #include <boost/polygon/voronoi.hpp>
-using namespace boost::polygon;
 #include "voronoi_test_helper.hpp"
+using boost::polygon::voronoi_builder;
+using boost::polygon::voronoi_diagram;
 
 typedef boost::mpl::list<int> test_types;
 typedef voronoi_diagram<double> vd_type;
@@ -27,9 +31,9 @@ typedef vd_type::const_cell_iterator const_cell_iterator;
 typedef vd_type::const_vertex_iterator const_vertex_iterator;
 
 #define CHECK_OUTPUT_SIZE(output, cells, vertices, edges) \
-    BOOST_CHECK(output.num_cells() == cells); \
-    BOOST_CHECK(output.num_vertices() == vertices); \
-    BOOST_CHECK(output.num_edges() == edges)
+    BOOST_CHECK_EQUAL(output.num_cells(), (std::size_t)cells); \
+    BOOST_CHECK_EQUAL(output.num_vertices(), (std::size_t)vertices); \
+    BOOST_CHECK_EQUAL(output.num_edges(), (std::size_t)edges)
 
 #define VERIFY_OUTPUT(output) \
     BOOST_CHECK(voronoi_test_helper::verify_output(output, \
@@ -66,7 +70,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(collinear_sites_test1, T, test_types) {
   vd_type test_output;
   construct_voronoi(points.begin(), points.end(), &test_output);
   VERIFY_OUTPUT(test_output);
-  CHECK_OUTPUT_SIZE(test_output, 2, 0, 1);
+  CHECK_OUTPUT_SIZE(test_output, 2, 0, 2);
 
   const_cell_iterator cell_it = test_output.cells().begin();
   cell_it++;
@@ -79,13 +83,13 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(collinear_sites_test1, T, test_types) {
 
   BOOST_CHECK(edge1_1->next() == edge1_1);
   BOOST_CHECK(edge1_1->prev() == edge1_1);
-  BOOST_CHECK(edge1_1->rot_next() == NULL);
-  BOOST_CHECK(edge1_1->rot_prev() == NULL);
+  BOOST_CHECK(edge1_1->rot_next() == edge1_2);
+  BOOST_CHECK(edge1_1->rot_prev() == edge1_2);
 
   BOOST_CHECK(edge1_2->next() == edge1_2);
   BOOST_CHECK(edge1_2->prev() == edge1_2);
-  BOOST_CHECK(edge1_2->rot_next() == NULL);
-  BOOST_CHECK(edge1_2->rot_prev() == NULL);
+  BOOST_CHECK(edge1_2->rot_next() == edge1_1);
+  BOOST_CHECK(edge1_2->rot_prev() == edge1_1);
 }
 
 // Sites: (0, 0), (1, 1), (2, 2).
@@ -97,7 +101,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(collinear_sites_test2, T, test_types) {
   vd_type test_output;
   construct_voronoi(points.begin(), points.end(), &test_output);
   VERIFY_OUTPUT(test_output);
-  CHECK_OUTPUT_SIZE(test_output, 3, 0, 2);
+  CHECK_OUTPUT_SIZE(test_output, 3, 0, 4);
 
   const_cell_iterator cell_it = test_output.cells().begin();
   const voronoi_edge_type* edge1_1 = cell_it->incident_edge();
@@ -111,11 +115,14 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(collinear_sites_test2, T, test_types) {
   BOOST_CHECK(edge2_1->twin() == edge2_2 && edge2_2->twin() == edge2_1);
 
   BOOST_CHECK(edge1_1->next() == edge1_1 && edge1_1->prev() == edge1_1);
-  BOOST_CHECK(edge1_1->rot_next() == NULL && edge1_1->rot_prev() == NULL);
-  BOOST_CHECK(edge1_2->rot_next() == NULL && edge1_2->rot_prev() == NULL);
-  BOOST_CHECK(edge2_1->rot_next() == NULL && edge2_1->rot_prev() == NULL);
+  BOOST_CHECK(edge1_2->next() == edge2_1 && edge1_2->prev() == edge2_1);
+  BOOST_CHECK(edge2_1->next() == edge1_2 && edge2_1->prev() == edge1_2);
   BOOST_CHECK(edge2_2->next() == edge2_2 && edge2_2->prev() == edge2_2);
-  BOOST_CHECK(edge2_2->rot_next() == NULL && edge2_2->rot_prev() == NULL);
+
+  BOOST_CHECK(edge1_1->rot_next() == edge1_2 && edge1_1->rot_prev() == edge2_1);
+  BOOST_CHECK(edge1_2->rot_next() == edge2_2 && edge1_2->rot_prev() == edge1_1);
+  BOOST_CHECK(edge2_1->rot_next() == edge1_1 && edge2_1->rot_prev() == edge2_2);
+  BOOST_CHECK(edge2_2->rot_next() == edge2_1 && edge2_2->rot_prev() == edge1_2);
 
   BOOST_CHECK(edge1_2->next() == edge2_1 && edge1_2->prev() == edge2_1);
   BOOST_CHECK(edge2_1->next() == edge1_2 && edge2_1->prev() == edge1_2);
@@ -133,7 +140,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(triangle_test1, T, test_types) {
   vd_type test_output;
   construct_voronoi(points.begin(), points.end(), &test_output);
   VERIFY_OUTPUT(test_output);
-  CHECK_OUTPUT_SIZE(test_output, 3, 1, 3);
+  CHECK_OUTPUT_SIZE(test_output, 3, 1, 6);
 
   const_vertex_iterator it = test_output.vertices().begin();
   BOOST_CHECK_EQUAL(it->x(), 0.25);
@@ -169,6 +176,10 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(triangle_test1, T, test_types) {
   BOOST_CHECK(edge1_1->rot_next() == edge3_1);
   BOOST_CHECK(edge3_1->rot_next() == edge2_1);
   BOOST_CHECK(edge2_1->rot_next() == edge1_1);
+
+  BOOST_CHECK(edge1_2->rot_next() == edge2_2);
+  BOOST_CHECK(edge2_2->rot_next() == edge3_2);
+  BOOST_CHECK(edge3_2->rot_next() == edge1_2);
 }
 
 // Sites: (0, 1), (2, 0), (2, 4).
@@ -183,7 +194,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(triangle_test2, T, test_types) {
   vd_type test_output;
   construct_voronoi(points.begin(), points.end(), &test_output);
   VERIFY_OUTPUT(test_output);
-  CHECK_OUTPUT_SIZE(test_output, 3, 1, 3);
+  CHECK_OUTPUT_SIZE(test_output, 3, 1, 6);
 
   const_vertex_iterator it = test_output.vertices().begin();
   BOOST_CHECK_EQUAL(it->x(), 1.75);
@@ -219,6 +230,10 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(triangle_test2, T, test_types) {
   BOOST_CHECK(edge1_1->rot_next() == edge3_1);
   BOOST_CHECK(edge3_1->rot_next() == edge2_1);
   BOOST_CHECK(edge2_1->rot_next() == edge1_1);
+
+  BOOST_CHECK(edge1_2->rot_next() == edge2_2);
+  BOOST_CHECK(edge2_2->rot_next() == edge3_2);
+  BOOST_CHECK(edge3_2->rot_next() == edge1_2);
 }
 
 // Sites: (0, 0), (0, 1), (1, 0), (1, 1).
@@ -235,7 +250,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(square_test1, T, test_types) {
   vd_type test_output;
   construct_voronoi(points.begin(), points.end(), &test_output);
   VERIFY_OUTPUT(test_output);
-  CHECK_OUTPUT_SIZE(test_output, 4, 1, 4);
+  CHECK_OUTPUT_SIZE(test_output, 4, 1, 8);
 
   // Check voronoi vertex.
   const_vertex_iterator it = test_output.vertices().begin();
@@ -282,6 +297,11 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(square_test1, T, test_types) {
   BOOST_CHECK(edge4_1->rot_next() == edge3_1);
   BOOST_CHECK(edge3_1->rot_next() == edge2_1);
   BOOST_CHECK(edge2_1->rot_next() == edge1_1);
+
+  BOOST_CHECK(edge1_2->rot_next() == edge2_2);
+  BOOST_CHECK(edge2_2->rot_next() == edge3_2);
+  BOOST_CHECK(edge3_2->rot_next() == edge4_2);
+  BOOST_CHECK(edge4_2->rot_next() == edge1_2);
 }
 
 #ifdef NDEBUG
@@ -296,7 +316,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(grid_test, T, test_types) {
     test_output_large.clear();
     point_vec_small.clear();
     point_vec_large.clear();
-    int koef = std::numeric_limits<int>::max() / max_value[k];
+    int koef = (std::numeric_limits<int>::max)() / max_value[k];
     for (int i = 0; i < grid_size[k]; i++) {
       for (int j = 0; j < grid_size[k]; j++) {
         point_vec_small.push_back(point_data<T>(i, j));
@@ -309,7 +329,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(grid_test, T, test_types) {
     VERIFY_OUTPUT(test_output_large);
     unsigned int num_cells = grid_size[k] * grid_size[k];
     unsigned int num_vertices = num_cells - 2 * grid_size[k] + 1;
-    unsigned int num_edges = 2 * num_cells - 2 * grid_size[k];
+    unsigned int num_edges = 4 * num_cells - 4 * grid_size[k];
     CHECK_OUTPUT_SIZE(test_output_small, num_cells, num_vertices, num_edges);
     CHECK_OUTPUT_SIZE(test_output_large, num_cells, num_vertices, num_edges);
   }
@@ -327,7 +347,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(random_test, T, test_types) {
   int max_value[] = {5, 50, 50, 5000};
   int array_length = sizeof(num_points) / sizeof(int);
   for (int k = 0; k < array_length; k++) {
-    int koef = std::numeric_limits<int>::max() / max_value[k];
+    int koef = (std::numeric_limits<int>::max)() / max_value[k];
     for (int i = 0; i < num_runs[k]; i++) {
       test_output_small.clear();
       test_output_large.clear();
@@ -358,7 +378,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(segment_sites_test1, T, test_types) {
   point_data<T> point2(1, 1);
   segments.push_back(segment_data<T>(point1, point2));
   construct_voronoi(segments.begin(), segments.end(), &test_output);
-  CHECK_OUTPUT_SIZE(test_output, 3, 0, 2);
+  CHECK_OUTPUT_SIZE(test_output, 3, 0, 4);
   VERIFY_NO_HALF_EDGE_INTERSECTIONS(test_output);
 }
 
@@ -374,7 +394,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(segment_sites_test2, T, test_types) {
   points.push_back(point3);
   points.push_back(point4);
   construct_voronoi(points.begin(), points.end(), segments.begin(), segments.end(), &test_output);
-  CHECK_OUTPUT_SIZE(test_output, 5, 4, 8);
+  CHECK_OUTPUT_SIZE(test_output, 5, 4, 16);
   VERIFY_NO_HALF_EDGE_INTERSECTIONS(test_output);
 }
 
@@ -390,7 +410,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(segment_sites_test3, T, test_types) {
   points.push_back(point3);
   points.push_back(point4);
   construct_voronoi(points.begin(), points.end(), segments.begin(), segments.end(), &test_output);
-  CHECK_OUTPUT_SIZE(test_output, 5, 4, 8);
+  CHECK_OUTPUT_SIZE(test_output, 5, 4, 16);
   VERIFY_NO_HALF_EDGE_INTERSECTIONS(test_output);
 }
 
@@ -406,7 +426,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(segment_sites_test4, T, test_types) {
   points.push_back(point3);
   points.push_back(point4);
   construct_voronoi(points.begin(), points.end(), segments.begin(), segments.end(), &test_output);
-  CHECK_OUTPUT_SIZE(test_output, 5, 3, 7);
+  CHECK_OUTPUT_SIZE(test_output, 5, 3, 14);
   VERIFY_NO_HALF_EDGE_INTERSECTIONS(test_output);
 }
 
@@ -424,7 +444,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(segment_site_test5, T, test_types) {
   points.push_back(point4);
   points.push_back(point5);
   construct_voronoi(points.begin(), points.end(), segments.begin(), segments.end(), &test_output);
-  CHECK_OUTPUT_SIZE(test_output, 6, 4, 9);
+  CHECK_OUTPUT_SIZE(test_output, 6, 4, 18);
   VERIFY_NO_HALF_EDGE_INTERSECTIONS(test_output);
 }
 
@@ -438,7 +458,16 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(segment_site_test6, T, test_types) {
   segments.push_back(segment_data<T>(point2, point3));
   points.push_back(point1);
   construct_voronoi(points.begin(), points.end(), segments.begin(), segments.end(), &test_output);
-  CHECK_OUTPUT_SIZE(test_output, 4, 2, 5);
+  using boost::polygon::detail::int32;
+  using boost::polygon::detail::int64;
+  using boost::polygon::detail::fpt64;
+  BOOST_CHECK_EQUAL(sizeof(detail::fpt64), 8U);
+  BOOST_CHECK_EQUAL(sizeof(detail::int32), 4U);
+  BOOST_CHECK_EQUAL(sizeof(detail::int64), 8U);
+  vd_type::vertex_type v = test_output.vertices()[0];
+  BOOST_CHECK_EQUAL(v.x(), -0.25);
+  BOOST_CHECK_EQUAL(v.y(), 0.0);
+  CHECK_OUTPUT_SIZE(test_output, 4, 2, 10);
   VERIFY_NO_HALF_EDGE_INTERSECTIONS(test_output);
 }
 
@@ -453,7 +482,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(segment_site_test7, T, test_types) {
   segments.push_back(segment_data<T>(point2, point3));
   segments.push_back(segment_data<T>(point3, point4));
   construct_voronoi(segments.begin(), segments.end(), &test_output);
-  CHECK_OUTPUT_SIZE(test_output, 7, 6, 12);
+  CHECK_OUTPUT_SIZE(test_output, 7, 6, 24);
   VERIFY_NO_HALF_EDGE_INTERSECTIONS(test_output);
 }
 
@@ -469,7 +498,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(segment_site_test8, T, test_types) {
   segments.push_back(segment_data<T>(point3, point4));
   segments.push_back(segment_data<T>(point4, point1));
   construct_voronoi(segments.begin(), segments.end(), &test_output);
-  CHECK_OUTPUT_SIZE(test_output, 8, 5, 12);
+  CHECK_OUTPUT_SIZE(test_output, 8, 5, 24);
   VERIFY_NO_HALF_EDGE_INTERSECTIONS(test_output);
 }
 
@@ -482,7 +511,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(segment_site_test9, T, test_types) {
   segments.push_back(segment_data<T>(point1, point2));
   segments.push_back(segment_data<T>(point2, point3));
   construct_voronoi(segments.begin(), segments.end(), &test_output);
-  CHECK_OUTPUT_SIZE(test_output, 5, 0, 4);
+  CHECK_OUTPUT_SIZE(test_output, 5, 0, 8);
   VERIFY_NO_HALF_EDGE_INTERSECTIONS(test_output);
 }
 
@@ -499,7 +528,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(segment_grid_test, T, test_types) {
     segments_small.clear();
     segments_large.clear();
     int cur_sz = grid_size[k];
-    int koef = std::numeric_limits<int>::max() / max_value[k];
+    int koef = (std::numeric_limits<int>::max)() / max_value[k];
     for (int i = 0; i < cur_sz + 1; i++)
       for (int j = 0; j < cur_sz; j++) {
         point_data<T> point1_1(10 * i, 10 * j);
@@ -572,7 +601,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(segment_random_test2, T, test_types) {
   int max_value[] = {10, 60, 125, 200};
   int array_length = sizeof(num_segments) / sizeof(int);
   for (int k = 0; k < array_length; k++) {
-    int koef = std::numeric_limits<int>::max() / max_value[k];
+    int koef = (std::numeric_limits<int>::max)() / max_value[k];
     for (int i = 0; i < num_runs[k]; i++) {
       test_output_small.clear();
       test_output_large.clear();

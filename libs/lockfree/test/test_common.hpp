@@ -1,25 +1,34 @@
+//  Copyright (C) 2011 Tim Blechmann
+//
+//  Distributed under the Boost Software License, Version 1.0. (See
+//  accompanying file LICENSE_1_0.txt or copy at
+//  http://www.boost.org/LICENSE_1_0.txt)
+
 #include <cassert>
 #include "test_helpers.hpp"
 
 #include <boost/array.hpp>
 #include <boost/thread.hpp>
 
-namespace impl
-{
+namespace impl {
 
 using boost::array;
 using namespace boost;
 using namespace std;
 
-using boost::lockfree::detail::atomic;
-
 template <bool Bounded = false>
 struct queue_stress_tester
 {
     static const unsigned int buckets = 1<<13;
-    static const long node_count = 50000;
+#ifndef BOOST_LOCKFREE_STRESS_TEST
+    static const long node_count =  5000;
+#else
+    static const long node_count = 500000;
+#endif
     const int reader_threads;
     const int writer_threads;
+
+    boost::lockfree::detail::atomic<int> writers_finished;
 
     static_hashed_set<long, buckets> data;
     static_hashed_set<long, buckets> dequeued;
@@ -48,35 +57,48 @@ struct queue_stress_tester
                     /*thread::yield()*/;
             ++push_count;
         }
+        writers_finished += 1;
     }
 
-    atomic<bool> running;
+    boost::lockfree::detail::atomic<bool> running;
 
     template <typename queue>
-    void get_items(queue & stk)
+    bool consume_element(queue & q)
+    {
+        long id;
+        bool ret = q.pop(id);
+
+        if (!ret)
+            return false;
+
+        bool erased = data.erase(id);
+        bool inserted = dequeued.insert(id);
+        assert(erased);
+        assert(inserted);
+        ++pop_count;
+        return true;
+    }
+
+    template <typename queue>
+    void get_items(queue & q)
     {
         for (;;) {
-            long id;
+            bool received_element = consume_element(q);
+            if (received_element)
+                continue;
 
-            bool got = stk.pop(id);
-            if (got) {
-                bool erased = data.erase(id);
-                bool inserted = dequeued.insert(id);
-                assert(erased);
-                assert(inserted);
-                ++pop_count;
-            } else
-                if (!running.load())
-                    return;
+            if ( writers_finished.load() == writer_threads )
+                break;
         }
+
+        while (consume_element(q));
     }
 
     template <typename queue>
     void run(queue & stk)
     {
         BOOST_WARN(stk.is_lock_free());
-
-        running.store(true);
+        writers_finished.store(0);
 
         thread_group writer;
         thread_group reader;
@@ -96,12 +118,11 @@ struct queue_stress_tester
 
         cout << "writer threads joined, waiting for readers" << endl;
 
-        running = false;
         reader.join_all();
 
         cout << "reader threads joined" << endl;
 
-        BOOST_REQUIRE_EQUAL(data.count_nodes(), 0);
+        BOOST_REQUIRE_EQUAL(data.count_nodes(), (size_t)0);
         BOOST_REQUIRE(stk.empty());
 
         BOOST_REQUIRE_EQUAL(push_count, pop_count);

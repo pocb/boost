@@ -1,4 +1,4 @@
-//  (C) Copyright Gennadiy Rozental 2005-2010.
+//  (C) Copyright Gennadiy Rozental 2005-2012.
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
@@ -127,10 +127,10 @@ void
 set_format( output_format rf )
 {
     switch( rf ) {
-    case CLF:
+    case OF_CLF:
         set_format( new output::plain_report_formatter );
         break;
-    case XML:
+    case OF_XML:
         set_format( new output::xml_report_formatter );
         break;
     default:

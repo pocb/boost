@@ -8,7 +8,7 @@
 [library Boost.Interprocess
     [quickbook 1.4]
     [authors [Gaztanaga, Ion]]
-    [copyright 2005- 2011 Ion Gaztanaga]
+    [copyright 2005-2012 Ion Gaztanaga]
     [id interprocess]
     [dirname interprocess]
     [purpose Interprocess communication utilities]
@@ -2079,8 +2079,6 @@ Boost.Interprocess offers the following sharable mutex types:
 * [classref boost::interprocess::named_sharable_mutex named_sharable_mutex]: A non-recursive,
   named sharable mutex.
 
-[endsect]
-
 Boost.Interprocess offers the following upgradable mutex types:
 
 [c++]
@@ -3900,6 +3898,8 @@ Here is a small example showing how aligned allocation is used:
 
 [section:managed_memory_segment_multiple_allocations Multiple allocation functions]
 
+[caution This feature is experimental, interface and ABI are unstable]
+
 If an application needs to allocate a lot of memory buffers but it needs
 to deallocate them independently, the application is normally forced to loop
 calling `allocate()`. Managed memory segments offer an alternative function
@@ -3919,33 +3919,26 @@ There are 2 types of `allocate_many` functions:
 
 [c++]
 
-   //!Allocates n_elements of elem_size bytes.
-   multiallocation_iterator allocate_many(std::size_t elem_size, std::size_t min_elements, std::size_t preferred_elements, std::size_t &received_elements);
+   //!Allocates n_elements of elem_bytes bytes. 
+   //!Throws bad_alloc on failure. chain.size() is not increased on failure.
+   void allocate_many(size_type elem_bytes, size_type n_elements, multiallocation_chain &chain);
 
-   //!Allocates n_elements, each one of elem_sizes[i] bytes.
-   multiallocation_iterator allocate_many(const std::size_t *elem_sizes, std::size_t n_elements);
+   //!Allocates n_elements, each one of element_lengths[i]*sizeof_element bytes.
+   //!Throws bad_alloc on failure. chain.size() is not increased on failure.
+   void allocate_many(const size_type *element_lengths, size_type n_elements, size_type sizeof_element, multiallocation_chain &chain);
 
-   //!Allocates n_elements of elem_size bytes. No throwing version.
-   multiallocation_iterator allocate_many(std::size_t elem_size, std::size_t min_elements, std::size_t preferred_elements, std::size_t &received_elements, std::nothrow_t nothrow);
+   //!Allocates n_elements of elem_bytes bytes. 
+   //!Non-throwing version. chain.size() is not increased on failure.
+   void allocate_many(std::nothrow_t, size_type elem_bytes, size_type n_elements, multiallocation_chain &chain);
 
-   //!Allocates n_elements, each one of elem_sizes[i] bytes. No throwing version.
-   multiallocation_iterator allocate_many(const std::size_t *elem_sizes, std::size_t n_elements, std::nothrow_t nothrow);
+   //!Allocates n_elements, each one of
+   //!element_lengths[i]*sizeof_element bytes.
+   //!Non-throwing version. chain.size() is not increased on failure.
+   void allocate_many(std::nothrow_t, const size_type *elem_sizes, size_type n_elements, size_type sizeof_element, multiallocation_chain &chain);
 
-All functions return a `multiallocation iterator` that can be used to obtain
-pointers to memory the user can overwrite. A `multiallocation_iterator`:
-
-*  Becomes invalidated if the memory is pointing to is deallocated or
-   the next iterators (which previously were reachable with `operator++`)
-   become invalid.
-*  Returned from `allocate_many` can be checked in a boolean expression to
-   know if the allocation has been successful.
-*  A default constructed `multiallocation iterator` indicates
-   both an invalid iterator and the "end" iterator.
-*  Dereferencing an iterator (`operator *()`) returns a `char &`
-   referencing the first byte user can overwrite
-   in the memory buffer.
-*  The iterator category depends on the memory allocation algorithm,
-   but it's at least a forward iterator.
+   //!Deallocates all elements contained in chain.
+   //!Never throws.
+   void deallocate_many(multiallocation_chain &chain);
 
 Here is a small example showing all this functionality:
 
@@ -6617,11 +6610,11 @@ example, a new managed shared memory that uses the new index:
 
 [section:notes_windows_com_init COM Initialization]
 
-[*Boost.Interprocess] uses the COM library to implement some features and initializes
-the COM library with concurrency model `COINIT_APARTMENTTHREADED`.
-If the COM library was already initialized by the calling thread for other model, [*Boost.Interprocess]
+[*Boost.Interprocess] uses the Windows COM library to implement some features and initializes
+it with concurrency model `COINIT_APARTMENTTHREADED`.
+If the COM library was already initialized by the calling thread for another concurrency model, [*Boost.Interprocess]
 handles this gracefully and uses COM calls for the already initialized model. If for some reason, you
-might want [*Boost.Interprocess] to initialize the COM library with another model, define the macro
+want [*Boost.Interprocess] to initialize the COM library with another model, define the macro
 `BOOST_INTERPROCESS_WINDOWS_COINIT_MODEL` before including [*Boost.Interprocess] to one of these values:
 
 * `COINIT_APARTMENTTHREADED_BIPC`
@@ -6654,7 +6647,7 @@ in the Windows configuration part of `boost/interprocess/detail/workaround.hpp`.
 
 The committed address space is the total amount of virtual memory (swap or physical memory/RAM) that the kernel might have to supply
 if all applications decide to access all of the memory they've requested from the kernel.
-By default, Linux allows processes to commmit more virtual memory than available in the system. If that memory is not
+By default, Linux allows processes to commit more virtual memory than available in the system. If that memory is not
 accessed, no physical memory + swap is actually used.
 
 The reason for this behaviour is that Linux tries to optimize memory usage on forked processes; fork() creates a full copy of
@@ -6666,6 +6659,8 @@ the OOM (Out Of Memory)-killer picks some processes to kill in order to recover 
 According to the [@http://www.kernel.org/doc/Documentation/vm/overcommit-accounting Kernel documentation], the
 Linux kernel supports several overcommit modes. If you need non-kill guarantees in your application, you should
 change this overcommit behaviour.
+
+[endsect]
 
 [endsect]
 
@@ -6716,26 +6711,36 @@ thank them:
 
 [section:release_notes Release Notes]
 
+[section:release_notes_boost_1_53_00 Boost 1.53 Release]
+
+*  Fixed GCC -Wshadow warnings.
+*  Experimental multiple allocation interface improved and changed again. Still unstable.
+*  Replaced deprecated BOOST_NO_XXXX with newer BOOST_NO_CXX11_XXX macros.
+*  [*ABI breaking]: changed node pool allocators internals for improved efficiency.
+
+[endsect]
+
 [section:release_notes_boost_1_52_00 Boost 1.52 Release]
 
 *  Added `shrink_by` and `advise` functions in `mapped_region`.
-*  Reimplemented `message_queue` with a circular buffer index (the
+*  [*ABI breaking:] Reimplemented `message_queue` with a circular buffer index (the
    old behavior used an ordered array, leading to excessive copies). This
    should greatly increase performance but breaks ABI. Old behaviour/ABI can be used
    undefining macro `BOOST_INTERPROCESS_MSG_QUEUE_CIRCULAR_INDEX` in `boost/interprocess/detail/workaround.hpp`
 *  Improved `message_queue` insertion time avoiding priority search for common cases
    (both array and circular buffer configurations).
-*  Implemented `sharable_mutex` and `interproces_condition_any`.
+*  Implemented `interproces_sharable_mutex` and `interproces_condition_any`.
+*  Improved `offset_ptr` performance.
+*  Added integer overflow checks.
 
 [endsect]
-
 
 [section:release_notes_boost_1_51_00 Boost 1.51 Release]
 
 *  Synchronous and asynchronous flushing for `mapped_region::flush`.
-*  Source & ABI breaking: Removed `get_offset` method from `mapped_region` as
+*  [*Source & ABI breaking]: Removed `get_offset` method from `mapped_region` as
    it has no practical utility and `m_offset` member was not for anything else.
-*  Source & ABI breaking: Removed `flush` from `managed_shared_memory`.
+*  [*Source & ABI breaking]: Removed `flush` from `managed_shared_memory`.
    as it is unspecified according to POSIX:
    [@http://pubs.opengroup.org/onlinepubs/009695399/functions/msync.html
    ['"The effect of msync() on a shared memory object or a typed memory object is unspecified"] ].

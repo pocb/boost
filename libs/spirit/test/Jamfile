@@ -161,6 +161,7 @@ path-constant LEX_DIR : $(BOOST_ROOT)/libs/spirit/test/lex ;
      [ run qi/regression_repeat.cpp                               : : : : qi_regression_repeat ]
      [ run qi/regression_transform_assignment.cpp                 : : : : qi_regression_transform_assignment ]
      [ run qi/regression_binary_action.cpp                        : : : : qi_regression_binary_action ]
+     [ run qi/regression_stream_eof.cpp                           : : : : qi_regression_stream_eof ]
     ;
 
     ###########################################################################
@@ -249,7 +250,9 @@ path-constant LEX_DIR : $(BOOST_ROOT)/libs/spirit/test/lex ;
      [ run karma/regression_semantic_action_attribute.cpp  : : : :  karma_regression_semantic_action_attribute ]
      [ run karma/regression_real_scientific.cpp            : : : :  karma_regression_real_scientific ]
      [ run karma/regression_center_alignment.cpp           : : : :  karma_regression_center_alignment ]
-     [ run karma/regression_container_variant_sequence.cpp : : : :  regression_container_variant_sequence ]
+     [ run karma/regression_container_variant_sequence.cpp : : : :  karma_regression_container_variant_sequence ]
+     [ run karma/regression_real_0.cpp                     : : : :  karma_regression_real_0 ]
+     [ run karma/regression_unicode_char.cpp               : : : :  karma_regression_unicode_char ]
 
     ;
 
