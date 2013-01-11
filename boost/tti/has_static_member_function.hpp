@@ -1,20 +1,17 @@
 
-//  (C) Copyright Edward Diener 2011
+//  (C) Copyright Edward Diener 2011,2012
 //  Use, modification and distribution are subject to the Boost Software License,
 //  Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt).
 
-#if !defined(TTI_HAS_STATIC_MEMBER_FUNCTION_HPP)
-#define TTI_HAS_STATIC_MEMBER_FUNCTION_HPP
+#if !defined(BOOST_TTI_HAS_STATIC_MEMBER_FUNCTION_HPP)
+#define BOOST_TTI_HAS_STATIC_MEMBER_FUNCTION_HPP
 
-#include <boost/config.hpp>
 #include <boost/function_types/property_tags.hpp>
 #include <boost/mpl/vector.hpp>
 #include <boost/preprocessor/cat.hpp>
-#include <boost/tti/gen/has_static_member_function_gen.hpp>
-#include <boost/tti/gen/namespace_gen.hpp>
 #include <boost/tti/detail/dstatic_mem_fun.hpp>
-#include <boost/tti/detail/dtfunction.hpp>
+#include <boost/tti/gen/has_static_member_function_gen.hpp>
 
 /*
 
@@ -45,24 +42,26 @@
     
                 TTI_T   = the enclosing type in which to look for our 'name'.
                 
-                TTI_R   = the return type of the static member function.
+                TTI_R   = the return type of the static member function
+                                       OR
+                          the signature of a function in the form of Return_Type ( Parameter_Types )
                 
-                TTI_FS  = an optional parameter which are the parameters of the static member function as a boost::mpl forward sequence.
+                TTI_FS  = (optional) the parameters of the static member function as a boost::mpl forward sequence
+                          if the second parameter is a return type and the function parameters exist.
                 
-                TTI_TAG = an optional parameter which is a boost::function_types tag to apply to the static member function.
+                TTI_TAG = (optional) a boost::function_types tag to apply to the static member function
+                          if the second parameter is a return type and the need for a tag exists.
                 
                 returns = 'value' is true if the 'name' exists, 
                           with the appropriate static member function type,
-                          as defined by TTI_R, TTI_FS, and TTI_TAG,
-                          within the enclosing TTI_T type, 
                           otherwise 'value' is false.
                           
 */
 #define BOOST_TTI_TRAIT_HAS_STATIC_MEMBER_FUNCTION(trait,name) \
-  TTI_DETAIL_TRAIT_HAS_STATIC_MEMBER_FUNCTION(trait,name) \
+  BOOST_TTI_DETAIL_TRAIT_HAS_STATIC_MEMBER_FUNCTION(trait,name) \
   template<class TTI_T,class TTI_R,class TTI_FS = boost::mpl::vector<>,class TTI_TAG = boost::function_types::null_tag> \
   struct trait : \
-    BOOST_PP_CAT(trait,_detail)<TTI_T,typename BOOST_TTI_NAMESPACE::detail::tfunction_seq<TTI_R,TTI_FS,TTI_TAG>::type> \
+    BOOST_PP_CAT(trait,_detail_hsmf)<TTI_T,TTI_R,TTI_FS,TTI_TAG> \
     { \
     }; \
 /**/
@@ -85,16 +84,18 @@
     
                 TTI_T   = the enclosing type in which to look for our 'name'.
                 
-                TTI_R   = the return type of the static member function.
+                TTI_R   = the return type of the static member function
+                                       OR
+                          the signature of a function in the form of Return_Type ( Parameter_Types )
                 
-                TTI_FS  = an optional parameter which are the parameters of the static member function as a boost::mpl forward sequence.
+                TTI_FS  = (optional) the parameters of the static member function as a boost::mpl forward sequence
+                          if the second parameter is a return type and the function parameters exist.
                 
-                TTI_TAG = an optional parameter which is a boost::function_types tag to apply to the static member function.
+                TTI_TAG = (optional) a boost::function_types tag to apply to the static member function
+                          if the second parameter is a return type and the need for a tag exists.
                 
                 returns = 'value' is true if the 'name' exists, 
                           with the appropriate static member function type,
-                          as defined by TTI_R, TTI_FS, and TTI_TAG,
-                          within the enclosing TTI_T type, 
                           otherwise 'value' is false.
                           
 */
@@ -106,4 +107,4 @@
   ) \
 /**/
 
-#endif // TTI_HAS_STATIC_MEMBER_FUNCTION_HPP
+#endif // BOOST_TTI_HAS_STATIC_MEMBER_FUNCTION_HPP

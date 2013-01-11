@@ -1,4 +1,4 @@
-//  lock-free queue queue from
+//  lock-free queue from
 //  Michael, M. M. and Scott, M. L.,
 //  "simple, fast and practical non-blocking and blocking concurrent queue algorithms"
 //
@@ -13,6 +13,7 @@
 
 #include <memory>               /* std::auto_ptr */
 
+#include <boost/assert.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/static_assert.hpp>
 #include <boost/type_traits/has_trivial_assign.hpp>
@@ -150,9 +151,9 @@ public:
     queue(void):
         head_(tagged_node_handle(0, 0)),
         tail_(tagged_node_handle(0, 0)),
-        pool(node_allocator(), has_capacity ? capacity : 0)
+        pool(node_allocator(), capacity)
     {
-        BOOST_STATIC_ASSERT(has_capacity);
+        BOOST_ASSERT(has_capacity);
         initialize();
     }
 
@@ -160,7 +161,7 @@ public:
     explicit queue(typename node_allocator::template rebind<U>::other const & alloc):
         head_(tagged_node_handle(0, 0)),
         tail_(tagged_node_handle(0, 0)),
-        pool(alloc, has_capacity ? capacity : 0)
+        pool(alloc, capacity)
     {
         BOOST_STATIC_ASSERT(has_capacity);
         initialize();
@@ -169,9 +170,9 @@ public:
     explicit queue(allocator const & alloc):
         head_(tagged_node_handle(0, 0)),
         tail_(tagged_node_handle(0, 0)),
-        pool(alloc, has_capacity ? capacity : 0)
+        pool(alloc, capacity)
     {
-        BOOST_STATIC_ASSERT(has_capacity);
+        BOOST_ASSERT(has_capacity);
         initialize();
     }
     // @}
@@ -183,7 +184,7 @@ public:
         tail_(tagged_node_handle(0, 0)),
         pool(node_allocator(), n + 1)
     {
-        BOOST_STATIC_ASSERT(!has_capacity);
+        BOOST_ASSERT(!has_capacity);
         initialize();
     }
 

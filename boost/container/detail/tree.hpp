@@ -15,7 +15,7 @@
 #include <boost/container/detail/workaround.hpp>
 #include <boost/container/container_fwd.hpp>
 
-#include <boost/move/move.hpp>
+#include <boost/move/utility.hpp>
 #include <boost/intrusive/pointer_traits.hpp>
 #include <boost/type_traits/has_trivial_destructor.hpp>
 #include <boost/detail/no_exceptions_support.hpp>
@@ -28,6 +28,7 @@
 #include <boost/container/detail/pair.hpp>
 #include <boost/container/detail/type_traits.hpp>
 #include <boost/container/allocator_traits.hpp>
+#include <boost/detail/no_exceptions_support.hpp>
 #ifndef BOOST_CONTAINER_PERFECT_FORWARDING
 #include <boost/container/detail/preprocessor.hpp>
 #endif
@@ -41,7 +42,7 @@ namespace container {
 namespace container_detail {
 
 template<class Key, class Value, class KeyCompare, class KeyOfValue>
-struct value_compare_impl
+struct tree_value_compare
    :  public KeyCompare
 {
    typedef Value        value_type;
@@ -49,7 +50,7 @@ struct value_compare_impl
    typedef KeyOfValue   key_of_value;
    typedef Key          key_type;
 
-   value_compare_impl(const key_compare &kcomp)
+   tree_value_compare(const key_compare &kcomp)
       :  key_compare(kcomp)
    {}
 
@@ -209,13 +210,13 @@ class rbtree
    : protected container_detail::node_alloc_holder
       < A
       , typename container_detail::intrusive_rbtree_type
-         <A, value_compare_impl<Key, Value, KeyCompare, KeyOfValue> 
+         <A, tree_value_compare<Key, Value, KeyCompare, KeyOfValue> 
          >::type
       , KeyCompare
       >
 {
    typedef typename container_detail::intrusive_rbtree_type
-         < A, value_compare_impl
+         < A, tree_value_compare
             <Key, Value, KeyCompare, KeyOfValue>
          >::type                                            Icont;
    typedef container_detail::node_alloc_holder 
@@ -247,19 +248,20 @@ class rbtree
       {
          if(NodePtr p = m_icont.unlink_leftmost_without_rebalance()){
             //First recycle a node (this can't throw)
-            try{
+            BOOST_TRY{
                //This can throw
                p->do_assign(other.m_data);
                return p;
             }
-            catch(...){
+            BOOST_CATCH(...){
                //If there is an exception destroy the whole source
                m_holder.destroy_node(p);
                while((p = m_icont.unlink_leftmost_without_rebalance())){
                   m_holder.destroy_node(p);
                }
-               throw;
+               BOOST_RETHROW
             }
+            BOOST_CATCH_END
          }
          else{
             return m_holder.create_node(other.m_data);
@@ -284,19 +286,20 @@ class rbtree
       {
          if(NodePtr p = m_icont.unlink_leftmost_without_rebalance()){
             //First recycle a node (this can't throw)
-            try{
+            BOOST_TRY{
                //This can throw
                p->do_move_assign(const_cast<Node &>(other).m_data);
                return p;
             }
-            catch(...){
+            BOOST_CATCH(...){
                //If there is an exception destroy the whole source
                m_holder.destroy_node(p);
                while((p = m_icont.unlink_leftmost_without_rebalance())){
                   m_holder.destroy_node(p);
                }
-               throw;
+               BOOST_RETHROW
             }
+            BOOST_CATCH_END
          }
          else{
             return m_holder.create_node(other.m_data);
@@ -315,7 +318,7 @@ class rbtree
    typedef Value                                      value_type;
    typedef A                                          allocator_type;
    typedef KeyCompare                                 key_compare;
-   typedef value_compare_impl< Key, Value
+   typedef tree_value_compare< Key, Value
                         , KeyCompare, KeyOfValue>     value_compare;
    typedef typename boost::container::
       allocator_traits<A>::pointer                    pointer;
@@ -1121,7 +1124,7 @@ class C, class A>
 struct has_trivial_destructor_after_move
    <boost::container::container_detail::rbtree<K, V, KOV, C, A> >
 {
-   static const bool value = has_trivial_destructor<A>::value && has_trivial_destructor<C>::value;
+   static const bool value = has_trivial_destructor_after_move<A>::value && has_trivial_destructor_after_move<C>::value;
 };
 */
 } //namespace boost  {

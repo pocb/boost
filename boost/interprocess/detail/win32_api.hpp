@@ -21,7 +21,7 @@
 #include <vector>
 #include <memory>
 
-#if (defined _MSC_VER) && (_MSC_VER >= 1200)
+#if defined (_MSC_VER) && (_MSC_VER >= 1200)
 #  pragma once
 #  pragma comment( lib, "advapi32.lib" )
 #  pragma comment( lib, "oleaut32.lib" )
@@ -241,17 +241,16 @@ struct wchar_variant
    } value;
 };
 
-   struct IUnknown_BIPC
-   {
-      public:
-      virtual long __stdcall QueryInterface(
-            /* [in] */ const GUID_BIPC &riid,
-            /* [iid_is][out] */ void **ppvObject) = 0;
+struct IUnknown_BIPC
+{
+   public:
+   virtual long __stdcall QueryInterface(
+      const GUID_BIPC &riid,  // [in]
+      void **ppvObject) = 0;  // [iid_is][out]
 
-      virtual unsigned long __stdcall AddRef( void) = 0;
-
-      virtual unsigned long __stdcall Release( void) = 0;
-   };
+   virtual unsigned long __stdcall AddRef (void) = 0;
+   virtual unsigned long __stdcall Release(void) = 0;
+};
 
 struct IWbemClassObject_BIPC : public IUnknown_BIPC
 {
@@ -358,7 +357,6 @@ struct IWbemClassObject_BIPC : public IUnknown_BIPC
       /* [out] */ wchar_t * *pstrClassName) = 0;
 
 };
-
 
 struct IWbemContext_BIPC : public IUnknown_BIPC
 {
@@ -587,8 +585,6 @@ public:
 
 };
 
-
-
 struct interprocess_overlapped
 {
    unsigned long *internal;
@@ -663,7 +659,7 @@ struct system_info {
     unsigned short wProcessorRevision;
 };
 
-typedef struct _interprocess_memory_basic_information
+struct interprocess_memory_basic_information
 {
    void *         BaseAddress;
    void *         AllocationBase;
@@ -672,16 +668,16 @@ typedef struct _interprocess_memory_basic_information
    unsigned long  State;
    unsigned long  Protect;
    unsigned long  Type;
-} interprocess_memory_basic_information;
+};
 
-typedef struct _interprocess_acl
+struct interprocess_acl
 {
    unsigned char  AclRevision;
    unsigned char  Sbz1;
    unsigned short AclSize;
    unsigned short AceCount;
    unsigned short Sbz2;
-} interprocess_acl;
+};
 
 typedef struct _interprocess_security_descriptor
 {
@@ -1037,7 +1033,7 @@ inline bool duplicate_current_process_handle
       , duplicate_same_access);
 }
 
-inline long get_file_type(void *hFile)
+inline unsigned long get_file_type(void *hFile)
 {
    return GetFileType(hFile);
 }

@@ -30,7 +30,7 @@ namespace detail
 
 inline uint32_t compare_and_swap( uint32_t * dest_, uint32_t compare_, uint32_t swap_ )
 {
-	return __builtin_cellAtomicCompareAndSwap32(dest_,compare_,swap_);
+    return __builtin_cellAtomicCompareAndSwap32(dest_,compare_,swap_);
 }
 
 inline uint32_t atomic_fetch_and_add( uint32_t * pw, uint32_t dv )
@@ -115,6 +115,7 @@ public:
     }
 
     virtual void * get_deleter( sp_typeinfo const & ti ) = 0;
+    virtual void * get_untyped_deleter() = 0;
 
     void add_ref_copy()
     {

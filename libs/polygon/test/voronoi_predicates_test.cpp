@@ -7,6 +7,7 @@
 
 // See http://www.boost.org for updates, documentation, and revision history.
 
+#include <limits>
 #include <map>
 
 #define BOOST_TEST_MODULE voronoi_predicates_test
@@ -16,6 +17,9 @@
 #include <boost/polygon/detail/voronoi_predicates.hpp>
 #include <boost/polygon/detail/voronoi_structures.hpp>
 using namespace boost::polygon::detail;
+
+#include <boost/polygon/voronoi_geometry_type.hpp>
+using namespace boost::polygon;
 
 ulp_comparison<double> ulp_cmp;
 
@@ -77,8 +81,8 @@ VP::circle_formation_predicate<site_type, circle_type, CEP_type, lazy_CFF_type> 
     CHECK_CIRCLE(c2, c_x, c_y, l_x); }
 
 BOOST_AUTO_TEST_CASE(orientation_test) {
-  int min_int = std::numeric_limits<int>::min();
-  int max_int = std::numeric_limits<int>::max();
+  int min_int = (std::numeric_limits<int>::min)();
+  int max_int = (std::numeric_limits<int>::max)();
   point_type point1(min_int, min_int);
   point_type point2(0, 0);
   point_type point3(max_int, max_int);
@@ -335,7 +339,7 @@ BOOST_AUTO_TEST_CASE(node_comparison_test5) {
 
 BOOST_AUTO_TEST_CASE(node_comparison_test6) {
   key_type node(site_type(1, 1).sorted_index(1), site_type(0, 0).sorted_index(0));
-  key_type nodes [] = {
+  key_type nodes[] = {
     key_type(site_type(2, -3).sorted_index(2)),
     key_type(site_type(2, -2).sorted_index(2)),
     key_type(site_type(2, 0).sorted_index(2)),
@@ -379,8 +383,8 @@ BOOST_AUTO_TEST_CASE(circle_formation_predicate_test1) {
 }
 
 BOOST_AUTO_TEST_CASE(circle_formation_predicate_test2) {
-  int min_int = std::numeric_limits<int>::min();
-  int max_int = std::numeric_limits<int>::max();
+  int min_int = (std::numeric_limits<int>::min)();
+  int max_int = (std::numeric_limits<int>::max)();
   site_type site1(min_int, min_int);
   site_type site2(min_int, max_int);
   site_type site3(max_int-1, max_int-1);

@@ -522,10 +522,10 @@ namespace boost { namespace spirit { namespace traits
 
     namespace detail
     {
-        struct attribute_size_visitor : static_visitor<>
+        struct attribute_size_visitor : static_visitor<std::size_t>
         {
             template <typename T>
-            typename attribute_size<T>::type operator()(T const& val) const
+            std::size_t operator()(T const& val) const
             {
                 return spirit::traits::size(val);
             }
@@ -537,9 +537,9 @@ namespace boost { namespace spirit { namespace traits
     {
         typedef std::size_t type;
 
-        static void call(variant<BOOST_VARIANT_ENUM_PARAMS(T)> const& val)
+        static type call(variant<BOOST_VARIANT_ENUM_PARAMS(T)> const& val)
         {
-            apply_visitor(detail::attribute_size_visitor(), val);
+            return apply_visitor(detail::attribute_size_visitor(), val);
         }
     };
 
@@ -771,7 +771,7 @@ namespace boost { namespace spirit { namespace traits
             };
 
             // never called, but needed for decltype-based result_of (C++0x)
-#ifndef BOOST_NO_RVALUE_REFERENCES
+#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
             template <typename Element>
             typename result<element_attribute(Element)>::type
             operator()(Element&&) const;
@@ -1181,8 +1181,8 @@ namespace boost { namespace spirit { namespace traits
         template <typename Out>
         struct print_fusion_sequence
         {
-            print_fusion_sequence(Out& out)
-              : out(out), is_first(true) {}
+            print_fusion_sequence(Out& out_)
+              : out(out_), is_first(true) {}
 
             typedef void result_type;
 
@@ -1204,7 +1204,7 @@ namespace boost { namespace spirit { namespace traits
         template <typename Out>
         struct print_visitor : static_visitor<>
         {
-            print_visitor(Out& out) : out(out) {}
+            print_visitor(Out& out_) : out(out_) {}
 
             template <typename T>
             void operator()(T const& val) const

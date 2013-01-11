@@ -25,7 +25,7 @@
 #include <utility>
 
 #include <boost/type_traits/has_trivial_destructor.hpp>
-#include <boost/move/move.hpp>
+#include <boost/move/utility.hpp>
 
 #include <boost/container/detail/utilities.hpp>
 #include <boost/container/detail/pair.hpp>
@@ -414,7 +414,8 @@ class flat_tree
    void insert_equal(ordered_range_t, FwdIt first, FwdIt last
       #if !defined(BOOST_CONTAINER_DOXYGEN_INVOKED)
       , typename container_detail::enable_if_c
-         < container_detail::is_forward_iterator<FwdIt>::value
+         < !container_detail::is_input_iterator<FwdIt>::value &&
+		   container_detail::is_forward_iterator<FwdIt>::value
          >::type * = 0
       #endif
       )
@@ -440,17 +441,17 @@ class flat_tree
 
       //Prereserve all memory so that iterators are not invalidated
       this->reserve(this->size()+len);
-      const const_iterator beg(this->cbegin());
-      const_iterator pos(beg);
+      const const_iterator b(this->cbegin());
+      const_iterator pos(b);
       //Loop in burst sizes
       while(len){
          const size_type burst = len < BurstSize ? len : BurstSize;
-         const const_iterator cend(this->cend());
+         const const_iterator ce(this->cend());
          len -= burst;
          for(size_type i = 0; i != burst; ++i){
             //Get the insertion position for each key
-            pos = const_cast<const flat_tree&>(*this).priv_upper_bound(pos, cend, KeyOfValue()(*first));
-            positions[i] = static_cast<size_type>(pos - beg);
+            pos = const_cast<const flat_tree&>(*this).priv_upper_bound(pos, ce, KeyOfValue()(*first));
+            positions[i] = static_cast<size_type>(pos - b);
             ++first;
          }
          //Insert all in a single step in the precalculated positions
@@ -488,35 +489,38 @@ class flat_tree
 
       //Prereserve all memory so that iterators are not invalidated
       this->reserve(this->size()+len);
-      const const_iterator beg(this->cbegin());
-      const_iterator pos(beg);
+      const const_iterator b(this->cbegin());
+      const_iterator pos(b);
       const value_compare &value_comp = this->m_data;
+      skips[0u] = 0u;
       //Loop in burst sizes
       while(len){
-         skips[0u] = 0u;
          const size_type burst = len < BurstSize ? len : BurstSize;
          size_type unique_burst = 0u;
-         const const_iterator cend(this->cend());
+         const const_iterator ce(this->cend());
          while(unique_burst < burst && len > 0){
             //Get the insertion position for each key
             const value_type & val = *first++;
             --len;
-            pos = const_cast<const flat_tree&>(*this).priv_lower_bound(pos, cend, KeyOfValue()(val));
+            pos = const_cast<const flat_tree&>(*this).priv_lower_bound(pos, ce, KeyOfValue()(val));
             //Check if already present
-            if(pos != cend && !value_comp(*pos, val)){
-               ++skips[unique_burst];
+            if(pos != ce && !value_comp(val, *pos)){
+               if(unique_burst > 0){
+                  ++skips[unique_burst-1];
+               }
                continue;
             }
 
             //If not present, calculate position
-            positions[unique_burst] = static_cast<size_type>(pos - beg);
-            if(++unique_burst < burst)
-               skips[unique_burst] = 0u;
+            positions[unique_burst] = static_cast<size_type>(pos - b);
+            skips[unique_burst++] = 0u;
          }
-         //Insert all in a single step in the precalculated positions
-         this->m_data.m_vect.insert_ordered_at(unique_burst, positions + unique_burst, skips + unique_burst, first);
-         //Next search position updated
-         pos += unique_burst;
+         if(unique_burst){
+            //Insert all in a single step in the precalculated positions
+            this->m_data.m_vect.insert_ordered_at(unique_burst, positions + unique_burst, skips + unique_burst, first);
+            //Next search position updated
+            pos += unique_burst;
+         }
       }
    }
 
@@ -688,10 +692,10 @@ class flat_tree
    // set operations:
    iterator find(const key_type& k)
    {
-      const Compare &key_comp = this->m_data.get_comp();
+      const Compare &key_cmp = this->m_data.get_comp();
       iterator i = this->lower_bound(k);
 
-      if (i != this->end() && key_comp(k, KeyOfValue()(*i))){ 
+      if (i != this->end() && key_cmp(k, KeyOfValue()(*i))){ 
          i = this->end(); 
       }
       return i;
@@ -699,10 +703,10 @@ class flat_tree
 
    const_iterator find(const key_type& k) const
    {
-      const Compare &key_comp = this->m_data.get_comp();
+      const Compare &key_cmp = this->m_data.get_comp();
       const_iterator i = this->lower_bound(k);
 
-      if (i != this->end() && key_comp(k, KeyOfValue()(*i))){ 
+      if (i != this->end() && key_cmp(k, KeyOfValue()(*i))){ 
          i = this->end(); 
       }
       return i;
@@ -736,8 +740,8 @@ class flat_tree
    size_type capacity() const          
    { return this->m_data.m_vect.capacity(); }
 
-   void reserve(size_type count)      
-   { this->m_data.m_vect.reserve(count);   }
+   void reserve(size_type cnt)      
+   { this->m_data.m_vect.reserve(cnt);   }
 
    private:
    struct insert_commit_data
@@ -776,13 +780,13 @@ class flat_tree
    }
 
    std::pair<iterator,bool> priv_insert_unique_prepare
-      (const_iterator beg, const_iterator end, const value_type& val, insert_commit_data &commit_data)
+      (const_iterator b, const_iterator e, const value_type& val, insert_commit_data &commit_data)
    {
       const value_compare &value_comp  = this->m_data;
-      commit_data.position = this->priv_lower_bound(beg, end, KeyOfValue()(val));
+      commit_data.position = this->priv_lower_bound(b, e, KeyOfValue()(val));
       return std::pair<iterator,bool>
          ( *reinterpret_cast<iterator*>(&commit_data.position)
-         , commit_data.position == end || value_comp(val, *commit_data.position));
+         , commit_data.position == e || value_comp(val, *commit_data.position));
    }
 
    std::pair<iterator,bool> priv_insert_unique_prepare
@@ -850,7 +854,7 @@ class flat_tree
    RanIt priv_lower_bound(RanIt first, RanIt last,
                           const key_type & key) const
    {
-      const Compare &key_comp = this->m_data.get_comp();
+      const Compare &key_cmp = this->m_data.get_comp();
       KeyOfValue key_extract;
       difference_type len = last - first, half;
       RanIt middle;
@@ -860,7 +864,7 @@ class flat_tree
          middle = first;
          middle += half;
 
-         if (key_comp(key_extract(*middle), key)) {
+         if (key_cmp(key_extract(*middle), key)) {
             ++middle;
             first = middle;
             len = len - half - 1;
@@ -875,7 +879,7 @@ class flat_tree
    RanIt priv_upper_bound(RanIt first, RanIt last,
                           const key_type & key) const
    {
-      const Compare &key_comp = this->m_data.get_comp();
+      const Compare &key_cmp = this->m_data.get_comp();
       KeyOfValue key_extract;
       difference_type len = last - first, half;
       RanIt middle;
@@ -885,7 +889,7 @@ class flat_tree
          middle = first;
          middle += half;
 
-         if (key_comp(key, key_extract(*middle))) {
+         if (key_cmp(key, key_extract(*middle))) {
             len = half;
          }
          else{
@@ -900,7 +904,7 @@ class flat_tree
    std::pair<RanIt, RanIt>
       priv_equal_range(RanIt first, RanIt last, const key_type& key) const
    {
-      const Compare &key_comp = this->m_data.get_comp();
+      const Compare &key_cmp = this->m_data.get_comp();
       KeyOfValue key_extract;
       difference_type len = last - first, half;
       RanIt middle, left, right;
@@ -910,12 +914,12 @@ class flat_tree
          middle = first;
          middle += half;
 
-         if (key_comp(key_extract(*middle), key)){
+         if (key_cmp(key_extract(*middle), key)){
             first = middle;
             ++first;
             len = len - half - 1;
          }
-         else if (key_comp(key, key_extract(*middle))){
+         else if (key_cmp(key, key_extract(*middle))){
             len = half;
          }
          else {
@@ -1029,7 +1033,7 @@ template <class K, class V, class KOV,
 class C, class A>
 struct has_trivial_destructor_after_move<boost::container::container_detail::flat_tree<K, V, KOV, C, A> >
 {
-   static const bool value = has_trivial_destructor<A>::value && has_trivial_destructor<C>::value;
+   static const bool value = has_trivial_destructor_after_move<A>::value && has_trivial_destructor_after_move<C>::value;
 };
 */
 }  //namespace boost {

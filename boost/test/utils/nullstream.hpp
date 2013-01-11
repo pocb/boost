@@ -1,4 +1,4 @@
-//  (C) Copyright Gennadiy Rozental 2002-2010.
+//  (C) Copyright Gennadiy Rozental 2002-2012.
 //  (C) Copyright Daryle Walker 2000-2001. 
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at 
@@ -16,10 +16,12 @@
 #ifndef BOOST_NULLSTREAM_HPP_071894GER
 #define BOOST_NULLSTREAM_HPP_071894GER
 
+// STL
 #include <ostream>    // for std::basic_ostream
 #include <streambuf>  // for std::basic_streambuf
 #include <string>     // for std::char_traits
 
+// Boost
 #include <boost/utility/base_from_member.hpp>
 
 #include <boost/test/detail/suppress_warnings.hpp>

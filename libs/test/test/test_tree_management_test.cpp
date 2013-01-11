@@ -1,4 +1,4 @@
-//  (C) Copyright Gennadiy Rozental 2007-2010.
+//  (C) Copyright Gennadiy Rozental 2007-2012.
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at 
 //  http://www.boost.org/LICENSE_1_0.txt)
@@ -34,8 +34,15 @@ BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE( S1 )
 
-BOOST_AUTO_TEST_CASE( tc3 ) {}
-BOOST_AUTO_TEST_CASE( tc4 ) {}
+void tc3() {}
+void tc4() {}
+
+struct myreg {
+    myreg() {
+        framework::current_auto_test_suite().add( BOOST_TEST_CASE( &tc3 ) ); 
+        framework::current_auto_test_suite().add( BOOST_TEST_CASE( &tc4 ) ); 
+    }
+} myreg_;
 
 BOOST_AUTO_TEST_SUITE_END()
 
@@ -86,30 +93,33 @@ BOOST_AUTO_TEST_SUITE_END()
 
 //____________________________________________________________________________//
 
-void empty() {}
+// VC9 defines a function called void empty(); in ivec.h
+void empty_() {}
 
 BOOST_AUTO_TEST_CASE( manual_test_case_creation_test )
 {
-    test_case* tc1 = BOOST_TEST_CASE( &empty );
+    test_case* tc1 = BOOST_TEST_CASE( &empty_ );
 
-    BOOST_CHECK_EQUAL( tc1->p_type, tut_case );
+    BOOST_CHECK_EQUAL( tc1->p_type, TUT_CASE );
     BOOST_CHECK_EQUAL( tc1->p_type_name, const_string( "case" ) );
     BOOST_CHECK_EQUAL( tc1->p_parent_id, 0U );
     BOOST_CHECK_NE( tc1->p_id, INV_TEST_UNIT_ID );
 
     BOOST_CHECK_EQUAL( tc1->p_expected_failures, 0U );
     BOOST_CHECK_EQUAL( tc1->p_timeout, 0U );
-    BOOST_CHECK_EQUAL( tc1->p_name, const_string( "empty" ) );
+    BOOST_CHECK_EQUAL( tc1->p_name, const_string( "empty_" ) );
     BOOST_CHECK( tc1->p_test_func );
     BOOST_CHECK( tc1->p_enabled );
 
     BOOST_CHECK_EQUAL( &framework::get<test_case>( tc1->p_id ), tc1 );
-    BOOST_CHECK_EQUAL( &framework::get( tc1->p_id, tut_case ), tc1 );
+    BOOST_CHECK_EQUAL( &framework::get( tc1->p_id, TUT_CASE ), tc1 );
 
-    BOOST_CHECK_THROW( &framework::get( tc1->p_id, tut_suite ), framework::internal_error );
+    BOOST_CHECK_THROW( &framework::get( tc1->p_id, TUT_SUITE ), framework::internal_error );
 
-    test_case* tc2 = make_test_case( &empty, "my test case" );
+    test_case* tc2 = make_test_case( &empty_, "my test case", "test_file_name", 1 );
     BOOST_CHECK_EQUAL( tc2->p_name, const_string( "my test case" ) );
+    BOOST_CHECK_EQUAL( tc2->p_file_name, const_string( "test_file_name" ) );
+    BOOST_CHECK_EQUAL( tc2->p_line_num, 1U );
 }
 
 //____________________________________________________________________________//
@@ -118,10 +128,16 @@ BOOST_AUTO_TEST_CASE( manual_test_suite_creation )
 {
     test_suite* ts1 = BOOST_TEST_SUITE( "TestSuite" );
 
-    BOOST_CHECK_EQUAL( ts1->p_type, tut_suite );
+    BOOST_CHECK_EQUAL( ts1->p_type, TUT_SUITE );
     BOOST_CHECK_EQUAL( ts1->p_type_name, const_string( "suite" ) );
     BOOST_CHECK_EQUAL( ts1->p_parent_id, 0U );
     BOOST_CHECK_NE( ts1->p_id, INV_TEST_UNIT_ID );
+    const_string fn(ts1->p_file_name);
+    const_string::size_type pos = fn.rfind( "/" );
+    if( pos != const_string::npos )
+        fn.trim_left( pos+1 );
+    BOOST_CHECK_EQUAL( fn, const_string( "test_tree_management_test.cpp" ) );
+    BOOST_CHECK_EQUAL( ts1->p_line_num, 129U );
 
     BOOST_CHECK_EQUAL( ts1->p_expected_failures, 0U );
     BOOST_CHECK_EQUAL( ts1->p_timeout, 0U );
@@ -130,7 +146,7 @@ BOOST_AUTO_TEST_CASE( manual_test_suite_creation )
     BOOST_CHECK_EQUAL( ts1->size(), 0U );
 
     BOOST_CHECK_EQUAL( &framework::get<test_suite>( ts1->p_id ), ts1 );
-    BOOST_CHECK_EQUAL( &framework::get( ts1->p_id, tut_suite ), ts1 );
+    BOOST_CHECK_EQUAL( &framework::get( ts1->p_id, TUT_SUITE ), ts1 );
 }
 
 //____________________________________________________________________________//
@@ -139,7 +155,9 @@ BOOST_AUTO_TEST_CASE( manual_test_unit_registration )
 {
     test_suite* ts1 = BOOST_TEST_SUITE( "TestSuite" );
 
-    test_case* tc1 = make_test_case( &empty, "empty1" );
+    std::size_t line_num = 1;
+
+    test_case* tc1 = make_test_case( &empty_, "empty1", "file_name", line_num );
 
     ts1->add( tc1, 1, 10U );
     BOOST_CHECK_EQUAL( ts1->size(), 1U );
@@ -148,7 +166,7 @@ BOOST_AUTO_TEST_CASE( manual_test_unit_registration )
     BOOST_CHECK_EQUAL( tc1->p_timeout, 10U );
     BOOST_CHECK_EQUAL( ts1->p_expected_failures, 1U );
 
-    test_case* tc2 = make_test_case( &empty, "empty2" );
+    test_case* tc2 = make_test_case( &empty_, "empty2", "file_name", line_num );
 
     ts1->add( tc2, 2U );
     BOOST_CHECK_EQUAL( ts1->size(), 2U );

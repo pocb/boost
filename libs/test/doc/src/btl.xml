@@ -2,7 +2,7 @@
 <!DOCTYPE library PUBLIC "-//Boost//DTD BoostBook XML V1.0//EN"  "../../../../tools/boostbook/dtd/boostbook.dtd" [
  <!ENTITY utf "<acronym>UTF</acronym>">
 ]>
-<library name="Test" dirname="test" id="btl" last-revision="$Date$">
+<library name="Test" dirname="test" id="btl">
  <libraryinfo>
   <author>
    <firstname>Gennadiy</firstname>
@@ -21,6 +21,7 @@
    <year>2009</year>
    <year>2010</year>
    <year>2011</year>
+   <year>2012</year>
    <holder>Gennadiy Rozental</holder>
   </copyright>
 
@@ -37,6 +38,7 @@
    test cases and test suites, and controlling their runtime execution.
   </librarypurpose>
   <librarycategory name="category:correctness-and-testing"/>
+
  </libraryinfo>
  
  <title>Boost Test Library</title> <!-- TO FIX: should be header 1 -->

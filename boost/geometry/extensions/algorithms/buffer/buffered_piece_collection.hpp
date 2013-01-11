@@ -31,6 +31,7 @@
 #include <boost/geometry/algorithms/detail/overlay/add_rings.hpp>
 #include <boost/geometry/algorithms/detail/overlay/assign_parents.hpp>
 #include <boost/geometry/algorithms/detail/overlay/calculate_distance_policy.hpp>
+#include <boost/geometry/algorithms/detail/overlay/enrich_intersection_points.hpp>
 #include <boost/geometry/algorithms/detail/overlay/enrichment_info.hpp>
 #include <boost/geometry/algorithms/detail/overlay/ring_properties.hpp>
 #include <boost/geometry/algorithms/detail/overlay/traversal_info.hpp>
@@ -744,9 +745,11 @@ struct buffered_piece_collection
 
 	inline void debug_segment(segment_identifier id)
 	{
-        auto const& ring = offsetted_rings[id.multi_index];
-		auto it = boost::begin(ring) + id.segment_index;
-		auto prev = it++;
+        typedef typename boost::range_iterator<buffered_ring<Ring> const>::type iterator;
+
+        buffered_ring<Ring> const& ring = offsetted_rings[id.multi_index];
+		iterator it = boost::begin(ring) + id.segment_index;
+		iterator prev = it++;
 		geometry::model::referring_segment<point_type const&> segment(*prev, *it);
         //std::cout << geometry::wkt(*prev) << " " << geometry::wkt(*it) << std::endl;
 	}

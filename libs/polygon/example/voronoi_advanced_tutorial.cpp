@@ -29,7 +29,7 @@ struct my_ulp_comparison {
     LESS = -1,
     EQUAL = 0,
     MORE = 1
-  };  
+  };
 
   Result operator()(fpt80 a, fpt80 b, unsigned int maxUlps) const {
     if (a == b)
@@ -44,19 +44,23 @@ struct my_ulp_comparison {
     rhs.d = b;
     if (lhs.ieee.negative ^ rhs.ieee.negative)
       return lhs.ieee.negative ? LESS : MORE;
-    boost::uint64_t le = lhs.ieee.exponent; le = (le << 32) + lhs.ieee.mantissa0;
-    boost::uint64_t re = rhs.ieee.exponent; re = (re << 32) + rhs.ieee.mantissa0;
+    boost::uint64_t le = lhs.ieee.exponent; le =
+        (le << 32) + lhs.ieee.mantissa0;
+    boost::uint64_t re = rhs.ieee.exponent; re =
+        (re << 32) + rhs.ieee.mantissa0;
     if (lhs.ieee.negative) {
       if (le - 1 > re)
         return LESS;
-      le = (le == re) ? 0 : 1; le = (le << 32) + lhs.ieee.mantissa1;
+      le = (le == re) ? 0 : 1;
+      le = (le << 32) + lhs.ieee.mantissa1;
       re = rhs.ieee.mantissa1;
       return (re + maxUlps < le) ? LESS : EQUAL;
     } else {
       if (le + 1 < re)
         return LESS;
       le = lhs.ieee.mantissa0;
-      re = (le == re) ? 0 : 1; re = (re << 32) + rhs.ieee.mantissa1;
+      re = (le == re) ? 0 : 1;
+      re = (re << 32) + rhs.ieee.mantissa1;
       return (le + maxUlps < re) ? LESS : EQUAL;
     }
   }
@@ -83,20 +87,13 @@ struct my_fpt_converter {
 // Voronoi diagram traits.
 struct my_voronoi_diagram_traits {
   typedef fpt80 coordinate_type;
-  typedef struct {
-    template <typename CT>
-    fpt80 operator()(const CT& that) const {
-      return static_cast<fpt80>(that);
-    }
-  } ctype_converter_type;
-  typedef detail::point_2d<coordinate_type> point_type;
   typedef voronoi_cell<coordinate_type> cell_type;
   typedef voronoi_vertex<coordinate_type> vertex_type;
   typedef voronoi_edge<coordinate_type> edge_type;
-  typedef struct {
+  typedef class {
   public:
     enum { ULPS = 128 };
-    bool operator()(const point_type &v1, const point_type &v2) const {
+    bool operator()(const vertex_type &v1, const vertex_type &v2) const {
       return (ulp_cmp(v1.x(), v2.x(), ULPS) == my_ulp_comparison::EQUAL &&
               ulp_cmp(v1.y(), v2.y(), ULPS) == my_ulp_comparison::EQUAL);
     }
@@ -121,8 +118,7 @@ struct my_voronoi_ctype_traits {
 const unsigned int GENERATED_POINTS = 100;
 const boost::int64_t MAX = 0x1000000000000LL;
 
-#include <iostream>
-int main () {
+int main() {
   boost::mt19937_64 gen(std::time(0));
   boost::random::uniform_int_distribution<boost::int64_t> distr(-MAX, MAX-1);
   voronoi_builder<boost::int64_t, my_voronoi_ctype_traits> vb;
@@ -142,8 +138,8 @@ int main () {
 
   printf("Construction done in: %s seconds.\n", ftime.c_str());
   printf("Resulting Voronoi graph has the following stats:\n");
-  printf("Number of Voronoi cells: %d.\n", vd.num_cells());
-  printf("Number of Voronoi vertices: %d.\n", vd.num_vertices());
-  printf("Number of Voronoi edges: %d.\n", vd.num_edges());
+  printf("Number of Voronoi cells: %lu.\n", vd.num_cells());
+  printf("Number of Voronoi vertices: %lu.\n", vd.num_vertices());
+  printf("Number of Voronoi edges: %lu.\n", vd.num_edges());
   return 0;
 }

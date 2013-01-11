@@ -1,4 +1,4 @@
-//  (C) Copyright Gennadiy Rozental 2001-2010.
+//  (C) Copyright Gennadiy Rozental 2001-2012.
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
@@ -100,7 +100,10 @@ void name ## _impl_defer();                                 \
                                                             \
 BOOST_AUTO_TEST_CASE( name )                                \
 {                                                           \
-    test_case* impl = make_test_case( &name ## _impl, #name ); \
+    test_case* impl = make_test_case( &name ## _impl,       \
+                                      #name,                \
+                                      __FILE__,             \
+                                      __LINE__ );           \
                                                             \
     unit_test_log.set_stream( ots() );                      \
     unit_test_log.set_threshold_level( log_nothing );       \
@@ -639,9 +642,100 @@ TEST_CASE( test_context_logging )
 
 //____________________________________________________________________________//
 
-TEST_CASE( test_BOOST_CHECKA )
+class FooType {
+public:
+    FooType&    operator*()     { return *this; }
+    operator    bool() const    { return false; }
+    int         operator&()     { return 10; }
+};
+
+#ifndef BOOST_NO_CXX11_DECLTYPE
+#define BOOST_TEST_FWD_1(P,M) BOOST_TEST(P)
+#define BOOST_TEST_FWD_3(P,M) BOOST_TEST(P)
+#else
+#define BOOST_TEST_FWD_1(P,M) BOOST_CHECK_MESSAGE( P, M );
+#define BOOST_TEST_FWD_3(P,M) BOOST_ERROR(M)
+#endif
+
+#if BOOST_PP_VARIADICS
+#define BOOST_TEST_FWD_2(P,M) BOOST_TEST(P,M)
+#else
+#define BOOST_TEST_FWD_2(P,M) BOOST_CHECK_MESSAGE( P, M );
+#endif
+
+TEST_CASE( test_BOOST_TEST_universal )
 {
-    BOOST_CHECKA( true );
+    unit_test_log.set_threshold_level( log_successful_tests );
+
+    BOOST_TEST( true );
+    BOOST_TEST( false );
+
+    bool_convertible bc;
+    BOOST_TEST( bc );
+
+    int i = 1;
+    BOOST_TEST( i == 2 );
+    BOOST_TEST( i != 1 );
+    BOOST_TEST( i > 2 );
+    BOOST_TEST( i < 1 );
+    BOOST_TEST( i <= 0 );
+    BOOST_TEST( i >= 5 );
+
+    int j = 2;
+    BOOST_TEST_FWD_1( i+j >= 5, "check i+j >= 5 failed [1 + 2 < 5]" );
+    BOOST_TEST_FWD_1( j-i == 2, "check j-i == 2 failed [2 - 1 != 2]" );
+
+    int* p = &i;
+    BOOST_TEST( *p == 2 );
+
+    BOOST_TEST_FWD_1( j-*p == 0, "check j-*p == 0 failed [2 - 1 != 0]" );
+
+    BOOST_TEST(( i > 5, true ));
+
+    FooType F;
+
+    BOOST_TEST( FooType() );
+    BOOST_TEST( *F );
+    BOOST_TEST( **F );
+    BOOST_TEST( ***F );
+    BOOST_TEST( &F > 100 );
+    BOOST_TEST( &*F > 100 );
+
+    BOOST_TEST_FWD_1( (i == 1) & (j == 1), "check (i == 1) & (j == 1) failed [1 & 0]" );
+    BOOST_TEST_FWD_1( (i == 2) | (j == 1), "check (i == 2) | (j == 1) failed [0 | 0]" );
+
+    BOOST_TEST(( i == 1 && j == 1 ));
+    BOOST_TEST(( i == 2 || j == 1 ));
+
+    BOOST_TEST_FWD_2( i+j==15,"This message reported instead");
+
+    // check correct behavior in if clause
+    if( true )
+        BOOST_TEST( true );
+
+    // check correct behavior in else clause
+    if( false )
+    {}
+    else
+        BOOST_TEST( true );
+
+    std::vector<int> v;
+    v.push_back( 1 );
+    v.push_back( 2 );
+    v.push_back( 3 );
+
+    std::list<int> l;
+    l.push_back( 1 );
+    l.push_back( 3 );
+    l.push_back( 2 );
+
+    BOOST_TEST_FWD_3( v <= l, "check v <= l failed.\nMismatch in a position 2: 3 > 2" );
+    BOOST_TEST_FWD_3( v == l, "check v == l failed.\nMismatch in a position 1: 2 != 3\nMismatch in a position 2: 3 != 2" );
+
+    // Does not work
+    // BOOST_TEST( i == 1 && j == 1 );
+    // BOOST_TEST( i == 2 || j == 1 );
+    // BOOST_TEST( i > 5 ? false : true );
 }
 
 //____________________________________________________________________________//

@@ -9,10 +9,33 @@
 
 #include <boost/config.hpp>
 
-// at this time, neither gcc (4.7) not clang (3.2) completely implement atomic<>
+// at this time, few compiles completely implement atomic<>
 #define BOOST_LOCKFREE_NO_HDR_ATOMIC
 
-#if (__cplusplus < 201103L) || defined(BOOST_LOCKFREE_NO_HDR_ATOMIC)
+// MSVC supports atomic<> from version 2012 onwards.
+#if defined(BOOST_MSVC) && (BOOST_MSVC >= 1700)
+#undef BOOST_LOCKFREE_NO_HDR_ATOMIC
+#endif
+
+// GCC supports atomic<> from version 4.8 onwards.
+#if defined(__GNUC__)
+# if defined(__GNUC_PATCHLEVEL__)
+#  define __GNUC_VERSION__ (__GNUC__ * 10000 \
+                            + __GNUC_MINOR__ * 100 \
+                            + __GNUC_PATCHLEVEL__)
+# else
+#  define __GNUC_VERSION__ (__GNUC__ * 10000 \
+                            + __GNUC_MINOR__ * 100)
+# endif
+#endif
+
+#if (__GNUC_VERSION__ >= 40800) && (__cplusplus >= 201103L)
+#undef BOOST_LOCKFREE_NO_HDR_ATOMIC
+#endif
+
+#undef __GNUC_VERSION__
+
+#if defined(BOOST_LOCKFREE_NO_HDR_ATOMIC)
 #include <boost/atomic.hpp>
 #else
 #include <atomic>
@@ -22,7 +45,7 @@ namespace boost {
 namespace lockfree {
 namespace detail {
 
-#if (__cplusplus < 201103L) || defined(BOOST_LOCKFREE_NO_HDR_ATOMIC)
+#if defined(BOOST_LOCKFREE_NO_HDR_ATOMIC)
 using boost::atomic;
 using boost::memory_order_acquire;
 using boost::memory_order_consume;

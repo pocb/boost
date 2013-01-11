@@ -1,4 +1,5 @@
-//  assert_macro_check implementation  ------------------------------------------------//
+//  deprecated macro check implementation  ---------------------------------------------//
+//	Protect against ourself: boostinspect:ndprecated_macros
 
 //  Copyright Eric Niebler 2010.
 //  Based on the assert_macro_check checker by Marshall Clow
@@ -63,12 +64,21 @@ namespace
 	"BOOST_NO_RVALUE_REFERENCES",
 	"BOOST_NO_SCOPED_ENUMS",
 	"BOOST_NO_STATIC_ASSERT",
-	"BOOST_NO_STD_UNORDERD",
+	"BOOST_NO_STD_UNORDERED",
 	"BOOST_NO_UNICODE_LITERALS",
 	"BOOST_NO_UNIFIED_INITIALIZATION_SYNTAX",
 	"BOOST_NO_VARIADIC_TEMPLATES",
 	"BOOST_NO_VARIADIC_MACROS",
 	"BOOST_NO_NUMERIC_LIMITS_LOWEST",
+    NULL
+    };
+
+  const char * boost153macros [] = {
+	"BOOST_HAS_STATIC_ASSERT",
+	"BOOST_HAS_RVALUE_REFS",
+	"BOOST_HAS_VARIADIC_TMPL",
+	"BOOST_HAS_CHAR_16_T",
+	"BOOST_HAS_CHAR_32_T",
     NULL
     };
 } // unnamed namespace
@@ -101,16 +111,6 @@ namespace boost
       if (contents.find( "boostinspect:" "ndprecated_macros" ) != string::npos)
         return;
 
-      // Check files iff (a) they are in the boost directory, or (b) they
-      // are in the src directory under libs.
-      if (m_from_boost_root) {
-        path relative( relative_to( full_path, fs::initial_path() ) );
-        path::const_iterator pbeg = relative.begin(), pend = relative.end();
-        if (pbeg != std::find(pbeg, pend, "boost") &&
-          !(pbeg == std::find(pbeg, pend, "libs") && pend != std::find(pbeg, pend, "src")))
-          return;
-      }
-
       const char **ptr;
       long errors = 0;
       for ( ptr = boost150macros; *ptr != NULL; ++ptr )
@@ -126,6 +126,14 @@ namespace boost
 		if ( contents.find( *ptr ) != string::npos ) {
           ++errors;
           error( library_name, full_path, string ( "Boost macro deprecated in 1.51: " ) + *ptr );
+          }
+      }
+
+      for ( ptr = boost153macros; *ptr != NULL; ++ptr )
+      {
+		if ( contents.find( *ptr ) != string::npos ) {
+          ++errors;
+          error( library_name, full_path, string ( "Boost macro deprecated in 1.53: " ) + *ptr );
           }
       }
 

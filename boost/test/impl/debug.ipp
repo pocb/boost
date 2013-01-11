@@ -1,4 +1,4 @@
-//  (C) Copyright Gennadiy Rozental 2006-2010.
+//  (C) Copyright Gennadiy Rozental 2006-2012.
 //  Use, modification, and distribution are subject to the
 //  Boost Software License, Version 1.0. (See accompanying file
 //  http://www.boost.org/LICENSE_1_0.txt)
@@ -39,10 +39,6 @@
 #    include <crtdbg.h>
 #  endif
 
-
-#  if BOOST_WORKAROUND( BOOST_MSVC, <1300)
-#    define snprintf _snprintf
-#  endif
 
 #  ifdef BOOST_NO_STDC_NAMESPACE
 namespace std { using ::memset; using ::sprintf; }
@@ -733,7 +729,7 @@ set_debugger( unit_test::const_string dbg_id, dbg_starter s )
     assign_op( s_info.p_dbg.value, dbg_id, 0 );
 
     if( !!s )
-        s_info.m_dbg_starter_reg[s_info.p_dbg] = s;
+        s_info.m_dbg_starter_reg[s_info.p_dbg.get()] = s;
 
     return old;
 }
@@ -944,6 +940,8 @@ detect_memory_leaks( bool on_off, unit_test::const_string report_file )
     }
 
     _CrtSetDbgFlag ( flags );
+#else
+    unit_test::ut_detail::ignore_unused_variable_warning( report_file );
 #endif // BOOST_MS_CRT_BASED_DEBUG
 }
 

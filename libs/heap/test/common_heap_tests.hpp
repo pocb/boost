@@ -1,3 +1,11 @@
+/*=============================================================================
+    Copyright (c) 2010 Tim Blechmann
+
+    Use, modification and distribution is subject to the Boost Software
+    License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+    http://www.boost.org/LICENSE_1_0.txt)
+=============================================================================*/
+
 #ifndef COMMON_HEAP_TESTS_HPP_INCLUDED
 #define COMMON_HEAP_TESTS_HPP_INCLUDED
 
@@ -60,7 +68,7 @@ void fill_q(pri_queue & q, data_container const & data)
         q.push(data[i]);
 }
 
-#if defined(BOOST_HAS_RVALUE_REFS) && !defined(BOOST_NO_VARIADIC_TEMPLATES)
+#if !defined(BOOST_NO_CXX11_RVALUE_REFERENCES) && !defined(BOOST_NO_CXX11_VARIADIC_TEMPLATES)
 template <typename pri_queue, typename data_container>
 void fill_emplace_q(pri_queue & q, data_container const & data)
 {
@@ -100,7 +108,7 @@ void pri_queue_test_sequential_reverse_push(void)
 template <typename pri_queue>
 void pri_queue_test_emplace(void)
 {
-#if defined(BOOST_HAS_RVALUE_REFS) && !defined(BOOST_NO_VARIADIC_TEMPLATES)
+#if !defined(BOOST_NO_CXX11_RVALUE_REFERENCES) && !defined(BOOST_NO_CXX11_VARIADIC_TEMPLATES)
     for (int i = 0; i != test_size; ++i)
     {
         pri_queue q;
@@ -165,7 +173,7 @@ void pri_queue_test_assignment(void)
 template <typename pri_queue>
 void pri_queue_test_moveconstructor(void)
 {
-#ifdef BOOST_HAS_RVALUE_REFS
+#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
     pri_queue q;
     test_data data = make_test_data(test_size);
     fill_q(q, data);
@@ -180,7 +188,7 @@ void pri_queue_test_moveconstructor(void)
 template <typename pri_queue>
 void pri_queue_test_move_assignment(void)
 {
-#ifdef BOOST_HAS_RVALUE_REFS
+#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
     pri_queue q;
     test_data data = make_test_data(test_size);
     fill_q(q, data);
@@ -431,5 +439,14 @@ void run_reserve_heap_tests(void)
 
     check_q(q, data);
 }
+
+struct less_with_T
+{
+    typedef int T;
+    bool operator()(const int& a, const int& b) const
+    {
+        return a < b;
+    }
+};
 
 #endif // COMMON_HEAP_TESTS_HPP_INCLUDED

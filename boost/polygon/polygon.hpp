@@ -16,13 +16,7 @@
 #include "point_traits.hpp"
 #include "point_concept.hpp"
 
-//point 3d
-#include "point_3d_data.hpp"
-#include "point_3d_traits.hpp"
-#include "point_3d_concept.hpp"
-
 #include "transform.hpp"
-#include "detail/transform_detail.hpp"
 
 //interval
 #include "interval_data.hpp"
@@ -92,5 +86,7 @@
 #include "detail/polygon_set_view.hpp"
 
 #include "polygon_set_concept.hpp"
+
+#include "segment_utils.hpp"
 
 #endif

@@ -10,15 +10,16 @@
 int main()
   {
   
-  BOOST_TEST(BOOST_TTI_HAS_TEMPLATE_CHECK_PARAMS_GEN(ATPMemberTemplate)<AType>::value);
-  BOOST_TEST(HaveCL<AType>::value);
-  BOOST_TEST(BOOST_TTI_HAS_TEMPLATE_CHECK_PARAMS_GEN(AMemberTemplate)<AType>::value);
-  BOOST_TEST(HaveAnotherMT<AType>::value);
-  BOOST_TEST(BOOST_TTI_HAS_TEMPLATE_CHECK_PARAMS_GEN(SomeMemberTemplate)<AnotherType>::value);
-  BOOST_TEST(ATemplateWithParms<AnotherType>::value);
-  BOOST_TEST(BOOST_TTI_HAS_TEMPLATE_CHECK_PARAMS_GEN(SimpleTMP)<AnotherType>::value);
-  BOOST_TEST(!BOOST_TTI_HAS_TEMPLATE_CHECK_PARAMS_GEN(TemplateNotExist)<AnotherType>::value);
+  BOOST_TEST(BOOST_TTI_HAS_TEMPLATE_GEN(ATPMemberTemplate)<AType>::value);
+  BOOST_TEST(BOOST_TTI_HAS_TEMPLATE_GEN(AMemberTemplate)<AType>::value);
+  BOOST_TEST(BOOST_TTI_HAS_TEMPLATE_GEN(SomeMemberTemplate)<AnotherType>::value);
+  BOOST_TEST(BOOST_TTI_HAS_TEMPLATE_GEN(SimpleTMP)<AnotherType>::value);
+  BOOST_TEST(!BOOST_TTI_HAS_TEMPLATE_GEN(TemplateNotExist)<AnotherType>::value);
 
+  BOOST_TEST(HaveCL<AType>::value);
+  BOOST_TEST(HaveAnotherMT<AType>::value);
+  BOOST_TEST(ATemplateWithParms<AnotherType>::value);
+  
   return boost::report_errors();
 
   }

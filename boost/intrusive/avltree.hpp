@@ -219,8 +219,8 @@ class avltree_impl
    //! <b>Throws</b>: If value_traits::node_traits::node
    //!   constructor throws (this does not happen with predefined Boost.Intrusive hooks)
    //!   or the copy constructor of the value_compare object throws. Basic guarantee.
-   avltree_impl( const value_compare &cmp = value_compare()
-               , const value_traits &v_traits = value_traits())
+   explicit avltree_impl( const value_compare &cmp = value_compare()
+                        , const value_traits &v_traits = value_traits())
       :  data_(cmp, v_traits)
    {
       node_algorithms::init_header(this->priv_header_ptr());
@@ -542,9 +542,9 @@ class avltree_impl
    template<class Iterator>
    void insert_equal(Iterator b, Iterator e)
    {
-      iterator end(this->end());
+      iterator iend(this->end());
       for (; b != e; ++b)
-         this->insert_equal(end, *b);
+         this->insert_equal(iend, *b);
    }
 
    //! <b>Requires</b>: value must be an lvalue
@@ -608,9 +608,9 @@ class avltree_impl
    void insert_unique(Iterator b, Iterator e)
    {
       if(this->empty()){
-         iterator end(this->end());
+         iterator iend(this->end());
          for (; b != e; ++b)
-            this->insert_unique(end, *b);
+            this->insert_unique(iend, *b);
       }
       else{
          for (; b != e; ++b)
