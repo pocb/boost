@@ -16,7 +16,6 @@
 // class thread
 
 // void join();
-
 #define BOOST_THREAD_VESRION 3
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
@@ -53,7 +52,7 @@ public:
   void operator()()
   {
     BOOST_TEST(alive_ == 1);
-    BOOST_TEST(n_alive == 1);
+    //BOOST_TEST(n_alive == 1);
     op_run = true;
   }
 };
@@ -68,8 +67,6 @@ void resource_deadlock_would_occur_tester()
   try
   {
     boost::unique_lock<boost::mutex> lk(resource_deadlock_would_occur_mtx);
-
-
     resource_deadlock_would_occur_th->join();
     BOOST_TEST(false);
   }
@@ -83,28 +80,6 @@ void resource_deadlock_would_occur_tester()
   }
 }
 
-void throws_thread_resource_error_tester()
-{
-  {
-    try {
-      boost::throw_exception(
-          boost::thread_resource_error(
-              boost::system::errc::resource_deadlock_would_occur,
-              "boost thread: trying joining itself"
-              ));
-      BOOST_TEST(false);
-    }
-    catch (boost::system::system_error& e)
-    {
-      BOOST_TEST(e.code().value() == boost::system::errc::resource_deadlock_would_occur);
-    }
-    catch (...)
-    {
-      BOOST_TEST(false&&"exception thrown");
-    }
-  }
-}
-
 int main()
 {
   {
@@ -114,10 +89,6 @@ int main()
     BOOST_TEST(!t0.joinable());
   }
 
-  {
-    boost::thread t0( throws_thread_resource_error_tester );
-    t0.join();
-  }
   {
     boost::unique_lock<boost::mutex> lk(resource_deadlock_would_occur_mtx);
     boost::thread t0( resource_deadlock_would_occur_tester );
@@ -130,35 +101,34 @@ int main()
     BOOST_TEST(!t0.joinable());
   }
 
-//  {
-//    boost::thread t0( (G()));
-//    t0.detach();
-//    try
-//    {
-//      t0.join();
-//      BOOST_TEST(false);
-//    }
-//    catch (boost::system::system_error& e)
-//    {
-//      BOOST_TEST(e.code().value() == boost::system::errc::no_such_process);
-//    }
-//  }
-//  {
-//    boost::thread t0( (G()));
-//    BOOST_TEST(t0.joinable());
-//    t0.join();
-//    BOOST_TEST(!t0.joinable());
-//    try
-//    {
-//      t0.join();
-//      BOOST_TEST(false);
-//    }
-//    catch (boost::system::system_error& e)
-//    {
-//      BOOST_TEST(e.code().value() == boost::system::errc::invalid_argument);
-//    }
-//
-//  }
+  {
+    boost::thread t0( (G()));
+    t0.detach();
+    try
+    {
+      t0.join();
+      BOOST_TEST(false);
+    }
+    catch (boost::system::system_error& e)
+    {
+      BOOST_TEST(e.code().value() == boost::system::errc::invalid_argument);
+    }
+  }
+  {
+    boost::thread t0( (G()));
+    BOOST_TEST(t0.joinable());
+    t0.join();
+    try
+    {
+      t0.join();
+      BOOST_TEST(false);
+    }
+    catch (boost::system::system_error& e)
+    {
+      BOOST_TEST(e.code().value() == boost::system::errc::invalid_argument);
+    }
+
+  }
 
   return boost::report_errors();
 }

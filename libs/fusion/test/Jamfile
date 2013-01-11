@@ -8,6 +8,10 @@
 # bring in rules for testing
 import testing ;
 
+project
+    : requirements
+    ;
+
 {
     test-suite fusion :
 

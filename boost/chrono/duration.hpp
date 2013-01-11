@@ -340,17 +340,17 @@ namespace detail
 namespace detail {
     template <class T, bool = is_arithmetic<T>::value>
     struct chrono_numeric_limits {
-        static BOOST_CONSTEXPR T lowest() throw() {return (std::numeric_limits<T>::min)  ();}
+        static BOOST_CHRONO_LIB_CONSTEXPR T lowest() BOOST_CHRONO_LIB_NOEXCEPT_OR_THROW {return (std::numeric_limits<T>::min)  ();}
     };
 
     template <class T>
     struct chrono_numeric_limits<T,true> {
-        static BOOST_CONSTEXPR T lowest() throw() {return (std::numeric_limits<T>::min)  ();}
+        static BOOST_CHRONO_LIB_CONSTEXPR T lowest() BOOST_CHRONO_LIB_NOEXCEPT_OR_THROW {return (std::numeric_limits<T>::min)  ();}
     };
 
     template <>
     struct chrono_numeric_limits<float,true> {
-        static BOOST_CONSTEXPR float lowest() throw()
+        static BOOST_CHRONO_LIB_CONSTEXPR float lowest() BOOST_CHRONO_LIB_NOEXCEPT_OR_THROW
         {
             return -(std::numeric_limits<float>::max) ();
         }
@@ -358,7 +358,7 @@ namespace detail {
 
     template <>
     struct chrono_numeric_limits<double,true> {
-        static BOOST_CONSTEXPR double lowest() throw()
+        static BOOST_CHRONO_LIB_CONSTEXPR double lowest() BOOST_CHRONO_LIB_NOEXCEPT_OR_THROW
         {
             return -(std::numeric_limits<double>::max) ();
         }
@@ -366,7 +366,7 @@ namespace detail {
 
     template <>
     struct chrono_numeric_limits<long double,true> {
-        static BOOST_CONSTEXPR long double lowest() throw()
+        static BOOST_CHRONO_LIB_CONSTEXPR long double lowest() BOOST_CHRONO_LIB_NOEXCEPT_OR_THROW
         {
             return -(std::numeric_limits<long double>::max)();
         }
@@ -381,12 +381,12 @@ template <class Rep>
 struct duration_values
 {
     static BOOST_CONSTEXPR Rep zero() {return Rep(0);}
-    static BOOST_CONSTEXPR Rep max BOOST_PREVENT_MACRO_SUBSTITUTION ()
+    static BOOST_CHRONO_LIB_CONSTEXPR Rep max BOOST_PREVENT_MACRO_SUBSTITUTION ()
     {
         return (std::numeric_limits<Rep>::max)();
     }
 
-    static BOOST_CONSTEXPR Rep min BOOST_PREVENT_MACRO_SUBSTITUTION ()
+    static BOOST_CHRONO_LIB_CONSTEXPR Rep min BOOST_PREVENT_MACRO_SUBSTITUTION ()
     {
         return detail::numeric_limits<Rep>::lowest();
     }
@@ -417,7 +417,7 @@ struct common_type<chrono::duration<Rep1, Period1>,
 namespace chrono {
 
     template <class Rep, class Period>
-    class duration
+    class BOOST_SYMBOL_VISIBLE duration
     {
     //BOOST_CHRONO_STATIC_ASSERT(boost::is_integral<Rep>::value, BOOST_CHRONO_A_DURATION_REPRESENTATION_MUST_BE_INTEGRAL, ());
     BOOST_CHRONO_STATIC_ASSERT(!boost::chrono::detail::is_duration<Rep>::value,
@@ -436,7 +436,7 @@ namespace chrono {
         BOOST_CONSTEXPR
         duration() : rep_(duration_values<rep>::zero()) { }
         template <class Rep2>
-        BOOST_CONSTEXPR
+        BOOST_SYMBOL_VISIBLE inline  BOOST_CONSTEXPR
         explicit duration(const Rep2& r
         , typename boost::enable_if <
                     mpl::and_ <
@@ -452,8 +452,7 @@ namespace chrono {
                 >::type* = 0
             ) : rep_(r) { }
         //~duration() {} //= default;
-        BOOST_CONSTEXPR
-        duration(const duration& rhs) : rep_(rhs.rep_) {} // = default;
+//        BOOST_CONSTEXPR        duration(const duration& rhs) : rep_(rhs.rep_) {} // = default;
         duration& operator=(const duration& rhs) // = default;
         {
             if (&rhs != this) rep_= rhs.rep_;
@@ -514,11 +513,11 @@ namespace chrono {
         {
             return duration(duration_values<rep>::zero());
         }
-        static BOOST_CONSTEXPR duration min BOOST_PREVENT_MACRO_SUBSTITUTION ()
+        static BOOST_CHRONO_LIB_CONSTEXPR duration min BOOST_PREVENT_MACRO_SUBSTITUTION ()
         {
             return duration((duration_values<rep>::min)());
         }
-        static BOOST_CONSTEXPR duration max BOOST_PREVENT_MACRO_SUBSTITUTION ()
+        static BOOST_CHRONO_LIB_CONSTEXPR duration max BOOST_PREVENT_MACRO_SUBSTITUTION ()
         {
             return duration((duration_values<rep>::max)());
         }

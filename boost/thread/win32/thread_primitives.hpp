@@ -232,7 +232,7 @@ namespace boost
                 BOOST_VERIFY(ReleaseSemaphore(semaphore,count,0)!=0);
             }
 
-            class handle_manager
+            class BOOST_THREAD_DECL handle_manager
             {
             private:
                 handle handle_to_manage;
@@ -349,9 +349,13 @@ namespace boost
                     setc al;
                 };
 #else
-                bool ret=false;
+                bool ret;
                 __asm {
-                    mov eax,bit; mov edx,x; lock bts [edx],eax; setc al; mov ret, al
+                    mov eax,bit
+                    mov edx,x
+                    lock bts [edx],eax
+                    setc al
+                    mov ret, al
                 };
                 return ret;
 
@@ -368,9 +372,13 @@ namespace boost
                     setc al;
                 };
 #else
-                bool ret=false;
+                bool ret;
                 __asm {
-                    mov eax,bit; mov edx,x; lock btr [edx],eax; setc al; mov ret, al
+                    mov eax,bit
+                    mov edx,x
+                    lock btr [edx],eax
+                    setc al
+                    mov ret, al
                 };
                 return ret;
 

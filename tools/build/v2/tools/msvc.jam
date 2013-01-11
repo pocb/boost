@@ -385,7 +385,8 @@ rule compile-c-c++ ( targets + : sources * )
 {
     DEPENDS $(<[1]) : [ on $(<[1]) return $(PCH_HEADER) ] ;
     DEPENDS $(<[1]) : [ on $(<[1]) return $(PCH_FILE) ] ;
-    PDB_NAME on $(<) = $(<:S=.pdb) ;
+    PDB_NAME on $(<) = $(<[1]:S=.pdb) ;
+    LOCATE on $(<[1]:S=.pdb) = [ on $(<[1]) return $(LOCATE) ] ;
 }
 
 rule preprocess-c-c++ ( targets + : sources * )
@@ -393,6 +394,7 @@ rule preprocess-c-c++ ( targets + : sources * )
     DEPENDS $(<[1]) : [ on $(<[1]) return $(PCH_HEADER) ] ;
     DEPENDS $(<[1]) : [ on $(<[1]) return $(PCH_FILE) ] ;
     PDB_NAME on $(<) = $(<:S=.pdb) ;
+    LOCATE on $(<[1]:S=.pdb) = [ on $(<[1]) return $(LOCATE) ] ;
 }
 
 # Action for running the C/C++ compiler using precompiled headers. In addition
@@ -559,7 +561,8 @@ else
 #
 rule archive ( targets + : sources * : properties * )
 {
-    PDB_NAME on $(>) = $(<:S=.pdb) ;
+    PDB_NAME on $(>) = $(<[1]:S=.pdb) ;
+    LOCATE on $(<[1]:S=.pdb) = [ on $(<[1]) return $(LOCATE) ] ;
 }
 
 
@@ -1114,7 +1117,6 @@ class msvc-linking-generator : linking-generator
         return $(result) ;
     }
 }
-
 
 
 # Unsafe worker rule for the register-toolset() rule. Must not be called

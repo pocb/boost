@@ -1,4 +1,4 @@
-//  (C) Copyright Gennadiy Rozental 2005-2010.
+//  (C) Copyright Gennadiy Rozental 2005-2012.
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt)
@@ -140,8 +140,12 @@ format_report( OutStream& os, predicate_result const& pr, unit_test::lazy_ostrea
         if( tl != PASS ) {
             const_string details_message = pr.message();
 
-            if( !details_message.is_empty() )
-                os << " [" << pr.message() << "]" ;
+            if( !details_message.is_empty() ) {
+                if( first_char( details_message ) != '\n' )
+                    os << " [" << details_message << "]" ;
+                else
+                    os << "." << details_message;
+            }
         }
         break;
 
@@ -330,18 +334,19 @@ check_impl( predicate_result const& pr, lazy_ostream const& assertion_descr,
 
     switch( tl ) {
     case PASS:
-        framework::assertion_result( true );
+        framework::assertion_result( AR_PASSED );
         return true;
 
     case WARN:
+        framework::assertion_result( AR_TRIGGERED );
         return false;
 
     case CHECK:
-        framework::assertion_result( false );
+        framework::assertion_result( AR_FAILED );
         return false;
         
     case REQUIRE:
-        framework::assertion_result( false );
+        framework::assertion_result( AR_FAILED );
 
         framework::test_unit_aborted( framework::current_test_case() );
 
@@ -489,7 +494,7 @@ output_test_stream::is_empty( bool flush_stream )
 {
     sync();
 
-    result_type res( m_pimpl->m_synced_string.empty() );
+    predicate_result res( m_pimpl->m_synced_string.empty() );
 
     m_pimpl->check_and_fill( res );
 
@@ -506,7 +511,7 @@ output_test_stream::check_length( std::size_t length_, bool flush_stream )
 {
     sync();
 
-    result_type res( m_pimpl->m_synced_string.length() == length_ );
+    predicate_result res( m_pimpl->m_synced_string.length() == length_ );
 
     m_pimpl->check_and_fill( res );
 
@@ -523,7 +528,7 @@ output_test_stream::is_equal( const_string arg, bool flush_stream )
 {
     sync();
 
-    result_type res( const_string( m_pimpl->m_synced_string ) == arg );
+    predicate_result res( const_string( m_pimpl->m_synced_string ) == arg );
 
     m_pimpl->check_and_fill( res );
 
@@ -540,7 +545,7 @@ output_test_stream::match_pattern( bool flush_stream )
 {
     sync();
 
-    result_type result( true );
+    predicate_result result( true );
 
     if( !m_pimpl->m_pattern.is_open() ) {
         result = false;

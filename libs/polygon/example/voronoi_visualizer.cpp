@@ -7,15 +7,13 @@
 
 // See http://www.boost.org for updates, documentation, and revision history.
 
-#include <cassert>
 #include <iostream>
+#include <vector>
 
 #include <QtOpenGL/QGLWidget>
 #include <QtGui/QtGui>
 
-#include <boost/polygon/point_data.hpp>
-#include <boost/polygon/rectangle_data.hpp>
-#include <boost/polygon/segment_data.hpp>
+#include <boost/polygon/polygon.hpp>
 #include <boost/polygon/voronoi.hpp>
 using namespace boost::polygon;
 
@@ -23,8 +21,9 @@ using namespace boost::polygon;
 
 class GLWidget : public QGLWidget {
   Q_OBJECT
-public:
-  GLWidget(QMainWindow* parent = NULL) :
+
+ public:
+  explicit GLWidget(QMainWindow* parent = NULL) :
       QGLWidget(QGLFormat(QGL::SampleBuffers), parent),
       primary_edges_only_(false),
       internal_edges_only_(false) {
@@ -76,7 +75,7 @@ public:
     internal_edges_only_ ^= true;
   }
 
-protected:
+ protected:
   void initializeGL() {
     glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -99,15 +98,15 @@ protected:
     glViewport((width - side) / 2, (height - side) / 2, side, side);
   }
 
-  void timerEvent(QTimerEvent*) {
+  void timerEvent(QTimerEvent* e) {
     update();
   }
 
-private:
+ private:
   typedef double coordinate_type;
-  typedef point_data<double> point_type;
-  typedef segment_data<double> segment_type;
-  typedef rectangle_data<double> rect_type;
+  typedef point_data<coordinate_type> point_type;
+  typedef segment_data<coordinate_type> segment_type;
+  typedef rectangle_data<coordinate_type> rect_type;
   typedef voronoi_builder<int> VB;
   typedef voronoi_diagram<coordinate_type> VD;
   typedef VD::cell_type cell_type;
@@ -198,7 +197,9 @@ private:
     glLoadIdentity();
     rect_type view_rect = brect_;
     deconvolve(view_rect, shift_);
-    glOrtho(xl(view_rect), xh(view_rect), yl(view_rect), yh(view_rect), -1.0, 1.0);
+    glOrtho(xl(view_rect), xh(view_rect),
+            yl(view_rect), yh(view_rect),
+            -1.0, 1.0);
     glMatrixMode(GL_MODELVIEW);
   }
 
@@ -213,9 +214,11 @@ private:
       glVertex2f(point.x(), point.y());
     }
     for (std::size_t i = 0; i < segment_data_.size(); ++i) {
-      point_type lp = deconvolve(low(segment_data_[i]), shift_);
-      point_type hp = deconvolve(high(segment_data_[i]), shift_);
+      point_type lp = low(segment_data_[i]);
+      lp = deconvolve(lp, shift_);
       glVertex2f(lp.x(), lp.y());
+      point_type hp = high(segment_data_[i]);
+      hp = deconvolve(hp, shift_);
       glVertex2f(hp.x(), hp.y());
     }
     glEnd();
@@ -227,9 +230,11 @@ private:
     glLineWidth(2.7f);
     glBegin(GL_LINES);
     for (std::size_t i = 0; i < segment_data_.size(); ++i) {
-      point_type lp = deconvolve(low(segment_data_[i]), shift_);
-      point_type hp = deconvolve(high(segment_data_[i]), shift_);
+      point_type lp = low(segment_data_[i]);
+      lp = deconvolve(lp, shift_);
       glVertex2f(lp.x(), lp.y());
+      point_type hp = high(segment_data_[i]);
+      hp = deconvolve(hp, shift_);
       glVertex2f(hp.x(), hp.y());
     }
     glEnd();
@@ -284,12 +289,12 @@ private:
     }
   }
 
-  void clip_infinite_edge(const edge_type& edge, std::vector<point_type>* clipped_edge) {
+  void clip_infinite_edge(
+      const edge_type& edge, std::vector<point_type>* clipped_edge) {
     const cell_type& cell1 = *edge.cell();
     const cell_type& cell2 = *edge.twin()->cell();
     point_type origin, direction;
     // Infinite edges could not be created by two segment sites.
-    assert(cell1.contains_point() || cell2.contains_point());
     if (cell1.contains_point() && cell2.contains_point()) {
       point_type p1 = retrieve_point(cell1);
       point_type p2 = retrieve_point(cell2);
@@ -315,20 +320,23 @@ private:
       }
     }
     coordinate_type side = xh(brect_) - xl(brect_);
-    coordinate_type koef = side / (std::max)(fabs(direction.x()), fabs(direction.y()));
+    coordinate_type koef =
+        side / (std::max)(fabs(direction.x()), fabs(direction.y()));
     if (edge.vertex0() == NULL) {
       clipped_edge->push_back(point_type(
           origin.x() - direction.x() * koef,
           origin.y() - direction.y() * koef));
     } else {
-      clipped_edge->push_back(point_type(edge.vertex0()->x(), edge.vertex0()->y()));
+      clipped_edge->push_back(
+          point_type(edge.vertex0()->x(), edge.vertex0()->y()));
     }
     if (edge.vertex1() == NULL) {
       clipped_edge->push_back(point_type(
           origin.x() + direction.x() * koef,
           origin.y() + direction.y() * koef));
     } else {
-      clipped_edge->push_back(point_type(edge.vertex1()->x(), edge.vertex1()->y()));
+      clipped_edge->push_back(
+          point_type(edge.vertex1()->x(), edge.vertex1()->y()));
     }
   }
 
@@ -349,11 +357,11 @@ private:
   point_type retrieve_point(const cell_type& cell) {
     source_index_type index = cell.source_index();
     source_category_type category = cell.source_category();
-    if (category == detail::SOURCE_CATEGORY_SINGLE_POINT) {
+    if (category == SOURCE_CATEGORY_SINGLE_POINT) {
       return point_data_[index];
     }
     index -= point_data_.size();
-    if (category == detail::SOURCE_CATEGORY_SEGMENT_START_POINT) {
+    if (category == SOURCE_CATEGORY_SEGMENT_START_POINT) {
       return low(segment_data_[index]);
     } else {
       return high(segment_data_[index]);
@@ -378,7 +386,8 @@ private:
 
 class MainWindow : public QWidget {
   Q_OBJECT
-public:
+
+ public:
   MainWindow() {
     glWidget_ = new GLWidget();
     file_dir_ = QDir(QDir::currentPath(), tr("*.txt"));
@@ -394,7 +403,7 @@ public:
     layout()->setSizeConstraint(QLayout::SetFixedSize);
   }
 
-private slots:
+ private slots:
   void primary_edges_only() {
     glWidget_->show_primary_edges_only();
   }
@@ -431,7 +440,7 @@ private slots:
     }
   }
 
-private:
+ private:
   QGridLayout* create_file_layout() {
     QGridLayout* file_layout = new QGridLayout;
 

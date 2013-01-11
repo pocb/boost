@@ -23,6 +23,7 @@ namespace boost
     class fmt_masks : public ios_flags<fmt_masks>
     {
       typedef ios_flags<fmt_masks> base_type;
+      fmt_masks& operator=(fmt_masks const& rhs) ;
 
     public:
       fmt_masks(std::ios_base& ios): base_type(ios) {}
@@ -131,13 +132,13 @@ namespace boost
     } // namespace detail
 
     template<typename CharT>
-    static inline std::basic_string<CharT> get_time_fmt(std::ios_base & ios)
+    inline std::basic_string<CharT> get_time_fmt(std::ios_base & ios)
     {
       ios_state_not_null_ptr<detail::ios_base_data<CharT>, detail::ios_base_data_aux<CharT> > ptr(ios);
       return ptr->time_fmt;
     }
     template<typename CharT>
-    static inline void set_time_fmt(std::ios_base& ios, std::basic_string<
+    inline void set_time_fmt(std::ios_base& ios, std::basic_string<
         CharT> const& fmt)
     {
       ios_state_not_null_ptr<detail::ios_base_data<CharT>, detail::ios_base_data_aux<CharT> > ptr(ios);

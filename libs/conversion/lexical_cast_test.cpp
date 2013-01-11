@@ -82,12 +82,13 @@ void test_wallocator();
 #endif
 void test_char_types_conversions();
 void operators_overload_test();
-#if !defined(BOOST_NO_CHAR16_T) && !defined(BOOST_NO_UNICODE_LITERALS)
+#if !defined(BOOST_NO_CXX11_CHAR16_T) && !defined(BOOST_NO_CXX11_UNICODE_LITERALS)
 void test_char16_conversions();
 #endif
-#if !defined(BOOST_NO_CHAR32_T) && !defined(BOOST_NO_UNICODE_LITERALS)
+#if !defined(BOOST_NO_CXX11_CHAR32_T) && !defined(BOOST_NO_CXX11_UNICODE_LITERALS)
 void test_char32_conversions();
 #endif
+void test_getting_pointer_to_function();
 
 unit_test::test_suite *init_unit_test_suite(int, char *[])
 {
@@ -119,12 +120,13 @@ unit_test::test_suite *init_unit_test_suite(int, char *[])
 
     suite->add(BOOST_TEST_CASE(&test_char_types_conversions));
     suite->add(BOOST_TEST_CASE(&operators_overload_test));
-#if !defined(BOOST_NO_CHAR16_T) && !defined(BOOST_NO_UNICODE_LITERALS)
+#if !defined(BOOST_NO_CXX11_CHAR16_T) && !defined(BOOST_NO_CXX11_UNICODE_LITERALS)
     suite->add(BOOST_TEST_CASE(&test_char16_conversions));
 #endif
-#if !defined(BOOST_NO_CHAR32_T) && !defined(BOOST_NO_UNICODE_LITERALS)
+#if !defined(BOOST_NO_CXX11_CHAR32_T) && !defined(BOOST_NO_CXX11_UNICODE_LITERALS)
     suite->add(BOOST_TEST_CASE(&test_char32_conversions));
 #endif
+    suite->add(BOOST_TEST_CASE(&test_getting_pointer_to_function));
 
     return suite;
 }
@@ -241,9 +243,15 @@ void test_conversion_to_bool()
     BOOST_CHECK_EQUAL(false, lexical_cast<bool>(0));
     BOOST_CHECK_THROW(lexical_cast<bool>(123), bad_lexical_cast);
     BOOST_CHECK_EQUAL(true, lexical_cast<bool>(1.0));
+    BOOST_CHECK_THROW(lexical_cast<bool>(-123), bad_lexical_cast);
     BOOST_CHECK_EQUAL(false, lexical_cast<bool>(0.0));
+    BOOST_CHECK_THROW(lexical_cast<bool>(1234), bad_lexical_cast);
+#if !defined(_CRAYC)
+    // Looks like a bug in CRAY compiler (throws bad_lexical_cast)
+    // TODO: localize the bug and report it to developers.
     BOOST_CHECK_EQUAL(true, lexical_cast<bool>(true));
     BOOST_CHECK_EQUAL(false, lexical_cast<bool>(false));
+#endif
     BOOST_CHECK_EQUAL(true, lexical_cast<bool>("1"));
     BOOST_CHECK_EQUAL(false, lexical_cast<bool>("0"));
     BOOST_CHECK_THROW(lexical_cast<bool>(""), bad_lexical_cast);
@@ -474,6 +482,11 @@ void test_wtraits()
 
 void test_allocator()
 {
+// Following test cause compilation error on MSVC2012:
+// (Reason: cannot convert from 'std::_Wrap_alloc<_Alloc>' to 'const my_allocator<CharT>')
+// 
+// MSVC developer is notified about this issue
+#if !defined(_MSC_VER) || (_MSC_VER < 1700)
     typedef std::basic_string< char
                              , std::char_traits<char>
                              , my_allocator<char>
@@ -486,10 +499,16 @@ void test_allocator()
     BOOST_CHECK(boost::lexical_cast<my_string>(1) == "1");
     BOOST_CHECK(boost::lexical_cast<my_string>("s") == s);
     BOOST_CHECK(boost::lexical_cast<my_string>(std::string("s")) == s);
+#endif
 }
 
 void test_wallocator()
 {
+// Following test cause compilation error on MSVC2012:
+// (Reason: cannot convert from 'std::_Wrap_alloc<_Alloc>' to 'const my_allocator<CharT>')
+// 
+// MSVC developer is notified about this issue
+#if !defined(_MSC_VER) || (_MSC_VER < 1700)
     typedef std::basic_string< wchar_t
                              , std::char_traits<wchar_t>
                              , my_allocator<wchar_t>
@@ -502,6 +521,7 @@ void test_wallocator()
     BOOST_CHECK(boost::lexical_cast<my_string>(1) == L"1");
     BOOST_CHECK(boost::lexical_cast<my_string>(L"s") == s);
     BOOST_CHECK(boost::lexical_cast<my_string>(std::wstring(L"s")) == s);
+#endif
 }
 
 #endif
@@ -571,7 +591,7 @@ void operators_overload_test()
 }
 
 
-#if !defined(BOOST_NO_CHAR16_T) && !defined(BOOST_NO_UNICODE_LITERALS)
+#if !defined(BOOST_NO_CXX11_CHAR16_T) && !defined(BOOST_NO_CXX11_UNICODE_LITERALS)
 void test_char16_conversions()
 {
     BOOST_CHECK(u"100" == lexical_cast<std::u16string>(u"100"));
@@ -579,12 +599,29 @@ void test_char16_conversions()
 }
 #endif
 
-#if !defined(BOOST_NO_CHAR16_T) && !defined(BOOST_NO_UNICODE_LITERALS)
+#if !defined(BOOST_NO_CXX11_CHAR16_T) && !defined(BOOST_NO_CXX11_UNICODE_LITERALS)
 void test_char32_conversions()
 {
     BOOST_CHECK(U"100" == lexical_cast<std::u32string>(U"100"));
     BOOST_CHECK(U"1" == lexical_cast<std::u32string>(U'1'));
 }
 #endif
+
+void test_getting_pointer_to_function()
+{
+    // Just checking that &lexical_cast<To, From> is not ambiguous
+    typedef char char_arr[4];    
+    typedef int(*f1)(const char_arr&);
+    f1 p1 = &boost::lexical_cast<int, char_arr>;
+    BOOST_CHECK(p1);
+
+    typedef int(*f2)(const std::string&);
+    f2 p2 = &boost::lexical_cast<int, std::string>;
+    BOOST_CHECK(p2);
+
+    typedef std::string(*f3)(const int&);
+    f3 p3 = &boost::lexical_cast<std::string, int>;
+    BOOST_CHECK(p3);
+}
 
 

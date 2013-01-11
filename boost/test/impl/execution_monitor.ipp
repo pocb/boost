@@ -1,4 +1,4 @@
-//  (C) Copyright Gennadiy Rozental 2001-2010.
+//  (C) Copyright Gennadiy Rozental 2001-2012.
 //  (C) Copyright Beman Dawes and Ullrich Koethe 1995-2001.
 //  Use, modification, and distribution are subject to the
 //  Boost Software License, Version 1.0. (See accompanying file
@@ -79,8 +79,10 @@ using std::va_list;
     typedef unsigned uintptr_t;
 #  endif
 
-#  if BOOST_WORKAROUND(_MSC_VER,  < 1300 ) || defined(UNDER_CE)
-typedef void* uintptr_t;
+#  if BOOST_WORKAROUND(_MSC_VER,  < 1300 ) || (defined(UNDER_CE) && BOOST_WORKAROUND(_MSC_VER,  < 1500 ))
+	 typedef void* uintptr_t;
+#  elif defined(UNDER_CE)	 
+#	 include <crtdefs.h>
 #  endif
 
 #  if !defined(NDEBUG) && defined(_MSC_VER) && !defined(UNDER_CE)
@@ -143,8 +145,12 @@ namespace { void _set_se_translator( void* ) {} }
 #    endif 
 #  endif 
 
-#  if !defined(__CYGWIN__) && !defined(__QNXNTO__)
-#   define BOOST_TEST_USE_ALT_STACK
+#  if defined(__ANDROID__) 
+#    include <android/api-level.h> 
+#  endif 
+
+#  if !defined(__CYGWIN__) && !defined(__QNXNTO__) && (!defined(__ANDROID__) || __ANDROID_API__ >= 8)
+#    define BOOST_TEST_USE_ALT_STACK
 #  endif
 
 #  if defined(SIGPOLL) && !defined(__CYGWIN__)                              && \
@@ -212,7 +218,7 @@ extract( boost::exception const* ex )
 static void
 report_error( execution_exception::error_code ec, boost::exception const* be, char const* format, va_list* args )
 {
-    static const int REPORT_ERROR_BUFFER_SIZE = 512;
+    static const int REPORT_ERROR_BUFFER_SIZE = 4096;
     static char buf[REPORT_ERROR_BUFFER_SIZE];
 
     BOOST_TEST_VSNPRINTF( buf, sizeof(buf)-1, format, *args ); 
@@ -1058,18 +1064,11 @@ system_signal_exception::report() const
 int BOOST_TEST_CALL_DECL
 assert_reporting_function( int reportType, char* userMessage, int* )
 {
-    switch( reportType ) {
-    case BOOST_TEST_CRT_ASSERT:
-        detail::report_error( execution_exception::user_error, userMessage );
+    // write this way instead of switch to avoid unreachable statements
+    if( reportType == BOOST_TEST_CRT_ASSERT || reportType == BOOST_TEST_CRT_ERROR )
+        detail::report_error( reportType == BOOST_TEST_CRT_ASSERT ? execution_exception::user_error : execution_exception::system_error, userMessage );
 
-        return 1; // return value and retVal are not important since we never reach this line
-    case BOOST_TEST_CRT_ERROR:
-        detail::report_error( execution_exception::system_error, userMessage );
-
-        return 1; // return value and retVal are not important since we never reach this line
-    default:
-        return 0; // use usual reporting method
-    }
+    return 0;
 } // assert_reporting_function
 
 //____________________________________________________________________________//
@@ -1352,7 +1351,7 @@ enable( unsigned mask )
 #elif defined(__GLIBC__) && defined(__USE_GNU) && !defined(BOOST_CLANG) && !defined(BOOST_NO_FENV_H)
     ::feclearexcept(BOOST_FPE_ALL);
     int res = ::feenableexcept( mask );
-    return res == -1 ? BOOST_FPE_INV : (unsigned)res;
+    return res == -1 ? (unsigned)BOOST_FPE_INV : (unsigned)res;
 #else
     /* Not Implemented  */
     return 0;
@@ -1387,7 +1386,7 @@ disable( unsigned mask )
 #elif defined(__GLIBC__) && defined(__USE_GNU) && !defined(BOOST_CLANG) && !defined(BOOST_NO_FENV_H)
     ::feclearexcept(BOOST_FPE_ALL);
     int res = ::fedisableexcept( mask );
-    return res == -1 ? BOOST_FPE_INV : (unsigned)res;
+    return res == -1 ? (unsigned)BOOST_FPE_INV : (unsigned)res;
 #else
     /* Not Implemented */
     return BOOST_FPE_INV;

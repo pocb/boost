@@ -1,4 +1,4 @@
-//  (C) Copyright Gennadiy Rozental 2005-2010.
+//  (C) Copyright Gennadiy Rozental 2005-2012.
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at 
 //  http://www.boost.org/LICENSE_1_0.txt)
@@ -92,6 +92,8 @@ void
 compiler_log_formatter::test_unit_start( std::ostream& output, test_unit const& tu )
 {
     BOOST_TEST_SCOPE_SETCOLOR( output, term_attr::BRIGHT, term_color::BLUE );
+
+    print_prefix( output, tu.p_file_name, tu.p_line_num );
 
     output << "Entering test " << tu.p_type_name << " \"" << tu.p_name << "\"" << std::endl;
 }
@@ -230,15 +232,18 @@ compiler_log_formatter::log_entry_finish( std::ostream& output )
 //____________________________________________________________________________//
 
 void
-compiler_log_formatter::print_prefix( std::ostream& output, const_string file, std::size_t line )
+compiler_log_formatter::print_prefix( std::ostream& output, const_string file_name, std::size_t line_num )
 {
+    if( !file_name.empty() )
+    {
 #ifdef __APPLE_CC__
-    // Xcode-compatible logging format, idea by Richard Dingwall at 
-    // <http://richarddingwall.name/2008/06/01/using-the-boost-unit-test-framework-with-xcode-3/>. 
-    output << file << ':' << line << ": ";
+        // Xcode-compatible logging format, idea by Richard Dingwall at
+        // <http://richarddingwall.name/2008/06/01/using-the-boost-unit-test-framework-with-xcode-3/>.
+        output << file_name << ':' << line_num << ": ";
 #else
-    output << file << '(' << line << "): ";
+        output << file_name << '(' << line_num << "): ";
 #endif
+    }
 }
 
 //____________________________________________________________________________//

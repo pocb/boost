@@ -1,4 +1,4 @@
-//  (C) Copyright Gennadiy Rozental 2011.
+//  (C) Copyright Gennadiy Rozental 2011-2012.
 //  Distributed under the Boost Software License, Version 1.0.
 //  (See accompanying file LICENSE_1_0.txt or copy at 
 //  http://www.boost.org/LICENSE_1_0.txt)
@@ -170,14 +170,14 @@ depends_on::do_apply( test_unit& tu )
 
     test_unit* dep = &framework::master_test_suite();
     while( tit != string_token_iterator() ) {
-        BOOST_TEST_SETUP_ASSERT( dep->p_type == tut_suite, std::string( "incorrect dependency specification " ) + m_dependency );
+        BOOST_TEST_SETUP_ASSERT( dep->p_type == TUT_SUITE, std::string( "incorrect dependency specification " ) + m_dependency );
 
         test_unit_id next_id = static_cast<test_suite*>(dep)->get( *tit );
 
         if( next_id == INV_TEST_UNIT_ID )
             throw framework::setup_error( std::string( "incorrect dependency specification " ) + m_dependency );
 
-        dep = &framework::get( next_id, tut_any );
+        dep = &framework::get( next_id, TUT_ANY );
         ++tit;           
     }
 

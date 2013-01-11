@@ -65,6 +65,7 @@ run-tests libs :
     container/example           # test-suite container_example
     container/test              # test-suite container_test
     context/test                # test-suite context
+    coroutine/test              # test-suite coroutine
     crc/test                    # test-suite crc
     date_time/test              # test-suite date_time
     detail/test                 # test-suite detail
@@ -79,7 +80,7 @@ run-tests libs :
     functional/test             # test-suite functional
     functional/factory/test     # test-suite functional/factory
     functional/forward/test     # test-suite functional/forward
-    functional/hash/test        # test-suite functional/hash
+    functional/hash/test/extra  # test-suite functional/hash
     functional/overloaded_function/test # test-suite func./overloaded_function
     function_types/test         # test-suite function_types
     fusion/test                 # test-suite fusion
@@ -103,6 +104,7 @@ run-tests libs :
     logic/test                  # test-suite logic
     lockfree/test               # test-suite lockfree
     math/test                   # test-suite math
+    multiprecision/test         # test-suite multiprecision
     move/example                # test-suite move_example
     move/test                   # test-suite move_test
     mpi/test                    # test-suite mpi
@@ -110,6 +112,7 @@ run-tests libs :
     msm/test                    # msm-unit-tests
     numeric/conversion/test     # test-suite numeric/conversion
     numeric/interval/test       # test-suite numeric/interval
+    numeric/odeint/test         # test-suite numeric/odeint
     numeric/ublas/test          # test-suite numeirc/uBLAS
     multi_array/test            # test-suite multi_array
     multi_index/test            # test-suite multi_index
@@ -166,3 +169,4 @@ run-tests libs :
 run-tests tools :
     bcp/test
     ;
+

@@ -13,6 +13,7 @@
 
 #include <boost/array.hpp>
 #include <boost/config.hpp>
+#include <boost/cstdint.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/static_assert.hpp>
 
@@ -148,7 +149,7 @@ public:
         return NULL;
     }
 
-private:
+protected: // allow use from subclasses
     template <bool ThreadSafe, bool Bounded>
     T * allocate (void)
     {
@@ -158,6 +159,7 @@ private:
             return allocate_impl_unsafe<Bounded>();
     }
 
+private:
     template <bool Bounded>
     T * allocate_impl (void)
     {
@@ -201,6 +203,7 @@ private:
         return reinterpret_cast<T*>(ptr);
     }
 
+protected:
     template <bool ThreadSafe>
     void deallocate (T * n)
     {
@@ -210,6 +213,7 @@ private:
             deallocate_impl_unsafe(n);
     }
 
+private:
     void deallocate_impl (T * n)
     {
         void * node = n;
@@ -251,7 +255,7 @@ public:
     {}
 
     /** copy constructor */
-#ifdef BOOST_NO_DEFAULTED_FUNCTIONS
+#ifdef BOOST_NO_CXX11_DEFAULTED_FUNCTIONS
     tagged_index(tagged_index const & rhs):
         index(rhs.index), tag(rhs.tag)
     {}
@@ -381,7 +385,7 @@ class fixed_size_freelist:
 #ifdef BOOST_LOCKFREE_FREELIST_INIT_RUNS_DTOR
             destruct<false>(nodes + i);
 #else
-            deallocate<false>(i);
+            deallocate<false>(static_cast<index_t>(i));
 #endif
         }
     }
@@ -391,7 +395,8 @@ public:
 
     template <typename Allocator>
     fixed_size_freelist (Allocator const & alloc, std::size_t count):
-        NodeStorage(alloc, count), pool_(tagged_index(count, 0))
+        NodeStorage(alloc, count),
+        pool_(tagged_index(static_cast<index_t>(count), 0))
     {
         initialize();
     }
@@ -461,7 +466,7 @@ public:
 
     index_t null_handle(void) const
     {
-        return NodeStorage::node_count();
+        return static_cast<index_t>(NodeStorage::node_count());
     }
 
     index_t get_handle(T * pointer) const
@@ -469,7 +474,7 @@ public:
         if (pointer == NULL)
             return null_handle();
         else
-            return pointer - NodeStorage::nodes();
+            return static_cast<index_t>(pointer - NodeStorage::nodes());
     }
 
     index_t get_handle(tagged_node_handle const & handle) const
@@ -495,7 +500,7 @@ public:
         return ptr;
     }
 
-private:
+protected: // allow use from subclasses
     template <bool ThreadSafe>
     index_t allocate (void)
     {
@@ -505,6 +510,7 @@ private:
             return allocate_impl_unsafe();
     }
 
+private:
     index_t allocate_impl (void)
     {
         tagged_index old_pool = pool_.load(memory_order_consume);

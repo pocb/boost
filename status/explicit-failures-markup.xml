@@ -45,6 +45,8 @@
         <toolset name="sun-5.8"/>
         <toolset name="sun-5.9"/>
         <toolset name="borland-*"/>
+        <toolset name="vacpp-*"/>
+        <toolset name="cray-*"/>
       </mark-unusable>
       <mark-expected-failures>
           <test name="tail_variate_means"/>
@@ -658,7 +660,6 @@
         <test name="lexical_cast_containers_test">
             <mark-failure>
                 <toolset name="vacpp*"/>
-                <toolset name="msvc-9.0~wm5~*"/>
                 <note author="Antony Polukhin">
                     This compiler is unable to compile Boost.Container library
                 </note>
@@ -696,7 +697,6 @@
         </test>
         <test name="lexical_cast_float_types_test">
             <mark-failure>
-                <toolset name="gcc-mingw-4.*"/>
                 <toolset name="vacpp-*"/>
                 <toolset name="vacpp"/>
                 <toolset name="msvc-9.0~stlport5.2"/>
@@ -711,6 +711,23 @@
             </mark-failure>
         </test>
     </library>
+
+
+    <!-- coroutine -->
+    <library name="coroutine">
+      <mark-unusable>
+        <toolset name="cray-*"/>
+        <toolset name="darwin-4.4"/>
+        <toolset name="darwin-4.4_0x"/>
+        <toolset name="gcc-4.4.4"/>
+        <toolset name="gcc-4.4.4_0x"/>
+        <toolset name="msvc-8.0"/>
+        <toolset name="pgi-*"/>
+        <toolset name="vacpp-*"/>
+        <toolset name="gcc-mingw-4.4*"/>
+      </mark-unusable>
+    </library>
+
 
     <!-- crc -->
     <library name="crc">
@@ -2829,8 +2846,70 @@ for more information.
         </mark-expected-failures>
     </library>
 
+   <!-- multiprecision -->
+   <library name="multiprecision">
+      <mark-unusable>
+         <toolset name="borland-5.5*"/>
+         <toolset name="borland-5.6*"/>
+         <toolset name="borland-5.8*"/>
+         <toolset name="borland-5.9*"/>
+         <note author="John Maddock" date="05 Dec 2012">
+            <p>
+               These compilers are too antiquated for this library.
+            </p>
+         </note>
+      </mark-unusable>
+      <mark-unusable>
+         <toolset name="vacpp*"/>
+         <toolset name="pgi*"/>
+         <toolset name="pgi*"/>
+         <toolset name="msvc-8.0"/>
+         <toolset name="msvc- 9.0~wm5*"/>
+         <note author="John Maddock" date="05 Dec 2012">
+            <p>
+               These compilers don't quite have the necessary support for this library, it's possible
+               that they could be made to work if someone cares enough.
+            </p>
+         </note>
+      </mark-unusable>
 
-    <!-- optional -->
+      <mark-expected-failures>
+         <test name="test_round_cpp_dec_float"/>
+         <test name="test_atan_cpp_dec_float"/>
+         <test name="sf_concept_check_bessel_cpp_dec_float"/>
+         <test name="sf_concept_check_bessel_backend_concept"/>
+         <test name="sf_concept_check_basic_cpp_dec_float"/>
+         <test name="sf_concept_check_basic_cpp_dec_float_no_et"/>
+         <test name="sf_concept_check_basic_backend_concept"/>
+         <test name="sf_concept_check_poly_backend_concept"/>
+         <test name="sf_concept_check_gamma_backend_concept"/>
+         <test name="sf_concept_check_elliptic_cpp_dec_float"/>
+         <test name="sf_concept_check_elliptic_backend_concept"/>
+         <test name="test_sinh_cpp_dec_float"/>
+         <test name="test_sin_cpp_dec_float"/>
+         <test name="test_pow_cpp_dec_float"/>
+         <test name="test_log_cpp_dec_float"/>
+         <test name="test_cos_cpp_dec_float"/>
+         <test name="test_atan_cpp_dec_float"/>
+         <test name="test_asin_cpp_dec_float"/>
+         <toolset name="intel*"/>
+         <note author="John Maddock">
+            This failure is caused by a test-runner timeout: unfortunately the Intel
+            compiler is exceptionally slow at building some of these tests.
+         </note>
+      </mark-expected-failures>
+      <mark-expected-failures>
+         <test name="test_arithmetic_cpp_dec_float"/>
+         <test name="test_arithmetic_mpfr_50"/>
+         <test name="test_arithmetic_mpz"/>
+         <toolset name="gcc-4.7"/>
+         <note author="John Maddock">
+            This failure is caused by a test-runner timeout.
+         </note>
+      </mark-expected-failures>
+   </library>
+   
+         <!-- optional -->
     <library name="optional">
         <mark-expected-failures>
             <test name="optional_test_ref"/>
@@ -2910,13 +2989,6 @@ for more information.
             This is due to the fact that phoenix uses proto
         </note>
         </mark-unusable>
-        <mark-expected-failures>
-            <test name="member"/>
-            <toolset name="msvc*"/>
-            <note author="Thomas Heller" id="phoenix-operator-member-bug">
-                MSVC seems to have a code generation bug showing up when using operator->* with a member variable
-            </note>
-        </mark-expected-failures>
     </library>
 
 
@@ -5428,6 +5500,7 @@ The implementation of native_handle() is not possible on this platform.
         <mark-expected-failures>
             <test name="*sleep_for*"/>
             <test name="*sleep_until*"/>
+            <test name="*thread__join*"/>
             <test name="*wait_for*"/>
             <test name="*wait_until*"/>
             <test name="*cons__duration*"/>
@@ -5441,11 +5514,31 @@ The implementation of native_handle() is not possible on this platform.
             <test name="*chrono*"/>
             <test name="*shared_lock_until*"/>
             <test name="*shared_lock_for*"/>
+            <test name="shared_mutex*"/>
+            <test name="future__get*"/>
+            <test name="packaged_task__operator*"/>
+            <test name="test_3628*"/>
+            <test name="test_7328*"/>
             <toolset name="vacpp-10*"/>
-            <note author="Vicente J. Botet Escriba" date="2012-03-21">
+            <note author="Vicente J. Botet Escriba" date="2012-10-13">
 This platform doesn't supports Boost.Chrono.
             </note>
         </mark-expected-failures>
+        <mark-expected-failures>
+            <test name="container__*"/>
+            <toolset name="vacpp-10*"/>
+            <note author="Vicente J. Botet Escriba" date="2012-10-13">
+This platform doesn't supports Boost.Container.
+            </note>
+        </mark-expected-failures>
+        <mark-expected-failures>
+            <test name="container__thread_vector*"/>
+            <toolset name="vacpp-12*"/>
+            <note author="Vicente J. Botet Escriba" date="2012-10-22">
+This platform doesn't supports Boost.Container.
+            </note>
+        </mark-expected-failures>
+
     </library>
 
     <!-- tuple -->

@@ -22,6 +22,8 @@
 #include <boost/geometry/multi/geometries/multi_geometries.hpp>
 #include <boost/geometry/algorithms/append.hpp>
 #include <boost/geometry/algorithms/area.hpp>
+#include <boost/geometry/algorithms/buffer.hpp>
+#include <boost/geometry/algorithms/centroid.hpp>
 #include <boost/geometry/algorithms/clear.hpp>
 #include <boost/geometry/algorithms/convert.hpp>
 #include <boost/geometry/algorithms/convex_hull.hpp>
@@ -32,12 +34,20 @@
 #include <boost/geometry/algorithms/envelope.hpp>
 #include <boost/geometry/algorithms/equals.hpp>
 #include <boost/geometry/algorithms/expand.hpp>
+#include <boost/geometry/algorithms/for_each.hpp>
+#include <boost/geometry/algorithms/length.hpp>
+#include <boost/geometry/algorithms/num_geometries.hpp>
+#include <boost/geometry/algorithms/num_interior_rings.hpp>
+#include <boost/geometry/algorithms/num_points.hpp>
 #include <boost/geometry/algorithms/overlaps.hpp>
+#include <boost/geometry/algorithms/perimeter.hpp>
+#include <boost/geometry/algorithms/reverse.hpp>
 #include <boost/geometry/algorithms/simplify.hpp>
 #include <boost/geometry/algorithms/transform.hpp>
 #include <boost/geometry/algorithms/unique.hpp>
 #include <boost/geometry/multi/algorithms/append.hpp>
 #include <boost/geometry/multi/algorithms/area.hpp>
+#include <boost/geometry/multi/algorithms/centroid.hpp>
 #include <boost/geometry/multi/algorithms/clear.hpp>
 #include <boost/geometry/multi/algorithms/convert.hpp>
 #include <boost/geometry/multi/algorithms/correct.hpp>
@@ -45,6 +55,13 @@
 #include <boost/geometry/multi/algorithms/distance.hpp>
 #include <boost/geometry/multi/algorithms/envelope.hpp>
 #include <boost/geometry/multi/algorithms/equals.hpp>
+#include <boost/geometry/multi/algorithms/for_each.hpp>
+#include <boost/geometry/multi/algorithms/length.hpp>
+#include <boost/geometry/multi/algorithms/num_geometries.hpp>
+#include <boost/geometry/multi/algorithms/num_interior_rings.hpp>
+#include <boost/geometry/multi/algorithms/num_points.hpp>
+#include <boost/geometry/multi/algorithms/perimeter.hpp>
+#include <boost/geometry/multi/algorithms/reverse.hpp>
 #include <boost/geometry/multi/algorithms/simplify.hpp>
 #include <boost/geometry/multi/algorithms/transform.hpp>
 #include <boost/geometry/multi/algorithms/unique.hpp>
@@ -89,18 +106,28 @@ typedef boost::mpl::vector<
     {};
 
 DECLARE_BINARY_ALGORITHM(append)
-DECLARE_UNARY_ALGORITHM (area)
-DECLARE_UNARY_ALGORITHM (clear)
+DECLARE_UNARY_ALGORITHM(area)
+DECLARE_BINARY_ALGORITHM(buffer)
+DECLARE_UNARY_ALGORITHM(centroid)
+DECLARE_UNARY_ALGORITHM(clear)
 DECLARE_BINARY_ALGORITHM(convert)
-DECLARE_UNARY_ALGORITHM (convex_hull)
-DECLARE_UNARY_ALGORITHM (correct)
+DECLARE_UNARY_ALGORITHM(convex_hull)
+DECLARE_UNARY_ALGORITHM(correct)
 DECLARE_BINARY_ALGORITHM(covered_by)
 DECLARE_BINARY_ALGORITHM(disjoint)
 DECLARE_BINARY_ALGORITHM(distance)
-DECLARE_UNARY_ALGORITHM (envelope)
+DECLARE_UNARY_ALGORITHM(envelope)
 DECLARE_BINARY_ALGORITHM(equals)
 DECLARE_BINARY_ALGORITHM(expand)
+DECLARE_UNARY_ALGORITHM(for_each_point)
+DECLARE_UNARY_ALGORITHM(for_each_segment)
+DECLARE_UNARY_ALGORITHM(length)
+DECLARE_UNARY_ALGORITHM(num_geometries)
+DECLARE_UNARY_ALGORITHM(num_interior_rings)
+DECLARE_UNARY_ALGORITHM(num_points)
 DECLARE_BINARY_ALGORITHM(overlaps)
+DECLARE_UNARY_ALGORITHM(perimeter)
+DECLARE_UNARY_ALGORITHM(reverse)
 DECLARE_UNARY_ALGORITHM(simplify)
 DECLARE_BINARY_ALGORITHM(transform)
 DECLARE_UNARY_ALGORITHM(unique)
@@ -215,6 +242,8 @@ void support_status()
 {
     test_binary_algorithm<append, all_types, boost::mpl::vector<point_type, std::vector<point_type> >, OutputFactory>("append");
     test_unary_algorithm<area, all_types, OutputFactory>("area");
+    test_binary_algorithm<buffer, all_types, all_types, OutputFactory>("buffer");
+    test_unary_algorithm<centroid, all_types, OutputFactory>("centroid");
     test_unary_algorithm<clear, all_types, OutputFactory>("clear");
     test_binary_algorithm<convert, all_types, all_types, OutputFactory>("convert");
     test_unary_algorithm<convex_hull, all_types, OutputFactory>("convex_hull");
@@ -225,7 +254,15 @@ void support_status()
     test_unary_algorithm<envelope, all_types, OutputFactory>("envelope");
     test_binary_algorithm<equals, all_types, all_types, OutputFactory>("equals");
     test_binary_algorithm<expand, all_types, all_types, OutputFactory>("expand");
+    test_unary_algorithm<for_each_point, all_types, OutputFactory>("for_each_point");
+    test_unary_algorithm<for_each_segment, all_types, OutputFactory>("for_each_segment");
+    test_unary_algorithm<length, all_types, OutputFactory>("length");
+    test_unary_algorithm<num_geometries, all_types, OutputFactory>("num_geometries");
+    test_unary_algorithm<num_interior_rings, all_types, OutputFactory>("num_interior_rings");
+    test_unary_algorithm<num_interior_rings, all_types, OutputFactory>("num_points");
     test_binary_algorithm<overlaps, all_types, all_types, OutputFactory>("overlaps");
+    test_unary_algorithm<perimeter, all_types, OutputFactory>("perimeter");
+    test_unary_algorithm<reverse, all_types, OutputFactory>("reverse");
     test_unary_algorithm<simplify, all_types, OutputFactory>("simplify");
     test_binary_algorithm<transform, all_types, all_types, OutputFactory>("transform");
     test_unary_algorithm<unique, all_types, OutputFactory>("unique");
