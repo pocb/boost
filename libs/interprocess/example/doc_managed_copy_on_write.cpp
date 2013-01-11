@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////
 //
-// (C) Copyright Ion Gaztanaga 2006-2011. Distributed under the Boost
+// (C) Copyright Ion Gaztanaga 2006-2012. Distributed under the Boost
 // Software License, Version 1.0. (See accompanying file
 // LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
@@ -25,12 +25,14 @@ int main()
    //Define file names
    //<-
    #if 1
-   std::string managed_file(boost::interprocess::ipcdetail::get_temporary_path());
-   managed_file += "/"; managed_file += test::get_process_id_name();
-   const char *ManagedFile = managed_file.c_str();
-   std::string managed_file2(boost::interprocess::ipcdetail::get_temporary_path());
-   managed_file2 += "/"; managed_file2 += test::get_process_id_name();  managed_file2 += "_2";
-   const char *ManagedFile2 = managed_file2.c_str();
+   const char *ManagedFile  = 0;
+   const char *ManagedFile2 = 0;
+   std::string managed_file_name(boost::interprocess::ipcdetail::get_temporary_path());
+   managed_file_name += "/"; managed_file_name += test::get_process_id_name();
+   ManagedFile = managed_file_name.c_str();
+   std::string managed_file2_name(boost::interprocess::ipcdetail::get_temporary_path());
+   managed_file2_name += "/"; managed_file2_name += test::get_process_id_name();  managed_file2_name += "_2";
+   ManagedFile2 = managed_file2_name.c_str();
    #else
    //->
    const char *ManagedFile  = "MyManagedFile";
@@ -81,7 +83,7 @@ int main()
    {
       //Now create a read-only version
       managed_mapped_file managed_file_ro(open_read_only, ManagedFile);
-    
+
       //Check the original is intact
       if(!managed_file_ro.find<int>("MyInt").first && managed_file_ro.find<int>("MyInt2").first)
          throw int(0);

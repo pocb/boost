@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
-// (C) Copyright Ion Gaztanaga 2005-2011. Distributed under the Boost
+// (C) Copyright Ion Gaztanaga 2005-2012. Distributed under the Boost
 // Software License, Version 1.0. (See accompanying file
 // LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
@@ -66,13 +66,16 @@ class expand_bwd_test_allocator
 
    typedef boost::interprocess::version_type<expand_bwd_test_allocator, 2>   version;
 
+   //Dummy multiallocation chain
+   struct multiallocation_chain{};
+
    template<class T2>
    struct rebind
    {  typedef expand_bwd_test_allocator<T2>   other;   };
 
    //!Constructor from the segment manager. Never throws
-   expand_bwd_test_allocator(T *buffer, size_type size, difference_type offset)
-      : mp_buffer(buffer), m_size(size)
+   expand_bwd_test_allocator(T *buf, size_type sz, difference_type offset)
+      : mp_buffer(buf), m_size(sz)
       , m_offset(offset),  m_allocations(0){ }
 
    //!Constructor from other expand_bwd_test_allocator. Never throws
@@ -109,7 +112,7 @@ class expand_bwd_test_allocator
    {  return m_size;   }
 
    friend void swap(self_t &alloc1, self_t &alloc2)
-   { 
+   {
       ipcdetail::do_swap(alloc1.mp_buffer, alloc2.mp_buffer);
       ipcdetail::do_swap(alloc1.m_size,    alloc2.m_size);
       ipcdetail::do_swap(alloc1.m_offset,  alloc2.m_offset);
@@ -126,7 +129,7 @@ class expand_bwd_test_allocator
       (void)preferred_size;   (void)reuse;   (void)command;
       //This allocator only expands backwards!
       assert(m_allocations == 0 || (command & boost::interprocess::expand_bwd));
-     
+
       received_size = limit_size;
 
       if(m_allocations == 0){

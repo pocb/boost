@@ -12,11 +12,10 @@
 //  See http://www.boost.org/LICENSE_1_0.txt
 
 #include <boost/ratio/ratio.hpp>
-#if !defined(BOOST_NO_STATIC_ASSERT)
+#if !defined(BOOST_NO_CXX11_STATIC_ASSERT)
 #define NOTHING ""
 #endif
 
-#define BOOST_RATIO_INTMAX_T_MAX (0x7FFFFFFFFFFFFFFFLL)
 void test()
 {
     {

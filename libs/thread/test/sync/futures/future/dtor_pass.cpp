@@ -14,9 +14,9 @@
 
 // <boost/thread/future.hpp>
 
-// class promise<R>
+// class future<R>
 
-// ~promise();
+// ~future();
 
 #define BOOST_THREAD_VERSION 3
 #include <boost/exception/exception.hpp>
@@ -24,7 +24,7 @@
 #include <boost/thread/future.hpp>
 #include <boost/detail/lightweight_test.hpp>
 #if defined BOOST_THREAD_PROVIDES_FUTURE_CTOR_ALLOCATORS
-#include <libs/thread/test/sync/futures/test_allocator.hpp>
+#include "../test_allocator.hpp"
 #endif
 
 int main()

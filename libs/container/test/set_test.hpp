@@ -17,7 +17,8 @@
 #include <set>
 #include <functional>
 #include "print_container.hpp"
-#include <boost/move/move.hpp>
+#include <boost/move/utility.hpp>
+#include <boost/move/iterator.hpp>
 #include <string>
 
 namespace boost{
@@ -88,13 +89,13 @@ int set_test ()
          IntType move_me(i);
          aux_vect3[i] = boost::move(move_me);
       }
-/*
-      MyBoostSet *boostset3 = MyBoostSet
+
+      MyBoostSet *boostset3 = new MyBoostSet
             ( ordered_unique_range
             , boost::make_move_iterator(&aux_vect[0])
             , boost::make_move_iterator(aux_vect + 50));
       MyStdSet *stdset3 = new MyStdSet(aux_vect2, aux_vect2 + 50);
-      MyBoostMultiSet *boostmultiset3 = MyBoostMultiSet
+      MyBoostMultiSet *boostmultiset3 = new MyBoostMultiSet
             ( ordered_range
             , boost::make_move_iterator(&aux_vect3[0])
             , boost::make_move_iterator(aux_vect3 + 50));
@@ -108,19 +109,18 @@ int set_test ()
          std::cout << "Error in construct<MyBoostMultiSet>(MyBoostMultiSet3)" << std::endl;
          return 1;
       }
-*/
+
       delete boostset2;
       delete boostmultiset2;
       delete stdset2;
       delete stdmultiset2;
-      //delete boostset3;
-      //delete boostmultiset3;
-      //delete stdset3;
-      //delete stdmultiset3;
+      delete boostset3;
+      delete boostmultiset3;
+      delete stdset3;
+      delete stdmultiset3;
    }
 
-   int i, j;
-   for(i = 0; i < max; ++i){
+   for(int i = 0; i < max; ++i){
       IntType move_me(i);
       boostset->insert(boost::move(move_me));
       stdset->insert(i);
@@ -301,7 +301,7 @@ int set_test ()
       }
    }
 
-   for(i = 0; i < max; ++i){
+   for(int i = 0; i < max; ++i){
       IntType move_me(i);
       boostset->insert(boost::move(move_me));
       stdset->insert(i);
@@ -319,37 +319,39 @@ int set_test ()
       return 1;
    }
 
-   for(i = 0; i < max; ++i){
-      IntType move_me(i);
-      boostset->insert(boostset->begin(), boost::move(move_me));
-      stdset->insert(stdset->begin(), i);
-      //PrintContainers(boostset, stdset);
-      IntType move_me2(i);
-      boostmultiset->insert(boostmultiset->begin(), boost::move(move_me2));
-      stdmultiset->insert(stdmultiset->begin(), i);
-      //PrintContainers(boostmultiset, stdmultiset);
-      if(!CheckEqualContainers(boostset, stdset)){
-         std::cout << "Error in boostset->insert(boostset->begin(), boost::move(move_me))" << std::endl;
-         return 1;
-      }
-      if(!CheckEqualContainers(boostmultiset, stdmultiset)){
-         std::cout << "Error in boostmultiset->insert(boostmultiset->begin(), boost::move(move_me2))" << std::endl;
-         return 1;
-      }
+   for(int i = 0; i < max; ++i){
+      {
+         IntType move_me(i);
+         boostset->insert(boostset->begin(), boost::move(move_me));
+         stdset->insert(stdset->begin(), i);
+         //PrintContainers(boostset, stdset);
+         IntType move_me2(i);
+         boostmultiset->insert(boostmultiset->begin(), boost::move(move_me2));
+         stdmultiset->insert(stdmultiset->begin(), i);
+         //PrintContainers(boostmultiset, stdmultiset);
+         if(!CheckEqualContainers(boostset, stdset)){
+            std::cout << "Error in boostset->insert(boostset->begin(), boost::move(move_me))" << std::endl;
+            return 1;
+         }
+         if(!CheckEqualContainers(boostmultiset, stdmultiset)){
+            std::cout << "Error in boostmultiset->insert(boostmultiset->begin(), boost::move(move_me2))" << std::endl;
+            return 1;
+         }
 
-      IntType move_me3(i);
-      boostset->insert(boostset->end(), boost::move(move_me3));
-      stdset->insert(stdset->end(), i);
-      IntType move_me4(i);
-      boostmultiset->insert(boostmultiset->end(), boost::move(move_me4));
-      stdmultiset->insert(stdmultiset->end(), i);
-      if(!CheckEqualContainers(boostset, stdset)){
-         std::cout << "Error in boostset->insert(boostset->end(), boost::move(move_me3))" << std::endl;
-         return 1;
-      }
-      if(!CheckEqualContainers(boostmultiset, stdmultiset)){
-         std::cout << "Error in boostmultiset->insert(boostmultiset->end(), boost::move(move_me4))" << std::endl;
-         return 1;
+         IntType move_me3(i);
+         boostset->insert(boostset->end(), boost::move(move_me3));
+         stdset->insert(stdset->end(), i);
+         IntType move_me4(i);
+         boostmultiset->insert(boostmultiset->end(), boost::move(move_me4));
+         stdmultiset->insert(stdmultiset->end(), i);
+         if(!CheckEqualContainers(boostset, stdset)){
+            std::cout << "Error in boostset->insert(boostset->end(), boost::move(move_me3))" << std::endl;
+            return 1;
+         }
+         if(!CheckEqualContainers(boostmultiset, stdmultiset)){
+            std::cout << "Error in boostmultiset->insert(boostmultiset->end(), boost::move(move_me4))" << std::endl;
+            return 1;
+         }
       }
       {
       IntType move_me(i);
@@ -372,10 +374,11 @@ int set_test ()
       }
       {
       IntType move_me(i);
+      IntType move_me2(i);
       boostset->insert(boostset->lower_bound(move_me), boost::move(move_me2));
       stdset->insert(stdset->lower_bound(i), i);
       //PrintContainers(boostset, stdset);
-      IntType move_me2(i);
+      move_me2 = i;
       boostmultiset->insert(boostmultiset->lower_bound(move_me2), boost::move(move_me2));
       stdmultiset->insert(stdmultiset->lower_bound(i), i);
       //PrintContainers(boostmultiset, stdmultiset);
@@ -391,7 +394,7 @@ int set_test ()
    }
 
    //Compare count with std containers
-   for(i = 0; i < max; ++i){
+   for(int i = 0; i < max; ++i){
       IntType count_me(i);
       if(boostset->count(count_me) != stdset->count(i)){
          return -1;
@@ -407,8 +410,8 @@ int set_test ()
    boostset->clear();
    boostmultiset->clear();
 
-   for(j = 0; j < 3; ++j)
-   for(i = 0; i < 100; ++i){
+   for(int j = 0; j < 3; ++j)
+   for(int i = 0; i < 100; ++i){
       IntType move_me(i);
       boostset->insert(boost::move(move_me));
       IntType move_me2(i);
@@ -448,8 +451,7 @@ int set_test_copyable ()
       MyBoostMultiSet *boostmultiset = new MyBoostMultiSet;
       MyStdMultiSet *stdmultiset = new MyStdMultiSet;
 
-      int i;
-      for(i = 0; i < max; ++i){
+      for(int i = 0; i < max; ++i){
          IntType move_me(i);
          boostset->insert(boost::move(move_me));
          stdset->insert(i);
