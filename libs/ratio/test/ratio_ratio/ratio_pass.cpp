@@ -16,10 +16,9 @@
 
 #include <boost/ratio/ratio.hpp>
 
-#if !defined(BOOST_NO_STATIC_ASSERT)
+#if !defined(BOOST_NO_CXX11_STATIC_ASSERT)
 #define NOTHING ""
 #endif
-#define BOOST_RATIO_INTMAX_T_MAX (0x7FFFFFFFFFFFFFFFLL)
 
 template <long long N, long long D, long long eN, long long eD>
 void test()
@@ -46,10 +45,10 @@ int main()
     test<222, -333, -2, 3>();
     test<-222, 333, -2, 3>();
     test<-222, -333, 2, 3>();
-    test<BOOST_RATIO_INTMAX_T_MAX, 127, 72624976668147841LL, 1>();
-    test<-BOOST_RATIO_INTMAX_T_MAX, 127, -72624976668147841LL, 1>();
-    test<BOOST_RATIO_INTMAX_T_MAX, -127, -72624976668147841LL, 1>();
-    test<-BOOST_RATIO_INTMAX_T_MAX, -127, 72624976668147841LL, 1>();
+    //test<BOOST_RATIO_INTMAX_T_MAX, 127, 72624976668147841LL, 1>();
+    //test<-BOOST_RATIO_INTMAX_T_MAX, 127, -72624976668147841LL, 1>();
+    //test<BOOST_RATIO_INTMAX_T_MAX, -127, -72624976668147841LL, 1>();
+    //test<-BOOST_RATIO_INTMAX_T_MAX, -127, 72624976668147841LL, 1>();
     //~ test<BOOST_RATIO_INTMAX_T_MAX, 127, BOOST_RATIO_INTMAX_T_MAX, 127>();
     //~ test<-BOOST_RATIO_INTMAX_T_MAX, 127, -BOOST_RATIO_INTMAX_T_MAX, 127>();
     //~ test<BOOST_RATIO_INTMAX_T_MAX, -127, -BOOST_RATIO_INTMAX_T_MAX, 127>();

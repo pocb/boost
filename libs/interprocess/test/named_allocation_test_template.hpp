@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////
 //
-// (C) Copyright Ion Gaztanaga 2006. Distributed under the Boost
+// (C) Copyright Ion Gaztanaga 2006-2012. Distributed under the Boost
 // Software License, Version 1.0. (See accompanying file
 // LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
@@ -134,8 +134,8 @@ bool test_named_iterators(ManagedMemory &m)
    }
 
    for(; named_beg != named_end; ++named_beg){
-      const char_type *name = named_beg->name();
-      aux_str = name;
+      const char_type *name_str = named_beg->name();
+      aux_str = name_str;
       if(names.find(aux_str) == names.end()){
          return 1;
       }
@@ -144,7 +144,7 @@ bool test_named_iterators(ManagedMemory &m)
          return 1;
       }
 
-      const void *found_value = m.template find<char>(name).first;
+      const void *found_value = m.template find<char>(name_str).first;
 
       if(found_value == 0)
          return false;

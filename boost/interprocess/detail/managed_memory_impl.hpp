@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////
 //
-// (C) Copyright Ion Gaztanaga 2005-2011. Distributed under the Boost
+// (C) Copyright Ion Gaztanaga 2005-2012. Distributed under the Boost
 // Software License, Version 1.0. (See accompanying file
 // LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
@@ -172,14 +172,14 @@ class basic_managed_memory_impl
       //This function should not throw. The index construction can
       //throw if constructor allocates memory. So we must catch it.
       BOOST_TRY{
-         //Let's construct the allocator in memory           
+         //Let's construct the allocator in memory
          mp_header       = new(addr) segment_manager(size);
       }
       BOOST_CATCH(...){
          return false;
       }
       BOOST_CATCH_END
-      return true;   
+      return true;
    }
 
    //!Connects to a segment manager in the reserved buffer. Never throws.
@@ -192,7 +192,7 @@ class basic_managed_memory_impl
 
    //!Frees resources. Never throws.
    bool close_impl()
-   { 
+   {
       bool ret = mp_header != 0;
       mp_header = 0;
       return ret;
@@ -254,12 +254,12 @@ class basic_managed_memory_impl
    handle_t get_handle_from_address   (const void *ptr) const
    {
       return (handle_t)(reinterpret_cast<const char*>(ptr) -
-             reinterpret_cast<const char*>(this->get_address())); 
+             reinterpret_cast<const char*>(this->get_address()));
    }
 
    //!Returns true if the address belongs to the managed memory segment
    bool belongs_to_segment (const void *ptr) const
-   { 
+   {
       return ptr >= this->get_address() &&
              ptr <  (reinterpret_cast<const char*>(this->get_address()) + this->get_size());
    }
@@ -292,7 +292,7 @@ class basic_managed_memory_impl
       allocation_command  (boost::interprocess::allocation_type command,   size_type limit_size,
                            size_type preferred_size,size_type &received_size,
                            T *reuse_ptr = 0)
-   { 
+   {
       return mp_header->allocation_command
          (command, limit_size, preferred_size, received_size, reuse_ptr);
    }
@@ -307,25 +307,31 @@ class basic_managed_memory_impl
 
    //Experimental. Don't use.
 
-   //!Allocates n_elements of elem_size bytes.
-   multiallocation_chain allocate_many(size_type elem_bytes, size_type num_elements)
-   {  return mp_header->allocate_many(elem_bytes, num_elements); }
+   //!Allocates n_elements of elem_bytes bytes. 
+   //!Throws bad_alloc on failure. chain.size() is not increased on failure.
+   void allocate_many(size_type elem_bytes, size_type n_elements, multiallocation_chain &chain)
+   {  mp_header->allocate_many(elem_bytes, n_elements, chain); }
 
-   //!Allocates n_elements, each one of elem_sizes[i] bytes.
-   multiallocation_chain allocate_many(const size_type *elem_sizes, size_type n_elements)
-   {  return mp_header->allocate_many(elem_sizes, n_elements); }
+   //!Allocates n_elements, each one of element_lengths[i]*sizeof_element bytes.
+   //!Throws bad_alloc on failure. chain.size() is not increased on failure.
+   void allocate_many(const size_type *element_lengths, size_type n_elements, size_type sizeof_element, multiallocation_chain &chain)
+   {  mp_header->allocate_many(element_lengths, n_elements, sizeof_element, chain); }
 
-   //!Allocates n_elements of elem_size bytes.
-   multiallocation_chain allocate_many(size_type elem_bytes, size_type num_elements, std::nothrow_t nothrow)
-   {  return mp_header->allocate_many(elem_bytes, num_elements, nothrow); }
+   //!Allocates n_elements of elem_bytes bytes. 
+   //!Non-throwing version. chain.size() is not increased on failure.
+   void allocate_many(std::nothrow_t, size_type elem_bytes, size_type n_elements, multiallocation_chain &chain)
+   {  mp_header->allocate_many(std::nothrow_t(), elem_bytes, n_elements, chain); }
 
-   //!Allocates n_elements, each one of elem_sizes[i] bytes.
-   multiallocation_chain allocate_many(const size_type *elem_sizes, size_type n_elements, std::nothrow_t nothrow)
-   {  return mp_header->allocate_many(elem_sizes, n_elements, nothrow); }
+   //!Allocates n_elements, each one of
+   //!element_lengths[i]*sizeof_element bytes.
+   //!Non-throwing version. chain.size() is not increased on failure.
+   void allocate_many(std::nothrow_t, const size_type *elem_sizes, size_type n_elements, size_type sizeof_element, multiallocation_chain &chain)
+   {  mp_header->allocate_many(std::nothrow_t(), elem_sizes, n_elements, sizeof_element, chain); }
 
-   //!Allocates n_elements, each one of elem_sizes[i] bytes.
-   void deallocate_many(multiallocation_chain chain)
-   {  return mp_header->deallocate_many(boost::move(chain)); }
+   //!Deallocates all elements contained in chain.
+   //!Never throws.
+   void deallocate_many(multiallocation_chain &chain)
+   {  mp_header->deallocate_many(chain); }
 
    /// @endcond
 
@@ -724,7 +730,7 @@ class create_open_func
       : m_frontend(frontend), m_type(type){}
 
    bool operator()(void *addr, typename BasicManagedMemoryImpl::size_type size, bool created) const
-   { 
+   {
       if(((m_type == DoOpen)   &&  created) ||
          ((m_type == DoCreate) && !created))
          return false;

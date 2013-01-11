@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////
 //
-// (C) Copyright Ion Gaztanaga 2006. Distributed under the Boost
+// (C) Copyright Ion Gaztanaga 2006-2012. Distributed under the Boost
 // Software License, Version 1.0. (See accompanying file
 // LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
@@ -118,7 +118,7 @@ bool test_allocation_shrink(Allocator &a)
 		 std::memset(buffers[i], 0, a.size(buffers[i]));
       }
    }
-  
+
    //Deallocate it in non sequential order
    for(int j = 0, max = (int)buffers.size()
       ;j < max
@@ -170,7 +170,7 @@ bool test_allocation_expand(Allocator &a)
          preferred_size = min_size*2;
       }
    }
-  
+
    //Deallocate it in non sequential order
    for(int j = 0, max = (int)buffers.size()
       ;j < max
@@ -243,7 +243,7 @@ bool test_allocation_shrink_and_expand(Allocator &a)
          return false;
       }
    }
-  
+
    //Deallocate it in non sequential order
    for(int j = 0, max = (int)buffers.size()
       ;j < max
@@ -310,7 +310,7 @@ bool test_allocation_deallocation_expand(Allocator &a)
          }
       }
    }
-  
+
    //Now erase null values from the vector
    buffers.erase( std::remove(buffers.begin(), buffers.end(), static_cast<void*>(0))
                 , buffers.end());
@@ -349,7 +349,7 @@ bool test_allocation_with_reuse(Allocator &a)
          std::memset(ptr, 0, size);
          buffers.push_back(ptr);
       }
-     
+
       //Now deallocate all except the latest
       //Now try to expand to the double of the sizeof_object
       for(int i = 0, max = (int)buffers.size() - 1
@@ -381,7 +381,7 @@ bool test_allocation_with_reuse(Allocator &a)
       }
       //There is only a single block so deallocate it
       a.deallocate(ptr);
-     
+
       if(!a.all_memory_deallocated() || !a.check_sanity())
          return false;
    }
@@ -405,7 +405,7 @@ bool test_aligned_allocation(Allocator &a)
                continue_loop = false;
             break;
          }
-        
+
          if(((std::size_t)ptr & (j - 1)) != 0)
             return false;
          a.deallocate(ptr);
@@ -441,7 +441,7 @@ bool test_continuous_aligned_allocation(Allocator &a)
             else{
                any_allocated = true;
             }
-           
+
             if(((std::size_t)ptr & (j - 1)) != 0)
                return false;
          }
@@ -673,14 +673,14 @@ bool test_many_equal_allocation(Allocator &a)
       typedef typename Allocator::multiallocation_chain multiallocation_chain;
       std::vector<void*> buffers;
       for(int i = 0; true; ++i){
-         multiallocation_chain chain(a.allocate_many(i+1, (i+1)*2, std::nothrow));
+         multiallocation_chain chain;
+         a.allocate_many(std::nothrow, i+1, (i+1)*2, chain);
          if(chain.empty())
             break;
 
          typename multiallocation_chain::size_type n = chain.size();
          while(!chain.empty()){
-            buffers.push_back(ipcdetail::to_raw_pointer(chain.front()));
-            chain.pop_front();
+            buffers.push_back(ipcdetail::to_raw_pointer(chain.pop_front()));
          }
          if(n != std::size_t((i+1)*2))
             return false;
@@ -783,13 +783,13 @@ bool test_many_different_allocation(Allocator &a)
 
       std::vector<void*> buffers;
       for(int i = 0; true; ++i){
-         multiallocation_chain chain(a.allocate_many(requested_sizes, ArraySize, 1, std::nothrow));
+         multiallocation_chain chain;
+         a.allocate_many(std::nothrow, requested_sizes, ArraySize, 1, chain);
          if(chain.empty())
             break;
          typename multiallocation_chain::size_type n = chain.size();
          while(!chain.empty()){
-            buffers.push_back(ipcdetail::to_raw_pointer(chain.front()));
-            chain.pop_front();
+            buffers.push_back(ipcdetail::to_raw_pointer(chain.pop_front()));
          }
          if(n != ArraySize)
             return false;
@@ -853,6 +853,8 @@ template<class Allocator>
 bool test_many_deallocation(Allocator &a)
 {
    typedef typename Allocator::multiallocation_chain multiallocation_chain;
+
+   typedef typename Allocator::multiallocation_chain multiallocation_chain;
    const std::size_t ArraySize = 11;
    vector<multiallocation_chain> buffers;
    typename Allocator::size_type requested_sizes[ArraySize];
@@ -863,13 +865,14 @@ bool test_many_deallocation(Allocator &a)
 
    {
       for(int i = 0; true; ++i){
-         multiallocation_chain chain = a.allocate_many(requested_sizes, ArraySize, 1, std::nothrow);
+         multiallocation_chain chain;
+         a.allocate_many(std::nothrow, requested_sizes, ArraySize, 1, chain);
          if(chain.empty())
             break;
          buffers.push_back(boost::move(chain));
       }
       for(int i = 0, max = (int)buffers.size(); i != max; ++i){
-         a.deallocate_many(boost::move(buffers[i]));
+         a.deallocate_many(buffers[i]);
       }
       buffers.clear();
       bool ok = free_memory == a.get_free_memory() &&
@@ -879,13 +882,14 @@ bool test_many_deallocation(Allocator &a)
 
    {
       for(int i = 0; true; ++i){
-         multiallocation_chain chain(a.allocate_many(i*4, ArraySize, std::nothrow));
+         multiallocation_chain chain;
+         a.allocate_many(std::nothrow, i*4, ArraySize, chain);
          if(chain.empty())
             break;
          buffers.push_back(boost::move(chain));
       }
       for(int i = 0, max = (int)buffers.size(); i != max; ++i){
-         a.deallocate_many(boost::move(buffers[i]));
+         a.deallocate_many(buffers[i]);
       }
       buffers.clear();
 

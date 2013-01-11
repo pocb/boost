@@ -45,6 +45,8 @@
         <toolset name="sun-5.8"/>
         <toolset name="sun-5.9"/>
         <toolset name="borland-*"/>
+        <toolset name="vacpp-*"/>
+        <toolset name="cray-*"/>
       </mark-unusable>
       <mark-expected-failures>
           <test name="tail_variate_means"/>
@@ -696,6 +698,21 @@
                 </note>
             </mark-failure>
         </test>
+    </library>
+
+    <!-- coroutine -->
+    <library name="coroutine">
+      <mark-unusable>
+        <toolset name="cray-*"/>
+        <toolset name="darwin-4.4"/>
+        <toolset name="darwin-4.4_0x"/>
+        <toolset name="gcc-4.4.4"/>
+        <toolset name="gcc-4.4.4_0x"/>
+        <toolset name="msvc-8.0"/>
+        <toolset name="pgi-*"/>
+        <toolset name="vacpp-*"/>
+        <toolset name="gcc-mingw-4.4*"/>
+      </mark-unusable>
     </library>
 
     <!-- crc -->
@@ -2894,13 +2911,6 @@ for more information.
             This is due to the fact that phoenix uses proto
         </note>
         </mark-unusable>
-        <mark-expected-failures>
-            <test name="member"/>
-            <toolset name="msvc*"/>
-            <note author="Thomas Heller" id="phoenix-operator-member-bug">
-                MSVC seems to have a code generation bug showing up when using operator->* with a member variable
-            </note>
-        </mark-expected-failures>
     </library>
 
 

@@ -2,6 +2,13 @@
 ->Add an example with stateful allocators
 ->Add test to check convertible types in push_back/insert
 ->Add SCARY iterators.
+->Align with C++11 [multi]map::insert(P &&p) overload.
+->Unify all allocator version traits in one class (starting from stable_vector_detail::allocator_version_wrapper)
+   maybe in allocator_traits?
+->Fix code marked with "//to-do: if possible, an efficient way to deallocate allocated blocks"
+->Add BOOST_CONTAINER_TRY, etc. macros to allow disabling exceptions only in this library (just like Boost.Intrusive)
+->Add macro to change the default allocator std::allocator to another one
+->Add front()/back() to string
 
 
 Review allocator traits
@@ -34,6 +41,17 @@ Write forward_list
 
 check move if noexcept conditions in vector, deque and stable_vector
 
+Add noexcept testing using static_assert (Howard Hinnants's suggestion):
+
+   #include <type_traits>
+
+   struct A
+   {
+      void foo() noexcept;
+   };
+
+   static_assert(noexcept(std::declval<A&>().foo()), "A::foo() should be noexcept");
+
 Detect always equal or unequal allocators at compiler time. operator== returns true_type or false_type
 
 change virtual functions with pointers to avoid template instantiation for every type
@@ -41,3 +59,5 @@ change virtual functions with pointers to avoid template instantiation for every
 Add hash for containers
 
 Add std:: hashing support
+
+Fix trivial destructor after move and other optimizing traits

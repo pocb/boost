@@ -9,10 +9,10 @@
 
 // reverse_lock& operator=(reverse_lock const&) = delete;
 
-#include <boost/thread/locks.hpp>
+#include <boost/thread/lock_types.hpp>
 #include <boost/thread/reverse_lock.hpp>
 #include <boost/thread/mutex.hpp>
-#include <boost/detail/lightweight_test.hpp>
+#include <boost/thread/lock_types.hpp>
 
 
 int main()
@@ -29,13 +29,5 @@ int main()
 
 }
 
-void remove_unused_warning()
-{
-  //../../../boost/system/error_code.hpp:214:36: warning: ‘boost::system::posix_category’ defined but not used [-Wunused-variable]
-  //../../../boost/system/error_code.hpp:215:36: warning: ‘boost::system::errno_ecat’ defined but not used [-Wunused-variable]
-  //../../../boost/system/error_code.hpp:216:36: warning: ‘boost::system::native_ecat’ defined but not used [-Wunused-variable]
+#include "../../../../remove_error_code_unused_warning.hpp"
 
-  (void)boost::system::posix_category;
-  (void)boost::system::errno_ecat;
-  (void)boost::system::native_ecat;
-}

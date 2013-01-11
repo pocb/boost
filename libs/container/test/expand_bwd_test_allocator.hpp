@@ -65,13 +65,16 @@ class expand_bwd_test_allocator
 
    typedef boost::container::container_detail::version_type<expand_bwd_test_allocator, 2>   version;
 
+   //Dummy multiallocation chain
+   struct multiallocation_chain{};
+
    template<class T2>
    struct rebind
    {  typedef expand_bwd_test_allocator<T2>   other;   };
 
    //!Constructor from the segment manager. Never throws
-   expand_bwd_test_allocator(T *buffer, size_type size, difference_type offset)
-      : mp_buffer(buffer), m_size(size)
+   expand_bwd_test_allocator(T *buffer, size_type sz, difference_type offset)
+      : mp_buffer(buffer), m_size(sz)
       , m_offset(offset),  m_allocations(0){ }
 
    //!Constructor from other expand_bwd_test_allocator. Never throws
@@ -108,7 +111,7 @@ class expand_bwd_test_allocator
    {  return m_size;   }
 
    friend void swap(self_t &alloc1, self_t &alloc2)
-   {  
+   { 
       container_detail::do_swap(alloc1.mp_buffer, alloc2.mp_buffer);
       container_detail::do_swap(alloc1.m_size,    alloc2.m_size);
       container_detail::do_swap(alloc1.m_offset,  alloc2.m_offset);

@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////
 //
-// (C) Copyright Ion Gaztanaga 2004-2011. Distributed under the Boost
+// (C) Copyright Ion Gaztanaga 2004-2012. Distributed under the Boost
 // Software License, Version 1.0. (See accompanying file
 // LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
@@ -31,7 +31,7 @@ struct eraser
    }
 };
 
-typedef ipcdetail::managed_open_or_create_impl<shared_memory_object> shared_memory;
+typedef ipcdetail::managed_open_or_create_impl<shared_memory_object, 0, true, false> shared_memory;
 
 //This wrapper is necessary to have a common constructor
 //in generic named_creation_template functions
@@ -62,7 +62,7 @@ int main ()
       test::test_named_creation<shared_memory_creation_test_wrapper>();
 
       //Create and get name, size and address
-      { 
+      {
          shared_memory_object::remove(ShmName);
          shared_memory shm1(create_only, ShmName, ShmSize, read_write, 0, permissions());
 
