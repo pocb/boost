@@ -11,4 +11,6 @@ boost_add_library (timer
 
   SHARED_COMPILE_FLAGS "-DBOOST_TIMER_DYN_LINK=1"
   STATIC_COMPILE_FLAGS "-DBOOST_TIMER_STATIC_LINK=1"
+
+  DEPENDS boost_system boost_chrono
 )

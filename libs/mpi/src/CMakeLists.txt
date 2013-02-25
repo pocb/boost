@@ -66,7 +66,7 @@ if(PYTHON_FOUND)
     python/status.cpp
     python/py_timer.cpp
 
-    DEPENDS boost_python boost_mpi
+    DEPENDS boost_python boost_mpi boost_mpi_python
     SHARED_COMPILE_FLAGS "-DBOOST_MPI_DYN_LINK=1 -DBOOST_MPI_PYTHON_DYN_LINK=1 -DBOOST_PYTHON_DYN_LINK=1"
     LINK_FLAGS ${MPI_LINK_FLAGS}
     LINK_LIBS ${MPI_LIBRARIES} ${PYTHON_LIBRARIES})

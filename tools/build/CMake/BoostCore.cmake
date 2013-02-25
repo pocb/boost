@@ -1548,8 +1548,6 @@ macro(boost_python_extension MODULE_NAME)
     ${MODULE_NAME}
     ${BPL_EXT_DEFAULT_ARGS}
     ${extlibtype}
-    LINK_LIBS ${PYTHON_LIBRARIES}
-    DEPENDS boost_python
     SHARED
     MULTI_THREADED
     )
