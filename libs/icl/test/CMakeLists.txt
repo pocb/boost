@@ -35,7 +35,7 @@ SET(TESTS
  test_changing_interval_defaults_/test_changing_interval_defaults)
 
 FOREACH(test ${TESTS})
-  boost_test_run(${test} DEPENDS boost_unit_test_framework boost_date_time)
+  boost_test_run(${test} DEPENDS boost_unit_test_framework boost_date_time STATIC)
 ENDFOREACH(test ${TESTS})
 
 

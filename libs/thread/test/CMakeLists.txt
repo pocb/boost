@@ -32,7 +32,7 @@ test_lock_concept
 test_generic_locks)
 
 foreach (TEST ${TESTS})
-  boost_test_run(${TEST} MULTI_THREADED DEPENDS boost_thread boost_unit_test_framework)
+  boost_test_run(${TEST} MULTI_THREADED DEPENDS boost_thread boost_unit_test_framework STATIC)
 endforeach (TEST ${TESTS})
 
 boost_test_compile_fail(no_implicit_move_from_lvalue_thread)

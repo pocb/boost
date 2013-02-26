@@ -14,8 +14,15 @@ if (ICU_FOUND AND ICU_I18N_FOUND)
        icu/conversion.cpp icu/date_time.cpp icu/formatter.cpp
        icu/icu_backend.cpp icu/numeric.cpp icu/time_zone.cpp )
   set (ICU_DEPENDS boost_thread)
+  set (_locale_link_libs ${BOOST_LOCALE_ICU_LIBRARIES})
 else (ICU_FOUND AND ICU_I18N_FOUND)
-  colormsg (CYAN "+-- ICU (unicode) not available for locale, disabling support.")
+  find_package(Iconv)
+  if(ICONV_FOUND)
+    add_definitions(-DBOOST_LOCALE_WITH_ICONV)
+    set (_locale_link_libs ${ICONV_LIBRARIES})
+    colormsg (CYAN "+-- ICU (unicode) not available for locale, disabling support.")
+    colormsg (CYAN "+-- using the iconv library instead.")
+  endif(ICONV_FOUND)
 endif (ICU_FOUND AND ICU_I18N_FOUND)
  
 if (WIN32)
@@ -60,8 +67,8 @@ boost_add_library (
   ${WIN32_SOURCES}
   ${ICU_SOURCES}
 
-  DEPENDS ${ICU_DEPENDS}
-  LINK_LIBS ${BOOST_LOCALE_ICU_LIBRARIES}
+  DEPENDS ${ICU_DEPENDS} boost_system
+  LINK_LIBS ${_locale_link_libs}
   SHARED_COMPILE_FLAGS -DBOOST_LOCALE_DYN_LINK=1
   ${NO_STATIC_IF_ICU_FOUND}
 )

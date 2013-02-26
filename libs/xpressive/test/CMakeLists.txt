@@ -60,7 +60,7 @@ SET(runtests
   )
 
 foreach(runtest ${runtests})
-  boost_test_run(${runtest} DEPENDS boost_unit_test_framework )
+  boost_test_run(${runtest} DEPENDS boost_unit_test_framework STATIC)
 endforeach(runtest ${runtests})
 
 boost_test_link(multiple_defs multiple_defs1.cpp multiple_defs2.cpp)

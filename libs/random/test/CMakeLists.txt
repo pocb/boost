@@ -46,7 +46,7 @@ FOREACH(test ${TESTS})
 ENDFOREACH(test ${TESTS})
 
 boost_test_run(random_demo ../example/random_demo.cpp)
-boost_test_run(random_test random_test.cpp)
+#boost_test_run(random_test random_test.cpp)
 boost_test_run(validate validate.cpp)
 #boost_test_run(test_random_device test_random_device.cpp)
 #boost_test_run(statistic_tests statistic_tests.cpp)

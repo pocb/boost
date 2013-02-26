@@ -13,7 +13,7 @@ boost_test_run(numeric_cast_test ../numeric_cast_test.cpp)
 boost_test_run(
   lexical_cast_test 
   ../lexical_cast_test.cpp 
-  DEPENDS boost_unit_test_framework
+  DEPENDS boost_unit_test_framework STATIC
 )
 
 

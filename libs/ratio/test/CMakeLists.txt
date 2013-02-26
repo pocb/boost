@@ -15,7 +15,7 @@ ratio_io
 ratio_ratio)
 
 foreach(TEST ${TESTS})
-  boost_test_run(${TEST} DEPENDS boost_unit_test_framework)
+#  boost_test_run(${TEST} DEPENDS boost_unit_test_framework STATIC)
 endforeach(TEST ${TESTS})
 
 if(WIN32)
@@ -23,5 +23,5 @@ if(WIN32)
 endif(WIN32)
 
 #
-ratio_test_run(ratio_test) 
-ratio_test_run(typedefs_pass) 
+boost_test_run(ratio_test) 
+boost_test_run(typedefs_pass DEPENDS boost_unit_test_framework STATIC) 

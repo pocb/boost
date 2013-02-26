@@ -36,6 +36,6 @@ foreach(T
     array_of_class
     array_of_int
     array_of_template)
-  boost_test_run(${T} DEPENDS boost_test_exec_monitor)
+  boost_test_run(${T} DEPENDS boost_test_exec_monitor STATIC)
 endforeach()
     

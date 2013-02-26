@@ -32,29 +32,31 @@ endmacro (locale_test_run)
 
 #
 set (TESTS 
-  test_config.cpp
-  test_utf.cpp
-  test_date_time.cpp
-  test_ios_prop.cpp
-  test_codepage_converter.cpp
-  test_codepage.cpp
-  test_message.cpp
-  test_generator.cpp
-  test_collate.cpp
-  test_convert.cpp
-  test_boundary.cpp
-  test_formatting.cpp
-  test_icu_vs_os_timezone.cpp
-  test_winapi_collate.cpp
-  test_winapi_convert.cpp
-  test_winapi_formatting.cpp
-  test_posix_collate.cpp
-  test_posix_convert.cpp
-  test_posix_formatting.cpp
-  test_std_collate.cpp
-  test_std_convert.cpp
-  test_std_formatting.cpp
+  test_config
+  test_utf
+  test_date_time
+  test_ios_prop
+  test_codepage_converter
+  test_codepage
+  test_message
+  test_generator
+  test_collate
+  test_convert
+  test_boundary
+  test_formatting
+  test_icu_vs_os_timezone
+  test_winapi_collate
+  test_winapi_convert
+#  test_winapi_formatting
+  test_posix_collate
+  test_posix_convert
+  test_posix_formatting
+  test_std_collate
+  test_std_convert
+  test_std_formatting
   )
 
 #
-locale_test_(run_timer_test) 
+foreach(_test ${TESTS})
+  locale_test_run(${_test}) 
+endforeach(_test ${TESTS})

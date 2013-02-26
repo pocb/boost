@@ -28,6 +28,7 @@
 // we need these later in the example
 //
 #include <boost/assert.hpp>
+#include <boost/noncopyable.hpp>
 #include <string>
 #include <exception>
 
