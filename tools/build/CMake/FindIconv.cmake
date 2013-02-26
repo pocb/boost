@@ -1,6 +1,7 @@
 # Find iconv library
 #
 # Author: Eddy Xu <eddyxu at gmail.com>
+# Changed: Florian Uhlig <f.uhlig at gsi.de>
 #
 # Released under BSD license
 #
@@ -13,20 +14,32 @@
 FIND_PATH( ICONV_INCLUDE_DIR NAMES iconv.h )
 MARK_AS_ADVANCED( ICONV_INCLUDE_DIR )
 
-# Look for the library
-FIND_LIBRARY( ICONV_LIBRARY NAMES iconv )
-MARK_AS_ADVANCED( ICONV_LIBRARY )
+# If the header file exist look for the library
+If(ICONV_INCLUDE_DIR)
 
-# Copy the result to output variables
-IF(ICONV_INCLUDE_DIR AND ICONV_LIBRARY)
-  SET(ICONV_FOUND 1)
-  SET(ICONV_LIBRARIES ${ICONV_LIBRARY})
-  SET(ICONV_INCLUDE_DIRS ${ICONV_INCLUDE_DIR})
-ELSE(ICONV_INCLUDE_DIR AND ICONV_LIBRARY)
+  # Check first if the functionality is part of the glibc
+  # This is the case for linux systems
+  include(CheckFunctionExists)
+  CHECK_FUNCTION_EXISTS(iconv_open IN_GLIBC)
+
+  If(IN_GLIBC)
+    Set(ICONV_FOUND 1)
+    SET(ICONV_LIBRARIES)
+    SET(ICONV_INCLUDE_DIRS ${ICONV_INCLUDE_DIR})
+  Else (IN_GLIBC)
+    # Look for the iconv library
+    FIND_LIBRARY( ICONV_LIBRARY NAMES iconv )
+    MARK_AS_ADVANCED( ICONV_LIBRARY )
+    SET(ICONV_LIBRARIES ${ICONV_LIBRARY})
+    SET(ICONV_INCLUDE_DIRS ${ICONV_INCLUDE_DIR})
+    Set(ICONV_FOUND 1)
+  EndIf (IN_GLIBC)
+
+Else(ICONV_INCLUDE_DIR)
   SET(ICONV_FOUND 0)
   SET(ICONV_LIBRARIES)
   SET(ICONV_INCLUDE_DIRS)
-ENDIF(ICONV_INCLUDE_DIR AND ICONV_LIBRARY)
+EndIf(ICONV_INCLUDE_DIR)
 
 # Report results
 IF(NOT ICONV_FOUND)
