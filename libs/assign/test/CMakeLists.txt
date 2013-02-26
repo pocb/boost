@@ -21,8 +21,8 @@ SET(TESTS
  my_vector_example)
 
 FOREACH(test ${TESTS})
-  boost_test_run(${test} DEPENDS boost_unit_test_framework)
+  boost_test_run(${test} DEPENDS boost_unit_test_framework STATIC)
 ENDFOREACH(test ${TESTS})
 
 boost_test_run(multi_index_container 
-  DEPENDS boost_unit_test_framework boost_serialization)
+  DEPENDS boost_unit_test_framework boost_serialization STATIC)

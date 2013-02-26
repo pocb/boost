@@ -23,11 +23,11 @@ macro (context_test_run TESTNAME)
   boost_test_run (${TESTNAME} 
     STATIC
     DEPENDS boost_context boost_test_exec_monitor )
-  boost_test_run ("${TESTNAME}_dll"
-    ${TESTNAME}.cpp
-    SHARED
-    DEPENDS boost_context 
-    "boost_test_exec_monitor${BOOST_TEST_EXEC_MONITOR_SUFFIX}")
+#  boost_test_run ("${TESTNAME}_dll"
+#    ${TESTNAME}.cpp
+#    SHARED
+#    DEPENDS boost_context 
+#    "boost_test_exec_monitor${BOOST_TEST_EXEC_MONITOR_SUFFIX}")
 endmacro (context_test_run)
 
 #
@@ -36,4 +36,4 @@ set (TESTS
   )
 
 #
-context_test_(run_timer_test) 
+context_test_run(test_context) 

@@ -37,8 +37,8 @@ set (tests
     lambda
     make_expr
     matches
-    proto_fusion
-    proto_fusion_s
+#    proto_fusion
+#    proto_fusion_s
     toy_spirit
     toy_spirit2
     noinvoke
@@ -51,7 +51,7 @@ set (tests
 foreach(test ${tests})
     boost_test_run(${test} "${test}.cpp"
                     COMPILE_FLAGS ${test_compile_flags} 
-                    DEPENDS boost_unit_test_framework) 
+                    DEPENDS boost_unit_test_framework STATIC) 
 endforeach(test ${tests})
 
 

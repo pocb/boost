@@ -6,11 +6,11 @@ boost_additional_test_dependencies (geometry BOOST_DEPENDS test)
 
 #
 set (TESTS 
-  core
+#  core
   point_concept 
   geometries
-  arithmetic
-  algorithms
+#  arithmetic
+#  algorithms (file not found)
   iterators
   strategies
   policies

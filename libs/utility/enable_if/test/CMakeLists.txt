@@ -14,7 +14,7 @@ foreach(T
     no_disambiguation
     partial_specializations
     )
-  boost_test_run(${T} DEPENDS boost_test_exec_monitor)
+  boost_test_run(${T} DEPENDS boost_test_exec_monitor STATIC)
 endforeach()
 
 

@@ -44,13 +44,14 @@ endforeach(R ${RUN_TESTS})
 set(RUN_TESTS_WITH_DEPS
   test_conversion
   test_scaled_unit
-  test_output
   test_trig
 )
 
 foreach(RD ${RUN_TESTS_WITH_DEPS})
-  boost_test_run(${RD} DEPENDS boost_unit_test_framework)
+  boost_test_run(${RD} DEPENDS boost_unit_test_framework STATIC)
 endforeach(RD ${RUN_TESTS_WITH_DEPS})
+
+boost_test_run(test_output DEPENDS boost_unit_test_framework boost_regex STATIC)
 
 set(COMPILE_FAIL_TESTS
   fail_implicit_conversion

@@ -42,7 +42,7 @@ hash_deque_test
 hash_set_test
 hash_map_test
 hash_complex_test
-container_fwd_test
+# container_fwd_test (file does not exist)
 hash_no_ext_macro_1
 hash_no_ext_macro_2
 )

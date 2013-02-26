@@ -11,7 +11,7 @@ ADD_DEFINITIONS(-DBOOST_ALL_NO_LIB) # -DBOOST_PROPERTY_TREE_STATIC_LINK
 
 SET(TEST_SUFFIXES 
   info_parser json_parser ini_parser xml_parser_rapidxml
-  multi_module1 multi_module2
+#  multi_module1 
   # registry_parser
   )
 
@@ -21,3 +21,6 @@ ENDFOREACH(test_suffix ${TEST_SUFFIXES})
 
 boost_test_run(test_property_tree test_property_tree.cpp
   DEPENDS boost_serialization SHARED)
+
+#boost_test_run(test_multi_module2 test_multi_module2.cpp
+#  DEPENDS boost_unit_test_framework STATIC)

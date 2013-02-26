@@ -45,7 +45,7 @@ median
 min
 moment
 pot_quantile
-p_square_cumulative_distribution
+p_square_cumul_dist
 p_square_quantile
 reference
 skewness
@@ -63,7 +63,7 @@ weighted_kurtosis
 weighted_mean
 weighted_median
 weighted_moment
-weighted_p_square_cum_dist
+weighted_p_square_cumul_dist
 weighted_p_square_quantile
 weighted_skewness
 weighted_sum
@@ -74,7 +74,7 @@ weighted_tail_quantile
 weighted_tail_variate_means)
 
 foreach(TEST ${TESTS})
-  boost_test_run(${TEST} DEPENDS boost_unit_test_framework boost_serialization)
+  boost_test_run(${TEST} DEPENDS boost_unit_test_framework boost_serialization STATIC)
 endforeach(TEST ${TESTS})
 
 if(WIN32)

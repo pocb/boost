@@ -47,7 +47,7 @@ statement
 stdlib)
 
 foreach(TEST ${TESTS})
-  boost_test_run(${TEST} DEPENDS boost_unit_test_framework)
+  boost_test_run(${TEST} DEPENDS boost_unit_test_framework STATIC)
 endforeach(TEST ${TESTS})
 
 if(WIN32)

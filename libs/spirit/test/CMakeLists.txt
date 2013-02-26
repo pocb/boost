@@ -62,31 +62,42 @@ foreach(qi_compile_fail_test
     COMPILE_FLAGS ${test_compile_flags})
 endforeach()
 
-foreach(karma_run_test
-    actions
-    alternative
-    binary
-    case_handling
-    center_alignment
-    char
-    delimiter
-    eol
-    eps
-    format_manip
-    grammar
-    int_numerics
-    kleene
-    lazy
-    left_alignment
-    list
-    lit
-    optional
-    pattern
-    real_numerics
-    right_alignment
-    sequence)
-  boost_test_run(karma_${karma_run_test} karma/${karma_run_test}.cpp COMPILE_FLAGS ${test_compile_flags})
+
+file(GLOB KARMA_TESTS RELATIVE karma karma/*.cpp)
+foreach(TEST ${KARMA_TESTS})
+  MESSAGE("TEST: ${TEST}")
+#  get_filename_component(TEST ${TEST} NAME_WE)
+#  boost_test_run(${TEST} DEPENDS boost_thread MULTI_THREADED)
+#  boost_test_run(karma_${TEST} karma/${karma_run_test}.cpp COMPILE_FLAGS ${test_compile_flags})
 endforeach()
+
+
+
+#foreach(karma_run_test
+#    actions
+#    alternative
+#    binary
+#    case_handling
+#   center_alignment
+#    char
+#    delimiter
+#    eol
+#    eps
+#    format_manip
+#    grammar
+#    int_numerics
+#    kleene
+#    lazy
+#    left_alignment
+#    list
+#    lit
+#    optional
+#    pattern
+#    real_numerics
+#    right_alignment
+#    sequence)
+#  boost_test_run(karma_${karma_run_test} karma/${karma_run_test}.cpp COMPILE_FLAGS ${test_compile_flags})
+#endforeach()
 
 foreach(karma_compile_fail_test
     karma_grammar_fail
@@ -112,7 +123,8 @@ foreach(lex_run_test
     lexertl3
     lexertl4
     lexertl5
-    state_switcher_test)
+#    state_switcher_test
+)
   boost_test_run(lex_${lex_run_test} lex/${lex_run_test}.cpp 
     COMPILE_FLAGS ${test_compile_flags})
 endforeach()

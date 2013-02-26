@@ -34,7 +34,7 @@ macro(serialization_test testname)
   
   set(BSL_TEST_LIBRARIES) 
   if(NOT BSL_NO_LIBS)
-    set(BSL_TEST_LIBRARIES "boost_serialization")
+    set(BSL_TEST_LIBRARIES "boost_serialization boost_system boost_filesystem")
   endif(NOT BSL_NO_LIBS)
 
   # Tests linking against the static serialization library
